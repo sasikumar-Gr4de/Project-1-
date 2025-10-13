@@ -4,18 +4,11 @@ import './App.css'
 
 import { useAuthStore } from './store/authStore';
 
-// Pages
-import IndexPage from './pages/index';
-import Login from './pages/login';
-import Register from './pages/register';
-import Dashboard from './pages/dashboard';
-
 // Error Pages
 import NotFound from './pages/errors/NotFound';
 import Unauthorized from './pages/errors/Unauthorized';
 
-// Common
-import ProtectedRoute from './components/common/ProtectedRoute';
+import Landing from './pages';
 
 function App() {
   const { initializeAuth, isLoading } = useAuthStore();
@@ -42,24 +35,13 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<IndexPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-
-        <Route
-          path="/dashboard/*"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-
+        <Route path="/" element={<Landing />} />
+        {/* Define your application routes here */}
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
-  );
+  )
 }
 
 export default App

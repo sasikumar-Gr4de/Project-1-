@@ -349,11 +349,11 @@ const Landing = () => {
               <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-shadow">
                 <CardContent className="p-8">
                   <div className="flex items-center mb-4">
-                    <img
+                    {/* <img
                       src={testimonial.avatar}
                       alt={testimonial.name}
                       className="w-12 h-12 rounded-full mr-4"
-                    />
+                    /> */}
                     <div>
                       <div className="font-semibold text-gray-900">{testimonial.name}</div>
                       <div className="text-sm text-gray-600">{testimonial.role}</div>

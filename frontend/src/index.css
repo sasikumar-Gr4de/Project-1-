@@ -1,4 +1,4 @@
-@tailwind utilities;
+@import "tailwindcss";
 
 @layer base {
   :root {
@@ -49,10 +49,13 @@
 
 @layer base {
   * {
-    @apply border-border;
+    /* apply default border color via CSS variable to avoid unknown Tailwind utility errors */
+    border-color: hsl(var(--border));
   }
   body {
-    @apply bg-background text-foreground;
+    /* use CSS variables directly for background and text color to avoid @apply resolution issues */
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
