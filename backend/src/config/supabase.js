@@ -44,3 +44,23 @@ export const testSupabaseConnection = async () => {
     }
 };
 
+// Database health check
+export const checkDatabaseHealth = async () => {
+  try {
+    const startTime = Date.now();
+    const { data, error } = await supabase.from('users').select('count').limit(1);
+    const responseTime = Date.now() - startTime;
+
+    return {
+      status: error ? 'unhealthy' : 'healthy',
+      responseTime: `${responseTime}ms`,
+      error: error ? error.message : null
+    };
+  } catch (error) {
+    return {
+      status: 'unhealthy',
+      responseTime: null,
+      error: error.message
+    };
+  }
+};
