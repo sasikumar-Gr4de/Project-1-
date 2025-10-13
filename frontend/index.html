@@ -2,12 +2,69 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="/soccer-ball.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
+    <meta name="description" content="Gr4de - Advanced Football Analytics Platform. Benchmark player performance, analyze matches, and discover talent with AI-powered insights." />
+    <meta name="keywords" content="football, analytics, soccer, player performance, match analysis, talent discovery" />
+    <title>Gr4de - Football Analytics Platform</title>
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Gr4de - Football Analytics Platform" />
+    <meta property="og:description" content="Advanced football analytics with AI-powered insights and benchmarking" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://gr4de.com" />
+    
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Gr4de - Football Analytics Platform" />
+    <meta name="twitter:description" content="Advanced football analytics with AI-powered insights and benchmarking" />
+    
+    <!-- Preload critical resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <style>
+      /* Critical CSS for initial load */
+      .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #1e40af 0%, #7e22ce 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        color: white;
+        font-family: system-ui, -apple-system, sans-serif;
+      }
+      
+      .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="loading-screen">
+        <div class="loading-spinner"></div>
+        <h2>Gr4de Football Analytics</h2>
+        <p>Loading...</p>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

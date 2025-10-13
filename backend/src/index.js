@@ -22,6 +22,15 @@ app.use(
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  next();
+});
+
+// Routes
+app.use("/api/auth", authRoutes);
+
 // Health check endpoint
 app.get("/api/health", async (req, res) => {
   const dbStatus = await testSupabaseConnection();
