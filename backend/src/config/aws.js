@@ -57,3 +57,21 @@ export const deleteObjectFromS3 = async (key) => {
     return { success: false, error: error.message };
   }
 };
+
+// Check S3 connection
+export const testS3Connection = async () => {
+  try {
+    const command = new GetObjectCommand({
+      Bucket: s3Config.bucket,
+      Key: 'test-connection.txt'
+    });
+    
+    await s3Client.send(command);
+    return { connected: true };
+  } catch (error) {
+    if (error.name === 'NoSuchKey') {
+      return { connected: true }; // Bucket exists but file doesn't
+    }
+    return { connected: false, error: error.message };
+  }
+};
