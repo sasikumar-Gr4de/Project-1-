@@ -13,7 +13,7 @@ if (!supabaseUrl || !supabaseServiceKey) {
 }
 
 // Create Supabase client
-export const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
@@ -25,19 +25,16 @@ export const supabase = createClient(supabaseUrl, supabaseServiceKey, {
 });
 
 // Create public client for frontend operations
-export const supabasePublic = createClient(supabaseUrl, supabaseAnonKey, {
+export const supabasePublic = createClient(supabaseUrl, supabaseServiceKey, {
   params: {
-    apikey: supabaseAnonKey,
+    apikey: supabaseServiceKey,
   },
 });
 
 // Test Database connection
 export const testSupabaseConnection = async () => {
   try {
-    const { data, error } = await supabase
-      .from("users")
-      .select("count")
-      .limit(1);
+    const { data, error } = await supabase.from("users").select("*").limit(1);
     if (error) throw error;
     console.log("Supabase connection successful");
     return true;
@@ -51,10 +48,7 @@ export const testSupabaseConnection = async () => {
 export const checkDatabaseHealth = async () => {
   try {
     const startTime = Date.now();
-    const { data, error } = await supabase
-      .from("users")
-      .select("count")
-      .limit(1);
+    const { data, error } = await supabase.from("users").select("*").limit(1);
     const responseTime = Date.now() - startTime;
 
     return {

@@ -70,6 +70,9 @@ export const register = async (req, res) => {
       });
     }
 
+    console.log("Checking if user exists...");
+    console.log({ email });
+
     // Create user
     const user = await User.create({
       email,

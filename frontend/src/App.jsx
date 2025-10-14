@@ -14,6 +14,8 @@ import Landing from "./pages";
 import Login from "./pages/login";
 import Register from "./pages/register";
 
+import Dashboard from "./pages/dashboard/Dashboard";
+
 function App() {
   const { initializeAuth, isLoading } = useAuthStore();
 
@@ -42,7 +44,15 @@ function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-
+        <Route
+          exact
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
         {/* Define your application routes here */}
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route path="*" element={<NotFound />} />

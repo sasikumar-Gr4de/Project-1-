@@ -72,7 +72,7 @@ export class User {
         .from("users")
         .select("*")
         .eq("email", email)
-        .single();
+        .maybeSingle();
       if (error) throw error;
       return data;
     } catch (err) {
@@ -87,7 +87,7 @@ export class User {
         .from("users")
         .select("*")
         .eq("id", id)
-        .single();
+        .maybeSingle();
       if (error) throw error;
       return data;
     } catch (err) {

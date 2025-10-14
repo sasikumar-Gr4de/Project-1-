@@ -33,6 +33,7 @@ import {
   CheckCircle,
   XCircle,
 } from "lucide-react";
+import { useAuthStore } from "@/store/authStore";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -45,6 +46,7 @@ const Register = () => {
     number: false,
     special: false,
   });
+  const { register: registerUser } = useAuthStore();
   const navigate = useNavigate();
 
   const form = useForm({
@@ -95,14 +97,11 @@ const Register = () => {
     if (!checkPasswordMatch()) {
       return;
     }
-
-    setIsLoading(true);
-
-    // Simulate registration process
-    setTimeout(() => {
-      setIsLoading(false);
+    const response = await registerUser(data);
+    if (response.success) {
       navigate("/dashboard");
-    }, 2000);
+    }
+    setIsLoading(true);
   };
 
   const roles = [
