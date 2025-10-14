@@ -21,11 +21,13 @@ import {
   ArrowLeft,
   Shield,
 } from "lucide-react";
+import { useAuthStore } from "@/store/authStore";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { login: loginUser } = useAuthStore();
 
   const form = useForm({
     defaultValues: {
@@ -36,6 +38,16 @@ const Login = () => {
 
   const onSubmit = async (data) => {
     setIsLoading(true);
+
+    const response = await loginUser(data.email, data.password);
+    if (!response.success) {
+      setIsLoading(false);
+      form.setError("email", {
+        type: "manual",
+        message: response.message,
+      });
+      return;
+    }
 
     // Simulate login process
     setTimeout(() => {
@@ -217,7 +229,7 @@ const Login = () => {
             </a>
           </p>
           <p className="text-xs text-gray-500">
-            © 2024 Gr4de Football Analytics. All rights reserved.
+            © 2025 Gr4de Football Analytics. All rights reserved.
           </p>
         </div>
       </div>

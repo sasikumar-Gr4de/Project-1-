@@ -99,8 +99,8 @@ const Register = () => {
     }
     const response = await registerUser(data);
     if (response.success) {
-      window.alert("Registration successful! You can now log in.");
-      // navigate("/dashboard");
+      // window.alert("Registration successful! You can now log in.");
+      navigate("/dashboard");
     }
     setIsLoading(true);
   };
@@ -546,7 +546,7 @@ const Register = () => {
             </a>
           </p>
           <p className="text-xs text-gray-500">
-            © 2024 Gr4de Football Analytics. All rights reserved.
+            © 2025 Gr4de Football Analytics. All rights reserved.
           </p>
         </div>
       </div>

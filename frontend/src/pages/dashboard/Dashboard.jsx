@@ -136,7 +136,7 @@ const Dashboard = () => {
       title: "View Analytics",
       description: "Deep dive into performance metrics",
       link: "/analytics",
-      color: "orange",
+      color: "yellow",
     },
   ];
 
