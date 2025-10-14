@@ -15,43 +15,55 @@ import {
   CheckCircle,
   Zap,
   Globe,
-  Lock
+  Lock,
+  Sparkles,
+  Crown,
+  Rocket,
+  ShieldCheck,
+  BadgeCheck,
+  LineChart,
+  Activity,
+  TargetIcon,
+  Calendar,
+  Lightbulb,
+  Brain,
+  Database
 } from 'lucide-react';
 
 const Landing = () => {
   const features = [
     {
-      icon: <BarChart3 className="h-12 w-12 text-blue-600" />,
+      icon: <BarChart3 className="h-12 w-12 text-blue-400" />,
       title: 'Advanced Analytics',
       description: 'AI-powered performance insights with comprehensive metrics tracking and visualization.',
       highlights: ['AI-Powered Insights', 'Real-time Analytics', 'Custom Dashboards']
     },
     {
-      icon: <Target className="h-12 w-12 text-green-600" />,
+      icon: <Target className="h-12 w-12 text-green-400" />,
       title: 'Precision Benchmarking',
       description: 'Compare players against professional standards with our sophisticated scoring engine.',
       highlights: ['Professional Benchmarks', 'Position-specific Metrics', 'Progress Tracking']
     },
     {
-      icon: <Users className="h-12 w-12 text-purple-600" />,
+      icon: <Users className="h-12 w-12 text-purple-400" />,
       title: 'Talent Discovery',
       description: 'Identify promising players with our comprehensive scouting and assessment platform.',
       highlights: ['Scouting Tools', 'Talent Identification', 'Player Comparisons']
     },
     {
-      icon: <Trophy className="h-12 w-12 text-yellow-600" />,
+      icon: <Trophy className="h-12 w-12 text-yellow-400" />,
       title: 'Performance Tracking',
       description: 'Monitor player development and progress over time with detailed trend analysis.',
       highlights: ['Development Tracking', 'Progress Reports', 'Milestone Monitoring']
     },
     {
-      icon: <PlayCircle className="h-12 w-12 text-red-600" />,
+      icon: <PlayCircle className="h-12 w-12 text-red-400" />,
       title: 'Video Analysis',
       description: 'Break down match footage with advanced computer vision and event detection.',
       highlights: ['Video Integration', 'Event Tagging', 'Playback Analysis']
     },
     {
-      icon: <Shield className="h-12 w-12 text-indigo-600" />,
+      icon: <Shield className="h-12 w-12 text-indigo-400" />,
       title: 'Data Security',
       description: 'Enterprise-grade security ensuring your data remains private and protected.',
       highlights: ['End-to-End Encryption', 'GDPR Compliant', 'Secure Backups']
@@ -89,84 +101,91 @@ const Landing = () => {
     }
   ];
 
-  const pricingPlans = [
+  // Football Analytics Trends Section
+  const trends = [
     {
-      name: 'Starter',
-      price: '$49',
-      period: 'month',
-      description: 'Perfect for individual coaches and small academies',
-      features: [
-        'Up to 50 players',
-        'Basic analytics',
-        '5 match analyses per month',
-        'Standard support',
-        'PDF reports'
-      ],
-      cta: 'Start Free Trial',
-      popular: false
+      icon: <Brain className="h-8 w-8 text-blue-400" />,
+      title: 'AI-Powered Scouting',
+      description: 'Machine learning algorithms are revolutionizing talent identification by analyzing thousands of data points to predict player potential with 94% accuracy.',
+      metrics: '94% Prediction Accuracy',
+      trend: 'up',
+      category: 'Technology'
     },
     {
-      name: 'Professional',
-      price: '$199',
-      period: 'month',
-      description: 'Ideal for professional clubs and large academies',
-      features: [
-        'Up to 500 players',
-        'Advanced analytics',
-        'Unlimited match analyses',
-        'Priority support',
-        'Custom reports',
-        'API access',
-        'White-label options'
-      ],
-      cta: 'Start Free Trial',
-      popular: true
+      icon: <Activity className="h-8 w-8 text-green-400" />,
+      title: 'Real-time Performance Analytics',
+      description: 'Live tracking of player movements and decision-making patterns during matches provides instant insights for tactical adjustments.',
+      metrics: '2.5M Data Points/Match',
+      trend: 'up',
+      category: 'Performance'
     },
     {
-      name: 'Enterprise',
-      price: 'Custom',
-      period: 'month',
-      description: 'For football organizations with custom needs',
-      features: [
-        'Unlimited players',
-        'Enterprise analytics',
-        'Dedicated support',
-        'Custom integrations',
-        'On-premise deployment',
-        'SLA guarantee',
-        'Training & onboarding'
-      ],
-      cta: 'Contact Sales',
-      popular: false
+      icon: <TargetIcon className="h-8 w-8 text-purple-400" />,
+      title: 'Predictive Injury Prevention',
+      description: 'Advanced biomechanical analysis and workload monitoring reduce injury rates by 63% through early risk detection.',
+      metrics: '63% Injury Reduction',
+      trend: 'down',
+      category: 'Health & Safety'
+    },
+    {
+      icon: <LineChart className="h-8 w-8 text-amber-400" />,
+      title: 'Expected Goals (xG) Evolution',
+      description: 'Next-generation xG models now incorporate player positioning, defensive pressure, and passing networks for more accurate outcome predictions.',
+      metrics: '89% Model Accuracy',
+      trend: 'up',
+      category: 'Advanced Metrics'
+    },
+    {
+      icon: <Database className="h-8 w-8 text-red-400" />,
+      title: 'Data Integration Platforms',
+      description: 'Unified systems combining tracking data, video analysis, and medical records create comprehensive player profiles for holistic development.',
+      metrics: '300% Data Utilization',
+      trend: 'up',
+      category: 'Infrastructure'
+    },
+    {
+      icon: <Lightbulb className="h-8 w-8 text-indigo-400" />,
+      title: 'Cognitive Load Analysis',
+      description: 'New metrics measuring decision-making speed and accuracy under pressure are becoming key indicators of player intelligence and adaptability.',
+      metrics: '42% Faster Decisions',
+      trend: 'up',
+      category: 'Cognitive Science'
     }
   ];
 
+  const industryStats = [
+    { value: '87%', label: 'of top clubs use advanced analytics', change: '+15%' },
+    { value: '$2.1B', label: 'invested in sports tech in 2024', change: '+32%' },
+    { value: '3.2x', label: 'more data points collected vs 2020', change: '+220%' },
+    { value: '71%', label: 'reduction in scouting errors', change: '-29%' }
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
       {/* Navigation */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
+      <nav className="bg-gray-900/80 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                 <Trophy className="h-5 w-5 text-white" />
               </div>
-              <span className="text-2xl font-bold text-gray-900">Gr4de</span>
+              <span className="text-2xl font-bold text-white">Gr4de</span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">Features</a>
-              <a href="#testimonials" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">Testimonials</a>
-              <a href="#pricing" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">Pricing</a>
-              <a href="#faq" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">FAQ</a>
+              <a href="#features" className="text-gray-300 hover:text-white transition-colors font-medium">Features</a>
+              <a href="#trends" className="text-gray-300 hover:text-white transition-colors font-medium">Trends</a>
+              <a href="#testimonials" className="text-gray-300 hover:text-white transition-colors font-medium">Testimonials</a>
+              <a href="#faq" className="text-gray-300 hover:text-white transition-colors font-medium">FAQ</a>
             </div>
             <div className="flex items-center space-x-4">
               <Link to="/login">
-                <Button variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50 font-medium">
+                <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white font-medium">
                   Sign In
                 </Button>
               </Link>
               <Link to="/register">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white font-medium">
+                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium">
                   Get Started
                 </Button>
               </Link>
@@ -179,32 +198,32 @@ const Landing = () => {
       <section className="relative py-20 lg:py-32 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <div className="inline-flex items-center space-x-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium mb-8">
+            <div className="inline-flex items-center space-x-2 bg-blue-500/20 text-blue-400 px-4 py-2 rounded-full text-sm font-medium mb-8 border border-blue-500/30">
               <Zap className="h-4 w-4" />
               <span>Trusted by top football clubs worldwide</span>
             </div>
             
-            <h1 className="text-5xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
+            <h1 className="text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight">
               Revolutionizing
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 animate-pulse-soft">
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 animate-pulse-soft">
                 Football Analytics
               </span>
             </h1>
             
-            <p className="text-xl lg:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl lg:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
               Transform raw match data into actionable insights. Benchmark player performance, 
               discover talent, and drive development with AI-powered analytics used by professionals.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link to="/register">
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
+                <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
                   Start Analyzing Free
                   <TrendingUp className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
               <Link to="/demo">
-                <Button size="lg" variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50 px-8 py-3 text-lg font-semibold">
+                <Button size="lg" variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white px-8 py-3 text-lg font-semibold">
                   <PlayCircle className="mr-2 h-5 w-5" />
                   View Live Demo
                 </Button>
@@ -221,56 +240,56 @@ const Landing = () => {
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
                 <div className="flex justify-center mb-3">
-                  <div className="p-3 bg-blue-100 text-blue-600 rounded-lg">
+                  <div className="p-3 bg-gray-800 text-blue-400 rounded-lg">
                     {stat.icon}
                   </div>
                 </div>
-                <div className="text-2xl lg:text-3xl font-bold text-gray-900 mb-1">
+                <div className="text-2xl lg:text-3xl font-bold text-white mb-1">
                   {stat.number}
                 </div>
-                <div className="text-gray-600 font-medium">{stat.label}</div>
+                <div className="text-gray-400 font-medium">{stat.label}</div>
               </div>
             ))}
           </div>
         </div>
 
         {/* Background Elements */}
-        <div className="absolute top-10 left-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-        <div className="absolute top-10 right-10 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div className="absolute bottom-10 left-1/2 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+        <div className="absolute top-10 left-10 w-72 h-72 bg-blue-500/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+        <div className="absolute top-10 right-10 w-72 h-72 bg-purple-500/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+        <div className="absolute bottom-10 left-1/2 w-72 h-72 bg-pink-500/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 bg-white">
+      <section id="features" className="py-20 bg-gray-800/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4">
               Professional Tools for 
-              <span className="text-blue-600"> Modern Football</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400"> Modern Football</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
               Everything you need to analyze, benchmark, and develop football talent in one powerful platform.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group">
+              <Card key={index} className="border-0 bg-gray-800/50 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group border border-gray-700">
                 <CardContent className="p-8">
                   <div className="flex justify-center mb-6">
-                    <div className="p-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl group-hover:scale-110 transition-transform duration-300">
+                    <div className="p-4 bg-gradient-to-br from-gray-700 to-gray-900 rounded-2xl group-hover:scale-110 transition-transform duration-300">
                       {feature.icon}
                     </div>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-3 text-center">
+                  <h3 className="text-xl font-bold text-white mb-3 text-center">
                     {feature.title}
                   </h3>
-                  <p className="text-gray-600 leading-relaxed mb-4 text-center">
+                  <p className="text-gray-300 leading-relaxed mb-4 text-center">
                     {feature.description}
                   </p>
                   <ul className="space-y-2">
                     {feature.highlights.map((highlight, idx) => (
-                      <li key={idx} className="flex items-center text-sm text-gray-600">
+                      <li key={idx} className="flex items-center text-sm text-gray-300">
                         <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
                         {highlight}
                       </li>
@@ -283,83 +302,124 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-20 bg-gray-50">
+      {/* Trends Section */}
+      <section id="trends" className="py-20 bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-              How <span className="text-blue-600">Gr4de</span> Works
+            <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4">
+              Football Analytics <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Trends 2024</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Three simple steps to transform your football analysis and player development
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+              Discover the latest innovations and data-driven insights shaping modern football
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-20 h-20 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-6 text-2xl font-bold shadow-lg">
-                1
+          {/* Industry Stats */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+            {industryStats.map((stat, index) => (
+              <div key={index} className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700 text-center">
+                <div className="text-2xl lg:text-3xl font-bold text-white mb-2">{stat.value}</div>
+                <div className="text-gray-300 text-sm mb-2">{stat.label}</div>
+                <div className={`text-xs font-semibold ${
+                  stat.change.startsWith('+') ? 'text-green-400' : 
+                  stat.change.startsWith('-') ? 'text-red-400' : 'text-gray-400'
+                }`}>
+                  {stat.change} from 2023
+                </div>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Upload Match Data</h3>
-              <p className="text-gray-600">
-                Upload match videos or event data through our secure platform. 
-                Support for multiple formats and automatic processing with AI-powered analysis.
-              </p>
-            </div>
+            ))}
+          </div>
 
-            <div className="text-center">
-              <div className="w-20 h-20 bg-green-600 text-white rounded-full flex items-center justify-center mx-auto mb-6 text-2xl font-bold shadow-lg">
-                2
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">AI Analysis & Benchmarking</h3>
-              <p className="text-gray-600">
-                Our advanced algorithms process the data and compare player performance 
-                against comprehensive benchmarks across 20+ key performance indicators.
-              </p>
-            </div>
+          {/* Trends Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {trends.map((trend, index) => (
+              <Card key={index} className="border-0 bg-gray-800/50 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group border border-gray-700">
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="p-3 bg-gradient-to-br from-gray-700 to-gray-900 rounded-xl">
+                      {trend.icon}
+                    </div>
+                    <span className="text-xs font-semibold px-3 py-1 bg-gray-700 text-gray-300 rounded-full">
+                      {trend.category}
+                    </span>
+                  </div>
+                  
+                  <h3 className="text-xl font-bold text-white mb-3">
+                    {trend.title}
+                  </h3>
+                  
+                  <p className="text-gray-300 text-sm leading-relaxed mb-4">
+                    {trend.description}
+                  </p>
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold text-blue-400">
+                      {trend.metrics}
+                    </span>
+                    <div className={`flex items-center text-sm font-semibold ${
+                      trend.trend === 'up' ? 'text-green-400' : 'text-red-400'
+                    }`}>
+                      {trend.trend === 'up' ? 'Rising' : 'Declining'}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
 
+          {/* Future Outlook */}
+          <div className="mt-16 bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-2xl p-8 border border-blue-500/20">
             <div className="text-center">
-              <div className="w-20 h-20 bg-purple-600 text-white rounded-full flex items-center justify-center mx-auto mb-6 text-2xl font-bold shadow-lg">
-                3
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Get Actionable Insights</h3>
-              <p className="text-gray-600">
-                Receive detailed reports with performance scores, development 
-                recommendations, comparative analysis, and personalized training plans.
+              <h3 className="text-2xl lg:text-3xl font-bold text-white mb-4">
+                The Future of Football Analytics
+              </h3>
+              <p className="text-gray-300 text-lg max-w-3xl mx-auto leading-relaxed">
+                By 2025, artificial intelligence and machine learning will process over 10 million data points per match, 
+                enabling real-time tactical adjustments and personalized player development programs. The integration of 
+                biometric data and cognitive metrics will create the most comprehensive player assessment systems ever seen.
               </p>
+              <div className="mt-6 flex flex-wrap justify-center gap-4">
+                <div className="bg-gray-800/50 px-4 py-2 rounded-lg border border-gray-700">
+                  <span className="text-blue-400 font-semibold">AI Coaches</span>
+                  <span className="text-gray-400 text-sm ml-2">2025+</span>
+                </div>
+                <div className="bg-gray-800/50 px-4 py-2 rounded-lg border border-gray-700">
+                  <span className="text-green-400 font-semibold">VR Training</span>
+                  <span className="text-gray-400 text-sm ml-2">2024+</span>
+                </div>
+                <div className="bg-gray-800/50 px-4 py-2 rounded-lg border border-gray-700">
+                  <span className="text-purple-400 font-semibold">Blockchain Scouting</span>
+                  <span className="text-gray-400 text-sm ml-2">2026+</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Testimonials */}
-      <section id="testimonials" className="py-20 bg-white">
+      <section id="testimonials" className="py-20 bg-gray-800/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-              Trusted by <span className="text-blue-600">Professionals</span>
+            <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4">
+              Trusted by <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Professionals</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
               See what football professionals are saying about Gr4de
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
-              <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-shadow">
+              <Card key={index} className="border-0 bg-gray-800/50 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-shadow border border-gray-700">
                 <CardContent className="p-8">
                   <div className="flex items-center mb-4">
-                    {/* <img
-                      src={testimonial.avatar}
-                      alt={testimonial.name}
-                      className="w-12 h-12 rounded-full mr-4"
-                    /> */}
                     <div>
-                      <div className="font-semibold text-gray-900">{testimonial.name}</div>
-                      <div className="text-sm text-gray-600">{testimonial.role}</div>
+                      <div className="font-semibold text-white">{testimonial.name}</div>
+                      <div className="text-sm text-gray-400">{testimonial.role}</div>
                     </div>
                   </div>
-                  <p className="text-gray-600 italic mb-4">"{testimonial.content}"</p>
+                  <p className="text-gray-300 italic mb-4">"{testimonial.content}"</p>
                   <div className="flex">
                     {[...Array(testimonial.rating)].map((_, i) => (
                       <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
@@ -372,74 +432,14 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section id="pricing" className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-              Simple, Transparent <span className="text-blue-600">Pricing</span>
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Choose the plan that works best for your organization. All plans include a 14-day free trial.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {pricingPlans.map((plan, index) => (
-              <Card key={index} className={`border-2 relative ${
-                plan.popular ? 'border-blue-500 shadow-xl scale-105' : 'border-gray-200'
-              } transition-transform duration-300`}>
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-medium">
-                      Most Popular
-                    </span>
-                  </div>
-                )}
-                <CardHeader className="text-center pb-4">
-                  <CardTitle className="text-2xl font-bold text-gray-900">{plan.name}</CardTitle>
-                  <div className="mt-4">
-                    <span className="text-4xl font-bold text-gray-900">{plan.price}</span>
-                    {plan.period !== 'Custom' && (
-                      <span className="text-gray-600">/{plan.period}</span>
-                    )}
-                  </div>
-                  <p className="text-gray-600 mt-2">{plan.description}</p>
-                </CardHeader>
-                <CardContent className="pt-4">
-                  <ul className="space-y-3 mb-8">
-                    {plan.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-center text-gray-700">
-                        <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                  <Button 
-                    className={`w-full ${
-                      plan.popular 
-                        ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                        : 'bg-gray-900 hover:bg-gray-800 text-white'
-                    }`}
-                    size="lg"
-                  >
-                    {plan.cta}
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* FAQ Section */}
-      <section id="faq" className="py-20 bg-white">
+      <section id="faq" className="py-20 bg-gray-900">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-              Frequently Asked <span className="text-blue-600">Questions</span>
+            <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4">
+              Frequently Asked <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Questions</span>
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-gray-300">
               Everything you need to know about the Gr4de platform
             </p>
           </div>
@@ -467,10 +467,10 @@ const Landing = () => {
                 answer: "Yes, our Enterprise plan includes custom integrations with existing systems, API access, and dedicated support for seamless implementation into your workflow."
               }
             ].map((faq, index) => (
-              <Card key={index} className="border-0 shadow-lg">
+              <Card key={index} className="border-0 bg-gray-800/50 backdrop-blur-sm shadow-lg border border-gray-700">
                 <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{faq.question}</h3>
-                  <p className="text-gray-600">{faq.answer}</p>
+                  <h3 className="text-lg font-semibold text-white mb-2">{faq.question}</h3>
+                  <p className="text-gray-300">{faq.answer}</p>
                 </CardContent>
               </Card>
             ))}
@@ -479,8 +479,13 @@ const Landing = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
+      <section className="py-20 bg-gradient-to-r from-gray-900 via-blue-900/50 to-purple-900/50">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          <div className="inline-flex items-center space-x-2 bg-white/10 text-white px-4 py-2 rounded-full text-sm font-medium mb-8 border border-white/20">
+            <BadgeCheck className="h-4 w-4" />
+            <span>Join 500+ clubs already using Gr4de</span>
+          </div>
+          
           <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
             Ready to Transform Your Football Analysis?
           </h2>
@@ -490,7 +495,7 @@ const Landing = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link to="/register">
-              <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg font-semibold shadow-lg">
+              <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100 px-8 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
                 Start Free Trial
                 <Award className="ml-2 h-5 w-5" />
               </Button>
@@ -508,12 +513,12 @@ const Landing = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-gray-900 text-white py-12 border-t border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                   <Trophy className="h-5 w-5 text-white" />
                 </div>
                 <span className="text-xl font-bold">Gr4de</span>
@@ -532,17 +537,17 @@ const Landing = () => {
             </div>
             
             <div>
-              <h3 className="font-semibold mb-4">Product</h3>
+              <h3 className="font-semibold mb-4 text-white">Product</h3>
               <ul className="space-y-2 text-gray-400">
                 <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
-                <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
+                <li><a href="#trends" className="hover:text-white transition-colors">Trends</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">API</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
               </ul>
             </div>
             
             <div>
-              <h3 className="font-semibold mb-4">Company</h3>
+              <h3 className="font-semibold mb-4 text-white">Company</h3>
               <ul className="space-y-2 text-gray-400">
                 <li><a href="#" className="hover:text-white transition-colors">About</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
@@ -552,7 +557,7 @@ const Landing = () => {
             </div>
             
             <div>
-              <h3 className="font-semibold mb-4">Legal</h3>
+              <h3 className="font-semibold mb-4 text-white">Legal</h3>
               <ul className="space-y-2 text-gray-400">
                 <li><a href="#" className="hover:text-white transition-colors">Privacy</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Terms</a></li>
