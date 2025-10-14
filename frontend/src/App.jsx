@@ -11,6 +11,8 @@ import NotFound from "./pages/errors/NotFound";
 import Unauthorized from "./pages/errors/Unauthorized";
 
 import Landing from "./pages";
+import Login from "./pages/login";
+import Register from "./pages/register";
 
 function App() {
   const { initializeAuth, isLoading } = useAuthStore();
@@ -38,6 +40,8 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
         {/* Define your application routes here */}
         <Route path="/unauthorized" element={<Unauthorized />} />
