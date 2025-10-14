@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { testSupabaseConnection } from "./config/supabase";
+import { testSupabaseConnection } from "./config/supabase.js";
 
 // Import routes
 import authRoutes from "./routes/auth.js";

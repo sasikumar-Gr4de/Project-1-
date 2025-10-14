@@ -1,4 +1,4 @@
-import { supabase } from "../config/supabase";
+import { supabase } from "../config/supabase.js";
 
 export const validatePagination = (req, res, next) => {
   const page = parseInt(req.query.page) || 1;
