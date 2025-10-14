@@ -34,10 +34,6 @@ function App() {
     }
   }, [isLoading]);
 
-  if (isLoading) {
-    return null; // Loading screen is handled by HTML
-  }
-
   return (
     <Router>
       <Routes>

@@ -22,12 +22,11 @@ export const protect = async (req, res, next) => {
     try {
       // Verify JWT token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
       // Get user from database
       const { data: user, error } = await supabase
         .from("users")
         .select("*")
-        .eq("id", decoded.id)
+        .eq("id", decoded.userId)
         .single();
 
       if (error || !user) {

@@ -99,7 +99,8 @@ const Register = () => {
     }
     const response = await registerUser(data);
     if (response.success) {
-      navigate("/dashboard");
+      window.alert("Registration successful! You can now log in.");
+      // navigate("/dashboard");
     }
     setIsLoading(true);
   };
@@ -343,6 +344,8 @@ const Register = () => {
                             className="pl-10 pr-10 bg-gray-700/50 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500"
                             required
                             autoComplete="new-password"
+                            data-bs-toggle=""
+                            data-bs-placement=""
                             onChange={(e) => {
                               field.onChange(e);
                               handlePasswordChange(e.target.value);
@@ -440,6 +443,8 @@ const Register = () => {
                             }`}
                             required
                             autoComplete="new-password"
+                            data-bs-toggle=""
+                            data-bs-placement=""
                           />
                         </FormControl>
                         <button

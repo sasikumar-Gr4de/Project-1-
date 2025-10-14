@@ -403,6 +403,17 @@
         }
       }
 
+      /* Prevent Bootstrap from initializing popovers on password inputs */
+      input[type="password"] {
+        /* This prevents Bootstrap's JavaScript from recognizing it as a popover target */
+        pointer-events: auto !important;
+      }
+
+      /* Alternative: Hide any potential popover overlays */
+      [data-bs-popper] {
+        display: none !important;
+      }
+
       @media (max-width: 480px) {
         .gr4de-logo {
           font-size: 2.5rem;
@@ -554,7 +565,7 @@
               loadingScreen.style.display = 'none';
             }, 500);
           }
-        }, 6000);
+        }, 8000);
       });
     </script>
   </body>
