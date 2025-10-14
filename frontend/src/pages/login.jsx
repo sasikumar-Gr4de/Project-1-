@@ -67,7 +67,7 @@ const Login = () => {
         </div>
 
         {/* Login Card */}
-        <Card className="border-0 bg-gray-800/50 backdrop-blur-sm shadow-2xl border border-gray-700">
+        <Card className="bg-gray-800/50 backdrop-blur-sm shadow-2xl border border-gray-700">
           <CardContent className="p-8">
             <Form {...form}>
               <form

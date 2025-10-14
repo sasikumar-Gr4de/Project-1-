@@ -376,7 +376,7 @@ const Landing = () => {
             {features.map((feature, index) => (
               <Card
                 key={index}
-                className="border-0 bg-gray-800/50 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group border border-gray-700"
+                className="bg-gray-800/50 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group border border-gray-700"
               >
                 <CardContent className="p-8">
                   <div className="flex justify-center mb-6">
@@ -455,7 +455,7 @@ const Landing = () => {
             {trends.map((trend, index) => (
               <Card
                 key={index}
-                className="border-0 bg-gray-800/50 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group border border-gray-700"
+                className="bg-gray-800/50 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group border border-gray-700"
               >
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-4">
@@ -550,7 +550,7 @@ const Landing = () => {
             {testimonials.map((testimonial, index) => (
               <Card
                 key={index}
-                className="border-0 bg-gray-800/50 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-shadow border border-gray-700"
+                className="bg-gray-800/50 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-shadow border border-gray-700"
               >
                 <CardContent className="p-8">
                   <div className="flex items-center mb-4">
@@ -626,7 +626,7 @@ const Landing = () => {
             ].map((faq, index) => (
               <Card
                 key={index}
-                className="border-0 bg-gray-800/50 backdrop-blur-sm shadow-lg border border-gray-700"
+                className="bg-gray-800/50 backdrop-blur-sm shadow-lg border border-gray-700"
               >
                 <CardContent className="p-6">
                   <h3 className="text-lg font-semibold text-white mb-2">
