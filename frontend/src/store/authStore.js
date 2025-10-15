@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
 import { authAPI } from "../services/api";
+import { useToastStore } from "./toastStore";
 
 export const useAuthStore = create(
   devtools(
@@ -45,6 +46,7 @@ export const useAuthStore = create(
             }
           } catch (error) {
             const errorMessage = error.response?.data?.message || error.message;
+            useToastStore.getState().error(errorMessage || "Login failed.");
             return {
               success: false,
               error: errorMessage,

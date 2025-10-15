@@ -38,10 +38,8 @@ const Login = () => {
 
   const onSubmit = async (data) => {
     setIsLoading(true);
-
-    const response = await loginUser(data.email, data.password);
-    const { success } = response;
-    if (!success) window.alert(response?.error, response?.needsVerification);
+    await loginUser(data.email, data.password);
+    setIsLoading(false);
   };
 
   return (

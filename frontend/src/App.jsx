@@ -4,7 +4,7 @@ import "./App.css";
 
 import { useAuthStore } from "./store/authStore";
 
-import ProtectedRoute from "./components/common/ProtectedRoute";
+import ProtectedRoute from "./components/common/protected-route";
 
 // Error Pages
 import NotFound from "./pages/errors/NotFound";
@@ -16,6 +16,7 @@ import Register from "./pages/register";
 
 import Dashboard from "./pages/dashboard/Dashboard";
 import VerifyEmail from "./pages/verify-email";
+import ToastContainer from "./components/common/toast-container";
 
 function App() {
   const { initializeAuth, isLoading } = useAuthStore();
@@ -55,6 +56,7 @@ function App() {
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <ToastContainer />
     </Router>
   );
 }
