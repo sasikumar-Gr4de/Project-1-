@@ -4,7 +4,7 @@ import "./App.css";
 
 import { useAuthStore } from "./store/authStore";
 
-import ProtectedRoute from "./components/common/protected-route";
+import ProtectedRoute from "./components/common/ProtectedRoute";
 
 // Error Pages
 import NotFound from "./pages/errors/NotFound";
@@ -16,7 +16,7 @@ import Register from "./pages/register";
 
 import Dashboard from "./pages/dashboard/Dashboard";
 import VerifyEmail from "./pages/verify-email";
-import ToastContainer from "./components/common/toast-container";
+import ToastContainer from "./components/common/ToastContainer";
 
 function App() {
   const { initializeAuth, isLoading } = useAuthStore();

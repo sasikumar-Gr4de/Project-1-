@@ -1,6 +1,6 @@
 import React from "react";
 import { useToastStore } from "../../store/toastStore";
-import Toast from "./toast";
+import Toast from "./Toast";
 
 const ToastContainer = () => {
   const toasts = useToastStore((state) => state.toasts);
