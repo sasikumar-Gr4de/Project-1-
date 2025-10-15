@@ -47,6 +47,7 @@ export const register = async (req, res) => {
 
     // Check if user already exists
     const existingUser = await User.findByEmail(email);
+
     if (existingUser) {
       return res.status(409).json({
         success: false,
@@ -70,9 +71,6 @@ export const register = async (req, res) => {
       });
     }
 
-    console.log("Checking if user exists...");
-    console.log({ email });
-
     // Create user
     const user = await User.create({
       email,
@@ -89,7 +87,7 @@ export const register = async (req, res) => {
 
     // Update last login
     await User.updateLastLogin(user.id);
-
+    console.log("updateLastLogin");
     res.status(201).json({
       success: true,
       message: "User registered successfully",
@@ -401,7 +399,6 @@ export const requestPasswordReset = async (req, res) => {
 };
 
 // Add these functions to the existing authController.js
-
 export const changePassword = async (req, res) => {
   try {
     const { current_password, new_password } = req.body;
@@ -498,17 +495,115 @@ export const resetPassword = async (req, res) => {
   }
 };
 
+export const sendVerificationEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required",
+      });
+    }
+
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email: email,
+      options: {
+        emailRedirectTo: `${process.env.CLIENT_URL}/verify-success`,
+      },
+    });
+
+    if (error) {
+      console.error("Resend verification error:", error);
+      // Don't reveal if email exists or not
+    }
+
+    // Always return success to prevent email enumeration
+    res.json({
+      success: true,
+      message:
+        "If an account with that email exists, a verification email has been sent.",
+    });
+  } catch (error) {
+    console.error("Send verification email error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error sending verification email",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Internal server error",
+    });
+  }
+};
+
+export const checkVerificationStatus = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    // Get current session to check email confirmation status
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession();
+
+    if (sessionError) {
+      throw sessionError;
+    }
+
+    const isVerified = session?.user?.email_confirmed_at !== null;
+
+    // Sync with our database
+    if (isVerified) {
+      await supabase
+        .from("users")
+        .update({
+          email_verified: true,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", userId);
+    }
+
+    res.json({
+      success: true,
+      data: {
+        email_verified: isVerified,
+        user_id: userId,
+      },
+    });
+  } catch (error) {
+    console.error("Check verification status error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error checking verification status",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Internal server error",
+    });
+  }
+};
+
 export const verifyEmail = async (req, res) => {
   try {
     const { token } = req.body;
 
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        message: "Verification token is required",
+      });
+    }
+
     // Verify email using Supabase Auth
     const { data, error } = await supabase.auth.verifyOtp({
       token_hash: token,
-      type: "email",
+      type: "signup",
     });
 
     if (error) {
+      console.error("Email verification error:", error);
       return res.status(400).json({
         success: false,
         message: "Invalid or expired verification token",
@@ -518,12 +613,26 @@ export const verifyEmail = async (req, res) => {
     // Update user email verification status in our database
     await supabase
       .from("users")
-      .update({ email_verified: true })
+      .update({
+        email_verified: true,
+        updated_at: new Date().toISOString(),
+      })
       .eq("id", data.user.id);
+
+    // Generate a new session/token after verification
+    const new_token = generateToken(data.user.id);
 
     res.json({
       success: true,
       message: "Email verified successfully",
+      data: {
+        user: {
+          id: data.user.id,
+          email: data.user.email,
+          email_verified: true,
+        },
+        token: new_token,
+      },
     });
   } catch (error) {
     console.error("Verify email error:", error);

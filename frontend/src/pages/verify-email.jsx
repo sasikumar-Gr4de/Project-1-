@@ -1,6 +1,6 @@
 // src/pages/verify-email.jsx
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -10,6 +10,7 @@ import {
   Clock,
   RefreshCw,
   Trophy,
+  AlertCircle,
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 
@@ -18,25 +19,66 @@ const VerifyEmail = () => {
   const [isResending, setIsResending] = useState(false);
   const [resendSuccess, setResendSuccess] = useState(false);
   const [countdown, setCountdown] = useState(0);
+  const [verificationError, setVerificationError] = useState("");
+  const [isVerifying, setIsVerifying] = useState(false);
+
   const navigate = useNavigate();
-  const { user, checkEmailVerification, setNeedsEmailVerification } =
-    useAuthStore();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token");
+
+  const {
+    user,
+    checkEmailVerification,
+    setNeedsEmailVerification,
+    verifyEmail,
+    resendVerificationEmail,
+  } = useAuthStore();
+
+  // Auto-verify if token is present in URL
+  useEffect(() => {
+    const autoVerify = async () => {
+      if (token && user) {
+        setIsVerifying(true);
+        const result = await verifyEmail(token);
+
+        if (result.success) {
+          // Redirect to dashboard after successful verification
+          navigate("/dashboard", { replace: true });
+        } else {
+          setVerificationError(result.error || "Failed to verify email");
+        }
+        setIsVerifying(false);
+      }
+    };
+
+    autoVerify();
+  }, [token, user, verifyEmail, navigate]);
 
   useEffect(() => {
     const checkVerificationStatus = async () => {
-      const needsVerification = await checkEmailVerification();
-      if (!needsVerification && user) {
-        navigate("/dashboard");
+      if (!token) {
+        const needsVerification = await checkEmailVerification();
+
+        // If user is verified and no token in URL, redirect to dashboard
+        if (!needsVerification && user) {
+          navigate("/dashboard", { replace: true });
+        }
+
+        // If no user is found, redirect to login
+        if (!user) {
+          navigate("/login", { replace: true });
+        }
       }
     };
 
     checkVerificationStatus();
 
-    // Check every 5 seconds if email is verified
-    const interval = setInterval(checkVerificationStatus, 5000);
-
-    return () => clearInterval(interval);
-  }, [checkEmailVerification, navigate, user]);
+    // Check every 10 seconds if email is verified (only when no token in URL)
+    if (!token) {
+      const interval = setInterval(checkVerificationStatus, 10000);
+      return () => clearInterval(interval);
+    }
+  }, [checkEmailVerification, navigate, user, token]);
 
   useEffect(() => {
     if (countdown > 0) {
@@ -46,32 +88,57 @@ const VerifyEmail = () => {
   }, [countdown]);
 
   const handleResendEmail = async () => {
+    if (!user?.email) return;
+
     setIsResending(true);
-    try {
-      const { error } = await supabase.auth.resend({
-        type: "signup",
-        email: user?.email,
-      });
+    setVerificationError("");
 
-      if (error) {
-        throw error;
-      }
+    const result = await resendVerificationEmail(user.email);
 
+    if (result.success) {
       setResendSuccess(true);
       setCountdown(60); // 60 seconds cooldown
       setTimeout(() => setResendSuccess(false), 5000);
-    } catch (error) {
-      console.error("Error resending email:", error);
-    } finally {
-      setIsResending(false);
+    } else {
+      setVerificationError(
+        result.error || "Failed to resend verification email"
+      );
     }
+
+    setIsResending(false);
+  };
+
+  const handleManualCheck = async () => {
+    setIsLoading(true);
+    setVerificationError("");
+
+    await checkEmailVerification();
+
+    setIsLoading(false);
   };
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    setNeedsEmailVerification(false);
+    const { logout } = useAuthStore.getState();
+    await logout();
     navigate("/login");
   };
+
+  // Show loading state during auto-verification
+  if (isVerifying) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-white mb-2">
+            Verifying Your Email
+          </h2>
+          <p className="text-gray-400">
+            Please wait while we verify your email address...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
@@ -90,10 +157,12 @@ const VerifyEmail = () => {
           </Link>
 
           <h1 className="text-3xl font-bold text-white mb-2">
-            Verify Your Email
+            {token ? "Verifying Email" : "Verify Your Email"}
           </h1>
           <p className="text-gray-400">
-            Almost there! Please verify your email to continue
+            {token
+              ? "Completing verification..."
+              : "Almost there! Please verify your email to continue"}
           </p>
         </div>
 
@@ -113,21 +182,38 @@ const VerifyEmail = () => {
                 </div>
               </div>
 
+              {/* Error Display */}
+              {verificationError && (
+                <div className="flex items-center space-x-2 p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
+                  <AlertCircle className="h-4 w-4 text-red-400 flex-shrink-0" />
+                  <p className="text-red-300 text-sm">{verificationError}</p>
+                </div>
+              )}
+
               {/* Instructions */}
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold text-white">
-                  Check your inbox
+                  {token ? "Completing Verification" : "Check Your Inbox"}
                 </h3>
-                <p className="text-gray-300">
-                  We've sent a verification link to:
-                </p>
-                <p className="text-blue-400 font-medium text-lg">
-                  {user?.email}
-                </p>
-                <p className="text-gray-400 text-sm">
-                  Click the link in the email to verify your account and start
-                  using Gr4de Analytics.
-                </p>
+
+                {!token ? (
+                  <>
+                    <p className="text-gray-300">
+                      We've sent a verification link to:
+                    </p>
+                    <p className="text-blue-400 font-medium text-lg break-all">
+                      {user?.email}
+                    </p>
+                    <p className="text-gray-400 text-sm">
+                      Click the link in the email to verify your account and
+                      start using Gr4de Analytics.
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-gray-300">
+                    Please wait while we verify your email address...
+                  </p>
+                )}
               </div>
 
               {/* Security Badge */}
@@ -138,90 +224,102 @@ const VerifyEmail = () => {
                 </p>
               </div>
 
-              {/* Resend Email Section */}
-              <div className="space-y-4">
-                <div className="border-t border-gray-600 pt-4">
-                  <p className="text-gray-400 text-sm mb-3">
-                    Didn't receive the email?
-                  </p>
+              {/* Actions Section - Only show if no token in URL */}
+              {!token && (
+                <div className="space-y-4">
+                  <div className="border-t border-gray-600 pt-4">
+                    <p className="text-gray-400 text-sm mb-3">
+                      Didn't receive the email?
+                    </p>
 
+                    <Button
+                      onClick={handleResendEmail}
+                      disabled={isResending || countdown > 0}
+                      className="w-full bg-gray-700 hover:bg-gray-600 text-white border border-gray-600 transition-all duration-200"
+                    >
+                      {isResending ? (
+                        <div className="flex items-center space-x-2">
+                          <RefreshCw className="h-4 w-4 animate-spin" />
+                          <span>Sending...</span>
+                        </div>
+                      ) : countdown > 0 ? (
+                        `Resend in ${countdown}s`
+                      ) : (
+                        <div className="flex items-center space-x-2">
+                          <Mail className="h-4 w-4" />
+                          <span>Resend Verification Email</span>
+                        </div>
+                      )}
+                    </Button>
+
+                    {resendSuccess && (
+                      <div className="flex items-center justify-center space-x-2 mt-3 p-2 bg-green-500/20 border border-green-500/30 rounded-lg">
+                        <CheckCircle className="h-4 w-4 text-green-400" />
+                        <span className="text-green-400 text-sm">
+                          Verification email sent!
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Check Status Button */}
                   <Button
-                    onClick={handleResendEmail}
-                    disabled={isResending || countdown > 0}
-                    className="w-full bg-gray-700 hover:bg-gray-600 text-white border border-gray-600 transition-all duration-200"
+                    onClick={handleManualCheck}
+                    disabled={isLoading}
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 transition-all duration-200"
                   >
-                    {isResending ? (
+                    {isLoading ? (
                       <div className="flex items-center space-x-2">
                         <RefreshCw className="h-4 w-4 animate-spin" />
-                        <span>Sending...</span>
+                        <span>Checking...</span>
                       </div>
-                    ) : countdown > 0 ? (
-                      `Resend in ${countdown}s`
                     ) : (
                       <div className="flex items-center space-x-2">
-                        <Mail className="h-4 w-4" />
-                        <span>Resend Verification Email</span>
+                        <RefreshCw className="h-4 w-4" />
+                        <span>Check Verification Status</span>
                       </div>
                     )}
                   </Button>
 
-                  {resendSuccess && (
-                    <div className="flex items-center justify-center space-x-2 mt-3 p-2 bg-green-500/20 border border-green-500/30 rounded-lg">
-                      <CheckCircle className="h-4 w-4 text-green-400" />
-                      <span className="text-green-400 text-sm">
-                        Verification email sent!
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Check Status Button */}
-                <Button
-                  onClick={() => checkEmailVerification()}
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 transition-all duration-200"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RefreshCw className="h-4 w-4" />
-                    <span>Check Verification Status</span>
+                  {/* Sign Out Option */}
+                  <div className="text-center">
+                    <button
+                      onClick={handleSignOut}
+                      className="text-gray-400 hover:text-gray-300 text-sm transition-colors"
+                    >
+                      Not your email? Sign out
+                    </button>
                   </div>
-                </Button>
-
-                {/* Sign Out Option */}
-                <div className="text-center">
-                  <button
-                    onClick={handleSignOut}
-                    className="text-gray-400 hover:text-gray-300 text-sm transition-colors"
-                  >
-                    Not your email? Sign out
-                  </button>
                 </div>
-              </div>
+              )}
             </div>
           </CardContent>
         </Card>
 
         {/* Help Section */}
-        <Card className="mt-6 bg-gray-800/30 backdrop-blur-sm border border-gray-700">
-          <CardContent className="p-6">
-            <div className="space-y-3">
-              <h4 className="font-semibold text-white text-sm">Need help?</h4>
-              <div className="space-y-2 text-xs text-gray-400">
-                <p>• Check your spam or junk folder</p>
-                <p>• Ensure you entered the correct email address</p>
-                <p>• Contact support if you continue having issues</p>
+        {!token && (
+          <Card className="mt-6 bg-gray-800/30 backdrop-blur-sm border border-gray-700">
+            <CardContent className="p-6">
+              <div className="space-y-3">
+                <h4 className="font-semibold text-white text-sm">Need help?</h4>
+                <div className="space-y-2 text-xs text-gray-400">
+                  <p>• Check your spam or junk folder</p>
+                  <p>• Ensure you entered the correct email address</p>
+                  <p>• Contact support if you continue having issues</p>
+                </div>
+                <div className="pt-2">
+                  <Button
+                    variant="outline"
+                    className="w-full border-gray-600 text-gray-300 hover:bg-gray-700"
+                    onClick={() => window.open("mailto:support@gr4de.com")}
+                  >
+                    Contact Support
+                  </Button>
+                </div>
               </div>
-              <div className="pt-2">
-                <Button
-                  variant="outline"
-                  className="w-full border-gray-600 text-gray-300 hover:bg-gray-700"
-                  onClick={() => window.open("mailto:support@gr4de.com")}
-                >
-                  Contact Support
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Footer Links */}
         <div className="text-center mt-6 space-y-2">

@@ -11,6 +11,8 @@ import {
   verifyEmail,
   changePassword,
   deleteAccount,
+  sendVerificationEmail,
+  checkVerificationStatus,
 } from "../controllers/authController.js";
 
 import { protect, optionalAuth } from "../middleware/auth.js";
@@ -124,25 +126,15 @@ router.post("/verify-email", verifyEmail);
  * @access  Private
  * @header  Authorization: Bearer <token>
  */
-router.post("/resend-verification", protect, async (req, res) => {
-  try {
-    // This would typically send a new verification email
-    // For now, we'll return a success message
-    res.json({
-      success: true,
-      message: "Verification email sent successfully",
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error sending verification email",
-      error:
-        process.env.NODE_ENV === "development"
-          ? error.message
-          : "Internal server error",
-    });
-  }
-});
+router.post("/resend-verification", protect, sendVerificationEmail);
+
+/**
+ * @route   GET /api/auth/verification-status
+ * @desc    Resend email verification
+ * @access  Private
+ * @header  Authorization: Bearer <token>
+ */
+router.get("/verification-status", protect, checkVerificationStatus);
 
 /**
  * @route   DELETE /api/auth/account

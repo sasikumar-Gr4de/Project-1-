@@ -98,22 +98,20 @@ const Register = () => {
       return;
     }
     setIsLoading(true);
-    const response = await registerUser(data);
-    if (response.success) {
-      try {
-        const response = await registerUser(data);
-        if (response.success) {
-          // Redirect to verification page instead of dashboard
-          navigate("/verify-email", {
-            replace: true,
-            state: { email: data.email },
-          });
-        }
-      } catch (error) {
-        console.error("Registration error:", error);
-      } finally {
-        setIsLoading(false);
+
+    try {
+      const response = await registerUser(data);
+      if (response.success) {
+        // Redirect to verification page instead of dashboard
+        navigate("/verify-email", {
+          replace: true,
+          state: { email: data.email },
+        });
       }
+    } catch (error) {
+      console.error("Registration error:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 

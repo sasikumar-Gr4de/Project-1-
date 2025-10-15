@@ -40,14 +40,14 @@ api.interceptors.response.use(
         // Try to refresh token
         const refreshResponse = await api.post("/auth/refresh");
         const newToken = refreshResponse.data.data.token;
-        localStorage.setItem("token", newToken);
+        localStorage.setItem("auth-token", newToken);
 
         // Retry original request with new token
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return api(originalRequest);
       } catch (refreshError) {
         // Refresh failed, redirect to login
-        localStorage.removeItem("token");
+        localStorage.removeItem("auth-token");
         window.location.href = "/login";
         return Promise.reject(refreshError);
       }
