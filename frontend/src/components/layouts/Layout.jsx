@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
+import Footer from "./Footer";
 import { useAuthStore } from "../../store/authStore";
 
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
   const { user } = useAuthStore();
 
   const toggleSidebar = () => {
@@ -18,12 +20,22 @@ const Layout = ({ children }) => {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
-      <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
+      <Sidebar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+      />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col lg:pl-64">
         {/* Header */}
-        <Header onMenuClick={toggleSidebar} />
+        <Header
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+        />
 
         {/* Main Content Area */}
         <main className="flex-1 pb-8">
@@ -56,36 +68,10 @@ const Layout = ({ children }) => {
         </main>
 
         {/* Footer */}
-        <footer className="bg-white border-t border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex flex-col md:flex-row justify-between items-center">
-              <div className="text-sm text-gray-600">
-                © 2025 Gr4de Football Analytics. All rights reserved.
-              </div>
-              <div className="flex space-x-6 mt-2 md:mt-0">
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-gray-500 text-sm"
-                >
-                  Privacy
-                </a>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-gray-500 text-sm"
-                >
-                  Terms
-                </a>
-                <a
-                  href="#"
-                  className="text-gray-400 hover:text-gray-500 text-sm"
-                >
-                  Contact
-                </a>
-              </div>
-            </div>
-          </div>
-        </footer>
+        <Footer />
       </div>
     </div>
   );
 };
+
+export default Layout;
