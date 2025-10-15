@@ -97,12 +97,24 @@ const Register = () => {
     if (!checkPasswordMatch()) {
       return;
     }
+    setIsLoading(true);
     const response = await registerUser(data);
     if (response.success) {
-      // window.alert("Registration successful! You can now log in.");
-      navigate("/dashboard");
+      try {
+        const response = await registerUser(data);
+        if (response.success) {
+          // Redirect to verification page instead of dashboard
+          navigate("/verify-email", {
+            replace: true,
+            state: { email: data.email },
+          });
+        }
+      } catch (error) {
+        console.error("Registration error:", error);
+      } finally {
+        setIsLoading(false);
+      }
     }
-    setIsLoading(true);
   };
 
   const roles = [

@@ -30,7 +30,7 @@ export const useAuthStore = create(
 
             return { success: true };
           } catch (error) {
-            set({ isLoading: false });
+            // set({ isLoading: false });
             return {
               success: false,
               message: error.response?.data?.message || "Login failed",

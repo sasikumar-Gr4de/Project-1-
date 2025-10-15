@@ -15,6 +15,7 @@ import Login from "./pages/login";
 import Register from "./pages/register";
 
 import Dashboard from "./pages/dashboard/Dashboard";
+import VerifyEmail from "./pages/verify-email";
 
 function App() {
   const { initializeAuth, isLoading } = useAuthStore();
@@ -40,6 +41,7 @@ function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
         <Route
           exact
           path="/dashboard"

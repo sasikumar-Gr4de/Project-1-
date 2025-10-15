@@ -40,20 +40,7 @@ const Login = () => {
     setIsLoading(true);
 
     const response = await loginUser(data.email, data.password);
-    if (!response.success) {
-      setIsLoading(false);
-      form.setError("email", {
-        type: "manual",
-        message: response.message,
-      });
-      return;
-    }
-
-    // Simulate login process
-    setTimeout(() => {
-      setIsLoading(false);
-      navigate("/dashboard");
-    }, 1500);
+    console.log(response);
   };
 
   return (
