@@ -156,5 +156,30 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addUtilities }) {
+      addUtilities({
+        ".scrollbar-transparent": {
+          "scrollbar-width": "thin",
+          "scrollbar-color": "rgba(107, 114, 128, 0.5) transparent",
+        },
+        ".scrollbar-transparent::-webkit-scrollbar": {
+          width: "8px",
+          height: "8px",
+        },
+        ".scrollbar-transparent::-webkit-scrollbar-track": {
+          background: "transparent",
+        },
+        ".scrollbar-transparent::-webkit-scrollbar-thumb": {
+          background: "rgba(107, 114, 128, 0.5)",
+          "border-radius": "4px",
+          border: "2px solid transparent",
+          "background-clip": "padding-box",
+        },
+        ".scrollbar-transparent::-webkit-scrollbar-thumb:hover": {
+          background: "rgba(107, 114, 128, 0.7)",
+        },
+      });
+    },
+  ],
 };

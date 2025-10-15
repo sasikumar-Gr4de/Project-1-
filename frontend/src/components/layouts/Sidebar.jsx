@@ -75,19 +75,21 @@ const Sidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) => {
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar - Fixed positioning */}
       <aside
         className={`
-        fixed lg:sticky top-16 h-[calc(100vh-4rem)] z-40
+        fixed top-0 left-0 h-screen z-40
         w-64 bg-gray-800/80 backdrop-blur-md border-r border-gray-700/50
-        transform transition-transform duration-300 ease-in-out lg:transition-none
+        transform transition-transform duration-300 ease-in-out
         flex flex-col shadow-2xl
         ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}
       >
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full pt-16">
+          {" "}
+          {/* Added pt-16 for header space */}
           {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-2">
+          <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
             {menuItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.path);
@@ -122,7 +124,6 @@ const Sidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) => {
               );
             })}
           </nav>
-
           {/* Sidebar Footer */}
           <div className="p-4 border-t border-gray-700/50">
             <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 backdrop-blur-sm rounded-xl p-4 border border-blue-500/20">
