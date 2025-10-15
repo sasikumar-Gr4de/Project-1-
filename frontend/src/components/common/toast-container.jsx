@@ -8,7 +8,7 @@ const ToastContainer = () => {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed top-3 right-4 z-50 space-y-3 max-w-md w-full">
+    <div className="fixed top-6 right-2 z-[100] max-w-md ">
       {toasts.map((toast) => (
         <Toast key={toast.id} toast={toast} />
       ))}
