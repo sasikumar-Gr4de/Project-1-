@@ -5,6 +5,7 @@ import RecentPlayers from "../../components/dashboard/RecentPlayers";
 import PerformanceMetrics from "../../components/dashboard/PerformanceMetrics";
 import TopPerformers from "../../components/dashboard/TopPerformers";
 import SystemStatus from "../../components/dashboard/SystemStatus";
+import { useAuthStore } from "@/store/authStore";
 
 const Dashboard = () => {
   // Mock data
@@ -15,12 +16,14 @@ const Dashboard = () => {
     accuracyRate: 98.2,
   };
 
+  const { user } = useAuthStore();
+
   return (
     <div className="min-h-screen text-white">
       {/* Welcome Section */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">
-          Welcome back, Coach!
+          Welcome back, {user["full_name"]}
         </h1>
         <p className="text-gray-400 text-lg">
           Here's what's happening with your players today.

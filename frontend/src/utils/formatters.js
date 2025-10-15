@@ -160,21 +160,21 @@ export const formatDuration = (seconds) => {
 };
 
 // Distance formatting (meters to appropriate unit)
-export const formatDistance = (meters, unit = "auto") => {
-  if (meters === null || meters === undefined) return "N/A";
+// export const formatDistance = (meters, unit = "auto") => {
+//   if (meters === null || meters === undefined) return "N/A";
 
-  if (unit === "auto") {
-    return meters >= 1000
-      ? `${(meters / 1000).toFixed(1)} km`
-      : `${Math.round(meters)} m`;
-  }
+//   if (unit === "auto") {
+//     return meters >= 1000
+//       ? `${(meters / 1000).toFixed(1)} km`
+//       : `${Math.round(meters)} m`;
+//   }
 
-  if (unit === "km") {
-    return `${(meters / 1000).toFixed(2)} km`;
-  }
+//   if (unit === "km") {
+//     return `${(meters / 1000).toFixed(2)} km`;
+//   }
 
-  return `${Math.round(meters)} m`;
-};
+//   return `${Math.round(meters)} m`;
+// };
 
 // Speed formatting
 export const formatSpeed = (metersPerSecond, unit = "km/h") => {

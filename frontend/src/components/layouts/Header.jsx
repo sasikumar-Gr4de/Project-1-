@@ -15,6 +15,9 @@ import {
   Target,
 } from "lucide-react";
 
+import { useAuthStore } from "../../store/authStore";
+import { capitalize } from "../../utils/formatters";
+
 const Header = ({
   activeTab,
   setActiveTab,
@@ -35,6 +38,8 @@ const Header = ({
     { id: "reports", label: "Reports", path: "/reports", icon: FileText },
     { id: "analytics", label: "Analytics", path: "/analytics", icon: Target },
   ];
+
+  const { user } = useAuthStore();
 
   return (
     <header className="bg-gray-800/80 backdrop-blur-md border-b border-gray-700/50 fixed top-0 left-0 right-0 z-50 shadow-2xl">
@@ -132,10 +137,10 @@ const Header = ({
                 </div>
                 <div className="hidden sm:block text-right">
                   <span className="block text-sm font-medium text-white">
-                    Admin User
+                    {user["full_name"]}
                   </span>
                   <span className="block text-xs text-gray-400">
-                    Administrator
+                    {capitalize(user["role"])}
                   </span>
                 </div>
               </div>

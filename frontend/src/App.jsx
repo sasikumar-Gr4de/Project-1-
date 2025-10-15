@@ -4,6 +4,7 @@ import "./App.css";
 
 import { useAuthStore } from "./store/authStore";
 import ProtectedRoute from "./components/common/ProtectedRoute";
+import PublicRoute from "./components/common/PublicRoute";
 
 // Error Pages
 import NotFound from "./pages/errors/NotFound";
@@ -14,12 +15,6 @@ import Login from "./pages/login";
 import Register from "./pages/register";
 
 import Dashboard from "./pages/dashboard/Dashboard";
-// import Players from "./pages/Players";
-// import Matches from "./pages/Matches";
-// import Tournaments from "./pages/Tournaments";
-// import Reports from "./pages/Reports";
-// import Analytics from "./pages/Analytics";
-// import Settings from "./pages/Settings";
 
 import VerifyEmail from "./pages/verify-email";
 import ToastContainer from "./components/common/ToastContainer";
@@ -46,26 +41,48 @@ function App() {
     <Router>
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route
+          path="/"
+          element={
+            <PublicRoute>
+              <Landing />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <PublicRoute>
+              <Register />
+            </PublicRoute>
+          }
+        />
         <Route path="/verify-email" element={<VerifyEmail />} />
 
         {/* Protected Routes with Layout */}
         <Route
           element={
-            // <ProtectedRoute>
-            <Layout />
-            // </ProtectedRoute>
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
           }
         >
-          <Route path="/dashboard" element={<Dashboard />} />
-          {/* <Route path="/players" element={<Players />} />
-          <Route path="/matches" element={<Matches />} />
-          <Route path="/tournaments" element={<Tournaments />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/settings" element={<Settings />} /> */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
         </Route>
 
         {/* Error Routes */}
