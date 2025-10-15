@@ -146,14 +146,14 @@ export const login = async (req, res) => {
 
     if (authError) {
       if (authError.message === "Invalid login credentials") {
-        return res.status(401).json({
+        return res.status(400).json({
           success: false,
           message: "Invalid email or password",
         });
       }
 
       if (authError.message === "Email not confirmed") {
-        return res.status(401).json({
+        return res.status(400).json({
           success: false,
           message: "Please verify your email address before logging in",
         });
@@ -165,14 +165,14 @@ export const login = async (req, res) => {
     // Get user profile from our database
     const user = await User.findById(authData.user.id);
     if (!user) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "User profile not found",
       });
     }
 
     if (!user.is_active) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Account is deactivated. Please contact support.",
       });

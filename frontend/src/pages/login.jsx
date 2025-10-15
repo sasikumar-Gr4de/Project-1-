@@ -40,7 +40,8 @@ const Login = () => {
     setIsLoading(true);
 
     const response = await loginUser(data.email, data.password);
-    console.log(response);
+    const { success } = response;
+    if (!success) window.alert(response?.error, response?.needsVerification);
   };
 
   return (
