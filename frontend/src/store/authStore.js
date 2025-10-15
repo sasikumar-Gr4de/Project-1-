@@ -33,7 +33,7 @@ export const useAuthStore = create(
             if (result.success) {
               // Store token
               if (result.data.token) {
-                localStorage.setItem("auth_token", result.data.token);
+                localStorage.setItem("auth-token", result.data.token);
               }
 
               set({
@@ -78,7 +78,7 @@ export const useAuthStore = create(
             if (result.success) {
               // Store token
               if (result.data.token) {
-                localStorage.setItem("auth_token", result.data.token);
+                localStorage.setItem("auth-token", result.data.token);
               }
 
               set({
@@ -104,7 +104,7 @@ export const useAuthStore = create(
 
         logout: async () => {
           try {
-            const token = localStorage.getItem("auth_token");
+            const token = localStorage.getItem("auth-token");
 
             if (token) {
               await fetch("/api/auth/logout", {
@@ -117,7 +117,7 @@ export const useAuthStore = create(
             }
 
             // Clear local storage
-            localStorage.removeItem("auth_token");
+            localStorage.removeItem("auth-token");
 
             // Clear state
             set({
@@ -130,7 +130,7 @@ export const useAuthStore = create(
           } catch (error) {
             console.error("Logout error:", error);
             // Still clear local data even if API call fails
-            localStorage.removeItem("auth_token");
+            localStorage.removeItem("auth-token");
             set({ user: null, session: null, needsEmailVerification: false });
             return { success: false, error: error.message };
           }
@@ -138,7 +138,7 @@ export const useAuthStore = create(
 
         initializeAuth: async () => {
           try {
-            const token = localStorage.getItem("auth_token");
+            const token = localStorage.getItem("auth-token");
 
             if (!token) {
               return { user: null, needsVerification: false };
@@ -165,19 +165,19 @@ export const useAuthStore = create(
               return { user, needsVerification: !user.email_verified };
             } else {
               // Token is invalid, clear it
-              localStorage.removeItem("auth_token");
+              localStorage.removeItem("auth-token");
               return { user: null, needsVerification: false };
             }
           } catch (error) {
             console.error("Error initializing auth:", error);
-            localStorage.removeItem("auth_token");
+            localStorage.removeItem("auth-token");
             return { user: null, needsVerification: false };
           }
         },
 
         checkEmailVerification: async () => {
           try {
-            const token = localStorage.getItem("auth_token");
+            const token = localStorage.getItem("auth-token");
 
             if (!token) {
               return false;
@@ -228,7 +228,7 @@ export const useAuthStore = create(
 
               // Store the new token
               if (result.data.token) {
-                localStorage.setItem("auth_token", result.data.token);
+                localStorage.setItem("auth-token", result.data.token);
               }
 
               return { success: true, user: result.data.user };

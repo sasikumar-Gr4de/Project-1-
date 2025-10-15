@@ -87,7 +87,6 @@ export const register = async (req, res) => {
 
     // Update last login
     await User.updateLastLogin(user.id);
-    console.log("updateLastLogin");
     res.status(201).json({
       success: true,
       message: "User registered successfully",
