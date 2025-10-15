@@ -1,9 +1,14 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '../../components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-import { ShieldAlert, Home, ArrowLeft, LogIn, Mail, Trophy } from 'lucide-react';
-import { useAuthStore } from '../../store/authStore';
+import React from "react";
+import { Link } from "react-router-dom";
+import { Button } from "../../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
+import { ShieldAlert, Home, ArrowLeft, LogIn, Mail } from "lucide-react";
+import { useAuthStore } from "../../store/authStore";
 
 const Unauthorized = () => {
   const { user, logout } = useAuthStore();
@@ -36,25 +41,30 @@ const Unauthorized = () => {
         <CardContent className="space-y-6">
           <div className="text-center">
             <p className="text-gray-300 mb-4">
-              This area requires special permissions that your current account doesn't have.
+              This area requires special permissions that your current account
+              doesn't have.
             </p>
-            
+
             {user && (
               <div className="bg-gray-700/50 p-3 rounded-lg mb-4 border border-gray-600">
                 <p className="text-sm text-gray-300">
-                  Logged in as: <span className="font-medium text-blue-400">{user.email}</span>
+                  Logged in as:{" "}
+                  <span className="font-medium text-blue-400">
+                    {user.email}
+                  </span>
                 </p>
                 <p className="text-sm text-gray-300">
-                  Role: <span className="font-medium text-blue-400">{user.role}</span>
+                  Role:{" "}
+                  <span className="font-medium text-blue-400">{user.role}</span>
                 </p>
               </div>
             )}
           </div>
 
           <div className="space-y-3">
-            <Button 
+            <Button
               onClick={() => window.history.back()}
-              variant="outline" 
+              variant="outline"
               className="w-full border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -69,9 +79,9 @@ const Unauthorized = () => {
             </Link>
 
             {user ? (
-              <Button 
+              <Button
                 onClick={handleLogout}
-                variant="outline" 
+                variant="outline"
                 className="w-full border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
               >
                 <LogIn className="h-4 w-4 mr-2" />
@@ -79,7 +89,10 @@ const Unauthorized = () => {
               </Button>
             ) : (
               <Link to="/login" className="block">
-                <Button variant="outline" className="w-full border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white">
+                <Button
+                  variant="outline"
+                  className="w-full border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
+                >
                   <LogIn className="h-4 w-4 mr-2" />
                   Sign In
                 </Button>
@@ -92,7 +105,11 @@ const Unauthorized = () => {
               Need elevated permissions?
             </p>
             <Link to="/contact">
-              <Button variant="outline" size="sm" className="w-full border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white"
+              >
                 <Mail className="h-4 w-4 mr-2" />
                 Request Access
               </Button>

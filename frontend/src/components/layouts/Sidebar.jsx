@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   BarChart3,
   Users,
@@ -9,14 +9,13 @@ import {
   Target,
   Settings,
   X,
+  HelpCircle,
+  Shield,
 } from "lucide-react";
 
-const DashboardSidebar = ({
-  activeTab,
-  setActiveTab,
-  sidebarOpen,
-  setSidebarOpen,
-}) => {
+const Sidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) => {
+  const location = useLocation();
+
   const menuItems = [
     {
       id: "overview",
@@ -62,12 +61,16 @@ const DashboardSidebar = ({
     },
   ];
 
+  const isActive = (path) => {
+    return location.pathname === path || activeTab === path.split("/")[1];
+  };
+
   return (
     <>
       {/* Mobile Overlay */}
       {sidebarOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
+          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -75,61 +78,66 @@ const DashboardSidebar = ({
       {/* Sidebar */}
       <aside
         className={`
-        fixed lg:static inset-y-0 left-0 z-40
-        w-64 bg-gray-800 border-r border-gray-700
-        transform transition-transform duration-300 ease-in-out
+        fixed lg:sticky top-16 h-[calc(100vh-4rem)] z-40
+        w-64 bg-gray-800/80 backdrop-blur-md border-r border-gray-700/50
+        transform transition-transform duration-300 ease-in-out lg:transition-none
+        flex flex-col shadow-2xl
         ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}
       >
         <div className="flex flex-col h-full">
-          {/* Sidebar Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-700">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <Trophy className="h-5 w-5 text-white" />
-              </div>
-              <span className="text-lg font-bold text-white">Gr4de</span>
-            </div>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-1 rounded-md text-gray-400 hover:text-white"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-2">
             {menuItems.map((item) => {
               const Icon = item.icon;
+              const active = isActive(item.path);
+
               return (
                 <Link
                   key={item.id}
                   to={item.path}
-                  onClick={() => setSidebarOpen(false)}
+                  onClick={() => {
+                    setActiveTab(item.id);
+                    setSidebarOpen(false);
+                  }}
                   className={`
-                    flex items-center space-x-3 px-3 py-3 rounded-lg transition-colors
+                    flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group backdrop-blur-sm
                     ${
-                      activeTab === item.id
-                        ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
-                        : "text-gray-300 hover:text-white hover:bg-gray-700/50"
+                      active
+                        ? "bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-400 border border-blue-500/30 shadow-lg"
+                        : "text-gray-400 hover:text-white hover:bg-gray-700/50 border border-transparent"
                     }
                   `}
                 >
-                  <Icon className="h-5 w-5" />
+                  <Icon
+                    className={`h-5 w-5 transition-transform duration-200 ${
+                      active ? "scale-110" : "group-hover:scale-105"
+                    }`}
+                  />
                   <span className="font-medium">{item.label}</span>
+                  {active && (
+                    <div className="ml-auto w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                  )}
                 </Link>
               );
             })}
           </nav>
 
           {/* Sidebar Footer */}
-          <div className="p-4 border-t border-gray-700">
-            <div className="bg-gray-700/50 rounded-lg p-3">
-              <p className="text-sm text-gray-300 font-medium">Need help?</p>
-              <p className="text-xs text-gray-400 mt-1">
-                Check our documentation or contact support
-              </p>
+          <div className="p-4 border-t border-gray-700/50">
+            <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 backdrop-blur-sm rounded-xl p-4 border border-blue-500/20">
+              <div className="flex items-start space-x-3">
+                <Shield className="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-white">Need help?</p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Check our documentation or contact support
+                  </p>
+                  <button className="mt-2 text-xs text-blue-400 hover:text-blue-300 font-medium transition-colors">
+                    Get Help →
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -138,4 +146,4 @@ const DashboardSidebar = ({
   );
 };
 
-export default DashboardSidebar;
+export default Sidebar;
