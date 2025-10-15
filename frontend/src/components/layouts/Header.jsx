@@ -18,13 +18,7 @@ import {
 import { useAuthStore } from "../../store/authStore";
 import { capitalize } from "../../utils/formatters";
 
-const Header = ({
-  activeTab,
-  setActiveTab,
-  sidebarOpen,
-  setSidebarOpen,
-  onMenuClick,
-}) => {
+const Header = ({ activeTab, setActiveTab, sidebarOpen, onMenuClick }) => {
   const navigation = [
     { id: "overview", label: "Overview", path: "/dashboard", icon: BarChart3 },
     { id: "players", label: "Players", path: "/players", icon: Users },

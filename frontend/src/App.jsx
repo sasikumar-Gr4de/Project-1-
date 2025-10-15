@@ -19,6 +19,10 @@ import Dashboard from "./pages/dashboard/Dashboard";
 import VerifyEmail from "./pages/verify-email";
 import ToastContainer from "./components/common/ToastContainer";
 import Layout from "./components/layouts/Layout";
+import Matches from "./pages/matches/Matches";
+import Players from "./pages/players/Players";
+import Teams from "./pages/teams/Teams";
+import Tournaments from "./pages/tournaments/Tournaments";
 
 function App() {
   const { initializeAuth, isLoading } = useAuthStore();
@@ -89,6 +93,38 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/matches"
+            element={
+              <ProtectedRoute>
+                <Matches />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/players"
+            element={
+              <ProtectedRoute>
+                <Players />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/Teams"
+            element={
+              <ProtectedRoute>
+                <Teams />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/tournaments"
+            element={
+              <ProtectedRoute>
+                <Tournaments />
               </ProtectedRoute>
             }
           />
