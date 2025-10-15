@@ -4,6 +4,7 @@ import Header from "./Header";
 import Sidebar from "./Sidebar";
 import Footer from "./Footer";
 import { useAuthStore } from "../../store/authStore";
+import ScrollIndicator from "../common/ScrollIndicator";
 
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -77,6 +78,9 @@ const Layout = () => {
 
         {/* Footer */}
         <Footer />
+
+        {/* Scroll Indicator */}
+        <ScrollIndicator />
       </div>
     </div>
   );

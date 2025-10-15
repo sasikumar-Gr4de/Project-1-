@@ -25,6 +25,8 @@ import {
   Database,
 } from "lucide-react";
 
+import ScrollIndicator from "@/components/common/ScrollIndicator";
+
 const Landing = () => {
   const features = [
     {
@@ -794,6 +796,9 @@ const Landing = () => {
           </div>
         </div>
       </footer>
+
+      {/* Scroll Indicator */}
+      <ScrollIndicator />
     </div>
   );
 };

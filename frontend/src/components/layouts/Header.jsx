@@ -9,6 +9,10 @@ import {
   X,
   Trophy,
   BarChart3,
+  Users,
+  PlayCircle,
+  FileText,
+  Target,
 } from "lucide-react";
 
 const Header = ({
@@ -20,11 +24,16 @@ const Header = ({
 }) => {
   const navigation = [
     { id: "overview", label: "Overview", path: "/dashboard", icon: BarChart3 },
-    { id: "players", label: "Players", path: "/players" },
-    { id: "matches", label: "Matches", path: "/matches" },
-    { id: "tournaments", label: "Tournaments", path: "/tournaments" },
-    { id: "reports", label: "Reports", path: "/reports" },
-    { id: "analytics", label: "Analytics", path: "/analytics" },
+    { id: "players", label: "Players", path: "/players", icon: Users },
+    { id: "matches", label: "Matches", path: "/matches", icon: PlayCircle },
+    {
+      id: "tournaments",
+      label: "Tournaments",
+      path: "/tournaments",
+      icon: Trophy,
+    },
+    { id: "reports", label: "Reports", path: "/reports", icon: FileText },
+    { id: "analytics", label: "Analytics", path: "/analytics", icon: Target },
   ];
 
   return (
@@ -76,7 +85,9 @@ const Header = ({
                         : "text-gray-400 hover:text-white hover:bg-gray-700/50"
                     }`}
                   >
-                    {Icon && <Icon className="h-4 w-4" />}
+                    {Icon && activeTab === item.id && (
+                      <Icon className="h-4 w-4" />
+                    )}
                     <span>{item.label}</span>
                   </a>
                 );

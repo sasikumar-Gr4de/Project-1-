@@ -71,7 +71,7 @@ const RecentPlayers = () => {
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
           <CardTitle className="text-white flex items-center">
-            <Users className="h-5 w-5 mr-2 text-blue-400" />
+            <Users className="h-5 w-5 m-2 text-blue-400" />
             Recent Players
           </CardTitle>
           <CardDescription className="text-gray-400">
