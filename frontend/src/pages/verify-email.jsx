@@ -27,13 +27,8 @@ const VerifyEmail = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
 
-  const {
-    user,
-    checkEmailVerification,
-    setNeedsEmailVerification,
-    verifyEmail,
-    resendVerificationEmail,
-  } = useAuthStore();
+  const { user, checkEmailVerification, verifyEmail, resendVerificationEmail } =
+    useAuthStore();
 
   // Auto-verify if token is present in URL
   useEffect(() => {

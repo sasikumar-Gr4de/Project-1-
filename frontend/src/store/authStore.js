@@ -16,30 +16,19 @@ export const useAuthStore = create(
         setNeedsEmailVerification: (needs) =>
           set({ needsEmailVerification: needs }),
 
-        // Login function
+        // Login function using authAPI
         login: async (email, password) => {
           set({ isLoading: true });
           try {
-            const response = await fetch("/api/auth/login", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ email, password }),
-            });
-
-            const result = await response.json();
+            const response = await authAPI.login(email, password);
+            const result = response.data;
 
             if (result.success) {
-              // Store token
-              if (result.data.token) {
-                localStorage.setItem("auth-token", result.data.token);
-              }
-
               set({
                 user: result.data.user,
                 session: result.data.session || null,
                 needsEmailVerification: result.data.needsVerification || false,
+                isAuthenticated: true,
               });
 
               return {
@@ -55,36 +44,30 @@ export const useAuthStore = create(
               };
             }
           } catch (error) {
-            return { success: false, error: error.message };
+            const errorMessage = error.response?.data?.message || error.message;
+            return {
+              success: false,
+              error: errorMessage,
+              needsVerification: error.response?.data?.needsVerification,
+            };
           } finally {
             set({ isLoading: false });
           }
         },
 
-        // Register function
+        // Register function using authAPI
         register: async (userData) => {
           set({ isLoading: true });
           try {
-            const response = await fetch("/api/auth/register", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(userData),
-            });
-
-            const result = await response.json();
+            const response = await authAPI.register(userData);
+            const result = response.data;
 
             if (result.success) {
-              // Store token
-              if (result.data.token) {
-                localStorage.setItem("auth-token", result.data.token);
-              }
-
               set({
                 user: result.data.user,
                 needsEmailVerification:
                   result.data.needsEmailVerification || false,
+                isAuthenticated: true,
               });
 
               return {
@@ -96,26 +79,21 @@ export const useAuthStore = create(
               return { success: false, error: result.message };
             }
           } catch (error) {
-            return { success: false, error: error.message };
+            const errorMessage = error.response?.data?.message || error.message;
+            return { success: false, error: errorMessage };
           } finally {
             set({ isLoading: false });
           }
         },
 
+        // Logout using authAPI
         logout: async () => {
           try {
-            const token = localStorage.getItem("auth-token");
-
-            if (token) {
-              await fetch("/api/auth/logout", {
-                method: "POST",
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                  "Content-Type": "application/json",
-                },
-              });
-            }
-
+            await authAPI.logout();
+          } catch (error) {
+            console.error("Logout API error:", error);
+            // Continue with cleanup even if API call fails
+          } finally {
             // Clear local storage
             localStorage.removeItem("auth-token");
 
@@ -124,18 +102,15 @@ export const useAuthStore = create(
               user: null,
               session: null,
               needsEmailVerification: false,
+              isAuthenticated: false,
+              permissions: [],
             });
-
-            return { success: true };
-          } catch (error) {
-            console.error("Logout error:", error);
-            // Still clear local data even if API call fails
-            localStorage.removeItem("auth-token");
-            set({ user: null, session: null, needsEmailVerification: false });
-            return { success: false, error: error.message };
           }
+
+          return { success: true };
         },
 
+        // Initialize auth using authAPI
         initializeAuth: async () => {
           try {
             const token = localStorage.getItem("auth-token");
@@ -144,22 +119,17 @@ export const useAuthStore = create(
               return { user: null, needsVerification: false };
             }
 
-            // Verify token and get user data
-            const response = await fetch("/api/auth/profile", {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            });
+            const response = await authAPI.getProfile();
+            const result = response.data;
 
-            if (response.ok) {
-              const result = await response.json();
+            if (result.success) {
               const user = result.data.user;
 
               set({
                 user: user,
                 needsEmailVerification: !user.email_verified,
+                isAuthenticated: true,
+                permissions: getPermissionsForRole(user.role),
               });
 
               return { user, needsVerification: !user.email_verified };
@@ -175,26 +145,14 @@ export const useAuthStore = create(
           }
         },
 
+        // Check email verification using authAPI
         checkEmailVerification: async () => {
           try {
-            const token = localStorage.getItem("auth-token");
+            const response = await authAPI.checkVerificationStatus();
+            const result = response.data;
 
-            if (!token) {
-              return false;
-            }
-
-            const response = await fetch("/api/auth/verification-status", {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            });
-
-            if (response.ok) {
-              const result = await response.json();
+            if (result.success) {
               const isVerified = result.data.email_verified;
-
               set({ needsEmailVerification: !isVerified });
               return !isVerified;
             }
@@ -206,18 +164,11 @@ export const useAuthStore = create(
           }
         },
 
-        // Verify email using backend endpoint
+        // Verify email using authAPI
         verifyEmail: async (token) => {
           try {
-            const response = await fetch("/api/auth/verify-email", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ token }),
-            });
-
-            const result = await response.json();
+            const response = await authAPI.verifyEmail(token);
+            const result = response.data;
 
             if (result.success) {
               // Update local state
@@ -226,43 +177,65 @@ export const useAuthStore = create(
                 user: { ...get().user, email_verified: true },
               });
 
-              // Store the new token
-              if (result.data.token) {
-                localStorage.setItem("auth-token", result.data.token);
-              }
-
               return { success: true, user: result.data.user };
             } else {
               return { success: false, error: result.message };
             }
           } catch (error) {
-            console.error("Email verification error:", error);
-            return { success: false, error: "Failed to verify email" };
+            const errorMessage = error.response?.data?.message || error.message;
+            console.error("Email verification error:", errorMessage);
+            return { success: false, error: errorMessage };
           }
         },
 
-        // Resend verification email via backend
+        // Resend verification email using authAPI
         resendVerificationEmail: async (email) => {
           try {
-            const response = await fetch("/api/auth/resend-verification", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ email }),
-            });
-
-            const result = await response.json();
-            return result;
+            const response = await authAPI.resendVerification(email);
+            return response.data;
           } catch (error) {
-            console.error("Resend verification error:", error);
+            const errorMessage = error.response?.data?.message || error.message;
+            console.error("Resend verification error:", errorMessage);
             return {
               success: false,
-              error: "Failed to resend verification email",
+              error: errorMessage,
             };
           }
         },
 
+        // Update profile using authAPI
+        updateProfile: async (userData) => {
+          try {
+            const response = await authAPI.updateProfile(userData);
+            const result = response.data;
+
+            if (result.success) {
+              set({ user: { ...get().user, ...result.data.user } });
+              return { success: true, user: result.data.user };
+            } else {
+              return { success: false, error: result.message };
+            }
+          } catch (error) {
+            const errorMessage = error.response?.data?.message || error.message;
+            return { success: false, error: errorMessage };
+          }
+        },
+
+        // Refresh token using authAPI
+        refreshToken: async () => {
+          try {
+            const response = await authAPI.refreshToken();
+            const { token } = response.data.data;
+            localStorage.setItem("auth-token", token);
+            return { success: true };
+          } catch (error) {
+            console.error("Token refresh failed:", error);
+            get().logout();
+            return { success: false };
+          }
+        },
+
+        // Permission check functions
         hasPermission: (permission) => {
           const { permissions } = get();
           return permissions.includes(permission);
@@ -282,21 +255,16 @@ export const useAuthStore = create(
           );
         },
 
-        updateProfile: (userData) => {
-          set({ user: { ...get().user, ...userData } });
-        },
-
-        refreshToken: async () => {
-          try {
-            const response = await authAPI.refreshToken();
-            const { token } = response.data.data;
-            localStorage.setItem("auth-token", token);
-            return { success: true };
-          } catch (error) {
-            console.error("Token refresh failed:", error);
-            get().logout();
-            return { success: false };
-          }
+        // Clear auth state (for manual cleanup)
+        clearAuth: () => {
+          localStorage.removeItem("auth-token");
+          set({
+            user: null,
+            session: null,
+            needsEmailVerification: false,
+            isAuthenticated: false,
+            permissions: [],
+          });
         },
       }),
       {
@@ -309,13 +277,13 @@ export const useAuthStore = create(
       }
     ),
     {
-      name: "auth-store", // This will appear in Redux DevTools
-      store: "authStore", // Optional identifier
+      name: "auth-store",
+      store: "authStore",
     }
   )
 );
 
-// Permission definitions (unchanged)
+// Permission definitions
 const getPermissionsForRole = (role) => {
   const rolePermissions = {
     admin: [
