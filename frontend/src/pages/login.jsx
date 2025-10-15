@@ -38,8 +38,9 @@ const Login = () => {
 
   const onSubmit = async (data) => {
     setIsLoading(true);
-    await loginUser(data.email, data.password);
+    const { success } = await loginUser(data.email, data.password);
     setIsLoading(false);
+    if (success) navigate("/dashboard", { replace: true });
   };
 
   return (

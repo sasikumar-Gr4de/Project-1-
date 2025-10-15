@@ -86,7 +86,6 @@ const Sidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) => {
       `}
       >
         <div className="flex flex-col h-full pt-16">
-          {" "}
           {/* Added pt-16 for header space */}
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-2 overflow-y-auto">

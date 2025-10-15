@@ -31,7 +31,8 @@ export const useAuthStore = create(
                 needsEmailVerification: result.data.needsVerification || false,
                 isAuthenticated: true,
               });
-
+              const { token } = result?.data;
+              localStorage.setItem("auth-token", token);
               return {
                 success: true,
                 user: result.data.user,
@@ -71,7 +72,8 @@ export const useAuthStore = create(
                   result.data.needsEmailVerification || false,
                 isAuthenticated: true,
               });
-
+              const { token } = result;
+              localStorage.setItem("auth-token", token);
               return {
                 success: true,
                 user: result.data.user,
