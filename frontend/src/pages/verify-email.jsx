@@ -51,7 +51,7 @@ const VerifyEmail = () => {
   }, [token, user, verifyEmail, navigate]);
 
   useEffect(() => {
-    const checkVerificationStatus = async () => {
+    const checkVerification = async () => {
       if (!token) {
         const needsVerification = await checkEmailVerification();
 
@@ -67,11 +67,11 @@ const VerifyEmail = () => {
       }
     };
 
-    checkVerificationStatus();
+    checkVerification();
 
     // Check every 10 seconds if email is verified (only when no token in URL)
     if (!token) {
-      const interval = setInterval(checkVerificationStatus, 10000);
+      const interval = setInterval(checkVerification, 10000);
       return () => clearInterval(interval);
     }
   }, [checkEmailVerification, navigate, user, token]);

@@ -543,15 +543,26 @@ export const checkVerificationStatus = async (req, res) => {
 
     // Get current session to check email confirmation status
     const {
-      data: { session },
-      error: sessionError,
-    } = await supabase.auth.getSession();
+      data: { user },
+      error: userError,
+    } = await supabase.auth.admin.getUserById(userId);
 
-    if (sessionError) {
-      throw sessionError;
+    if (userError) {
+      console.error("Error fetching user from Supabase Auth:", userError);
+      return res.status(400).json({
+        success: false,
+        message: "Error checking verification status",
+      });
     }
 
-    const isVerified = session?.user?.email_confirmed_at !== null;
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const isVerified = user?.email_confirmed_at !== null;
 
     // Sync with our database
     if (isVerified) {

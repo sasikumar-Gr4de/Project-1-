@@ -9,11 +9,9 @@ const ProtectedRoute = ({ children }) => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const needsVerification = await checkEmailVerification();
-
       if (!user) {
         navigate("/login");
-      } else if (needsVerification || needsEmailVerification) {
+      } else if (needsEmailVerification) {
         navigate("/verify-email");
       }
     };
