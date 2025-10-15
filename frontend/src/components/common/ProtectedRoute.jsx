@@ -1,25 +1,37 @@
-import React from "react";
-import { Navigate } from "react-router-dom";
-import { useAuthStore } from "../../store/authStore";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "@/store/authStore";
 
-const ProtectedRoute = ({ children, requiredRole }) => {
-  const { isAuthenticated, user } = useAuthStore();
+const ProtectedRoute = ({ children }) => {
+  const navigate = useNavigate();
+  const { user, needsEmailVerification, checkEmailVerification } =
+    useAuthStore();
 
-  // The loading state is handled by the index.html loading screen
-  // which will be hidden once the React app mounts and auth is checked
+  useEffect(() => {
+    const checkAuth = async () => {
+      const needsVerification = await checkEmailVerification();
 
-  // Redirect to login if not authenticated
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+      if (!user) {
+        navigate("/login");
+      } else if (needsVerification || needsEmailVerification) {
+        navigate("/verify-email");
+      }
+    };
+
+    checkAuth();
+  }, [user, needsEmailVerification, checkEmailVerification, navigate]);
+
+  if (!user || needsEmailVerification) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-white text-center">
+          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p>Checking authentication...</p>
+        </div>
+      </div>
+    );
   }
 
-  // Check role-based access if requiredRole is specified
-  if (requiredRole && user?.role !== requiredRole) {
-    window.alert("You do not have permission to access this page.");
-    return <Navigate to="/unauthorized" replace />;
-  }
-
-  // User is authenticated and has required role (if any)
   return children;
 };
 

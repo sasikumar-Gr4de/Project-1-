@@ -11,6 +11,7 @@ export const useAuthStore = create(
         isAuthenticated: false,
         permissions: [],
         session: null,
+        needsEmailVerification: false,
 
         login: async (email, password) => {
           set({ isLoading: true });
@@ -47,14 +48,17 @@ export const useAuthStore = create(
             localStorage.setItem("token", token);
             const permissions = getPermissionsForRole(user.role);
 
-            set({
-              user,
-              isAuthenticated: true,
-              permissions,
-              isLoading: false,
-            });
-
-            return { success: true };
+            if (user) {
+              set({
+                user,
+                isAuthenticated: true,
+                permissions,
+                isLoading: false,
+                needsVerification: true,
+              });
+              return { success: true };
+            }
+            return { success: false };
           } catch (error) {
             set({ isLoading: false });
             return {
@@ -108,6 +112,21 @@ export const useAuthStore = create(
               isLoading: false,
             });
           }
+        },
+
+        setNeedsEmailVerification: (needs) =>
+          set({ needsEmailVerification: needs }),
+
+        checkEmailVerification: async () => {
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
+          if (session?.user) {
+            const needsVerification = !session.user.email_confirmed_at;
+            set({ needsEmailVerification: needsVerification });
+            return needsVerification;
+          }
+          return false;
         },
 
         hasPermission: (permission) => {
