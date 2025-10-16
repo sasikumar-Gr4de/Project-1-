@@ -117,7 +117,7 @@ const PlayerCard = ({
             <div className="text-xs text-gray-400">Matches</div>
           </div>
           <div className="text-center">
-            <div className="text-lg font-bold text-yellow-400">
+            <div className="text-2xl font-bold text-yellow-400">
               {Math.floor(player.game_time / 60)}h
             </div>
             <div className="text-xs text-gray-400">Played</div>
