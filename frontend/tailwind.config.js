@@ -130,8 +130,31 @@ export default {
           "0%": { backgroundPosition: "-200px 0" },
           "100%": { backgroundPosition: "200px 0" },
         },
+        scan: {
+          "0%": { top: "0%", opacity: "1" },
+          "50%": { opacity: "0.8" },
+          "100%": { top: "100%", opacity: "0" },
+        },
+        morph: {
+          "0%, 100%": { borderRadius: "60% 40% 30% 70% / 60% 30% 70% 40%" },
+          "50%": { borderRadius: "30% 60% 70% 40% / 50% 60% 30% 60%" },
+        },
+        rotate3d: {
+          "0%": { transform: "rotateX(0) rotateY(0) rotateZ(0)" },
+          "25%": { transform: "rotateX(90deg) rotateY(45deg) rotateZ(45deg)" },
+          "50%": { transform: "rotateX(180deg) rotateY(90deg) rotateZ(90deg)" },
+          "75%": {
+            transform: "rotateX(270deg) rotateY(135deg) rotateZ(135deg)",
+          },
+          "100%": {
+            transform: "rotateX(360deg) rotateY(180deg) rotateZ(180deg)",
+          },
+        },
       },
       animation: {
+        scan: "scan 1.5s linear infinite",
+        morph: "morph 3s ease-in-out infinite",
+        "rotate-3d": "rotate3d 2s infinite ease-in-out",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in": "fade-in 0.2s ease-out",

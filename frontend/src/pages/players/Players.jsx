@@ -48,6 +48,7 @@ import {
 } from "../../utils/constants";
 
 import { calculateAge } from "../../utils/calculate";
+import Loading from "@/components/common/Loading";
 
 const Players = () => {
   const [players, setPlayers] = useState([]);
@@ -414,14 +415,7 @@ const Players = () => {
   );
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white">Loading players...</p>
-        </div>
-      </div>
-    );
+    return <Loading overlay text="" color="blue" variant="cyberpunk-scan" />;
   }
 
   return (
