@@ -1,4 +1,3 @@
-// components/common/DataTable.jsx
 import React, { useState } from "react";
 import {
   ChevronLeft,
