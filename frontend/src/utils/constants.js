@@ -94,6 +94,32 @@ export const STATUS_OPTIONS = [
   { value: PLAYER_STATUS.TRANSFER_LISTED, label: "Transfer Listed" },
 ];
 
+export const MATCH_STATUS_OPTIONS = [
+  { value: "upcoming", label: "Upcoming", color: "blue" },
+  { value: "live", label: "Live", color: "red" },
+  { value: "completed", label: "Completed", color: "green" },
+  { value: "cancelled", label: "Cancelled", color: "gray" },
+  { value: "postponed", label: "Postponed", color: "yellow" },
+];
+
+export const MATCH_EVENT_TYPES = {
+  GOAL: "goal",
+  YELLOW_CARD: "yellow_card",
+  RED_CARD: "red_card",
+  SUBSTITUTION: "substitution",
+  PENALTY: "penalty",
+  OWN_GOAL: "own_goal",
+};
+
+export const MATCH_EVENT_COLORS = {
+  [MATCH_EVENT_TYPES.GOAL]: "text-green-400",
+  [MATCH_EVENT_TYPES.YELLOW_CARD]: "text-yellow-400",
+  [MATCH_EVENT_TYPES.RED_CARD]: "text-red-400",
+  [MATCH_EVENT_TYPES.SUBSTITUTION]: "text-blue-400",
+  [MATCH_EVENT_TYPES.PENALTY]: "text-purple-400",
+  [MATCH_EVENT_TYPES.OWN_GOAL]: "text-orange-400",
+};
+
 // Event types for match analysis
 export const EVENT_TYPES = {
   PASS: "pass",
