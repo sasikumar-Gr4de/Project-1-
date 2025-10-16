@@ -9,58 +9,105 @@ import {
   Target,
   Settings,
   Shield,
+  Home,
+  Database,
+  UserCog,
 } from "lucide-react";
 
 const Sidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) => {
   const location = useLocation();
 
-  const menuItems = [
+  // Grouped navigation items
+  const menuGroups = [
     {
-      id: "overview",
-      label: "Overview",
-      icon: BarChart3,
-      path: "/dashboard",
+      title: "Main",
+      items: [
+        {
+          id: "overview",
+          label: "Overview",
+          icon: Home,
+          path: "/dashboard",
+        },
+        {
+          id: "analytics",
+          label: "Analytics",
+          icon: BarChart3,
+          path: "/analytics",
+        },
+      ],
     },
     {
-      id: "players",
-      label: "Players",
-      icon: Users,
-      path: "/players",
+      title: "Football Data",
+      items: [
+        {
+          id: "players",
+          label: "Players",
+          icon: Users,
+          path: "/players",
+        },
+        {
+          id: "teams",
+          label: "Teams",
+          icon: Shield,
+          path: "/teams",
+        },
+        {
+          id: "matches",
+          label: "Matches",
+          icon: PlayCircle,
+          path: "/matches",
+        },
+        {
+          id: "tournaments",
+          label: "Tournaments",
+          icon: Trophy,
+          path: "/tournaments",
+        },
+      ],
     },
     {
-      id: "matches",
-      label: "Matches",
-      icon: PlayCircle,
-      path: "/matches",
+      title: "Reports & Insights",
+      items: [
+        {
+          id: "reports",
+          label: "Reports",
+          icon: FileText,
+          path: "/reports",
+        },
+        {
+          id: "scouting",
+          label: "Scouting",
+          icon: Target,
+          path: "/scouting",
+        },
+      ],
     },
     {
-      id: "tournaments",
-      label: "Tournaments",
-      icon: Trophy,
-      path: "/tournaments",
-    },
-    {
-      id: "reports",
-      label: "Reports",
-      icon: FileText,
-      path: "/reports",
-    },
-    {
-      id: "analytics",
-      label: "Analytics",
-      icon: Target,
-      path: "/analytics",
-    },
-    {
-      id: "settings",
-      label: "Settings",
-      icon: Settings,
-      path: "/settings",
+      title: "System",
+      items: [
+        {
+          id: "data-management",
+          label: "Data Management",
+          icon: Database,
+          path: "/data-management",
+        },
+        {
+          id: "user-management",
+          label: "User Management",
+          icon: UserCog,
+          path: "/user-management",
+        },
+        {
+          id: "settings",
+          label: "Settings",
+          icon: Settings,
+          path: "/settings",
+        },
+      ],
     },
   ];
 
   const isActive = (path) => {
-    console.log(location.pathname, path);
     return location.pathname === path || activeTab === path.split("/")[1];
   };
 
@@ -86,41 +133,58 @@ const Sidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) => {
       >
         <div className="flex flex-col h-full pt-16">
           {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              const active = isActive(item.path);
+          <nav className="flex-1 p-4 space-y-6 overflow-y-auto">
+            {menuGroups.map((group, groupIndex) => (
+              <div key={groupIndex} className="space-y-2">
+                {/* Group Title */}
+                <div className="px-3 py-2">
+                  <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    {group.title}
+                  </span>
+                </div>
 
-              return (
-                <Link
-                  key={item.id}
-                  to={item.path}
-                  onClick={() => {
-                    setActiveTab(item.id);
-                    setSidebarOpen(false);
-                  }}
-                  className={`
-                    flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group backdrop-blur-sm
-                    ${
-                      active
-                        ? "bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-400 border border-blue-500/30 shadow-lg"
-                        : "text-gray-400 hover:text-white hover:bg-gray-700/50 border border-transparent"
-                    }
-                  `}
-                >
-                  <Icon
-                    className={`h-5 w-5 transition-transform duration-200 ${
-                      active ? "scale-110" : "group-hover:scale-105"
-                    }`}
-                  />
-                  <span className="font-medium">{item.label}</span>
-                  {active && (
-                    <div className="ml-auto w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                  )}
-                </Link>
-              );
-            })}
+                {/* Group Items */}
+                <div className="space-y-1">
+                  {group.items.map((item) => {
+                    const Icon = item.icon;
+                    const active = isActive(item.path);
+
+                    return (
+                      <Link
+                        key={item.id}
+                        to={item.path}
+                        onClick={() => {
+                          setActiveTab(item.id);
+                          setSidebarOpen(false);
+                        }}
+                        className={`
+                          flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 group backdrop-blur-sm
+                          ${
+                            active
+                              ? "bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-400 border border-blue-500/30 shadow-lg"
+                              : "text-gray-400 hover:text-white hover:bg-gray-700/50 border border-transparent"
+                          }
+                        `}
+                      >
+                        <Icon
+                          className={`h-4 w-4 transition-transform duration-200 ${
+                            active ? "scale-110" : "group-hover:scale-105"
+                          }`}
+                        />
+                        <span className="font-medium text-sm">
+                          {item.label}
+                        </span>
+                        {active && (
+                          <div className="ml-auto w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></div>
+                        )}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </nav>
+
           {/* Sidebar Footer */}
           <div className="p-4 border-t border-gray-700/50">
             <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 backdrop-blur-sm rounded-xl p-4 border border-blue-500/20">

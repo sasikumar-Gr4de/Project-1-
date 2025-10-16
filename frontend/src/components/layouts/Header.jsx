@@ -13,6 +13,7 @@ import {
   PlayCircle,
   FileText,
   Target,
+  Shield, // Add Shield icon for Teams
 } from "lucide-react";
 
 import { useAuthStore } from "../../store/authStore";
@@ -23,6 +24,7 @@ const Header = ({ activeTab, setActiveTab, sidebarOpen, onMenuClick }) => {
   const navigation = [
     { id: "overview", label: "Overview", path: "/dashboard", icon: BarChart3 },
     { id: "players", label: "Players", path: "/players", icon: Users },
+    { id: "teams", label: "Teams", path: "/teams", icon: Shield }, // Added Teams
     { id: "matches", label: "Matches", path: "/matches", icon: PlayCircle },
     {
       id: "tournaments",
@@ -75,8 +77,7 @@ const Header = ({ activeTab, setActiveTab, sidebarOpen, onMenuClick }) => {
                   <Link
                     key={item.id}
                     to={item.path}
-                    onClick={(e) => {
-                      // e.preventDefault();
+                    onClick={() => {
                       setActiveTab(item.id);
                     }}
                     className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-medium transition-all duration-200 backdrop-blur-sm ${
@@ -132,10 +133,10 @@ const Header = ({ activeTab, setActiveTab, sidebarOpen, onMenuClick }) => {
                 </div>
                 <div className="hidden sm:block text-right">
                   <span className="block text-sm font-medium text-white">
-                    {user["full_name"]}
+                    {user?.["full_name"] || "User"}
                   </span>
                   <span className="block text-xs text-gray-400">
-                    {capitalize(user["role"])}
+                    {capitalize(user?.["role"] || "user")}
                   </span>
                 </div>
               </div>
@@ -150,8 +151,7 @@ const Header = ({ activeTab, setActiveTab, sidebarOpen, onMenuClick }) => {
               <Link
                 key={item.id}
                 to={item.path}
-                onClick={(e) => {
-                  e.preventDefault();
+                onClick={() => {
                   setActiveTab(item.id);
                 }}
                 className={`flex-shrink-0 px-3 py-2 rounded-lg font-medium text-sm transition-all backdrop-blur-sm ${
