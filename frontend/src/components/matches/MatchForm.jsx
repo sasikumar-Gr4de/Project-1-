@@ -155,7 +155,7 @@ const MatchForm = ({ isOpen, onClose, onSave, match, teams = [] }) => {
               >
                 <SelectValue placeholder="Select tournament" />
               </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-gray-600">
+              <SelectContent className="bg-gray-800 border-gray-600 text-white">
                 {TOURNAMENT_OPTIONS.map((tournament) => (
                   <SelectItem key={tournament.value} value={tournament.value}>
                     {tournament.label}

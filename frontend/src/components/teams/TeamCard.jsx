@@ -17,6 +17,8 @@ import {
 import TeamAvatar from "./TeamAvatar";
 import TeamStatusBadge from "./TeamStatusBadge";
 
+import { capitalize } from "@/utils/formatters";
+
 const TeamCard = ({ team, onEdit, onDelete, calculateAge }) => {
   const teamMetrics = {
     averageAge: team.players
@@ -71,7 +73,7 @@ const TeamCard = ({ team, onEdit, onDelete, calculateAge }) => {
           </div>
           <div className="flex items-center text-sm text-gray-400">
             <Trophy className="h-4 w-4 mr-2" />
-            <span>Tournament: {team.tournament}</span>
+            <span>Tournament: {capitalize(team.tournament)}</span>
           </div>
           <div className="flex items-center text-sm text-gray-400">
             <Building className="h-4 w-4 mr-2" />
