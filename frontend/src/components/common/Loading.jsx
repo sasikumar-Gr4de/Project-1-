@@ -52,24 +52,41 @@ const Loading = ({
 
   // Holographic Wave Animation
   const HolographicWave = () => (
-    <div className={cn("flex items-center justify-center", sizeClasses[size])}>
-      <div className="relative">
-        <div
-          className={cn(
-            "rounded-full bg-gradient-to-r animate-pulse",
-            colorClasses[color],
-            "h-full w-full"
-          )}
-        />
-        <div
-          className={cn(
-            "absolute inset-0 rounded-full bg-gradient-to-r animate-pulse",
-            colorClasses[color],
-            "opacity-50 blur-sm"
-          )}
-          style={{ animationDelay: "0.5s" }}
-        />
-      </div>
+    <div className={cn("relative", sizeClasses[size])}>
+      {/* Base orb */}
+      <div
+        className={cn(
+          "absolute inset-0 rounded-full bg-gradient-to-br opacity-80",
+          colorClasses[color],
+          "animate-pulse"
+        )}
+      />
+
+      {/* Moving wave lines */}
+      <div
+        className={cn(
+          "absolute inset-0 rounded-full border-2 opacity-60",
+          `border-${color.split("-")[0]}-400`,
+          "animate-wave"
+        )}
+      />
+
+      <div
+        className={cn(
+          "absolute inset-1 rounded-full border opacity-40",
+          `border-${color.split("-")[0]}-300`,
+          "animate-wave-reverse"
+        )}
+      />
+
+      {/* Glow effect */}
+      <div
+        className={cn(
+          "absolute -inset-2 rounded-full opacity-30 blur-md",
+          "bg-gradient-to-r animate-pulse",
+          colorClasses[color]
+        )}
+      />
     </div>
   );
 
@@ -175,7 +192,7 @@ const Loading = ({
       {text && (
         <p
           className={cn(
-            "text-white font-medium bg-gradient-to-r from-gray-200 to-gray-400 bg-clip-text text-transparent",
+            "text-white font-medium bg-gradient-to-r from-gray-200 to-gray-400 bg-clip-text",
             textSizes[size]
           )}
         >

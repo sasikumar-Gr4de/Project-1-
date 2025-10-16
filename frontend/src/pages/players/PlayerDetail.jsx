@@ -23,6 +23,7 @@ import PlayerStatusBadge from "../../components/players/PlayerStatusBadge";
 import AbilityRadarChart from "../../components/players/AbilityRadarChart";
 import PerformanceMetrics from "../../components/players/PerformanceMetrics";
 import MatchHistory from "../../components/players/MatchHistory";
+import Loading from "@/components/common/Loading";
 
 const PlayerDetail = () => {
   const { id } = useParams();
@@ -109,21 +110,8 @@ const PlayerDetail = () => {
     return age;
   };
 
-  const formatGameTime = (minutes) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return `${hours}h ${mins}m`;
-  };
-
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white">Loading player data...</p>
-        </div>
-      </div>
-    );
+    return <Loading overlay text="" color="blue" variant="holographic-wave" />;
   }
 
   if (!player) {
