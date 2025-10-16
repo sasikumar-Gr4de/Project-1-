@@ -2,7 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
-import { Card, CardContent } from "../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
 import {
   Select,
   SelectContent,
@@ -13,6 +18,7 @@ import {
 import {
   Plus,
   Search,
+  Filter,
   MoreHorizontal,
   Edit,
   Trash2,
@@ -22,9 +28,12 @@ import {
   Users,
   Calendar,
   MapPin,
+  Ruler,
+  Scale,
   Footprints,
   Grid,
   Table,
+  Image,
   BarChart3,
   Clock,
 } from "lucide-react";
@@ -96,7 +105,85 @@ const Players = () => {
       game_time: 1420,
       overall_ability: 74,
     },
-    // Add more mock players with detailed data...
+    {
+      id: 3,
+      name: "Sarah Williams",
+      date_of_birth: "2005-12-03",
+      nationality: "Wales",
+      current_club: "Rovers FC",
+      primary_position: "CB",
+      height_cm: 165,
+      weight_kg: 58,
+      preferred_foot: "Right",
+      status: "injured",
+      profile_picture:
+        "https://images.unsplash.com/photo-1552058544-f2b08422138a?w=150&h=150&fit=crop&crop=face",
+      created_at: "2024-01-13T14:20:00Z",
+      updated_at: "2024-01-13T14:20:00Z",
+      matches_played: 15,
+      sense_score: 71,
+      game_time: 1120,
+      overall_ability: 69,
+    },
+    {
+      id: 4,
+      name: "James Rodriguez",
+      date_of_birth: "2006-03-18",
+      nationality: "Spain",
+      current_club: "Athletic Youth",
+      primary_position: "GK",
+      height_cm: 185,
+      weight_kg: 78,
+      preferred_foot: "Right",
+      status: "active",
+      profile_picture:
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+      created_at: "2024-01-12T11:45:00Z",
+      updated_at: "2024-01-12T11:45:00Z",
+      matches_played: 22,
+      sense_score: 79,
+      game_time: 1980,
+      overall_ability: 81,
+    },
+    {
+      id: 5,
+      name: "Alex Turner",
+      date_of_birth: "2006-07-11",
+      nationality: "Scotland",
+      current_club: "United Academy",
+      primary_position: "CDM",
+      height_cm: 175,
+      weight_kg: 70,
+      preferred_foot: "Right",
+      status: "active",
+      profile_picture: null,
+      created_at: "2024-01-11T08:15:00Z",
+      updated_at: "2024-01-11T08:15:00Z",
+      matches_played: 20,
+      sense_score: 84,
+      game_time: 1650,
+      overall_ability: 76,
+    },
+    {
+      id: 6,
+      name: "Mohamed Hassan",
+      date_of_birth: "2005-11-25",
+      nationality: "Egypt",
+      current_club: "City Youth",
+      primary_position: "RW",
+      height_cm: 170,
+      weight_kg: 65,
+      preferred_foot: "Left",
+      status: "suspended",
+      profile_picture:
+        "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&h=150&fit=crop&crop=face",
+      created_at: "2024-01-10T16:45:00Z",
+      updated_at: "2024-01-10T16:45:00Z",
+      matches_played: 16,
+      sense_score: 73,
+      game_time: 1280,
+      overall_ability: 72,
+    },
   ];
 
   const teams = Array.from(new Set(mockPlayers.map((p) => p.current_club))).map(
@@ -155,6 +242,69 @@ const Players = () => {
 
     setFilteredPlayers(filtered);
     setCurrentPage(1); // Reset to first page when filters change
+  };
+
+  // Missing functions - Added here
+  const handleAddPlayer = () => {
+    setSelectedPlayer(null);
+    setIsFormOpen(true);
+  };
+
+  const handleEdit = (player) => {
+    setSelectedPlayer(player);
+    setIsFormOpen(true);
+  };
+
+  const handleDelete = (player) => {
+    setSelectedPlayer(player);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (selectedPlayer) {
+      setPlayers(players.filter((p) => p.id !== selectedPlayer.id));
+      setIsDeleteModalOpen(false);
+      setSelectedPlayer(null);
+    }
+  };
+
+  const handleSavePlayer = (playerData) => {
+    if (selectedPlayer) {
+      // Update existing player
+      setPlayers(
+        players.map((p) =>
+          p.id === selectedPlayer.id
+            ? {
+                ...playerData,
+                id: selectedPlayer.id,
+                updated_at: new Date().toISOString(),
+                // Preserve performance data if not in form
+                matches_played: selectedPlayer.matches_played,
+                sense_score: selectedPlayer.sense_score,
+                game_time: selectedPlayer.game_time,
+                overall_ability: selectedPlayer.overall_ability,
+              }
+            : p
+        )
+      );
+    } else {
+      // Add new player
+      const newPlayer = {
+        ...playerData,
+        id: Math.max(...players.map((p) => p.id)) + 1,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        status: "active",
+        // Default performance data for new players
+        matches_played: 0,
+        sense_score: 0,
+        game_time: 0,
+        overall_ability: 0,
+      };
+      setPlayers([...players, newPlayer]);
+    }
+    setIsFormOpen(false);
+    setSelectedPlayer(null);
   };
 
   // Calculate age function
@@ -281,8 +431,16 @@ const Players = () => {
     </tr>
   );
 
-  // Rest of the component (handleEdit, handleDelete, etc.) remains similar...
-  // [Previous handlers and modal management code...]
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white">Loading players...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
@@ -346,7 +504,7 @@ const Players = () => {
                 </div>
 
                 <div className="flex items-center space-x-4">
-                  <div className="text-sm text-gray-400">
+                  <div className="text-sm text-gray-400 hidden sm:block">
                     Showing {filteredPlayers.length} of {players.length} players
                   </div>
 
@@ -376,37 +534,50 @@ const Players = () => {
                 </div>
               </div>
 
-              {/* Multi-select Filters */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <MultiSelectFilter
-                  options={ALL_POSITIONS}
-                  selectedValues={selectedPositions}
-                  onChange={setSelectedPositions}
-                  placeholder="Filter by positions..."
-                />
+              {/* Multi-select Filters - Single Row */}
+              <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                <div className="flex-1 min-w-0">
+                  <MultiSelectFilter
+                    options={ALL_POSITIONS}
+                    selectedValues={selectedPositions}
+                    onChange={setSelectedPositions}
+                    placeholder="Filter by positions..."
+                    className="w-full"
+                  />
+                </div>
 
-                <MultiSelectFilter
-                  options={teams}
-                  selectedValues={selectedTeams}
-                  onChange={setSelectedTeams}
-                  placeholder="Filter by teams..."
-                />
+                <div className="flex-1 min-w-0">
+                  <MultiSelectFilter
+                    options={teams}
+                    selectedValues={selectedTeams}
+                    onChange={setSelectedTeams}
+                    placeholder="Filter by teams..."
+                    className="w-full"
+                  />
+                </div>
 
-                <Select
-                  value={selectedStatus}
-                  onValueChange={setSelectedStatus}
-                >
-                  <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
-                    <SelectValue placeholder="Filter by status" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-gray-800 border-gray-600 text-white">
-                    {STATUS_OPTIONS.map((status) => (
-                      <SelectItem key={status.value} value={status.value}>
-                        {status.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="flex-1 min-w-0">
+                  <Select
+                    value={selectedStatus}
+                    onValueChange={setSelectedStatus}
+                  >
+                    <SelectTrigger className="bg-gray-700 border-gray-600 text-white w-full">
+                      <SelectValue placeholder="Filter by status" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-800 border-gray-600 text-white">
+                      {STATUS_OPTIONS.map((status) => (
+                        <SelectItem key={status.value} value={status.value}>
+                          {status.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Mobile counter */}
+                <div className="text-sm text-gray-400 block sm:hidden w-full text-center pt-2">
+                  Showing {filteredPlayers.length} of {players.length} players
+                </div>
               </div>
             </div>
           </CardContent>
