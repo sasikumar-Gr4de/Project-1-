@@ -374,18 +374,18 @@ const Players = () => {
       <td className="py-4 px-6 text-white">{player.current_club}</td>
       <td className="py-4 px-6">
         <div className="space-y-1">
-          <div className="flex items-center text-sm">
-            <BarChart3 className="h-3 w-3 mr-1 text-blue-400" />
+          <div className="flex items-center text-sm  text-blue-400">
+            <BarChart3 className="h-3 w-3 mr-1" />
             Sense:{" "}
             <span className="font-medium ml-1">{player.sense_score}</span>
           </div>
-          <div className="flex items-center text-sm">
-            <Calendar className="h-3 w-3 mr-1 text-green-400" />
+          <div className="flex items-center text-sm  text-green-400">
+            <Calendar className="h-3 w-3 mr-1" />
             Matches:{" "}
             <span className="font-medium ml-1">{player.matches_played}</span>
           </div>
-          <div className="flex items-center text-sm">
-            <Clock className="h-3 w-3 mr-1 text-yellow-400" />
+          <div className="flex items-center text-sm  text-yellow-400">
+            <Clock className="h-3 w-3 mr-1" />
             Played:{" "}
             <span className="font-medium ml-1">
               {formatGameTime(player.game_time)}
