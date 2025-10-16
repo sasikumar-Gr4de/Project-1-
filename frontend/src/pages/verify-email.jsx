@@ -35,9 +35,12 @@ const VerifyEmail = () => {
     const autoVerify = async () => {
       if (token && user) {
         setIsVerifying(true);
-        const result = await verifyEmail(token);
-
-        if (result.success) {
+        const {
+          data: { email_verified },
+        } = await verifyEmail(token);
+        console.log(email_verified);
+        debugger;
+        if (email_verified) {
           // Redirect to dashboard after successful verification
           navigate("/dashboard", { replace: true });
         } else {

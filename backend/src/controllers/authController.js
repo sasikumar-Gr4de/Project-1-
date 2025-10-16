@@ -554,15 +554,15 @@ export const checkVerificationStatus = async (req, res) => {
         message: "Error checking verification status",
       });
     }
-
+    // console.log(user);
     if (!user) {
       return res.status(404).json({
         success: false,
         message: "User not found",
       });
     }
-
-    const isVerified = user?.email_confirmed_at !== null;
+    const { user_metadata } = user;
+    const isVerified = user_metadata?.email_verified;
 
     // Sync with our database
     if (isVerified) {

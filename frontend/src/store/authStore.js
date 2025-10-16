@@ -64,7 +64,7 @@ export const useAuthStore = create(
           try {
             const response = await authAPI.register(userData);
             const result = response.data;
-
+            console.log(result);
             if (result.success) {
               set({
                 user: result.data.user,
@@ -72,8 +72,10 @@ export const useAuthStore = create(
                   result.data.needsEmailVerification || false,
                 isAuthenticated: true,
               });
-              const { token } = result;
+              const { token } = result.data;
               localStorage.setItem("auth-token", token);
+              console.log(token);
+              debugger;
               return {
                 success: true,
                 user: result.data.user,

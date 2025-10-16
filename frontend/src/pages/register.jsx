@@ -103,6 +103,7 @@ const Register = () => {
       const response = await registerUser(data);
       if (response.success) {
         // Redirect to verification page instead of dashboard
+        console.log("redirect to verify-email");
         navigate("/verify-email", {
           replace: true,
           state: { email: data.email },

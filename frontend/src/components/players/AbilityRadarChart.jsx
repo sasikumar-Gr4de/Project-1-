@@ -34,7 +34,7 @@ const AbilityRadarChart = ({ abilities }) => {
 
   return (
     <div className="w-full h-full flex flex-col items-center">
-      <svg width="200" height="200" viewBox="0 0 200 200" className="mb-4">
+      <svg width="300" height="300" viewBox="0 0 200 200" className="mb-4">
         {/* Background circles */}
         {Array.from({ length: numberOfCircles }).map((_, index) => (
           <circle

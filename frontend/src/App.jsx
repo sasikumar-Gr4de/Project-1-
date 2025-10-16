@@ -75,9 +75,9 @@ function App() {
           exact
           path="/verify-email"
           element={
-            <PublicRoute>
-              <VerifyEmail />
-            </PublicRoute>
+            // <PublicRoute>
+            <VerifyEmail />
+            // </PublicRoute>
           }
         />
 

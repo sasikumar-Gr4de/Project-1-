@@ -13,7 +13,7 @@ if (!supabaseUrl || !supabaseServiceKey) {
 }
 
 // Create Supabase client
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+export const supabase = createClient(supabaseUrl, supabaseServiceKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
