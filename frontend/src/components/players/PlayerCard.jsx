@@ -14,6 +14,9 @@ import {
 } from "lucide-react";
 
 import PlayerAvatar from "./PlayerAvatar";
+import PlayerStatusBadge from "./PlayerStatusBadge";
+
+import { ALL_POSITIONS } from "../../utils/constants";
 
 const PlayerCard = ({
   player,
