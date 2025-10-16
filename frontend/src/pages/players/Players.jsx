@@ -47,6 +47,8 @@ import {
   STATUS_OPTIONS,
 } from "../../utils/constants";
 
+import { calculateAge } from "../../utils/calculate";
+
 const Players = () => {
   const [players, setPlayers] = useState([]);
   const [filteredPlayers, setFilteredPlayers] = useState([]);
@@ -302,23 +304,6 @@ const Players = () => {
     }
     setIsFormOpen(false);
     setSelectedPlayer(null);
-  };
-
-  // Calculate age function
-  const calculateAge = (dateString) => {
-    const today = new Date();
-    const birthDate = new Date(dateString);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-
-    if (
-      monthDiff < 0 ||
-      (monthDiff === 0 && today.getDate() < birthDate.getDate())
-    ) {
-      age--;
-    }
-
-    return age;
   };
 
   // Format game time to hours and minutes
