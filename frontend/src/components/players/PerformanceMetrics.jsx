@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { Target, Crosshair, Zap, Brain, Heart } from "lucide-react";
+import { Target, Crosshair, Zap, Brain, Heart, Activity } from "lucide-react"; // Add Activity import
 
 const PerformanceMetrics = ({ player }) => {
   const metrics = [
@@ -73,9 +73,7 @@ const PerformanceMetrics = ({ player }) => {
                     className="h-2 rounded-full transition-all duration-300"
                     style={{
                       width: `${percentage}%`,
-                      backgroundColor: metric.color
-                        .replace("text-", "bg-")
-                        .split("-")[1],
+                      backgroundColor: getColorFromText(metric.color),
                     }}
                   />
                 </div>
@@ -86,6 +84,18 @@ const PerformanceMetrics = ({ player }) => {
       </CardContent>
     </Card>
   );
+};
+
+// Helper function to convert text color to background color
+const getColorFromText = (textColor) => {
+  const colorMap = {
+    "text-red-400": "#f87171",
+    "text-blue-400": "#60a5fa",
+    "text-green-400": "#34d399",
+    "text-purple-400": "#a78bfa",
+    "text-yellow-400": "#fbbf24",
+  };
+  return colorMap[textColor] || "#60a5fa";
 };
 
 export default PerformanceMetrics;

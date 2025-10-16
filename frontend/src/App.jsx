@@ -21,6 +21,7 @@ import ToastContainer from "./components/common/ToastContainer";
 import Layout from "./components/layouts/Layout";
 import Matches from "./pages/matches/Matches";
 import Players from "./pages/players/Players";
+import PlayerDetail from "./pages/players/PlayerDetail";
 import Teams from "./pages/teams/Teams";
 import Tournaments from "./pages/tournaments/Tournaments";
 
@@ -109,6 +110,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Players />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/players/:id"
+            element={
+              <ProtectedRoute>
+                <PlayerDetail />
               </ProtectedRoute>
             }
           />
