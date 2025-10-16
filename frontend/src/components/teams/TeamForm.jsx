@@ -90,7 +90,7 @@ const TeamForm = ({ isOpen, onClose, onSave, team }) => {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Team Logo Upload */}
           <div className="space-y-3">
-            <Label>Team Logo</Label>
+            <Label htmlFor="team-mark-upload">Team Logo</Label>
             <div className="flex items-center space-x-4">
               <div className="relative">
                 {previewImage ? (
@@ -117,13 +117,13 @@ const TeamForm = ({ isOpen, onClose, onSave, team }) => {
               <div>
                 <input
                   type="file"
-                  id="team-mark"
+                  id="team-mark-upload"
                   accept="image/*"
                   onChange={handleImageUpload}
                   className="hidden"
                 />
                 <Label
-                  htmlFor="team-mark"
+                  htmlFor="team-mark-upload"
                   className="cursor-pointer inline-flex items-center px-3 py-2 border border-gray-600 rounded-md text-sm bg-gray-700 hover:bg-gray-600 text-white"
                 >
                   <Upload className="h-4 w-4 mr-2" />
@@ -135,9 +135,9 @@ const TeamForm = ({ isOpen, onClose, onSave, team }) => {
 
           {/* Team Name */}
           <div className="space-y-2">
-            <Label htmlFor="name">Team Name *</Label>
+            <Label htmlFor="team-name">Team Name *</Label>
             <Input
-              id="name"
+              id="team-name"
               value={formData.name}
               onChange={(e) => handleInputChange("name", e.target.value)}
               placeholder="Enter team name"
@@ -148,9 +148,9 @@ const TeamForm = ({ isOpen, onClose, onSave, team }) => {
 
           {/* Admin Name */}
           <div className="space-y-2">
-            <Label htmlFor="admin_name">Team Admin *</Label>
+            <Label htmlFor="admin-name">Team Admin *</Label>
             <Input
-              id="admin_name"
+              id="admin-name"
               value={formData.admin_name}
               onChange={(e) => handleInputChange("admin_name", e.target.value)}
               placeholder="Enter admin name"
@@ -161,12 +161,15 @@ const TeamForm = ({ isOpen, onClose, onSave, team }) => {
 
           {/* Tournament */}
           <div className="space-y-2">
-            <Label htmlFor="tournament">Tournament *</Label>
+            <Label htmlFor="tournament-select">Tournament *</Label>
             <Select
               value={formData.tournament}
               onValueChange={(value) => handleInputChange("tournament", value)}
             >
-              <SelectTrigger className="bg-gray-700 border-gray-600">
+              <SelectTrigger
+                id="tournament-select"
+                className="bg-gray-700 border-gray-600"
+              >
                 <SelectValue placeholder="Select tournament" />
               </SelectTrigger>
               <SelectContent className="bg-gray-800 border-gray-600">
@@ -181,12 +184,15 @@ const TeamForm = ({ isOpen, onClose, onSave, team }) => {
 
           {/* Organizer */}
           <div className="space-y-2">
-            <Label htmlFor="organizer">Organizer *</Label>
+            <Label htmlFor="organizer-select">Organizer *</Label>
             <Select
               value={formData.organizer}
               onValueChange={(value) => handleInputChange("organizer", value)}
             >
-              <SelectTrigger className="bg-gray-700 border-gray-600">
+              <SelectTrigger
+                id="organizer-select"
+                className="bg-gray-700 border-gray-600"
+              >
                 <SelectValue placeholder="Select organizer" />
               </SelectTrigger>
               <SelectContent className="bg-gray-800 border-gray-600">
@@ -201,9 +207,9 @@ const TeamForm = ({ isOpen, onClose, onSave, team }) => {
 
           {/* Location */}
           <div className="space-y-2">
-            <Label htmlFor="location">Location</Label>
+            <Label htmlFor="team-location">Location</Label>
             <Input
-              id="location"
+              id="team-location"
               value={formData.location}
               onChange={(e) => handleInputChange("location", e.target.value)}
               placeholder="Enter team location"

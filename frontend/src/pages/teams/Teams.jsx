@@ -2,10 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
-import {
-  Card,
-  CardContent,
-} from "../../components/ui/card";
+import { Card, CardContent } from "../../components/ui/card";
 import {
   Select,
   SelectContent,
@@ -72,7 +69,7 @@ const Teams = () => {
       tournament: "premier-league",
       organizer: "premier-league",
       location: "Manchester, UK",
-      team_mark: "https://images.unsplash.com/photo-1614624532983-1fe21c1d4ae5?w=150&h=150&fit=crop&crop=center",
+      team_mark: "",
       status: "active",
       created_at: "2024-01-15T10:00:00Z",
       updated_at: "2024-01-15T10:00:00Z",
@@ -100,7 +97,7 @@ const Teams = () => {
       tournament: "premier-league",
       organizer: "premier-league",
       location: "Manchester, UK",
-      team_mark: "https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=150&h=150&fit=crop&crop=center",
+      team_mark: "",
       status: "active",
       created_at: "2024-01-14T09:30:00Z",
       updated_at: "2024-01-14T09:30:00Z",
@@ -149,7 +146,7 @@ const Teams = () => {
       tournament: "youth-league",
       organizer: "local",
       location: "Bilbao, Spain",
-      team_mark: "https://images.unsplash.com/photo-1614624532983-1fe21c1d4ae5?w=150&h=150&fit=crop&crop=center",
+      team_mark: "",
       status: "inactive",
       created_at: "2024-01-12T11:45:00Z",
       updated_at: "2024-01-12T11:45:00Z",
@@ -179,7 +176,13 @@ const Teams = () => {
 
   useEffect(() => {
     filterTeams();
-  }, [searchTerm, selectedTournaments, selectedOrganizers, selectedStatus, teams]);
+  }, [
+    searchTerm,
+    selectedTournaments,
+    selectedOrganizers,
+    selectedStatus,
+    teams,
+  ]);
 
   const filterTeams = () => {
     let filtered = teams;
@@ -283,8 +286,15 @@ const Teams = () => {
   // Render table row
   const renderTableRow = (team, index) => {
     const playerCount = team.players ? team.players.length : 0;
-    const averageAbility = team.players && team.players.length > 0 ? 
-      Math.round(team.players.reduce((sum, player) => sum + (player.overall_ability || 0), 0) / team.players.length) : 0;
+    const averageAbility =
+      team.players && team.players.length > 0
+        ? Math.round(
+            team.players.reduce(
+              (sum, player) => sum + (player.overall_ability || 0),
+              0
+            ) / team.players.length
+          )
+        : 0;
 
     return (
       <tr
@@ -311,18 +321,21 @@ const Teams = () => {
         <td className="py-4 px-6 text-white">{team.admin_name}</td>
         <td className="py-4 px-6">
           <div className="text-white">
-            {TOURNAMENT_OPTIONS.find((t) => t.value === team.tournament)?.label || team.tournament}
+            {TOURNAMENT_OPTIONS.find((t) => t.value === team.tournament)
+              ?.label || team.tournament}
           </div>
           <div className="text-sm text-gray-400 flex items-center">
             <Building className="h-3 w-3 mr-1" />
-            {ORGANIZER_OPTIONS.find((o) => o.value === team.organizer)?.label || team.organizer}
+            {ORGANIZER_OPTIONS.find((o) => o.value === team.organizer)?.label ||
+              team.organizer}
           </div>
         </td>
         <td className="py-4 px-6">
           <div className="space-y-1">
             <div className="flex items-center text-sm text-blue-400">
               <BarChart3 className="h-3 w-3 mr-1" />
-              Ability: <span className="font-medium ml-1">{averageAbility}</span>
+              Ability:{" "}
+              <span className="font-medium ml-1">{averageAbility}</span>
             </div>
             <div className="flex items-center text-sm text-green-400">
               <Users className="h-3 w-3 mr-1" />
@@ -330,8 +343,14 @@ const Teams = () => {
             </div>
             <div className="flex items-center text-sm text-yellow-400">
               <Calendar className="h-3 w-3 mr-1" />
-              Matches: <span className="font-medium ml-1">
-                {team.players ? team.players.reduce((sum, player) => sum + (player.matches_played || 0), 0) : 0}
+              Matches:{" "}
+              <span className="font-medium ml-1">
+                {team.players
+                  ? team.players.reduce(
+                      (sum, player) => sum + (player.matches_played || 0),
+                      0
+                    )
+                  : 0}
               </span>
             </div>
           </div>
@@ -554,7 +573,7 @@ const Teams = () => {
               md: 2,
               lg: 3,
               xl: 4,
-              "2xl": 4
+              "2xl": 4,
             }}
             onPageChange={setCurrentPage}
           />
