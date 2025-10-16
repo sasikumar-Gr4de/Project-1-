@@ -49,6 +49,7 @@ import {
 
 import { calculateAge } from "../../utils/calculate";
 import Loading from "@/components/common/Loading";
+import GridView from "@/components/common/GridView";
 
 const Players = () => {
   const [players, setPlayers] = useState([]);
@@ -414,6 +415,29 @@ const Players = () => {
     </tr>
   );
 
+  // Render grid item for reusable GridView
+  const renderGridItem = (player) => (
+    <PlayerCard
+      key={player.id}
+      player={player}
+      onEdit={handleEdit}
+      onDelete={handleDelete}
+      calculateAge={calculateAge}
+      formatGameTime={formatGameTime}
+    />
+  );
+
+  // Empty state action for GridView
+  const emptyAction = (
+    <Button
+      onClick={handleAddPlayer}
+      className="bg-blue-600 hover:bg-blue-700 text-white"
+    >
+      <Plus className="h-4 w-4 mr-2" />
+      Add Player
+    </Button>
+  );
+
   if (isLoading) {
     return <Loading overlay text="" color="blue" variant="cyberpunk-scan" />;
   }
@@ -561,13 +585,21 @@ const Players = () => {
 
         {/* Content based on view mode */}
         {viewMode === "grid" ? (
-          <PlayersGridView
-            players={filteredPlayers}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            calculateAge={calculateAge}
-            formatGameTime={formatGameTime}
-            onAddPlayer={handleAddPlayer}
+          <GridView
+            data={filteredPlayers}
+            renderItem={renderGridItem}
+            emptyMessage="No players found"
+            emptyIcon={Users}
+            emptyAction={emptyAction}
+            pageSize={12}
+            columns={{
+              sm: 1,
+              md: 2,
+              lg: 3,
+              xl: 4,
+              "2xl": 4,
+            }}
+            onPageChange={setCurrentPage}
           />
         ) : (
           <Card className="bg-gray-800/50 backdrop-blur-sm border border-gray-700">
@@ -605,54 +637,6 @@ const Players = () => {
         onConfirm={confirmDelete}
         player={selectedPlayer}
       />
-    </div>
-  );
-};
-
-// Enhanced Grid View Component
-const PlayersGridView = ({
-  players,
-  onEdit,
-  onDelete,
-  calculateAge,
-  formatGameTime,
-  onAddPlayer,
-}) => {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
-      {players.map((player) => (
-        <PlayerCard
-          key={player.id}
-          player={player}
-          onEdit={onEdit}
-          onDelete={onDelete}
-          calculateAge={calculateAge}
-          formatGameTime={formatGameTime}
-        />
-      ))}
-
-      {players.length === 0 && (
-        <div className="col-span-full">
-          <Card className="bg-gray-800/50 backdrop-blur-sm border border-gray-700">
-            <CardContent className="p-12 text-center">
-              <Users className="h-12 w-12 text-gray-500 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-white mb-2">
-                No players found
-              </h3>
-              <p className="text-gray-400 mb-4">
-                Get started by adding your first player
-              </p>
-              <Button
-                onClick={onAddPlayer}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Player
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      )}
     </div>
   );
 };

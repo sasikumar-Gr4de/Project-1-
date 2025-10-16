@@ -54,6 +54,29 @@ export const DETAILED_POSITIONS = {
 
 export const ALL_POSITIONS = Object.values(DETAILED_POSITIONS).flat();
 
+export const TOURNAMENT_OPTIONS = [
+  { value: "premier-league", label: "Premier League" },
+  { value: "championship", label: "Championship" },
+  { value: "fa-cup", label: "FA Cup" },
+  { value: "league-cup", label: "League Cup" },
+  { value: "youth-league", label: "Youth League" },
+  { value: "friendly", label: "Friendly Matches" },
+];
+
+export const ORGANIZER_OPTIONS = [
+  { value: "premier-league", label: "Premier League Organization" },
+  { value: "fa", label: "Football Association" },
+  { value: "uefa", label: "UEFA" },
+  { value: "fifa", label: "FIFA" },
+  { value: "local", label: "Local Organization" },
+];
+
+export const TEAM_STATUS_OPTIONS = [
+  { value: "active", label: "Active", color: "green" },
+  { value: "inactive", label: "Inactive", color: "gray" },
+  { value: "suspended", label: "Suspended", color: "red" },
+];
+
 export const PLAYER_STATUS = {
   ACTIVE: "active",
   INJURED: "injured",
