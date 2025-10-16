@@ -24,6 +24,7 @@ import Players from "./pages/players/Players";
 import PlayerDetail from "./pages/players/PlayerDetail";
 import Teams from "./pages/teams/Teams";
 import Tournaments from "./pages/tournaments/Tournaments";
+import TeamDetail from "./pages/teams/TeamDetail";
 
 function App() {
   const { initializeAuth, isLoading } = useAuthStore();
@@ -122,10 +123,18 @@ function App() {
             }
           />
           <Route
-            path="/Teams"
+            path="/teams"
             element={
               <ProtectedRoute>
                 <Teams />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/teams/:id"
+            element={
+              <ProtectedRoute>
+                <TeamDetail />
               </ProtectedRoute>
             }
           />

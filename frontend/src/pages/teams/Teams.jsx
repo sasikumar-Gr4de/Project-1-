@@ -414,7 +414,7 @@ const Teams = () => {
   );
 
   if (isLoading) {
-    return <Loading overlay text="" color="blue" variant="gradient-spinner" />;
+    return <Loading overlay text="" color="blue" variant="cyberpunk-scan" />;
   }
 
   return (

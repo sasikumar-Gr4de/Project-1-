@@ -172,7 +172,7 @@ const TeamForm = ({ isOpen, onClose, onSave, team }) => {
               >
                 <SelectValue placeholder="Select tournament" />
               </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-gray-600">
+              <SelectContent className="bg-gray-800 border-gray-600  text-white">
                 {TOURNAMENT_OPTIONS.map((tournament) => (
                   <SelectItem key={tournament.value} value={tournament.value}>
                     {tournament.label}
@@ -191,11 +191,11 @@ const TeamForm = ({ isOpen, onClose, onSave, team }) => {
             >
               <SelectTrigger
                 id="organizer-select"
-                className="bg-gray-700 border-gray-600"
+                className="bg-gray-700 border-gray-600 text-white"
               >
                 <SelectValue placeholder="Select organizer" />
               </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-gray-600">
+              <SelectContent className="bg-gray-800 border-gray-600 text-white">
                 {ORGANIZER_OPTIONS.map((organizer) => (
                   <SelectItem key={organizer.value} value={organizer.value}>
                     {organizer.label}
