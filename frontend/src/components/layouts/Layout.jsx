@@ -47,9 +47,9 @@ const Layout = () => {
 
       {/* Main Content */}
       <div className="flex-1 pt-16 lg:ml-64 transition-all duration-300 relative z-10 min-h-screen">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {/* Welcome Banner for non-admin users */}
-          {user && user.role !== "admin" && (
+          {/* {user && user.role !== "admin" && (
             <div className="mb-6 bg-gradient-to-r from-blue-600/20 to-purple-600/20 backdrop-blur-sm rounded-xl shadow-2xl p-6 text-white border border-gray-700/50">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
                 <div className="flex-1">
@@ -68,7 +68,7 @@ const Layout = () => {
                 </div>
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Page Content */}
           <div className="animate-fade-in">

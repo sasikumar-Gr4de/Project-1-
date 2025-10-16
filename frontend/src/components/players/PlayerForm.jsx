@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../components/ui/select";
+import { Users, Upload, X } from "lucide-react";
 
 const PlayerForm = ({ isOpen, onClose, onSave, player }) => {
   const [formData, setFormData] = useState({
@@ -27,7 +28,10 @@ const PlayerForm = ({ isOpen, onClose, onSave, player }) => {
     weight_kg: "",
     preferred_foot: "Right",
     status: "active",
+    profile_picture: null,
   });
+  const [previewImage, setPreviewImage] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const positions = ["Goalkeeper", "Defender", "Midfielder", "Forward"];
   const feet = ["Right", "Left"];
@@ -50,7 +54,9 @@ const PlayerForm = ({ isOpen, onClose, onSave, player }) => {
         weight_kg: player.weight_kg || "",
         preferred_foot: player.preferred_foot || "Right",
         status: player.status || "active",
+        profile_picture: player.profile_picture || null,
       });
+      setPreviewImage(player.profile_picture || null);
     } else {
       setFormData({
         name: "",
@@ -62,9 +68,39 @@ const PlayerForm = ({ isOpen, onClose, onSave, player }) => {
         weight_kg: "",
         preferred_foot: "Right",
         status: "active",
+        profile_picture: null,
       });
+      setPreviewImage(null);
     }
   }, [player, isOpen]);
+
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      // Simulate upload process
+      setIsUploading(true);
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImage(reader.result);
+        setFormData((prev) => ({
+          ...prev,
+          profile_picture: reader.result, // In real app, upload to server and get URL
+        }));
+        setIsUploading(false);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setPreviewImage(null);
+    setFormData((prev) => ({
+      ...prev,
+      profile_picture: null,
+    }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -84,176 +120,264 @@ const PlayerForm = ({ isOpen, onClose, onSave, player }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-gray-800 border-gray-700 text-white max-w-2xl">
+      <DialogContent className="bg-gray-800 border-gray-700 text-white max-w-4xl">
         <DialogHeader>
           <DialogTitle>{player ? "Edit Player" : "Add New Player"}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Basic Information */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium text-white">
-                Basic Information
-              </h3>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Profile Picture Section */}
+            <div className="lg:col-span-1">
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-white">
+                  Profile Picture
+                </h3>
 
-              <div>
-                <Label htmlFor="name" className="text-gray-300">
-                  Full Name
-                </Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => handleChange("name", e.target.value)}
-                  className="bg-gray-700 border-gray-600 text-white mt-1"
-                  required
-                />
-              </div>
+                <div className="flex flex-col items-center space-y-4">
+                  {/* Profile Picture Preview */}
+                  <div className="relative">
+                    <div className="w-32 h-32 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center overflow-hidden">
+                      {previewImage ? (
+                        <img
+                          src={previewImage}
+                          alt="Preview"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <Users className="h-12 w-12 text-white" />
+                      )}
+                    </div>
 
-              <div>
-                <Label htmlFor="date_of_birth" className="text-gray-300">
-                  Date of Birth
-                </Label>
-                <Input
-                  id="date_of_birth"
-                  type="date"
-                  value={formData.date_of_birth}
-                  onChange={(e) =>
-                    handleChange("date_of_birth", e.target.value)
-                  }
-                  className="bg-gray-700 border-gray-600 text-white mt-1"
-                  required
-                />
-              </div>
+                    {previewImage && (
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+                      >
+                        <X className="h-3 w-3 text-white" />
+                      </button>
+                    )}
+                  </div>
 
-              <div>
-                <Label htmlFor="nationality" className="text-gray-300">
-                  Nationality
-                </Label>
-                <Input
-                  id="nationality"
-                  value={formData.nationality}
-                  onChange={(e) => handleChange("nationality", e.target.value)}
-                  className="bg-gray-700 border-gray-600 text-white mt-1"
-                  required
-                />
-              </div>
+                  {/* Upload Button */}
+                  <div>
+                    <input
+                      type="file"
+                      id="profile_picture"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                    <Label htmlFor="profile_picture">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="border-gray-600 text-gray-300 hover:bg-gray-700 cursor-pointer"
+                        disabled={isUploading}
+                      >
+                        {isUploading ? (
+                          "Uploading..."
+                        ) : (
+                          <>
+                            <Upload className="h-4 w-4 mr-2" />
+                            {previewImage ? "Change Photo" : "Upload Photo"}
+                          </>
+                        )}
+                      </Button>
+                    </Label>
+                  </div>
 
-              <div>
-                <Label htmlFor="current_club" className="text-gray-300">
-                  Current Club
-                </Label>
-                <Input
-                  id="current_club"
-                  value={formData.current_club}
-                  onChange={(e) => handleChange("current_club", e.target.value)}
-                  className="bg-gray-700 border-gray-600 text-white mt-1"
-                  required
-                />
+                  <p className="text-xs text-gray-400 text-center">
+                    Recommended: Square image, 300x300px or larger
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Physical & Position */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium text-white">
-                Physical & Position
-              </h3>
+            {/* Form Fields */}
+            <div className="lg:col-span-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Basic Information */}
+                <div className="md:col-span-2 space-y-4">
+                  <h3 className="text-lg font-medium text-white">
+                    Basic Information
+                  </h3>
 
-              <div>
-                <Label htmlFor="primary_position" className="text-gray-300">
-                  Primary Position
-                </Label>
-                <Select
-                  value={formData.primary_position}
-                  onValueChange={(value) =>
-                    handleChange("primary_position", value)
-                  }
-                >
-                  <SelectTrigger className="bg-gray-700 border-gray-600 text-white mt-1">
-                    <SelectValue placeholder="Select position" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-gray-700 border-gray-600 text-white">
-                    {positions.map((position) => (
-                      <SelectItem key={position} value={position}>
-                        {position}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+                  <div>
+                    <Label htmlFor="name" className="text-gray-300">
+                      Full Name
+                    </Label>
+                    <Input
+                      id="name"
+                      value={formData.name}
+                      onChange={(e) => handleChange("name", e.target.value)}
+                      className="bg-gray-700 border-gray-600 text-white mt-1"
+                      required
+                    />
+                  </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="height_cm" className="text-gray-300">
-                    Height (cm)
-                  </Label>
-                  <Input
-                    id="height_cm"
-                    type="number"
-                    value={formData.height_cm}
-                    onChange={(e) => handleChange("height_cm", e.target.value)}
-                    className="bg-gray-700 border-gray-600 text-white mt-1"
-                    required
-                  />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="date_of_birth" className="text-gray-300">
+                        Date of Birth
+                      </Label>
+                      <Input
+                        id="date_of_birth"
+                        type="date"
+                        value={formData.date_of_birth}
+                        onChange={(e) =>
+                          handleChange("date_of_birth", e.target.value)
+                        }
+                        className="bg-gray-700 border-gray-600 text-white mt-1"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="nationality" className="text-gray-300">
+                        Nationality
+                      </Label>
+                      <Input
+                        id="nationality"
+                        value={formData.nationality}
+                        onChange={(e) =>
+                          handleChange("nationality", e.target.value)
+                        }
+                        className="bg-gray-700 border-gray-600 text-white mt-1"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="current_club" className="text-gray-300">
+                      Current Club
+                    </Label>
+                    <Input
+                      id="current_club"
+                      value={formData.current_club}
+                      onChange={(e) =>
+                        handleChange("current_club", e.target.value)
+                      }
+                      className="bg-gray-700 border-gray-600 text-white mt-1"
+                      required
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <Label htmlFor="weight_kg" className="text-gray-300">
-                    Weight (kg)
-                  </Label>
-                  <Input
-                    id="weight_kg"
-                    type="number"
-                    value={formData.weight_kg}
-                    onChange={(e) => handleChange("weight_kg", e.target.value)}
-                    className="bg-gray-700 border-gray-600 text-white mt-1"
-                    required
-                  />
+                {/* Physical & Position */}
+                <div className="md:col-span-2 space-y-4">
+                  <h3 className="text-lg font-medium text-white">
+                    Physical & Position
+                  </h3>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label
+                        htmlFor="primary_position"
+                        className="text-gray-300"
+                      >
+                        Primary Position
+                      </Label>
+                      <Select
+                        value={formData.primary_position}
+                        onValueChange={(value) =>
+                          handleChange("primary_position", value)
+                        }
+                      >
+                        <SelectTrigger className="bg-gray-700 border-gray-600 text-white mt-1">
+                          <SelectValue placeholder="Select position" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-gray-700 border-gray-600 text-white">
+                          {positions.map((position) => (
+                            <SelectItem key={position} value={position}>
+                              {position}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="status" className="text-gray-300">
+                        Status
+                      </Label>
+                      <Select
+                        value={formData.status}
+                        onValueChange={(value) => handleChange("status", value)}
+                      >
+                        <SelectTrigger className="bg-gray-700 border-gray-600 text-white mt-1">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-gray-700 border-gray-600 text-white">
+                          {statuses.map((status) => (
+                            <SelectItem key={status.value} value={status.value}>
+                              {status.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <Label htmlFor="height_cm" className="text-gray-300">
+                        Height (cm)
+                      </Label>
+                      <Input
+                        id="height_cm"
+                        type="number"
+                        value={formData.height_cm}
+                        onChange={(e) =>
+                          handleChange("height_cm", e.target.value)
+                        }
+                        className="bg-gray-700 border-gray-600 text-white mt-1"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="weight_kg" className="text-gray-300">
+                        Weight (kg)
+                      </Label>
+                      <Input
+                        id="weight_kg"
+                        type="number"
+                        value={formData.weight_kg}
+                        onChange={(e) =>
+                          handleChange("weight_kg", e.target.value)
+                        }
+                        className="bg-gray-700 border-gray-600 text-white mt-1"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="preferred_foot" className="text-gray-300">
+                        Preferred Foot
+                      </Label>
+                      <Select
+                        value={formData.preferred_foot}
+                        onValueChange={(value) =>
+                          handleChange("preferred_foot", value)
+                        }
+                      >
+                        <SelectTrigger className="bg-gray-700 border-gray-600 text-white mt-1">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-gray-700 border-gray-600 text-white">
+                          {feet.map((foot) => (
+                            <SelectItem key={foot} value={foot}>
+                              {foot}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
                 </div>
-              </div>
-
-              <div>
-                <Label htmlFor="preferred_foot" className="text-gray-300">
-                  Preferred Foot
-                </Label>
-                <Select
-                  value={formData.preferred_foot}
-                  onValueChange={(value) =>
-                    handleChange("preferred_foot", value)
-                  }
-                >
-                  <SelectTrigger className="bg-gray-700 border-gray-600 text-white mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-gray-700 border-gray-600 text-white">
-                    {feet.map((foot) => (
-                      <SelectItem key={foot} value={foot}>
-                        {foot}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="status" className="text-gray-300">
-                  Status
-                </Label>
-                <Select
-                  value={formData.status}
-                  onValueChange={(value) => handleChange("status", value)}
-                >
-                  <SelectTrigger className="bg-gray-700 border-gray-600 text-white mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-gray-700 border-gray-600 text-white">
-                    {statuses.map((status) => (
-                      <SelectItem key={status.value} value={status.value}>
-                        {status.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
             </div>
           </div>

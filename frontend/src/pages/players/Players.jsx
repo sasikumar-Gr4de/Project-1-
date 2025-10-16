@@ -10,6 +10,13 @@ import {
   CardTitle,
 } from "../../components/ui/card";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Plus,
   Search,
   Filter,
@@ -25,6 +32,9 @@ import {
   Ruler,
   Scale,
   Footprints,
+  Grid,
+  Table,
+  Image,
 } from "lucide-react";
 import PlayerForm from "../../components/players/PlayerForm";
 import DeletePlayerModal from "../../components/players/DeletePlayerModal";
@@ -35,12 +45,13 @@ const Players = () => {
   const [filteredPlayers, setFilteredPlayers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPosition, setSelectedPosition] = useState("all");
+  const [viewMode, setViewMode] = useState("grid"); // 'grid' or 'table'
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Mock data - replace with actual API calls
+  // Mock data with profile pictures
   const mockPlayers = [
     {
       id: 1,
@@ -53,6 +64,8 @@ const Players = () => {
       weight_kg: 72,
       preferred_foot: "Right",
       status: "active",
+      profile_picture:
+        "https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=150&h=150&fit=crop&crop=face",
       created_at: "2024-01-15T10:00:00Z",
       updated_at: "2024-01-15T10:00:00Z",
     },
@@ -67,6 +80,7 @@ const Players = () => {
       weight_kg: 68,
       preferred_foot: "Left",
       status: "active",
+      profile_picture: null, // No profile picture
       created_at: "2024-01-14T09:30:00Z",
       updated_at: "2024-01-14T09:30:00Z",
     },
@@ -81,6 +95,8 @@ const Players = () => {
       weight_kg: 58,
       preferred_foot: "Right",
       status: "injured",
+      profile_picture:
+        "https://images.unsplash.com/photo-1552058544-f2b08422138a?w=150&h=150&fit=crop&crop=face",
       created_at: "2024-01-13T14:20:00Z",
       updated_at: "2024-01-13T14:20:00Z",
     },
@@ -95,6 +111,8 @@ const Players = () => {
       weight_kg: 78,
       preferred_foot: "Right",
       status: "active",
+      profile_picture:
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
       created_at: "2024-01-12T11:45:00Z",
       updated_at: "2024-01-12T11:45:00Z",
     },
@@ -214,7 +232,7 @@ const Players = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-white">Loading players...</p>
@@ -224,10 +242,10 @@ const Players = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen">
       {/* Header */}
       <div className="bg-gray-800 border-b border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-2xl font-bold text-white flex items-center">
@@ -266,80 +284,93 @@ const Players = () => {
       </div>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Filters and Search */}
         <Card className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 mb-6">
           <CardContent className="p-6">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
               <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
                 <div className="relative flex-1 max-w-md">
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
                     type="text"
                     placeholder="Search players by name, club, or nationality..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                    className="pl-10 w-full h-10 bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500"
                   />
                 </div>
-
-                <select
-                  value={selectedPosition}
-                  onChange={(e) => setSelectedPosition(e.target.value)}
-                  className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                <Select
+                  onValueChange={(value) => setSelectedPosition(value)}
+                  defaultValue={selectedPosition}
                 >
-                  {positions.map((position) => (
-                    <option
-                      key={position}
-                      value={position === "All Positions" ? "all" : position}
-                    >
-                      {position}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500">
+                    <SelectValue placeholder="Select your role" />
+                  </SelectTrigger>
+
+                  <SelectContent className="bg-gray-800 border border-gray-600 text-white">
+                    {positions.map((position) => (
+                      <SelectItem
+                        key={position}
+                        value={position === "All Positions" ? "all" : position}
+                      >
+                        {position}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
-              <div className="text-sm text-gray-400">
-                Showing {filteredPlayers.length} of {players.length} players
+              <div className="flex items-center space-x-4">
+                <div className="text-sm text-gray-400">
+                  Showing {filteredPlayers.length} of {players.length} players
+                </div>
+
+                {/* View Mode Toggle */}
+                <div className="flex bg-gray-700 rounded-lg p-1">
+                  <button
+                    onClick={() => setViewMode("grid")}
+                    className={`p-2 rounded-md transition-colors ${
+                      viewMode === "grid"
+                        ? "bg-blue-500 text-white"
+                        : "text-gray-400 hover:text-white"
+                    }`}
+                  >
+                    <Grid className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode("table")}
+                    className={`p-2 rounded-md transition-colors ${
+                      viewMode === "table"
+                        ? "bg-blue-500 text-white"
+                        : "text-gray-400 hover:text-white"
+                    }`}
+                  >
+                    <Table className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Players Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filteredPlayers.map((player) => (
-            <PlayerCard
-              key={player.id}
-              player={player}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              calculateAge={calculateAge}
-            />
-          ))}
-        </div>
-
-        {filteredPlayers.length === 0 && (
-          <Card className="bg-gray-800/50 backdrop-blur-sm border border-gray-700">
-            <CardContent className="p-12 text-center">
-              <Users className="h-12 w-12 text-gray-500 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-white mb-2">
-                No players found
-              </h3>
-              <p className="text-gray-400 mb-4">
-                {searchTerm || selectedPosition !== "all"
-                  ? "Try adjusting your search criteria"
-                  : "Get started by adding your first player"}
-              </p>
-              <Button
-                onClick={handleAddPlayer}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Player
-              </Button>
-            </CardContent>
-          </Card>
+        {/* Content based on view mode */}
+        {viewMode === "grid" ? (
+          <PlayersGridView
+            players={filteredPlayers}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            calculateAge={calculateAge}
+            onAddPlayer={handleAddPlayer}
+          />
+        ) : (
+          <PlayersTableView
+            players={filteredPlayers}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            calculateAge={calculateAge}
+            onAddPlayer={handleAddPlayer}
+          />
         )}
       </main>
 
@@ -367,23 +398,229 @@ const Players = () => {
   );
 };
 
-// Player Card Component
+// Grid View Component
+const PlayersGridView = ({
+  players,
+  onEdit,
+  onDelete,
+  calculateAge,
+  onAddPlayer,
+}) => {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      {players.map((player) => (
+        <PlayerCard
+          key={player.id}
+          player={player}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          calculateAge={calculateAge}
+        />
+      ))}
+
+      {players.length === 0 && (
+        <div className="col-span-full">
+          <Card className="bg-gray-800/50 backdrop-blur-sm border border-gray-700">
+            <CardContent className="p-12 text-center">
+              <Users className="h-12 w-12 text-gray-500 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-white mb-2">
+                No players found
+              </h3>
+              <p className="text-gray-400 mb-4">
+                Get started by adding your first player
+              </p>
+              <Button
+                onClick={onAddPlayer}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Player
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Table View Component
+const PlayersTableView = ({
+  players,
+  onEdit,
+  onDelete,
+  calculateAge,
+  onAddPlayer,
+}) => {
+  const [showActions, setShowActions] = useState(null);
+
+  return (
+    <Card className="bg-gray-800/50 backdrop-blur-sm border border-gray-700">
+      <CardContent className="p-0">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-gray-700">
+                <th className="text-left py-4 px-6 text-sm font-medium text-gray-400">
+                  Player
+                </th>
+                <th className="text-left py-4 px-6 text-sm font-medium text-gray-400">
+                  Position
+                </th>
+                <th className="text-left py-4 px-6 text-sm font-medium text-gray-400">
+                  Club
+                </th>
+                <th className="text-left py-4 px-6 text-sm font-medium text-gray-400">
+                  Age
+                </th>
+                <th className="text-left py-4 px-6 text-sm font-medium text-gray-400">
+                  Nationality
+                </th>
+                <th className="text-left py-4 px-6 text-sm font-medium text-gray-400">
+                  Status
+                </th>
+                <th className="text-right py-4 px-6 text-sm font-medium text-gray-400">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {players.map((player) => (
+                <tr
+                  key={player.id}
+                  className="border-b border-gray-700/50 hover:bg-gray-700/20"
+                >
+                  <td className="py-4 px-6">
+                    <div className="flex items-center space-x-3">
+                      <PlayerAvatar player={player} size="md" />
+                      <div>
+                        <div className="font-medium text-white">
+                          {player.name}
+                        </div>
+                        <div className="text-sm text-gray-400 flex items-center">
+                          <Ruler className="h-3 w-3 mr-1" />
+                          {player.height_cm}cm • {player.weight_kg}kg
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-4 px-6">
+                    <div className="text-white">{player.primary_position}</div>
+                    <div className="text-sm text-gray-400 flex items-center">
+                      <Footprints className="h-3 w-3 mr-1" />
+                      {player.preferred_foot}
+                    </div>
+                  </td>
+                  <td className="py-4 px-6 text-white">
+                    {player.current_club}
+                  </td>
+                  <td className="py-4 px-6 text-white">
+                    {calculateAge(player.date_of_birth)}
+                  </td>
+                  <td className="py-4 px-6">
+                    <div className="flex items-center text-white">
+                      <MapPin className="h-3 w-3 mr-1" />
+                      {player.nationality}
+                    </div>
+                  </td>
+                  <td className="py-4 px-6">
+                    <PlayerStatusBadge status={player.status} />
+                  </td>
+                  <td className="py-4 px-6">
+                    <div className="flex justify-end space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onEdit(player)}
+                        className="text-gray-400 hover:text-white"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onDelete(player)}
+                        className="text-red-400 hover:text-red-300"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {players.length === 0 && (
+          <div className="p-12 text-center">
+            <Users className="h-12 w-12 text-gray-500 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-white mb-2">
+              No players found
+            </h3>
+            <p className="text-gray-400 mb-4">
+              Get started by adding your first player
+            </p>
+            <Button
+              onClick={onAddPlayer}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Player
+            </Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+// Player Avatar Component
+const PlayerAvatar = ({ player, size = "md" }) => {
+  const sizeClasses = {
+    sm: "w-8 h-8",
+    md: "w-10 h-10",
+    lg: "w-12 h-12",
+    xl: "w-16 h-16",
+  };
+
+  return (
+    <div
+      className={`${sizeClasses[size]} rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center overflow-hidden`}
+    >
+      {player.profile_picture ? (
+        <img
+          src={player.profile_picture}
+          alt={player.name}
+          className="w-full h-full object-cover"
+        />
+      ) : (
+        <Users className="h-1/2 w-1/2 text-white" />
+      )}
+    </div>
+  );
+};
+
+// Player Card Component (for grid view)
 const PlayerCard = ({ player, onEdit, onDelete, calculateAge }) => {
   const [showActions, setShowActions] = useState(false);
 
   return (
     <Card className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 hover:border-gray-600 transition-colors">
       <CardContent className="p-6">
-        {/* Header */}
+        {/* Header with Avatar and Actions */}
         <div className="flex items-start justify-between mb-4">
-          <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-semibold text-white truncate">
-              {player.name}
-            </h3>
-            <p className="text-sm text-gray-400 flex items-center mt-1">
-              <MapPin className="h-3 w-3 mr-1" />
-              {player.nationality}
-            </p>
+          <div className="flex items-center space-x-3">
+            <PlayerAvatar player={player} size="lg" />
+            <div className="flex-1 min-w-0">
+              <h3 className="text-lg font-semibold text-white truncate">
+                {player.name}
+              </h3>
+              <p className="text-sm text-gray-400 flex items-center mt-1">
+                <MapPin className="h-3 w-3 mr-1" />
+                {player.nationality}
+              </p>
+            </div>
           </div>
 
           <div className="relative">
