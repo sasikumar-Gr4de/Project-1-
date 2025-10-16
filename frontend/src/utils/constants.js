@@ -6,6 +6,71 @@ export const POSITION_CATEGORIES = {
   FORWARD: "Forward",
 };
 
+export const DETAILED_POSITIONS = {
+  GOALKEEPER: [
+    { value: "GK", label: "Goalkeeper (GK)", category: "Goalkeeper" },
+  ],
+  DEFENDER: [
+    { value: "CB", label: "Center Back (CB)", category: "Defender" },
+    { value: "RB", label: "Right Back (RB)", category: "Defender" },
+    { value: "LB", label: "Left Back (LB)", category: "Defender" },
+    { value: "SW", label: "Sweeper (SW)", category: "Defender" },
+    { value: "RWB", label: "Right Wing Back (RWB)", category: "Defender" },
+    { value: "LWB", label: "Left Wing Back (LWB)", category: "Defender" },
+  ],
+  MIDFIELDER: [
+    {
+      value: "CDM",
+      label: "Defensive Midfielder (CDM)",
+      category: "Midfielder",
+    },
+    { value: "CM", label: "Center Midfielder (CM)", category: "Midfielder" },
+    {
+      value: "CAM",
+      label: "Attacking Midfielder (CAM)",
+      category: "Midfielder",
+    },
+    { value: "RM", label: "Right Midfielder (RM)", category: "Midfielder" },
+    { value: "LM", label: "Left Midfielder (LM)", category: "Midfielder" },
+    {
+      value: "RWM",
+      label: "Right Wing Midfielder (RWM)",
+      category: "Midfielder",
+    },
+    {
+      value: "LWM",
+      label: "Left Wing Midfielder (LWM)",
+      category: "Midfielder",
+    },
+  ],
+  FORWARD: [
+    { value: "CF", label: "Center Forward (CF)", category: "Forward" },
+    { value: "ST", label: "Striker (ST)", category: "Forward" },
+    { value: "RW", label: "Right Winger (RW)", category: "Forward" },
+    { value: "LW", label: "Left Winger (LW)", category: "Forward" },
+    { value: "SS", label: "Second Striker (SS)", category: "Forward" },
+  ],
+};
+
+export const ALL_POSITIONS = Object.values(DETAILED_POSITIONS).flat();
+
+export const PLAYER_STATUS = {
+  ACTIVE: "active",
+  INJURED: "injured",
+  SUSPENDED: "suspended",
+  INACTIVE: "inactive",
+  TRANSFER_LISTED: "transfer_listed",
+};
+
+export const STATUS_OPTIONS = [
+  { value: "all", label: "All Status" },
+  { value: PLAYER_STATUS.ACTIVE, label: "Active" },
+  { value: PLAYER_STATUS.INJURED, label: "Injured" },
+  { value: PLAYER_STATUS.SUSPENDED, label: "Suspended" },
+  { value: PLAYER_STATUS.INACTIVE, label: "Inactive" },
+  { value: PLAYER_STATUS.TRANSFER_LISTED, label: "Transfer Listed" },
+];
+
 // Event types for match analysis
 export const EVENT_TYPES = {
   PASS: "pass",
@@ -277,6 +342,9 @@ export const API_ENDPOINTS = {
 
 export default {
   POSITION_CATEGORIES,
+  DETAILED_POSITIONS,
+  ALL_POSITIONS,
+  STATUS_OPTIONS,
   EVENT_TYPES,
   METRIC_CATEGORIES,
   MATCH_STATUS,
