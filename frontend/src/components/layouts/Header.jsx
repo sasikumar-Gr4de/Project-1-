@@ -17,6 +17,7 @@ import {
 
 import { useAuthStore } from "../../store/authStore";
 import { capitalize } from "../../utils/formatters";
+import { Link } from "react-router-dom";
 
 const Header = ({ activeTab, setActiveTab, sidebarOpen, onMenuClick }) => {
   const navigation = [
@@ -71,11 +72,11 @@ const Header = ({ activeTab, setActiveTab, sidebarOpen, onMenuClick }) => {
               {navigation.map((item) => {
                 const Icon = item.icon;
                 return (
-                  <a
+                  <Link
                     key={item.id}
-                    href={item.path}
+                    to={item.path}
                     onClick={(e) => {
-                      e.preventDefault();
+                      // e.preventDefault();
                       setActiveTab(item.id);
                     }}
                     className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-medium transition-all duration-200 backdrop-blur-sm ${
@@ -88,7 +89,7 @@ const Header = ({ activeTab, setActiveTab, sidebarOpen, onMenuClick }) => {
                       <Icon className="h-4 w-4" />
                     )}
                     <span>{item.label}</span>
-                  </a>
+                  </Link>
                 );
               })}
             </nav>
@@ -146,9 +147,9 @@ const Header = ({ activeTab, setActiveTab, sidebarOpen, onMenuClick }) => {
         <div className="lg:hidden pb-3 border-t border-gray-700/50 mt-2 pt-3">
           <div className="flex space-x-1 overflow-x-auto scrollbar-hide">
             {navigation.map((item) => (
-              <a
+              <Link
                 key={item.id}
-                href={item.path}
+                to={item.path}
                 onClick={(e) => {
                   e.preventDefault();
                   setActiveTab(item.id);
@@ -160,7 +161,7 @@ const Header = ({ activeTab, setActiveTab, sidebarOpen, onMenuClick }) => {
                 }`}
               >
                 {item.label}
-              </a>
+              </Link>
             ))}
           </div>
         </div>

@@ -8,8 +8,6 @@ import {
   FileText,
   Target,
   Settings,
-  X,
-  HelpCircle,
   Shield,
 } from "lucide-react";
 
@@ -62,6 +60,7 @@ const Sidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) => {
   ];
 
   const isActive = (path) => {
+    console.log(location.pathname, path);
     return location.pathname === path || activeTab === path.split("/")[1];
   };
 
@@ -86,7 +85,6 @@ const Sidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) => {
       `}
       >
         <div className="flex flex-col h-full pt-16">
-          {/* Added pt-16 for header space */}
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
             {menuItems.map((item) => {
