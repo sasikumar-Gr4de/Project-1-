@@ -65,8 +65,7 @@ const Matches = () => {
       team_b_id: 2,
       team_a_name: "United Academy",
       team_b_name: "City Youth",
-      team_a_logo:
-        "https://images.unsplash.com/photo-1614624532983-1fe21c1d4ae5?w=150&h=150&fit=crop&crop=center",
+      team_a_logo: "",
       team_b_logo:
         "https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=150&h=150&fit=crop&crop=center",
       tournament_name: "premier-league",
@@ -86,8 +85,7 @@ const Matches = () => {
       team_a_name: "Rovers FC",
       team_b_name: "Athletic Youth",
       team_a_logo: "",
-      team_b_logo:
-        "https://images.unsplash.com/photo-1614624532983-1fe21c1d4ae5?w=150&h=150&fit=crop&crop=center",
+      team_b_logo: "",
       tournament_name: "championship",
       match_day: 2,
       match_date: "2024-03-20T18:30:00",
@@ -104,8 +102,7 @@ const Matches = () => {
       team_b_id: 3,
       team_a_name: "United Academy",
       team_b_name: "Rovers FC",
-      team_a_logo:
-        "https://images.unsplash.com/photo-1614624532983-1fe21c1d4ae5?w=150&h=150&fit=crop&crop=center",
+      team_a_logo: "",
       team_b_logo: "",
       tournament_name: "premier-league",
       match_day: 3,
@@ -125,8 +122,7 @@ const Matches = () => {
       team_b_name: "Athletic Youth",
       team_a_logo:
         "https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?w=150&h=150&fit=crop&crop=center",
-      team_b_logo:
-        "https://images.unsplash.com/photo-1614624532983-1fe21c1d4ae5?w=150&h=150&fit=crop&crop=center",
+      team_b_logo: "",
       tournament_name: "youth-league",
       match_day: 1,
       match_date: "2024-03-25T16:00:00",
@@ -143,8 +139,7 @@ const Matches = () => {
     {
       id: 1,
       name: "United Academy",
-      team_mark:
-        "https://images.unsplash.com/photo-1614624532983-1fe21c1d4ae5?w=150&h=150&fit=crop&crop=center",
+      team_mark: "",
     },
     {
       id: 2,
@@ -421,7 +416,7 @@ const Matches = () => {
   );
 
   if (isLoading) {
-    return <Loading overlay text="" color="blue" variant="gradient-spinner" />;
+    return <Loading overlay text="" color="blue" variant="cyberpunk-scan" />;
   }
 
   return (

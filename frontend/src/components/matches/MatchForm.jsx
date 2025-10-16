@@ -105,7 +105,7 @@ const MatchForm = ({ isOpen, onClose, onSave, match, teams = [] }) => {
               >
                 <SelectValue placeholder="Select home team" />
               </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-gray-600">
+              <SelectContent className="bg-gray-800 border-gray-600 text-white">
                 {teamOptions.map((team) => (
                   <SelectItem key={team.value} value={team.value}>
                     {team.label}
@@ -128,7 +128,7 @@ const MatchForm = ({ isOpen, onClose, onSave, match, teams = [] }) => {
               >
                 <SelectValue placeholder="Select away team" />
               </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-gray-600">
+              <SelectContent className="bg-gray-800 border-gray-600 text-white">
                 {teamOptions
                   .filter((team) => team.value !== formData.team_a_id)
                   .map((team) => (
@@ -206,7 +206,7 @@ const MatchForm = ({ isOpen, onClose, onSave, match, teams = [] }) => {
               >
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-gray-600">
+              <SelectContent className="bg-gray-800 border-gray-600 text-white">
                 {MATCH_STATUS_OPTIONS.map((status) => (
                   <SelectItem key={status.value} value={status.value}>
                     {status.label}
