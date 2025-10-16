@@ -1,5 +1,20 @@
 import React, { useState } from "react";
 
+import { Link } from "react-router-dom";
+import { Button } from "../../components/ui/button";
+import { Card, CardContent } from "../../components/ui/card";
+
+import {
+  MoreHorizontal,
+  Edit,
+  Trash2,
+  Eye,
+  MapPin,
+  Footprints,
+} from "lucide-react";
+
+import PlayerAvatar from "./PlayerAvatar";
+
 const PlayerCard = ({
   player,
   onEdit,

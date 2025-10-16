@@ -18,8 +18,6 @@ import {
 import {
   Plus,
   Search,
-  Filter,
-  MoreHorizontal,
   Edit,
   Trash2,
   Eye,
@@ -28,12 +26,9 @@ import {
   Users,
   Calendar,
   MapPin,
-  Ruler,
-  Scale,
   Footprints,
   Grid,
   Table,
-  Image,
   BarChart3,
   Clock,
 } from "lucide-react";
