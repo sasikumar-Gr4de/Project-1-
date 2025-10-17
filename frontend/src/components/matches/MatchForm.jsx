@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from "@/components/ui/select";
 import { Calendar as CalendarIcon, Trophy, Users } from "lucide-react";
-import {
-  TOURNAMENT_OPTIONS,
-  MATCH_STATUS_OPTIONS,
-} from "../../utils/constants";
+import { TOURNAMENT_OPTIONS, MATCH_STATUS_OPTIONS } from "@/utils/constants";
 
 const MatchForm = ({ isOpen, onClose, onSave, match, teams = [] }) => {
   const [formData, setFormData] = useState({

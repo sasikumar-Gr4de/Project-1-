@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Card, CardContent } from "../../components/ui/card";
-import { Button } from "../../components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Edit,
   Trash2,
@@ -11,8 +11,8 @@ import {
   MapPin,
   Award,
 } from "lucide-react";
-import TournamentAvatar from "./TournamentAvatar";
-import TournamentStatusBadge from "./TournamentStatusBadge";
+import TournamentAvatar from "@/components/tournaments/TournamentAvatar";
+import TournamentStatusBadge from "@/components/tournaments/TournamentStatusBadge";
 
 const TournamentCard = ({ tournament, onEdit, onDelete, formatDate }) => {
   return (

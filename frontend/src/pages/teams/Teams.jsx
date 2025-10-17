@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
-import { Card, CardContent } from "../../components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -28,22 +28,22 @@ import {
   MapPin,
 } from "lucide-react";
 
-import TeamForm from "../../components/teams/TeamForm";
-import DeleteTeamModal from "../../components/teams/DeleteTeamModal";
-import TeamStatusBadge from "../../components/teams/TeamStatusBadge";
-import TeamAvatar from "../../components/teams/TeamAvatar";
-import DataTable from "../../components/common/DataTable";
-import GridView from "../../components/common/GridView";
-import MultiSelectFilter from "../../components/common/MultiSelectFilter";
-import TeamCard from "../../components/teams/TeamCard";
+import TeamForm from "@/components/teams/TeamForm";
+import DeleteTeamModal from "@/components/teams/DeleteTeamModal";
+import TeamStatusBadge from "@/components/teams/TeamStatusBadge";
+import TeamAvatar from "@/components/teams/TeamAvatar";
+import DataTable from "@/components/common/DataTable";
+import GridView from "@/components/common/GridView";
+import MultiSelectFilter from "@/components/common/MultiSelectFilter";
+import TeamCard from "@/components/teams/TeamCard";
 
 import {
   TOURNAMENT_OPTIONS,
   ORGANIZER_OPTIONS,
   TEAM_STATUS_OPTIONS,
-} from "../../utils/constants";
+} from "@/utils/constants";
 
-import { calculateAge } from "../../utils/calculate";
+import { calculateAge } from "@/utils/calculate";
 import Loading from "@/components/common/Loading";
 
 const Teams = () => {

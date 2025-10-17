@@ -1,10 +1,10 @@
 import React from "react";
-import StatsGrid from "../../components/dashboard/StatsGrid";
-import QuickActions from "../../components/dashboard/QuickActions";
-import RecentPlayers from "../../components/dashboard/RecentPlayers";
-import PerformanceMetrics from "../../components/dashboard/PerformanceMetrics";
-import TopPerformers from "../../components/dashboard/TopPerformers";
-import SystemStatus from "../../components/dashboard/SystemStatus";
+import StatsGrid from "@/components/dashboard/StatsGrid";
+import QuickActions from "@/components/dashboard/QuickActions";
+import RecentPlayers from "@/components/dashboard/RecentPlayers";
+import PerformanceMetrics from "@/components/dashboard/PerformanceMetrics";
+import TopPerformers from "@/components/dashboard/TopPerformers";
+import SystemStatus from "@/components/dashboard/SystemStatus";
 import { useAuthStore } from "@/store/authStore";
 
 const Dashboard = () => {

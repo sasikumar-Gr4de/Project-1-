@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
-import { Card, CardContent } from "../../components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -30,20 +30,20 @@ import {
   Award,
 } from "lucide-react";
 
-import TournamentForm from "../../components/tournaments/TournamentForm";
-import DeleteTournamentModal from "../../components/tournaments/DeleteTournamentModal";
-import TournamentStatusBadge from "../../components/tournaments/TournamentStatusBadge";
-import TournamentAvatar from "../../components/tournaments/TournamentAvatar";
-import DataTable from "../../components/common/DataTable";
-import GridView from "../../components/common/GridView";
-import MultiSelectFilter from "../../components/common/MultiSelectFilter";
-import TournamentCard from "../../components/tournaments/TournamentCard";
+import TournamentForm from "@/components/tournaments/TournamentForm";
+import DeleteTournamentModal from "@/components/tournaments/DeleteTournamentModal";
+import TournamentStatusBadge from "@/components/tournaments/TournamentStatusBadge";
+import TournamentAvatar from "@/components/tournaments/TournamentAvatar";
+import DataTable from "@/components/common/DataTable";
+import GridView from "@/components/common/GridView";
+import MultiSelectFilter from "@/components/common/MultiSelectFilter";
+import TournamentCard from "@/components/tournaments/TournamentCard";
 
 import {
   TOURNAMENT_OPTIONS,
   ORGANIZER_OPTIONS,
   MATCH_STATUS_OPTIONS,
-} from "../../utils/constants";
+} from "@/utils/constants";
 
 import Loading from "@/components/common/Loading";
 

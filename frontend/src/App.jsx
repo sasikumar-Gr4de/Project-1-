@@ -1,31 +1,31 @@
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import "./App.css";
+import "@/App.css";
 
-import { useAuthStore } from "./store/authStore";
-import ProtectedRoute from "./components/common/ProtectedRoute";
-import PublicRoute from "./components/common/PublicRoute";
+import { useAuthStore } from "@/store/authStore";
+import ProtectedRoute from "@/components/common/ProtectedRoute";
+import PublicRoute from "@/components/common/PublicRoute";
 
 // Error Pages
-import NotFound from "./pages/errors/NotFound";
-import Unauthorized from "./pages/errors/Unauthorized";
+import NotFound from "@/pages/errors/NotFound";
+import Unauthorized from "@/pages/errors/Unauthorized";
 
-import Landing from "./pages";
-import Login from "./pages/login";
-import Register from "./pages/register";
+import Landing from "@/pages";
+import Login from "@/pages/login";
+import Register from "@/pages/register";
 
-import Dashboard from "./pages/dashboard/Dashboard";
+import Dashboard from "@/pages/dashboard/Dashboard";
 
-import VerifyEmail from "./pages/verify-email";
-import ToastContainer from "./components/common/ToastContainer";
-import Layout from "./components/layouts/Layout";
-import Matches from "./pages/matches/Matches";
-import Players from "./pages/players/Players";
-import PlayerDetail from "./pages/players/PlayerDetail";
-import Teams from "./pages/teams/Teams";
-import Tournaments from "./pages/tournaments/Tournaments";
-import TeamDetail from "./pages/teams/TeamDetail";
-import MatchDetail from "./pages/matches/MatchDetail";
+import VerifyEmail from "@/pages/verify-email";
+import ToastContainer from "@/components/common/ToastContainer";
+import Layout from "@/components/layouts/Layout";
+import Matches from "@/pages/matches/Matches";
+import Players from "@/pages/players/Players";
+import PlayerDetail from "@/pages/players/PlayerDetail";
+import Teams from "@/pages/teams/Teams";
+import Tournaments from "@/pages/tournaments/Tournaments";
+import TeamDetail from "@/pages/teams/TeamDetail";
+import MatchDetail from "@/pages/matches/MatchDetail";
 
 function App() {
   const { initializeAuth, isLoading } = useAuthStore();

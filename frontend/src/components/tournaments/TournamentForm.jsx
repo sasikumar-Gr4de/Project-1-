@@ -4,18 +4,18 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "../../components/ui/dialog";
-import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../components/ui/select";
-import { ORGANIZER_OPTIONS, MATCH_STATUS_OPTIONS } from "../../utils/constants";
+} from "@/components/ui/select";
+import { ORGANIZER_OPTIONS, MATCH_STATUS_OPTIONS } from "@/utils/constants";
 
 const TournamentForm = ({ isOpen, onClose, onSave, tournament }) => {
   const [formData, setFormData] = useState({

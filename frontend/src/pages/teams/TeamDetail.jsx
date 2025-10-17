@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../../components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -27,21 +22,19 @@ import {
   Clock,
   Plus,
   Search,
-  Edit,
   Trash2,
   Eye,
   Footprints,
 } from "lucide-react";
 
-import TeamAvatar from "../../components/teams/TeamAvatar";
-import TeamStatusBadge from "../../components/teams/TeamStatusBadge";
-import PlayerAvatar from "../../components/players/PlayerAvatar";
-import PlayerStatusBadge from "../../components/players/PlayerStatusBadge";
-import DataTable from "../../components/common/DataTable";
-import GridView from "../../components/common/GridView";
-import MultiSelectFilter from "../../components/common/MultiSelectFilter";
-import { calculateAge } from "../../utils/calculate";
-import { ALL_POSITIONS, STATUS_OPTIONS } from "../../utils/constants";
+import TeamAvatar from "@/components/teams/TeamAvatar";
+import TeamStatusBadge from "@/components/teams/TeamStatusBadge";
+import PlayerAvatar from "@/components/players/PlayerAvatar";
+import PlayerStatusBadge from "@/components/players/PlayerStatusBadge";
+import DataTable from "@/components/common/DataTable";
+import MultiSelectFilter from "@/components/common/MultiSelectFilter";
+import { calculateAge } from "@/utils/calculate";
+import { ALL_POSITIONS, STATUS_OPTIONS } from "@/utils/constants";
 import Loading from "@/components/common/Loading";
 
 const TeamDetail = () => {

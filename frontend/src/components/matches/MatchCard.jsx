@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Card, CardContent } from "../ui/card";
-import { Button } from "../ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Eye,
   Edit,
@@ -11,8 +11,8 @@ import {
   Calendar,
   Trophy,
 } from "lucide-react";
-import TeamAvatar from "../teams/TeamAvatar";
-import MatchStatusBadge from "./MatchStatusBadge";
+import TeamAvatar from "@/components/teams/TeamAvatar";
+import MatchStatusBadge from "@/components/matches/MatchStatusBadge";
 
 const MatchCard = ({ match, onEdit, onDelete, onUploadVideo }) => {
   const canViewDetails = match.status !== "upcoming";

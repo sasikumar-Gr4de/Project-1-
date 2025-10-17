@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Card, CardContent } from "../ui/card";
-import { Button } from "../ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Users,
   Trophy,
@@ -14,8 +14,8 @@ import {
   User,
   Building,
 } from "lucide-react";
-import TeamAvatar from "./TeamAvatar";
-import TeamStatusBadge from "./TeamStatusBadge";
+import TeamAvatar from "@/components/teams/TeamAvatar";
+import TeamStatusBadge from "@/components/teams/TeamStatusBadge";
 
 import { capitalize } from "@/utils/formatters";
 

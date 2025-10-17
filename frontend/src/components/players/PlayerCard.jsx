@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 
 import { Link } from "react-router-dom";
-import { Button } from "../../components/ui/button";
-import { Card, CardContent } from "../../components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
 import {
   MoreHorizontal,
@@ -13,10 +13,9 @@ import {
   Footprints,
 } from "lucide-react";
 
-import PlayerAvatar from "./PlayerAvatar";
-import PlayerStatusBadge from "./PlayerStatusBadge";
-
-import { ALL_POSITIONS } from "../../utils/constants";
+import { ALL_POSITIONS } from "@/utils/constants";
+import PlayerAvatar from "@/components/players/PlayerAvatar";
+import PlayerStatusBadge from "@/components/players/PlayerStatusBadge";
 
 const PlayerCard = ({
   player,

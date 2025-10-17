@@ -1,6 +1,6 @@
 import React from "react";
-import { cn } from "../../lib/utils";
-import { TEAM_STATUS_OPTIONS } from "../../utils/constants";
+import { cn } from "@/lib/utils";
+import { TEAM_STATUS_OPTIONS } from "@/utils/constants";
 
 const TeamStatusBadge = ({ status, className = "" }) => {
   const statusConfig = TEAM_STATUS_OPTIONS.find((s) => s.value === status) || {

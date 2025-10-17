@@ -6,13 +6,13 @@ import TeamAvatar from "@/components/teams/TeamAvatar";
 import { Users, Download, RefreshCw } from "lucide-react";
 
 // Import pitch components
-import PitchMarkings from "./pitch/PitchMarkings";
-import PitchPlayer from "./pitch/PitchPlayer";
-import BenchPlayer from "./pitch/BenchPlayer";
-import EmptySlot from "./pitch/EmptySlot";
-import ActionPanel from "./pitch/ActionPanel";
-import FormationSelector from "./pitch/FormationSelector";
-import MatchTimeline from "./pitch/MatchTimeline";
+import PitchMarkings from "@/components/matches/pitch/PitchMarkings";
+import PitchPlayer from "@/components/matches/pitch/PitchPlayer";
+import BenchPlayer from "@/components/matches/pitch/BenchPlayer";
+import EmptySlot from "@/components/matches/pitch/EmptySlot";
+import ActionPanel from "@/components/matches/pitch/ActionPanel";
+import FormationSelector from "@/components/matches/pitch/FormationSelector";
+import MatchTimeline from "@/components/matches/pitch/MatchTimeline";
 
 // Import constants and data
 import { FORMATIONS } from "@/utils/constants";
@@ -20,7 +20,7 @@ import {
   enhancedPlayers,
   initialLineups,
   initialSubstitutes,
-} from "./pitch/utils/playerData";
+} from "@/components/matches/pitch/utils/playerData";
 
 const FootballPitch = ({
   match,

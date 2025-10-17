@@ -1,22 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Button } from "../../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../../components/ui/card";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "../../components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ArrowLeft,
   Play,
-  Video,
   Download,
   Share2,
   Calendar,
@@ -26,9 +15,7 @@ import {
   Target,
   Zap,
   Crosshair,
-  Shield,
   GitMerge,
-  TrendingUp,
   Clock,
   AlertTriangle,
   CheckCircle,
@@ -37,9 +24,8 @@ import {
   Flag,
 } from "lucide-react";
 
-import TeamAvatar from "../../components/teams/TeamAvatar";
-import MatchStatusBadge from "../../components/matches/MatchStatusBadge";
-import PlayerAvatar from "../../components/players/PlayerAvatar";
+import TeamAvatar from "@/components/teams/TeamAvatar";
+import MatchStatusBadge from "@/components/matches/MatchStatusBadge";
 import Loading from "@/components/common/Loading";
 import FootballPitch from "@/components/matches/FootballPitch";
 

@@ -1,23 +1,23 @@
 // components/players/PlayerForm.jsx - Fixed accessibility issues
 import React, { useState, useEffect } from "react";
-import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "../../components/ui/dialog";
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../components/ui/select";
+} from "@/components/ui/select";
 import { Users, Upload, X, Calendar } from "lucide-react";
-import { ALL_POSITIONS } from "../../utils/constants";
+import { ALL_POSITIONS } from "@/utils/constants";
 
 const PlayerForm = ({ isOpen, onClose, onSave, player }) => {
   const [formData, setFormData] = useState({

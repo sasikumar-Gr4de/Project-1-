@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-} from "../../components/ui/card";
+} from "@/components/ui/card";
 import { Crown } from "lucide-react";
 
 const TopPerformers = () => {

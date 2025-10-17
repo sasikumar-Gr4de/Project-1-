@@ -1,14 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Button } from "../../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../../components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShieldAlert, Home, ArrowLeft, LogIn, Mail } from "lucide-react";
-import { useAuthStore } from "../../store/authStore";
+import { useAuthStore } from "@/store/authStore";
 
 const Unauthorized = () => {
   const { user, logout } = useAuthStore();

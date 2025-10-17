@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
-import Header from "./Header";
-import Sidebar from "./Sidebar";
-import Footer from "./Footer";
-import { useAuthStore } from "../../store/authStore";
-import ScrollIndicator from "../common/ScrollIndicator";
+import Header from "@/components/layouts/Header";
+import Sidebar from "@/components/layouts/Sidebar";
+import Footer from "@/components/layouts/Footer";
+import { useAuthStore } from "@/store/authStore";
+import ScrollIndicator from "@/components/common/ScrollIndicator";
 
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);

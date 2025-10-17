@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-} from "../../components/ui/card";
+} from "@/components/ui/card";
 import { Activity, TrendingUp, TrendingDown } from "lucide-react";
 
 const PerformanceMetrics = () => {

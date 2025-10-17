@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-} from "../../components/ui/card";
+} from "@/components/ui/card";
 import { Upload, FileText, Users, BarChart3, Zap } from "lucide-react";
 
 const QuickActions = () => {

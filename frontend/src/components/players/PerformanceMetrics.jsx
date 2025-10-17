@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Target, Crosshair, Zap, Brain, Heart, Activity } from "lucide-react"; // Add Activity import
 
 const PerformanceMetrics = ({ player }) => {

@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardContent } from "../../components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Users, PlayCircle, FileText, Target, TrendingUp } from "lucide-react";
 
 const StatsGrid = ({ stats }) => {

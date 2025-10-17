@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
-import { Card, CardContent } from "../../components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -19,26 +19,21 @@ import {
   Download,
   Upload,
   Calendar,
-  Trophy,
   Grid,
   Table,
-  Play,
 } from "lucide-react";
 
-import MatchForm from "../../components/matches/MatchForm";
-import DeleteMatchModal from "../../components/matches/DeleteMatchModal";
-import UploadVideoModal from "../../components/matches/UploadVideoModal";
-import MatchStatusBadge from "../../components/matches/MatchStatusBadge";
-import TeamAvatar from "../../components/teams/TeamAvatar";
-import DataTable from "../../components/common/DataTable";
-import GridView from "../../components/common/GridView";
-import MultiSelectFilter from "../../components/common/MultiSelectFilter";
-import MatchCard from "../../components/matches/MatchCard";
+import MatchForm from "@/components/matches/MatchForm";
+import DeleteMatchModal from "@/components/matches/DeleteMatchModal";
+import UploadVideoModal from "@/components/matches/UploadVideoModal";
+import MatchStatusBadge from "@/components/matches/MatchStatusBadge";
+import TeamAvatar from "@/components/teams/TeamAvatar";
+import DataTable from "@/components/common/DataTable";
+import GridView from "@/components/common/GridView";
+import MultiSelectFilter from "@/components/common/MultiSelectFilter";
+import MatchCard from "@/components/matches/MatchCard";
 
-import {
-  TOURNAMENT_OPTIONS,
-  MATCH_STATUS_OPTIONS,
-} from "../../utils/constants";
+import { TOURNAMENT_OPTIONS, MATCH_STATUS_OPTIONS } from "@/utils/constants";
 
 import Loading from "@/components/common/Loading";
 

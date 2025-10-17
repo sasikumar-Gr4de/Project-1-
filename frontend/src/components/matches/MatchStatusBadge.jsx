@@ -1,6 +1,6 @@
 import React from "react";
-import { cn } from "../../lib/utils";
-import { MATCH_STATUS_OPTIONS } from "../../utils/constants";
+import { cn } from "@/lib/utils";
+import { MATCH_STATUS_OPTIONS } from "@/utils/constants";
 import { Clock, Play, Check, X, Calendar } from "lucide-react";
 
 const MatchStatusBadge = ({ status, className = "" }) => {

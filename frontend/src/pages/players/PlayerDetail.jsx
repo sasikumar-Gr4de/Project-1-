@@ -1,12 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Button } from "../../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../../components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ArrowLeft,
   Edit,
@@ -18,11 +13,11 @@ import {
   Activity,
   Eye,
 } from "lucide-react";
-import PlayerAvatar from "../../components/players/PlayerAvatar";
-import PlayerStatusBadge from "../../components/players/PlayerStatusBadge";
-import AbilityRadarChart from "../../components/players/AbilityRadarChart";
-import PerformanceMetrics from "../../components/players/PerformanceMetrics";
-import MatchHistory from "../../components/players/MatchHistory";
+import PlayerAvatar from "@/components/players/PlayerAvatar";
+import PlayerStatusBadge from "@/components/players/PlayerStatusBadge";
+import AbilityRadarChart from "@/components/players/AbilityRadarChart";
+import PerformanceMetrics from "@/components/players/PerformanceMetrics";
+import MatchHistory from "@/components/players/MatchHistory";
 import Loading from "@/components/common/Loading";
 
 const PlayerDetail = () => {

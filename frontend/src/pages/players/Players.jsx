@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../../components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -33,21 +28,21 @@ import {
   Clock,
 } from "lucide-react";
 
-import PlayerForm from "../../components/players/PlayerForm";
-import DeletePlayerModal from "../../components/players/DeletePlayerModal";
-import PlayerStatusBadge from "../../components/players/PlayerStatusBadge";
-import PlayerAvatar from "../../components/players/PlayerAvatar";
-import DataTable from "../../components/common/DataTable";
-import MultiSelectFilter from "../../components/common/MultiSelectFilter";
-import PlayerCard from "../../components/players/PlayerCard";
+import PlayerForm from "@/components/players/PlayerForm";
+import DeletePlayerModal from "@/components/players/DeletePlayerModal";
+import PlayerStatusBadge from "@/components/players/PlayerStatusBadge";
+import PlayerAvatar from "@/components/players/PlayerAvatar";
+import DataTable from "@/components/common/DataTable";
+import MultiSelectFilter from "@/components/common/MultiSelectFilter";
+import PlayerCard from "@/components/players/PlayerCard";
 
 import {
   DETAILED_POSITIONS,
   ALL_POSITIONS,
   STATUS_OPTIONS,
-} from "../../utils/constants";
+} from "@/utils/constants";
 
-import { calculateAge } from "../../utils/calculate";
+import { calculateAge } from "@/utils/calculate";
 import Loading from "@/components/common/Loading";
 import GridView from "@/components/common/GridView";
 
