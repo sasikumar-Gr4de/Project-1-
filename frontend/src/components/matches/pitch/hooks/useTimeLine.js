@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 export const useTimeline = (
   formationHistory,
@@ -10,7 +10,7 @@ export const useTimeline = (
   const [isPlaying, setIsPlaying] = useState(false);
   const playbackIntervalRef = useRef(null);
 
-  // Playback control with animation support
+  // Playback control
   useEffect(() => {
     if (isPlaying) {
       playbackIntervalRef.current = setInterval(() => {
@@ -35,19 +35,9 @@ export const useTimeline = (
     };
   }, [isPlaying]);
 
-  // Jump to specific time with smooth transition
+  // Jump to specific time in match
   const handleTimeJump = useCallback(
     (time) => {
-      // Animate timeline progress
-      const timelineElement = document.querySelector(".timeline-progress");
-      if (timelineElement) {
-        gsap.to(timelineElement, {
-          width: `${(time / 90) * 100}%`,
-          duration: 0.5,
-          ease: "power2.out",
-        });
-      }
-
       setCurrentTime(time);
       setIsPlaying(false);
 
@@ -56,7 +46,6 @@ export const useTimeline = (
         .sort((a, b) => b.time - a.time)[0];
 
       if (snapshot) {
-        // Animate formation change
         setFormations(snapshot.formations);
         setLineups(snapshot.lineups);
         setSubstitutes(snapshot.substitutes);
