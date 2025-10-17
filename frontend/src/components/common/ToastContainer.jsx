@@ -1,5 +1,5 @@
 import React from "react";
-import { useToastStore } from "@/store/authStore";
+import { useToastStore } from "@/store/toastStore";
 import Toast from "@/components/common/KernelToast";
 
 const ToastContainer = () => {
