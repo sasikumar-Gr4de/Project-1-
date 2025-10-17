@@ -43,13 +43,10 @@ app.get("/api/directories", async (req, res) => {
   const targetPath = req.query.path
     ? path.resolve(
         path.dirname(new URL(import.meta.url).pathname),
-        "../../../",
+        "../",
         req.query.path
       )
-    : path.resolve(
-        path.dirname(new URL(import.meta.url).pathname),
-        "../../../"
-      );
+    : path.resolve(path.dirname(new URL(import.meta.url).pathname), "../");
 
   try {
     async function getDirStructure(dirPath, basePath = dirPath) {
