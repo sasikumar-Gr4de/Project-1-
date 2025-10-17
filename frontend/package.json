@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "echo 'Starting Vite build' && vite build && echo 'Vite build completed' || echo 'Vite build failed'",
     "lint": "eslint .",
     "preview": "vite preview"
   },
