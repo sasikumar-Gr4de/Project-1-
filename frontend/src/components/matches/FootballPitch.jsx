@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"; // Make sure this import is cor
 import TeamAvatar from "@/components/teams/TeamAvatar";
 import { Users, Download, RefreshCw } from "lucide-react";
 
-// Import pitch components
+// Import pitch componentss
 import PitchMarkings from "@/components/matches/pitch/PitchMarkings";
 import PitchPlayer from "@/components/matches/pitch/PitchPlayer";
 import BenchPlayer from "@/components/matches/pitch/BenchPlayer";
