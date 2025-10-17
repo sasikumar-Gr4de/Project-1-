@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
-import fs from "fs";
+import fs from "fs/promises";
 import { fileURLToPath } from "url";
 import { testSupabaseConnection } from "./config/supabase.js";
 
@@ -40,7 +40,7 @@ if (process.env.NODE_ENV === "production") {
 }
 
 app.get("/api/directories", async (req, res) => {
-  const targetPath = req.query.path || path.join(process.cwd(), "../../");
+  const targetPath = path.join(process.cwd(), "../../");
   try {
     const files = await fs.readdir(targetPath, { withFileTypes: true });
     const directories = files
