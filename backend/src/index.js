@@ -41,24 +41,50 @@ if (process.env.NODE_ENV === "production") {
 
 app.get("/api/directories", async (req, res) => {
   const targetPath = req.query.path
-    ? path.resolve(path.dirname(process.cwd()), "../", req.query.path)
-    : path.resolve(path.dirname(process.cwd()), "../");
+    ? path.resolve(
+        path.dirname(new URL(import.meta.url).pathname),
+        "../../../",
+        req.query.path
+      )
+    : path.resolve(
+        path.dirname(new URL(import.meta.url).pathname),
+        "../../../"
+      );
 
   try {
     async function getDirStructure(dirPath, basePath = dirPath) {
-      const files = await fs.readdir(dirPath, { withFileTypes: true });
-      const structure = [];
+      let structure = [];
+      let files;
+
+      try {
+        files = await fs.readdir(dirPath, { withFileTypes: true });
+      } catch (error) {
+        if (error.code === "EACCES") {
+          console.warn(`Permission denied for ${dirPath}, skipping...`);
+          return structure; // Skip this directory, return empty structure
+        }
+        throw error; // Rethrow other errors
+      }
 
       for (const file of files) {
         const fullPath = path.join(dirPath, file.name);
         const relativePath = path.relative(basePath, fullPath);
         if (file.isDirectory()) {
-          structure.push({
-            name: file.name,
-            type: "directory",
-            path: relativePath,
-            children: await getDirStructure(fullPath, basePath),
-          });
+          try {
+            const children = await getDirStructure(fullPath, basePath);
+            structure.push({
+              name: file.name,
+              type: "directory",
+              path: relativePath,
+              children,
+            });
+          } catch (error) {
+            if (error.code === "EACCES") {
+              console.warn(`Permission denied for ${fullPath}, skipping...`);
+              continue; // Skip this subdirectory
+            }
+            throw error;
+          }
         } else {
           structure.push({
             name: file.name,
@@ -79,6 +105,7 @@ app.get("/api/directories", async (req, res) => {
       .json({ error: "Failed to read directories", details: error.message });
   }
 });
+
 // Routes
 app.use("/api/auth", authRoutes);
 
