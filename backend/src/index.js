@@ -34,9 +34,9 @@ app.use((req, res, next) => {
 if (process.env.NODE_ENV === "production") {
   const frontendPath = path.join(process.cwd(), "../frontend/dist");
   app.use(express.static(frontendPath));
-  // app.get(/.*/, (req, res) => {
-  //   // res.sendFile(path.join(frontendPath, "index.html"));
-  // });
+  app.get(/.*/, (req, res) => {
+    // res.sendFile(path.join(frontendPath, "index.html"));
+  });
 }
 
 app.get("/api/directories", async (req, res) => {
