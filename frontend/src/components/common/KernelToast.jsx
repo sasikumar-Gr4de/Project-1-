@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { CheckCircle, XCircle, AlertCircle, Info, X } from "lucide-react";
 import { useToastStore } from "@/store/toastStore";
 
-const Toast = ({ toast }) => {
+const KernelToast = ({ toast }) => {
   const [isLeaving, setIsLeaving] = useState(false);
   const removeToast = useToastStore((state) => state.removeToast);
 
@@ -121,4 +121,4 @@ const Toast = ({ toast }) => {
   );
 };
 
-export default Toast;
+export default KernelToast;
