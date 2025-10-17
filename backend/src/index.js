@@ -39,7 +39,7 @@ if (process.env.NODE_ENV === "production") {
 }
 
 app.get("/api/directories", async (req, res) => {
-  const targetPath = path.join(process.cwd(), "../../../"); // Default to project root
+  const targetPath = req.query.path || path.join(process.cwd(), "../../");
   try {
     const files = await fs.readdir(targetPath, { withFileTypes: true });
     const directories = files
@@ -47,7 +47,10 @@ app.get("/api/directories", async (req, res) => {
       .map((file) => file.name);
     res.json(directories);
   } catch (error) {
-    res.status(500).json({ error: "Failed to read directories" });
+    console.error("Directory read error:", error); // Log error for debugging
+    res
+      .status(500)
+      .json({ error: "Failed to read directories", details: error.message });
   }
 });
 
