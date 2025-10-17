@@ -1,7 +1,13 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 import { testSupabaseConnection } from "./config/supabase.js";
+
+// Get __dirname in ES Module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Import routes
 import authRoutes from "./routes/auth.js";
@@ -31,7 +37,7 @@ app.use((req, res, next) => {
 if (process.env.NODE_ENV === "production") {
   const frontendPath = path.join(__dirname, "../../../frontend/dist");
   app.use(express.static(frontendPath));
-  app.get("*", (req, res) => {
+  app.get(/.*/, (req, res) => {
     res.sendFile(path.join(frontendPath, "index.html"));
   });
 }
