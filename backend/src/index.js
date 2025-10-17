@@ -40,21 +40,52 @@ if (process.env.NODE_ENV === "production") {
 }
 
 app.get("/api/directories", async (req, res) => {
-  const targetPath = path.join(process.cwd(), "./backend/");
+  const targetPath = req.query.path
+    ? path.resolve(
+        path.dirname(new URL(import.meta.url).pathname),
+        "../../../",
+        req.query.path
+      )
+    : path.resolve(
+        path.dirname(new URL(import.meta.url).pathname),
+        "../../../"
+      );
+
   try {
-    const files = await fs.readdir(targetPath, { withFileTypes: true });
-    const directories = files
-      .filter((file) => file.isDirectory())
-      .map((file) => file.name);
-    res.json(directories);
+    async function getDirStructure(dirPath, basePath = dirPath) {
+      const files = await fs.readdir(dirPath, { withFileTypes: true });
+      const structure = [];
+
+      for (const file of files) {
+        const fullPath = path.join(dirPath, file.name);
+        const relativePath = path.relative(basePath, fullPath);
+        if (file.isDirectory()) {
+          structure.push({
+            name: file.name,
+            type: "directory",
+            path: relativePath,
+            children: await getDirStructure(fullPath, basePath),
+          });
+        } else {
+          structure.push({
+            name: file.name,
+            type: "file",
+            path: relativePath,
+          });
+        }
+      }
+      return structure;
+    }
+
+    const dirStructure = await getDirStructure(targetPath);
+    res.json(dirStructure);
   } catch (error) {
-    console.error("Directory read error:", error); // Log error for debugging
+    console.error("Directory read error:", error);
     res
       .status(500)
       .json({ error: "Failed to read directories", details: error.message });
   }
 });
-
 // Routes
 app.use("/api/auth", authRoutes);
 
