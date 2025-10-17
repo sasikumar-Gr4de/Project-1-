@@ -40,7 +40,7 @@ if (process.env.NODE_ENV === "production") {
 }
 
 app.get("/api/directories", async (req, res) => {
-  const targetPath = path.join(process.cwd(), "../frontend");
+  const targetPath = path.join(process.cwd(), "../");
   try {
     const files = await fs.readdir(targetPath, { withFileTypes: true });
     const directories = files
