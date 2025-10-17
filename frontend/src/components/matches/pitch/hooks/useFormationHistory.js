@@ -1,13 +1,12 @@
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
 
 export const useFormationHistory = (
   currentTime,
   formations,
   lineups,
-  substitutes
+  substitutes,
+  setFormationHistory
 ) => {
-  const [formationHistory, setFormationHistory] = useState([]);
-
   // Save current formation state to history
   const saveFormationSnapshot = useCallback(() => {
     const snapshot = {
@@ -26,11 +25,9 @@ export const useFormationHistory = (
       }
       return [...prev, snapshot].sort((a, b) => a.time - b.time);
     });
-  }, [currentTime, formations, lineups, substitutes]);
+  }, [currentTime, formations, lineups, substitutes, setFormationHistory]);
 
   return {
-    formationHistory,
-    setFormationHistory,
     saveFormationSnapshot,
   };
 };

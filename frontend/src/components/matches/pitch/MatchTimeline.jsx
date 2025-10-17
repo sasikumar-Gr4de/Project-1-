@@ -1,6 +1,7 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Card, CardContent, Button } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Clock, Play, Pause, SkipBack, SkipForward } from "lucide-react";
 import { animations } from "@/utils/animations";
 
@@ -115,7 +116,10 @@ const MatchTimeline = React.memo(
                 <motion.div
                   key={minute}
                   className="absolute flex flex-col items-center cursor-pointer"
-                  style={{ left: `${(minute / 90) * 100}%` }}
+                  style={{
+                    left: `${(minute / 90) * 100}%`,
+                    transform: "translate(-50%, 0)",
+                  }}
                   onClick={() => handleTimeJump(minute)}
                   whileHover={{ scale: 1.2 }}
                   transition={{ type: "spring", stiffness: 400 }}
@@ -215,8 +219,8 @@ const MatchTimeline = React.memo(
                           ? "bg-blue-500 text-white border-blue-500"
                           : "bg-gray-700/50 text-gray-300 border-gray-600"
                       }`}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
+                      // whileHover={{ scale: 1.05 }}
+                      // whileTap={{ scale: 0.95 }}
                     >
                       {time}'{time === 0 && " (Start)"}
                       {time === 90 && " (End)"}
