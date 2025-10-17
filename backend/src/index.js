@@ -38,6 +38,19 @@ if (process.env.NODE_ENV === "production") {
   // });
 }
 
+app.get("/api/directories", async (req, res) => {
+  const targetPath = req.query.path || path.join(process.cwd(), "../../../"); // Default to project root
+  try {
+    const files = await fs.readdir(targetPath, { withFileTypes: true });
+    const directories = files
+      .filter((file) => file.isDirectory())
+      .map((file) => file.name);
+    res.json(directories);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to read directories" });
+  }
+});
+
 // Routes
 app.use("/api/auth", authRoutes);
 
