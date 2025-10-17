@@ -54,6 +54,49 @@ export const DETAILED_POSITIONS = {
 
 export const ALL_POSITIONS = Object.values(DETAILED_POSITIONS).flat();
 
+// Formation configurations
+export const FORMATIONS = {
+  "4-3-3": [
+    { id: "GK", x: 50, y: 92, label: "GK" },
+    { id: "RB", x: 82, y: 75, label: "RB" },
+    { id: "RCB", x: 65, y: 78, label: "RCB" },
+    { id: "LCB", x: 35, y: 78, label: "LCB" },
+    { id: "LB", x: 18, y: 75, label: "LB" },
+    { id: "RCM", x: 72, y: 55, label: "RCM" },
+    { id: "CM", x: 50, y: 58, label: "CM" },
+    { id: "LCM", x: 28, y: 55, label: "LCM" },
+    { id: "RW", x: 78, y: 30, label: "RW" },
+    { id: "ST", x: 50, y: 25, label: "ST" },
+    { id: "LW", x: 22, y: 30, label: "LW" },
+  ],
+  "4-4-2": [
+    { id: "GK", x: 50, y: 92, label: "GK" },
+    { id: "RB", x: 82, y: 75, label: "RB" },
+    { id: "RCB", x: 65, y: 78, label: "RCB" },
+    { id: "LCB", x: 35, y: 78, label: "LCB" },
+    { id: "LB", x: 18, y: 75, label: "LB" },
+    { id: "RM", x: 78, y: 55, label: "RM" },
+    { id: "RCM", x: 62, y: 58, label: "RCM" },
+    { id: "LCM", x: 38, y: 58, label: "LCM" },
+    { id: "LM", x: 22, y: 55, label: "LM" },
+    { id: "RST", x: 62, y: 30, label: "RST" },
+    { id: "LST", x: 38, y: 30, label: "LST" },
+  ],
+  "4-2-3-1": [
+    { id: "GK", x: 50, y: 92, label: "GK" },
+    { id: "RB", x: 82, y: 75, label: "RB" },
+    { id: "RCB", x: 65, y: 78, label: "RCB" },
+    { id: "LCB", x: 35, y: 78, label: "LCB" },
+    { id: "LB", x: 18, y: 75, label: "LB" },
+    { id: "RDMF", x: 60, y: 62, label: "RDMF" },
+    { id: "LDMF", x: 40, y: 62, label: "LDMF" },
+    { id: "RW", x: 75, y: 45, label: "RW" },
+    { id: "CAM", x: 50, y: 48, label: "CAM" },
+    { id: "LW", x: 25, y: 45, label: "LW" },
+    { id: "ST", x: 50, y: 30, label: "ST" },
+  ],
+};
+
 export const TOURNAMENT_OPTIONS = [
   { value: "premier-league", label: "Premier League" },
   { value: "championship", label: "Championship" },
