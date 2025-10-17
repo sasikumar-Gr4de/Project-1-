@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Clock, Play, Pause, SkipBack, SkipForward } from "lucide-react";
-import { animations } from "@/utils/animations";
 
 const MatchTimeline = React.memo(
   ({
@@ -24,54 +23,73 @@ const MatchTimeline = React.memo(
         <CardContent className="p-4">
           <motion.div
             className="flex items-center justify-between mb-4"
-            {...animations.timeline.slideIn}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
           >
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleTimeJump(0)}
-                  disabled={currentTime === 0}
-                  className="h-8 w-8 p-0 text-white"
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  <SkipBack className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsPlaying(!isPlaying)}
-                  className="w-20 h-8 text-white"
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleTimeJump(0)}
+                    disabled={currentTime === 0}
+                    className="h-8 w-8 p-0 text-white"
+                  >
+                    <SkipBack className="h-4 w-4" />
+                  </Button>
+                </motion.div>
+
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={isPlaying ? "pause" : "play"}
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      exit={{ scale: 0.8, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="flex items-center"
-                    >
-                      {isPlaying ? (
-                        <Pause className="h-4 w-4" />
-                      ) : (
-                        <Play className="h-4 w-4" />
-                      )}
-                      <span className="ml-2 text-xs">
-                        {isPlaying ? "Pause" : "Play"}
-                      </span>
-                    </motion.div>
-                  </AnimatePresence>
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleTimeJump(90)}
-                  disabled={currentTime === 90}
-                  className="h-8 w-8 p-0 text-white"
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsPlaying(!isPlaying)}
+                    className="w-20 h-8 text-white"
+                  >
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={isPlaying ? "pause" : "play"}
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0.8, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="flex items-center"
+                      >
+                        {isPlaying ? (
+                          <Pause className="h-4 w-4" />
+                        ) : (
+                          <Play className="h-4 w-4" />
+                        )}
+                        <span className="ml-2 text-xs">
+                          {isPlaying ? "Pause" : "Play"}
+                        </span>
+                      </motion.div>
+                    </AnimatePresence>
+                  </Button>
+                </motion.div>
+
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  <SkipForward className="h-4 w-4" />
-                </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleTimeJump(90)}
+                    disabled={currentTime === 90}
+                    className="h-8 w-8 p-0 text-white"
+                  >
+                    <SkipForward className="h-4 w-4" />
+                  </Button>
+                </motion.div>
               </div>
 
               <motion.div
@@ -118,11 +136,11 @@ const MatchTimeline = React.memo(
                   className="absolute flex flex-col items-center cursor-pointer"
                   style={{
                     left: `${(minute / 90) * 100}%`,
-                    transform: "translate(-50%, 0)",
+                    transform: "translate(-50%, 0%)",
                   }}
                   onClick={() => handleTimeJump(minute)}
-                  whileHover={{ scale: 1.2 }}
-                  transition={{ type: "spring", stiffness: 400 }}
+                  // whileHover={{ scale: 1 }}
+                  // transition={{ type: "spring", stiffness: 400 }}
                 >
                   <div className="w-px h-4 bg-white/30"></div>
                   <motion.span
@@ -210,21 +228,24 @@ const MatchTimeline = React.memo(
                     exit={{ scale: 0, opacity: 0 }}
                     transition={{ type: "spring", stiffness: 500 }}
                   >
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleTimeJump(time)}
-                      className={`text-xs ${
-                        currentTime === time
-                          ? "bg-blue-500 text-white border-blue-500"
-                          : "bg-gray-700/50 text-gray-300 border-gray-600"
-                      }`}
-                      // whileHover={{ scale: 1.05 }}
-                      // whileTap={{ scale: 0.95 }}
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                     >
-                      {time}'{time === 0 && " (Start)"}
-                      {time === 90 && " (End)"}
-                    </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleTimeJump(time)}
+                        className={`text-xs ${
+                          currentTime === time
+                            ? "bg-blue-500 text-white border-blue-500"
+                            : "bg-gray-700/50 text-gray-300 border-gray-600"
+                        }`}
+                      >
+                        {time}'{time === 0 && " (Start)"}
+                        {time === 90 && " (End)"}
+                      </Button>
+                    </motion.div>
                   </motion.div>
                 ))}
               </AnimatePresence>

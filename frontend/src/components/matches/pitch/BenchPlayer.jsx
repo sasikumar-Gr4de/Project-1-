@@ -23,7 +23,7 @@ const BenchPlayer = React.memo(
 
     return (
       <motion.div
-        className={`flex items-center p-3 rounded-lg m-1 cursor-pointer transition-all duration-200 group border ${
+        className={`flex items-center p-3 m-6 rounded-lg cursor-pointer transition-all duration-200 group border ${
           isSelected
             ? "ring-2 ring-yellow-400 bg-yellow-400/20 scale-105 border-yellow-400/50"
             : isSwapTarget
@@ -76,12 +76,11 @@ const BenchPlayer = React.memo(
             animate={
               isSelected
                 ? {
-                    scale: [1, 1.1, 1],
-                    rotate: [0, -5, 5, 0],
+                    scale: 1.1,
+                    transition: { duration: 0.3, ease: "easeInOut" },
                   }
-                : {}
+                : { scale: 1 }
             }
-            transition={{ duration: 0.5 }}
           >
             <span className="text-white font-bold text-sm">
               {player.number}

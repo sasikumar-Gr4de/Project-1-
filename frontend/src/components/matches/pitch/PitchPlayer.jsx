@@ -1,7 +1,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Award, Target, ArrowLeftRight } from "lucide-react";
-import { animations } from "@/utils/animations";
 
 const PitchPlayer = React.memo(
   ({
@@ -62,12 +61,11 @@ const PitchPlayer = React.memo(
             animate={
               isSelected
                 ? {
-                    scale: [1, 1.1, 1],
-                    rotate: [0, -5, 5, 0],
+                    scale: 1.1,
+                    transition: { duration: 0.3, ease: "easeInOut" },
                   }
-                : {}
+                : { scale: 1 }
             }
-            transition={{ duration: 0.5 }}
           >
             <div
               className={`w-12 h-12 rounded-full flex items-center justify-center relative ${
@@ -103,7 +101,7 @@ const PitchPlayer = React.memo(
                   >
                     <motion.span
                       className="text-white text-xs font-bold"
-                      animate={{ rotate: [0, 360] }}
+                      animate={{ rotate: 360 }}
                       transition={{
                         duration: 2,
                         repeat: Infinity,

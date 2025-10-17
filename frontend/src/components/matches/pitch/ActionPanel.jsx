@@ -75,27 +75,33 @@ const ActionPanel = ({
                 transition={{ delay: 0.3 }}
               >
                 {actionState === "swapping" && (
-                  <Button
-                    variant="outline"
-                    className="border-green-600 text-green-400 hover:bg-green-600/20"
-                    onClick={cancelAction}
+                  <motion.div
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <X className="h-4 w-4 mr-2" />
-                    Cancel Swap
-                  </Button>
+                    <Button
+                      variant="outline"
+                      className="border-green-600 text-green-400 hover:bg-green-600/20"
+                      onClick={cancelAction}
+                    >
+                      <X className="h-4 w-4 mr-2" />
+                      Cancel Swap
+                    </Button>
+                  </motion.div>
                 )}
-                <Button
-                  variant="outline"
-                  className="border-gray-600 text-gray-300 hover:bg-gray-700"
-                  onClick={cancelAction}
+                <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <X className="h-4 w-4 mr-2" />
-                  Cancel
-                </Button>
+                  <Button
+                    variant="outline"
+                    className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                    onClick={cancelAction}
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Cancel
+                  </Button>
+                </motion.div>
               </motion.div>
             </motion.div>
           </CardContent>

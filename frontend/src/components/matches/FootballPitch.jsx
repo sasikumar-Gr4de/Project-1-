@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"; // Make sure this import is correct
 import TeamAvatar from "@/components/teams/TeamAvatar";
 import { Users, Download, RefreshCw } from "lucide-react";
 
@@ -13,11 +13,6 @@ import EmptySlot from "./pitch/EmptySlot";
 import ActionPanel from "./pitch/ActionPanel";
 import FormationSelector from "./pitch/FormationSelector";
 import MatchTimeline from "./pitch/MatchTimeline";
-
-// Import hooks
-import { usePlayerMovement } from "./pitch/hooks/usePlayerMovement";
-import { useTimeline } from "./pitch/hooks/useTimeline";
-import { useFormationHistory } from "./pitch/hooks/useFormationHistory";
 
 // Import constants and data
 import { FORMATIONS } from "@/utils/constants";
@@ -44,13 +39,14 @@ const FootballPitch = ({
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [actionState, setActionState] = useState(null);
   const [swapTarget, setSwapTarget] = useState(null);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [formationHistory, setFormationHistory] = useState([]);
 
   // Refs
   const tooltipRef = useRef(null);
   const tooltipTimeoutRef = useRef(null);
-
-  // Initialize formation history first (it needs currentTime)
-  const [formationHistory, setFormationHistory] = useState([]);
+  const playbackIntervalRef = useRef(null);
 
   // Initialize match data
   useEffect(() => {
@@ -69,41 +65,30 @@ const FootballPitch = ({
     }
   }, [match]);
 
-  // Now initialize timeline hook (it needs formationHistory)
-  const {
-    currentTime,
-    setCurrentTime,
-    isPlaying,
-    setIsPlaying,
-    handleTimeJump,
-  } = useTimeline(formationHistory, setFormations, setLineups, setSubstitutes);
+  // Playback control
+  useEffect(() => {
+    if (isPlaying) {
+      playbackIntervalRef.current = setInterval(() => {
+        setCurrentTime((prev) => {
+          if (prev >= 90) {
+            setIsPlaying(false);
+            return 90;
+          }
+          return prev + 1;
+        });
+      }, 500);
+    } else {
+      if (playbackIntervalRef.current) {
+        clearInterval(playbackIntervalRef.current);
+      }
+    }
 
-  // Now initialize formation history hook with currentTime
-  const { saveFormationSnapshot } = useFormationHistory(
-    currentTime,
-    formations,
-    lineups,
-    substitutes,
-    setFormationHistory
-  );
-
-  // Finally initialize player movement hook
-  const { handlePlayerSelect, handlePositionSelect, resetSelection } =
-    usePlayerMovement(
-      lineups,
-      setLineups,
-      substitutes,
-      setSubstitutes,
-      selectedPlayer,
-      setSelectedPlayer,
-      actionState,
-      setActionState,
-      swapTarget,
-      setSwapTarget,
-      enhancedPlayers,
-      saveFormationSnapshot,
-      onPlayerMove
-    );
+    return () => {
+      if (playbackIntervalRef.current) {
+        clearInterval(playbackIntervalRef.current);
+      }
+    };
+  }, [isPlaying]);
 
   // Update player minutes when time changes
   useEffect(() => {
@@ -140,8 +125,257 @@ const FootballPitch = ({
     updatePlayerMinutes();
   }, [currentTime]);
 
+  // Save current formation state to history
+  const saveFormationSnapshot = useCallback(() => {
+    const snapshot = {
+      time: currentTime,
+      formations: { ...formations },
+      lineups: JSON.parse(JSON.stringify(lineups)),
+      substitutes: JSON.parse(JSON.stringify(substitutes)),
+    };
+
+    setFormationHistory((prev) => {
+      const existingIndex = prev.findIndex((item) => item.time === currentTime);
+      if (existingIndex >= 0) {
+        const updated = [...prev];
+        updated[existingIndex] = snapshot;
+        return updated;
+      }
+      return [...prev, snapshot].sort((a, b) => a.time - b.time);
+    });
+  }, [currentTime, formations, lineups, substitutes]);
+
+  // Jump to specific time in match
+  const handleTimeJump = useCallback(
+    (time) => {
+      setCurrentTime(time);
+      setIsPlaying(false);
+
+      const snapshot = formationHistory
+        .filter((item) => item.time <= time)
+        .sort((a, b) => b.time - a.time)[0];
+
+      if (snapshot) {
+        setFormations(snapshot.formations);
+        setLineups(snapshot.lineups);
+        setSubstitutes(snapshot.substitutes);
+      }
+    },
+    [formationHistory]
+  );
+
+  // Player movement functions
+  const resetSelection = useCallback(() => {
+    setSelectedPlayer(null);
+    setActionState(null);
+    setSwapTarget(null);
+  }, []);
+
+  const handlePlayerSelect = useCallback(
+    (player, team, fromBench = false) => {
+      if (selectedPlayer && selectedPlayer.team !== team) {
+        resetSelection();
+        return;
+      }
+
+      if (actionState === "swapping" && swapTarget) {
+        // Handle swap completion
+        const updatedLineups = { ...lineups };
+        const updatedSubstitutes = { ...substitutes };
+
+        if (selectedPlayer.fromBench && !fromBench) {
+          // Bench to pitch swap
+          updatedSubstitutes[team] = updatedSubstitutes[team].filter(
+            (p) => p.id !== selectedPlayer.id
+          );
+          updatedLineups[team] = updatedLineups[team].filter(
+            (p) => p.id !== player.id
+          );
+
+          updatedLineups[team] = [
+            ...updatedLineups[team],
+            {
+              ...selectedPlayer,
+              position: player.position,
+              fromBench: false,
+            },
+          ];
+          updatedSubstitutes[team] = [
+            ...updatedSubstitutes[team],
+            {
+              ...player,
+              fromBench: true,
+            },
+          ];
+        } else if (!selectedPlayer.fromBench && fromBench) {
+          // Pitch to bench swap
+          updatedLineups[team] = updatedLineups[team].filter(
+            (p) => p.id !== selectedPlayer.id
+          );
+          updatedSubstitutes[team] = updatedSubstitutes[team].filter(
+            (p) => p.id !== player.id
+          );
+
+          updatedSubstitutes[team] = [
+            ...updatedSubstitutes[team],
+            {
+              ...selectedPlayer,
+              fromBench: true,
+            },
+          ];
+          updatedLineups[team] = [
+            ...updatedLineups[team],
+            {
+              ...player,
+              position: selectedPlayer.position,
+              fromBench: false,
+            },
+          ];
+        } else if (!selectedPlayer.fromBench && !fromBench) {
+          // Pitch to pitch swap
+          updatedLineups[team] = updatedLineups[team].filter(
+            (p) => p.id !== selectedPlayer.id && p.id !== player.id
+          );
+
+          updatedLineups[team] = [
+            ...updatedLineups[team],
+            {
+              ...selectedPlayer,
+              position: player.position,
+            },
+            {
+              ...player,
+              position: selectedPlayer.position,
+            },
+          ];
+        }
+
+        setLineups(updatedLineups);
+        setSubstitutes(updatedSubstitutes);
+        saveFormationSnapshot();
+        resetSelection();
+        return;
+      }
+
+      if (
+        selectedPlayer &&
+        selectedPlayer.id === player.id &&
+        selectedPlayer.team === team
+      ) {
+        resetSelection();
+      } else if (selectedPlayer) {
+        setSwapTarget({ player, team, fromBench });
+        setActionState("swapping");
+      } else {
+        setSelectedPlayer({
+          ...player,
+          team,
+          fromBench,
+          originalPreferredPositions:
+            enhancedPlayers[team]?.[player.id]?.preferredPositions || [],
+        });
+        setActionState("selecting");
+      }
+    },
+    [
+      selectedPlayer,
+      actionState,
+      swapTarget,
+      lineups,
+      substitutes,
+      saveFormationSnapshot,
+      resetSelection,
+    ]
+  );
+
+  const handlePositionSelect = useCallback(
+    (position, team) => {
+      if (!selectedPlayer) return;
+
+      if (selectedPlayer.team !== team) {
+        resetSelection();
+        return;
+      }
+
+      if (actionState === "swapping" && swapTarget) {
+        // Move selected player to position
+        const updatedLineups = { ...lineups };
+        const updatedSubstitutes = { ...substitutes };
+
+        if (selectedPlayer.fromBench) {
+          updatedSubstitutes[selectedPlayer.team] = updatedSubstitutes[
+            selectedPlayer.team
+          ].filter((p) => p.id !== selectedPlayer.id);
+        } else {
+          updatedLineups[selectedPlayer.team] = updatedLineups[
+            selectedPlayer.team
+          ].filter((p) => p.id !== selectedPlayer.id);
+        }
+
+        const playerWithOriginalData = {
+          ...selectedPlayer,
+          position: position.id,
+          fromBench: false,
+        };
+
+        updatedLineups[team] = [
+          ...updatedLineups[team].filter((p) => p.position !== position.id),
+          playerWithOriginalData,
+        ];
+
+        setLineups(updatedLineups);
+        setSubstitutes(updatedSubstitutes);
+        onPlayerMove?.(selectedPlayer.id, selectedPlayer.position, position.id);
+        saveFormationSnapshot();
+        resetSelection();
+        return;
+      }
+
+      // Move player to empty position
+      const updatedLineups = { ...lineups };
+      const updatedSubstitutes = { ...substitutes };
+
+      if (selectedPlayer.fromBench) {
+        updatedSubstitutes[selectedPlayer.team] = updatedSubstitutes[
+          selectedPlayer.team
+        ].filter((p) => p.id !== selectedPlayer.id);
+      } else {
+        updatedLineups[selectedPlayer.team] = updatedLineups[
+          selectedPlayer.team
+        ].filter((p) => p.id !== selectedPlayer.id);
+      }
+
+      const playerWithOriginalData = {
+        ...selectedPlayer,
+        position: position.id,
+        fromBench: false,
+      };
+
+      updatedLineups[team] = [
+        ...updatedLineups[team].filter((p) => p.position !== position.id),
+        playerWithOriginalData,
+      ];
+
+      setLineups(updatedLineups);
+      setSubstitutes(updatedSubstitutes);
+      onPlayerMove?.(selectedPlayer.id, selectedPlayer.position, position.id);
+      saveFormationSnapshot();
+      resetSelection();
+    },
+    [
+      selectedPlayer,
+      actionState,
+      swapTarget,
+      lineups,
+      substitutes,
+      onPlayerMove,
+      saveFormationSnapshot,
+      resetSelection,
+    ]
+  );
+
   // Tooltip functions
-  const showTooltip = (event, player, team, isHome) => {
+  const showTooltip = useCallback((event, player, team, isHome) => {
     if (tooltipTimeoutRef.current) {
       clearTimeout(tooltipTimeoutRef.current);
     }
@@ -157,9 +391,9 @@ const FootballPitch = ({
     tooltip.style.left = `${rect.left + rect.width / 2}px`;
     tooltip.style.top = `${rect.top - 10}px`;
     tooltip.style.transform = "translate(-50%, -100%)";
-  };
+  }, []);
 
-  const hideTooltip = () => {
+  const hideTooltip = useCallback(() => {
     if (tooltipTimeoutRef.current) {
       clearTimeout(tooltipTimeoutRef.current);
     }
@@ -169,7 +403,7 @@ const FootballPitch = ({
         tooltipRef.current.style.display = "none";
       }
     }, 100);
-  };
+  }, []);
 
   const createTooltipContent = (player, playerStats, isHome) => {
     const currentStats = player.stats || { goals: 0, assists: 0, minutes: 0 };
@@ -242,13 +476,16 @@ const FootballPitch = ({
     `;
   };
 
-  const handleFormationChange = (team, newFormation) => {
-    setFormations((prev) => ({ ...prev, [team]: newFormation }));
-    onFormationChange?.(team, newFormation);
-    saveFormationSnapshot();
-  };
+  const handleFormationChange = useCallback(
+    (team, newFormation) => {
+      setFormations((prev) => ({ ...prev, [team]: newFormation }));
+      onFormationChange?.(team, newFormation);
+      saveFormationSnapshot();
+    },
+    [onFormationChange, saveFormationSnapshot]
+  );
 
-  const handleResetFormation = () => {
+  const handleResetFormation = useCallback(() => {
     // Reset to initial formations
     setLineups(initialLineups);
     setSubstitutes(initialSubstitutes);
@@ -265,11 +502,11 @@ const FootballPitch = ({
         substitutes: initialSubstitutes,
       },
     ]);
-  };
+  }, [resetSelection]);
 
-  const cancelAction = () => {
+  const cancelAction = useCallback(() => {
     resetSelection();
-  };
+  }, [resetSelection]);
 
   return (
     <motion.div

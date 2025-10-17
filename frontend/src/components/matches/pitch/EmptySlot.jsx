@@ -27,16 +27,16 @@ const EmptySlot = React.memo(
         animate={
           isSelected
             ? {
-                scale: [1, 1.1, 1],
-                backgroundColor: [
-                  "rgba(250, 204, 21, 0.2)",
-                  "rgba(250, 204, 21, 0.3)",
-                  "rgba(250, 204, 21, 0.2)",
-                ],
+                scale: 1.1,
+                backgroundColor: "rgba(250, 204, 21, 0.3)",
+                transition: {
+                  duration: 1,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                },
               }
             : {}
         }
-        // transition={isSelected ? { duration: 1, repeat: Infinity } : {}}
       >
         <div className="text-center">
           <div className="font-semibold">{position.label}</div>
