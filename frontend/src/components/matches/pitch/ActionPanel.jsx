@@ -89,7 +89,7 @@ const ActionPanel = ({
                     </Button>
                   </motion.div>
                 )}
-                <motion.div
+                {/* <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -101,7 +101,7 @@ const ActionPanel = ({
                     <X className="h-4 w-4 mr-2" />
                     Cancel
                   </Button>
-                </motion.div>
+                </motion.div> */}
               </motion.div>
             </motion.div>
           </CardContent>

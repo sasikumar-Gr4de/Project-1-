@@ -154,7 +154,7 @@ const FootballPitch = ({
       const snapshot = formationHistory
         .filter((item) => item.time <= time)
         .sort((a, b) => b.time - a.time)[0];
-
+      console.log(snapshot);
       if (snapshot) {
         setFormations(snapshot.formations);
         setLineups(snapshot.lineups);
