@@ -111,7 +111,7 @@ const PlayerDetail = () => {
   };
 
   if (isLoading) {
-    return <Loading overlay text="" color="blue" variant="holographic-wave" />;
+    return <Loading overlay text="" color="blue" variant="gradient-spinner" />;
   }
 
   if (!player) {
