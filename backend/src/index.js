@@ -98,14 +98,23 @@ app.use((err, req, res, next) => {
   });
 });
 
-if (process.env.NODE_ENV === "development") {
-  app.listen(PORT, () => {
-    log(
-      chalk.blueBright(
-        `Gr4de Football Analytics Platform API is running on port ${PORT}`
-      )
-    );
-  });
-}
+// if (process.env.NODE_ENV === "development") {
+//   app.listen(PORT, () => {
+//     log(
+//       chalk.blueBright(
+//         `Gr4de Football Analytics Platform API is running on port ${PORT}`
+//       )
+//     );
+//   });
+// }
 
-export default serverless(app);
+app.listen(PORT, () => {
+  log(
+    chalk.blueBright(
+      `Gr4de Football Analytics Platform API is running on port ${PORT}`
+    )
+  );
+});
+
+// export default serverless(app);
+export default app;
