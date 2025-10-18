@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
-import path from "path";
 import chalk from "chalk";
+import serverless from "serverless-http";
 import { testSupabaseConnection } from "./config/supabase.js";
 
 // Import routes
@@ -10,9 +10,6 @@ import authRoutes from "./routes/auth.js";
 const app = express();
 const PORT = process.env.PORT || 5000;
 const log = console.log;
-
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
 
 // Middleware
 app.use(
@@ -23,15 +20,6 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
-// Serve frontend in production
-// if (process.env.NODE_ENV === "production") {
-//   const frontendPath = path.join(__dirname, "../../frontend/dist");
-//   app.use(express.static(frontendPath));
-//   app.get(/.*/, (req, res) => {
-//     res.sendFile(path.join(frontendPath, "index.html"));
-//   });
-// }
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
@@ -116,13 +104,17 @@ app.use((err, req, res, next) => {
   });
 });
 
-const server = app.listen(PORT, () => {
-  log(
-    chalk.blueBright(
-      `Gr4de Football Analytics Platform API is running on port ${PORT}`
-    )
-  );
-});
+export const handler = serverless(app);
+
+if (process.env.NODE_ENV === "development") {
+  app.listen(PORT, () => {
+    log(
+      chalk.blueBright(
+        `Gr4de Football Analytics Platform API is running on port ${PORT}`
+      )
+    );
+  });
+}
 
 process.on("SIGTERM", () => {
   log("SIGTERM signal received: closing HTTP server");
@@ -130,5 +122,3 @@ process.on("SIGTERM", () => {
     log("HTTP server closed");
   });
 });
-
-export default app;
