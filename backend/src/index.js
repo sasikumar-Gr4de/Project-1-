@@ -1,8 +1,7 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import path from "path";
-import { fileURLToPath } from "url";
+import chalk from "chalk";
 import { testSupabaseConnection } from "./config/supabase.js";
 
 // Import routes
@@ -10,6 +9,7 @@ import authRoutes from "./routes/auth.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const log = console.log;
 
 // Middleware
 app.use(
@@ -26,7 +26,7 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 // Request logging middleware
 app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  log(chalk.green(`${new Date().toISOString()} - ${req.method} ${req.path}`));
   next();
 });
 
@@ -113,18 +113,17 @@ app.use((err, req, res, next) => {
 });
 
 const server = app.listen(PORT, () => {
-  console.log(` Gr4de Football Analytics Platform API
-     Port: ${PORT}
-     Environment: ${process.env.NODE_ENV}
-     API: http://localhost:${PORT}/api
-     Health: http://localhost:${PORT}/api/health
-  `);
+  log(
+    chalk.blueBright(
+      `Gr4de Football Analytics Platform API is running on port ${PORT}`
+    )
+  );
 });
 
 process.on("SIGTERM", () => {
-  console.log("SIGTERM signal received: closing HTTP server");
+  log("SIGTERM signal received: closing HTTP server");
   server.close(() => {
-    console.log("HTTP server closed");
+    log("HTTP server closed");
   });
 });
 
