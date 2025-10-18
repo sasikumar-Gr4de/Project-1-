@@ -72,24 +72,17 @@ app.get("/api", (req, res) => {
 // Global error handler
 app.use((err, req, res, next) => {
   console.error("Global Error Handler:", err);
-
-  // Default error
   let error = { ...err };
   error.message = err.message;
 
-  // Mongoose bad ObjectId
   if (err.name === "CastError") {
     const message = "Resource not found";
     error = { message, statusCode: 404 };
   }
-
-  // Mongoose duplicate key
   if (err.code === 23505) {
     const message = "Duplicate field value entered";
     error = { message, statusCode: 400 };
   }
-
-  // Mongoose validation error
   if (err.name === "ValidationError") {
     const message = Object.values(err.errors)
       .map((val) => val.message)
@@ -104,8 +97,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-export default serverless(app);
-
+// --- LOCAL SERVER ---
 if (process.env.NODE_ENV === "development") {
   app.listen(PORT, () => {
     log(
@@ -116,9 +108,5 @@ if (process.env.NODE_ENV === "development") {
   });
 }
 
-process.on("SIGTERM", () => {
-  log("SIGTERM signal received: closing HTTP server");
-  server.close(() => {
-    log("HTTP server closed");
-  });
-});
+// --- VERCEL SERVERLESS EXPORT ---
+export default serverless(app);
