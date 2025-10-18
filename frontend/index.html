@@ -519,42 +519,53 @@
     <script>
       // Scoped JavaScript for loading screen only
       document.addEventListener('DOMContentLoaded', function() {
-        const steps = document.querySelectorAll('.gr4de-step-indicator');
-        let currentStep = 0;
-        
-        const stepInterval = setInterval(() => {
-          if (currentStep > 0) {
-            steps[currentStep - 1].classList.remove('gr4de-active');
-          }
-          
-          steps[currentStep].classList.add('gr4de-active');
-          currentStep++;
-          
-          if (currentStep >= steps.length) {
-            clearInterval(stepInterval);
-          }
-        }, 1500);
-        
-        // Update loading text
+        const steps = Array.from(document.querySelectorAll('.gr4de-step-indicator'));
+        const loadingTextElement = document.querySelector('.gr4de-loading-text');
+
+        // Step indicators animation (guarded)
+        if (steps.length > 0) {
+          let currentStep = 0;
+          // ensure a clean start
+          steps.forEach(s => s.classList.remove('gr4de-active'));
+          steps[0].classList.add('gr4de-active');
+
+          const stepInterval = setInterval(() => {
+            // remove current active
+            if (steps[currentStep]) {
+              steps[currentStep].classList.remove('gr4de-active');
+            }
+            currentStep++;
+            if (currentStep >= steps.length) {
+              clearInterval(stepInterval);
+              return;
+            }
+            if (steps[currentStep]) {
+              steps[currentStep].classList.add('gr4de-active');
+            }
+          }, 1500);
+        }
+
+        // Update loading text (guarded)
         const loadingTexts = [
           'Initializing neural networks for player performance analysis...',
           'Connecting to real-time data streams...',
           'Calibrating analytics engine...',
           'System ready for advanced football insights'
         ];
-        
-        let textIndex = 0;
-        const loadingTextElement = document.querySelector('.gr4de-loading-text');
-        
-        const textInterval = setInterval(() => {
-          textIndex++;
-          if (textIndex < loadingTexts.length) {
-            loadingTextElement.textContent = loadingTexts[textIndex];
-          } else {
-            clearInterval(textInterval);
-          }
-        }, 2000);
-        
+
+        if (loadingTextElement && loadingTexts.length > 0) {
+          let textIndex = 0;
+          loadingTextElement.textContent = loadingTexts[0];
+          const textInterval = setInterval(() => {
+            textIndex++;
+            if (textIndex < loadingTexts.length) {
+              loadingTextElement.textContent = loadingTexts[textIndex];
+            } else {
+              clearInterval(textInterval);
+            }
+          }, 2000);
+        }
+
         // Remove loading screen when app is ready (simulated)
         setTimeout(() => {
           const loadingScreen = document.querySelector('.gr4de-loading-screen');

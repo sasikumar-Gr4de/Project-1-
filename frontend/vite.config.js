@@ -16,7 +16,7 @@ export default defineConfig({
     host: true,
     proxy: {
       "/api": {
-        target: "http://localhost:5000",
+        target: "https://project-1-gr-4-de.vercel.app",
         changeOrigin: true,
         secure: false,
       },
