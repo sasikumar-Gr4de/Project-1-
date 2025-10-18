@@ -1,5 +1,10 @@
 import React, { useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 import "@/App.css";
 
 import { useAuthStore } from "@/store/authStore";
@@ -27,25 +32,38 @@ import Tournaments from "@/pages/tournaments/Tournaments";
 import TeamDetail from "@/pages/teams/TeamDetail";
 import MatchDetail from "@/pages/matches/MatchDetail";
 
-function App() {
+import useNavigationLoading from "@/hooks/useNavigationLoading";
+
+// Create a wrapper component that uses the navigation hook
+function AppContent() {
   const { initializeAuth, isLoading } = useAuthStore();
+
+  // Use the navigation loading hook
+  useNavigationLoading();
 
   useEffect(() => {
     initializeAuth();
   }, [initializeAuth]);
 
+  // Initial loading screen handling
   useEffect(() => {
-    const loadingScreen = document.querySelector(".loading-screen");
+    const loadingScreen = document.querySelector(".gr4de-loading-screen");
+
+    // Hide initial loading screen when auth is initialized
     if (loadingScreen && !isLoading) {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         loadingScreen.style.opacity = "0";
-        setTimeout(() => loadingScreen.remove(), 300);
-      }, 500);
+        setTimeout(() => {
+          loadingScreen.style.display = "none";
+        }, 500);
+      }, 1000);
+
+      return () => clearTimeout(timer);
     }
   }, [isLoading]);
 
   return (
-    <Router>
+    <>
       <Routes>
         {/* Public Routes */}
         <Route
@@ -83,70 +101,14 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/matches"
-            element={
-              <ProtectedRoute>
-                <Matches />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/matches/:id"
-            element={
-              <ProtectedRoute>
-                <MatchDetail />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/players"
-            element={
-              <ProtectedRoute>
-                <Players />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/players/:id"
-            element={
-              <ProtectedRoute>
-                <PlayerDetail />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/teams"
-            element={
-              <ProtectedRoute>
-                <Teams />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/teams/:id"
-            element={
-              <ProtectedRoute>
-                <TeamDetail />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/tournaments"
-            element={
-              <ProtectedRoute>
-                <Tournaments />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/matches" element={<Matches />} />
+          <Route path="/matches/:id" element={<MatchDetail />} />
+          <Route path="/players" element={<Players />} />
+          <Route path="/players/:id" element={<PlayerDetail />} />
+          <Route path="/teams" element={<Teams />} />
+          <Route path="/teams/:id" element={<TeamDetail />} />
+          <Route path="/tournaments" element={<Tournaments />} />
         </Route>
 
         {/* Error Routes */}
@@ -154,6 +116,14 @@ function App() {
         <Route path="*" element={<NotFound />} />
       </Routes>
       <ToastContainer />
+    </>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }

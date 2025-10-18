@@ -58,6 +58,7 @@ api.interceptors.response.use(
 
         const refreshResponse = await refreshAxios.post("/auth/refresh");
         const newToken = refreshResponse.data.data.token;
+
         localStorage.setItem("auth-token", newToken);
 
         // Retry original request with new token
@@ -66,6 +67,7 @@ api.interceptors.response.use(
       } catch (refreshError) {
         // Refresh failed, redirect to login
         console.error("Token refresh failed:", refreshError);
+
         localStorage.removeItem("auth-token");
         localStorage.removeItem("auth-user");
         window.location.href = "/login";
@@ -84,7 +86,7 @@ api.interceptors.response.use(
 
 const refreshToken = () => {
   // Use separate instance for refresh to avoid interceptor
-  window.alert("refresh token");
+
   const refreshAxios = axios.create({
     baseURL: API_BASE_URL,
     headers: {

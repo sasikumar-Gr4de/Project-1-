@@ -18,6 +18,7 @@ export const useAuthStore = create(
 
         // Login function using authAPI
         login: async (email, password) => {
+          debugger;
           set({ isLoading: true });
           try {
             const response = await authAPI.login(email, password);
@@ -30,9 +31,10 @@ export const useAuthStore = create(
                 email_verified: result.data.email_verified || false,
                 isAuthenticated: true,
               });
-              const { token } = result?.data;
               debugger;
+              const { token } = result?.data;
               localStorage.setItem("auth-token", token);
+
               return {
                 success: true,
                 user: result.data.user,
@@ -74,6 +76,7 @@ export const useAuthStore = create(
               });
               debugger;
               const { token } = result.data;
+
               localStorage.setItem("auth-token", token);
               return {
                 success: true,
@@ -148,6 +151,7 @@ export const useAuthStore = create(
             }
           } catch (error) {
             console.error("Error initializing auth:", error);
+
             localStorage.removeItem("auth-token");
             return { user: null, email_verified: false };
           }
@@ -215,7 +219,6 @@ export const useAuthStore = create(
           try {
             const response = await authAPI.refreshToken();
             const { token } = response.data.data;
-            debugger;
             localStorage.setItem("auth-token", token);
             return { success: true };
           } catch (error) {

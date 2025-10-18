@@ -249,10 +249,10 @@ export const migrateToEncryptedStorage = (keyPatterns = []) => {
   }
 };
 
-// Initialize migration on import (optional)
-if (typeof window !== "undefined") {
-  // Auto-migrate common store patterns
-  setTimeout(() => {
-    migrateToEncryptedStorage(["auth-", "user-", "app-", "settings-"]);
-  }, 1000);
-}
+// // Initialize migration on import (optional)
+// if (typeof window !== "undefined") {
+//   // Auto-migrate common store patterns
+//   setTimeout(() => {
+//     migrateToEncryptedStorage(["auth-", "user-", "app-", "settings-"]);
+//   }, 1000);
+// }

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, replace, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -38,11 +38,24 @@ const Login = () => {
 
   const onSubmit = async (data) => {
     setIsLoading(true);
-    const { success } = await loginUser(data.email, data.password);
-    setIsLoading(false);
-    if (success) navigate("/dashboard", { replace: true });
-  };
 
+    try {
+      const result = await loginUser(data.email, data.password);
+
+      if (result.success) {
+        // Small delay to ensure state is updated
+
+        navigate("/dashboard", { replace: true });
+      } else {
+        // Handle login error
+        console.error("Login failed:", result.error);
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
       {/* Background Elements */}
