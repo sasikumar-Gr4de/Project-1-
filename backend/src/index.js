@@ -11,7 +11,6 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const log = console.log;
 
-// Middleware
 app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:5173",
@@ -24,31 +23,37 @@ app.use(
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
-// Request logging middleware
+// Request logging
 app.use((req, res, next) => {
   log(chalk.green(`${new Date().toISOString()} - ${req.method} ${req.path}`));
   next();
 });
 
-// Routes
 app.use("/api/auth", authRoutes);
 
-// Health check endpoint
 app.get("/api/health", async (req, res) => {
-  const dbStatus = await testSupabaseConnection();
+  try {
+    const dbStatus = await testSupabaseConnection();
 
-  res.json({
-    success: true,
-    message: "Gr4de Platform API is running",
-    data: {
-      service: "Gr4de Football Analytics API",
-      version: process.env.APP_VERSION || "1.0.0",
-      environment: process.env.NODE_ENV,
-      database: dbStatus ? "connected" : "disconnected",
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-    },
-  });
+    res.status(200).json({
+      success: true,
+      message: "Gr4de Platform API is running",
+      data: {
+        service: "Gr4de Football Analytics API",
+        version: process.env.APP_VERSION || "1.0.0",
+        environment: process.env.NODE_ENV,
+        database: dbStatus ? "connected" : "disconnected",
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Error connecting to database",
+      error: err.message,
+    });
+  }
 });
 
 app.get("/api", (req, res) => {
@@ -69,26 +74,22 @@ app.get("/api", (req, res) => {
   });
 });
 
-// Global error handler
 app.use((err, req, res, next) => {
   console.error("Global Error Handler:", err);
   let error = { ...err };
   error.message = err.message;
 
-  if (err.name === "CastError") {
-    const message = "Resource not found";
-    error = { message, statusCode: 404 };
-  }
-  if (err.code === 23505) {
-    const message = "Duplicate field value entered";
-    error = { message, statusCode: 400 };
-  }
-  if (err.name === "ValidationError") {
-    const message = Object.values(err.errors)
-      .map((val) => val.message)
-      .join(", ");
-    error = { message, statusCode: 400 };
-  }
+  if (err.name === "CastError")
+    error = { message: "Resource not found", statusCode: 404 };
+  if (err.code === 23505)
+    error = { message: "Duplicate field value entered", statusCode: 400 };
+  if (err.name === "ValidationError")
+    error = {
+      message: Object.values(err.errors)
+        .map((val) => val.message)
+        .join(", "),
+      statusCode: 400,
+    };
 
   res.status(error.statusCode || 500).json({
     success: false,
@@ -97,7 +98,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-// --- LOCAL SERVER ---
 if (process.env.NODE_ENV === "development") {
   app.listen(PORT, () => {
     log(
@@ -108,5 +108,4 @@ if (process.env.NODE_ENV === "development") {
   });
 }
 
-// --- VERCEL SERVERLESS EXPORT ---
 export default serverless(app);

@@ -12,11 +12,9 @@ if (!supabaseUrl || !supabaseServiceKey) {
   throw new Error("Missing Supabase environment variables");
 }
 
-// Create Supabase client
 export const supabase = createClient(supabaseUrl, supabaseServiceKey, {
   auth: {
-    autoRefreshToken: true,
-    persistSession: true,
+    persistSession: false, // no persistent session in serverless
     detectSessionInUrl: false,
   },
   db: {
@@ -24,14 +22,12 @@ export const supabase = createClient(supabaseUrl, supabaseServiceKey, {
   },
 });
 
-// Create public client for frontend operations
 export const supabasePublic = createClient(supabaseUrl, supabaseServiceKey, {
   params: {
     apikey: supabaseServiceKey,
   },
 });
 
-// Test Database connection
 export const testSupabaseConnection = async () => {
   try {
     const { data, error } = await supabase.from("users").select("*").limit(1);
@@ -44,7 +40,6 @@ export const testSupabaseConnection = async () => {
   }
 };
 
-// Database health check
 export const checkDatabaseHealth = async () => {
   try {
     const startTime = Date.now();
