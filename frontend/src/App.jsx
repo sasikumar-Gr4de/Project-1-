@@ -73,15 +73,7 @@ function App() {
           }
         />
 
-        <Route
-          exact
-          path="/verify-email"
-          element={
-            <PublicRoute>
-              <VerifyEmail />
-            </PublicRoute>
-          }
-        />
+        <Route exact path="/verify-email" element={<VerifyEmail />} />
 
         {/* Protected Routes with Layout */}
         <Route

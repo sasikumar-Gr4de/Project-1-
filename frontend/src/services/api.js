@@ -67,6 +67,7 @@ api.interceptors.response.use(
         // Refresh failed, redirect to login
         console.error("Token refresh failed:", refreshError);
         localStorage.removeItem("auth-token");
+        localStorage.removeItem("auth-user");
         window.location.href = "/login";
         return Promise.reject(refreshError);
       }

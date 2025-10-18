@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import tailwind from "@tailwindcss/vite";
 import path from "path";
 
+// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), tailwind()],
   resolve: {
@@ -15,7 +16,7 @@ export default defineConfig({
     host: true,
     proxy: {
       "/api": {
-        target: "localhost:5000",
+        target: "http://localhost:5000",
         changeOrigin: true,
         secure: false,
       },

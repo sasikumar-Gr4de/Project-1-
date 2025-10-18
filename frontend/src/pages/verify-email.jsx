@@ -1,4 +1,3 @@
-// src/pages/verify-email.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -21,63 +20,24 @@ const VerifyEmail = () => {
   const [resendSuccess, setResendSuccess] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const [verificationError, setVerificationError] = useState("");
-  const [isVerifying, setIsVerifying] = useState(false);
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
 
-  const { user, checkEmailVerification, verifyEmail, resendVerificationEmail } =
-    useAuthStore();
+  const {
+    user,
+    email_verified,
+    checkEmailVerification,
+    resendVerificationEmail,
+  } = useAuthStore();
 
-  // Auto-verify if token is present in URL
+  // Fixed: Ensure dependencies are proper values, not functions
   useEffect(() => {
-    const autoVerify = async () => {
-      if (token && user) {
-        setIsVerifying(true);
-        const {
-          data: { email_verified },
-        } = await verifyEmail(token);
-        console.log(email_verified);
-        debugger;
-        if (email_verified) {
-          // Redirect to dashboard after successful verification
-          navigate("/dashboard", { replace: true });
-        } else {
-          setVerificationError(result.error || "Failed to verify email");
-        }
-        setIsVerifying(false);
-      }
-    };
-
-    autoVerify();
-  }, [token, user, verifyEmail, navigate]);
-
-  useEffect(() => {
-    const checkVerification = async () => {
-      if (!token) {
-        const needsVerification = await checkEmailVerification();
-
-        // If user is verified and no token in URL, redirect to dashboard
-        if (!needsVerification && user) {
-          navigate("/dashboard", { replace: true });
-        }
-
-        // If no user is found, redirect to login
-        if (!user) {
-          navigate("/login", { replace: true });
-        }
-      }
-    };
-
-    checkVerification();
-
-    // Check every 10 seconds if email is verified (only when no token in URL)
-    if (!token) {
-      const interval = setInterval(checkVerification, 10000);
-      return () => clearInterval(interval);
-    }
-  }, [checkEmailVerification, navigate, user, token]);
+    // If user is already verified, redirect to dashboard
+    if (user && email_verified) navigate("/dashboard", { replace: true });
+    console.log(user, email_verified);
+  }, [email_verified, navigate, user]); // Fixed: Removed any non-serializable dependencies
 
   useEffect(() => {
     if (countdown > 0) {
@@ -121,23 +81,6 @@ const VerifyEmail = () => {
     await logout();
     navigate("/login");
   };
-
-  // Show loading state during auto-verification
-  if (isVerifying) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-white mb-2">
-            Verifying Your Email
-          </h2>
-          <p className="text-gray-400">
-            Please wait while we verify your email address...
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
@@ -294,31 +237,6 @@ const VerifyEmail = () => {
             </div>
           </CardContent>
         </Card>
-
-        {/* Help Section */}
-        {!token && (
-          <Card className="mt-6 bg-gray-800/30 backdrop-blur-sm border border-gray-700">
-            <CardContent className="p-6">
-              <div className="space-y-3">
-                <h4 className="font-semibold text-white text-sm">Need help?</h4>
-                <div className="space-y-2 text-xs text-gray-400">
-                  <p>• Check your spam or junk folder</p>
-                  <p>• Ensure you entered the correct email address</p>
-                  <p>• Contact support if you continue having issues</p>
-                </div>
-                <div className="pt-2">
-                  <Button
-                    variant="outline"
-                    className="w-full border-gray-600 text-gray-300 hover:bg-gray-700"
-                    onClick={() => window.open("mailto:support@gr4de.com")}
-                  >
-                    Contact Support
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
 
         {/* Footer Links */}
         <div className="text-center mt-6 space-y-2">

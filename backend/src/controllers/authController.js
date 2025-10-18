@@ -101,6 +101,7 @@ export const register = async (req, res) => {
           avatar_url: user.avatar_url,
           is_active: user.is_active,
         },
+        email_verified: user.email_verified,
         token,
       },
     });
@@ -199,6 +200,7 @@ export const login = async (req, res) => {
           is_active: user.is_active,
           last_login: user.last_login,
         },
+        email_verified: user.email_verified,
         token,
       },
     });
@@ -239,11 +241,12 @@ export const getProfile = async (req, res) => {
           phone_number: user.phone_number,
           avatar_url: user.avatar_url,
           is_active: user.is_active,
-          email_verified: user.email_verified,
           last_login: user.last_login,
           created_at: user.created_at,
+
           updated_at: user.updated_at,
         },
+        email_verified: user.email_verified,
       },
     });
   } catch (error) {
@@ -497,6 +500,7 @@ export const resetPassword = async (req, res) => {
 export const sendVerificationEmail = async (req, res) => {
   try {
     const { email } = req.body;
+    console.log("Request to resend verification email for:", email);
 
     if (!email) {
       return res.status(400).json({
@@ -587,68 +591,6 @@ export const checkVerificationStatus = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error checking verification status",
-      error:
-        process.env.NODE_ENV === "development"
-          ? error.message
-          : "Internal server error",
-    });
-  }
-};
-
-export const verifyEmail = async (req, res) => {
-  try {
-    const { token } = req.body;
-
-    if (!token) {
-      return res.status(400).json({
-        success: false,
-        message: "Verification token is required",
-      });
-    }
-
-    // Verify email using Supabase Auth
-    const { data, error } = await supabase.auth.verifyOtp({
-      token_hash: token,
-      type: "signup",
-    });
-
-    if (error) {
-      console.error("Email verification error:", error);
-      return res.status(400).json({
-        success: false,
-        message: "Invalid or expired verification token",
-      });
-    }
-
-    // Update user email verification status in our database
-    await supabase
-      .from("users")
-      .update({
-        email_verified: true,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", data.user.id);
-
-    // Generate a new session/token after verification
-    const new_token = generateToken(data.user.id);
-
-    res.json({
-      success: true,
-      message: "Email verified successfully",
-      data: {
-        user: {
-          id: data.user.id,
-          email: data.user.email,
-          email_verified: true,
-        },
-        token: new_token,
-      },
-    });
-  } catch (error) {
-    console.error("Verify email error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Error verifying email",
       error:
         process.env.NODE_ENV === "development"
           ? error.message

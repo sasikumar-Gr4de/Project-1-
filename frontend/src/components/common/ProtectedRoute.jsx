@@ -4,22 +4,20 @@ import { useAuthStore } from "@/store/authStore";
 
 const ProtectedRoute = ({ children }) => {
   const navigate = useNavigate();
-  const { user, needsEmailVerification, checkEmailVerification } =
-    useAuthStore();
+  const { user, email_verified } = useAuthStore();
 
   useEffect(() => {
     const checkAuth = async () => {
       if (!user) {
         navigate("/login");
-      } else if (needsEmailVerification) {
+      } else if (!email_verified) {
         navigate("/verify-email");
       }
     };
-
     checkAuth();
-  }, [user, needsEmailVerification, checkEmailVerification, navigate]);
+  }, [user, email_verified, navigate]);
 
-  if (!user || needsEmailVerification) {
+  if (!user || !email_verified) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="text-white text-center">

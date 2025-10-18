@@ -3,6 +3,8 @@ import { persist, devtools } from "zustand/middleware";
 import { authAPI } from "../services/api";
 import { useToastStore } from "./toastStore";
 
+import { zustandEncryptedStorage } from "@/utils/storage";
+
 export const useAuthStore = create(
   devtools(
     persist(
@@ -12,10 +14,7 @@ export const useAuthStore = create(
         isAuthenticated: false,
         permissions: [],
         session: null,
-        needsEmailVerification: false,
-
-        setNeedsEmailVerification: (needs) =>
-          set({ needsEmailVerification: needs }),
+        email_verified: false,
 
         // Login function using authAPI
         login: async (email, password) => {
@@ -28,30 +27,32 @@ export const useAuthStore = create(
               set({
                 user: result.data.user,
                 session: result.data.session || null,
-                needsEmailVerification: result.data.needsVerification || false,
+                email_verified: result.data.email_verified || false,
                 isAuthenticated: true,
               });
               const { token } = result?.data;
+              debugger;
               localStorage.setItem("auth-token", token);
               return {
                 success: true,
                 user: result.data.user,
-                needsVerification: result.data.needsVerification,
+                email_verified: result.data.email_verified || false,
               };
             } else {
               return {
                 success: false,
                 error: result.message,
-                needsVerification: result.needsVerification,
+                email_verified: result.email_verified,
               };
             }
           } catch (error) {
             const errorMessage = error.response?.data?.message || error.message;
             useToastStore.getState().error(errorMessage || "Login failed.");
+
             return {
               success: false,
               error: errorMessage,
-              needsVerification: error.response?.data?.needsVerification,
+              email_verified: error.response?.data?.email_verified,
             };
           } finally {
             set({ isLoading: false });
@@ -64,22 +65,20 @@ export const useAuthStore = create(
           try {
             const response = await authAPI.register(userData);
             const result = response.data;
-            console.log(result);
+
             if (result.success) {
               set({
                 user: result.data.user,
-                needsEmailVerification:
-                  result.data.needsEmailVerification || false,
+                email_verified: result.data.email_verified || false,
                 isAuthenticated: true,
               });
+              debugger;
               const { token } = result.data;
               localStorage.setItem("auth-token", token);
-              console.log(token);
-              debugger;
               return {
                 success: true,
                 user: result.data.user,
-                needsVerification: result.data.needsEmailVerification,
+                email_verified: result.data.email_verified,
               };
             } else {
               return { success: false, error: result.message };
@@ -107,7 +106,7 @@ export const useAuthStore = create(
             set({
               user: null,
               session: null,
-              needsEmailVerification: false,
+              email_verified: false,
               isAuthenticated: false,
               permissions: [],
             });
@@ -122,32 +121,35 @@ export const useAuthStore = create(
             const token = localStorage.getItem("auth-token");
 
             if (!token) {
-              return { user: null, needsVerification: false };
+              return { user: null, email_verified: false };
             }
 
             const response = await authAPI.getProfile();
             const result = response.data;
 
             if (result.success) {
-              const user = result.data.user;
+              const { user, email_verified } = result.data;
 
               set({
                 user: user,
-                needsEmailVerification: !user.email_verified,
+                email_verified: email_verified || user.email_verified || false,
                 isAuthenticated: true,
                 permissions: getPermissionsForRole(user.role),
               });
 
-              return { user, needsVerification: !user.email_verified };
+              return {
+                user,
+                email_verified: email_verified || user.email_verified || false,
+              };
             } else {
               // Token is invalid, clear it
               localStorage.removeItem("auth-token");
-              return { user: null, needsVerification: false };
+              return { user: null, email_verified: false };
             }
           } catch (error) {
             console.error("Error initializing auth:", error);
             localStorage.removeItem("auth-token");
-            return { user: null, needsVerification: false };
+            return { user: null, email_verified: false };
           }
         },
 
@@ -156,41 +158,17 @@ export const useAuthStore = create(
           try {
             const response = await authAPI.checkVerificationStatus();
             const result = response.data;
-
+            debugger;
             if (result.success) {
               const isVerified = result.data.email_verified;
-              set({ needsEmailVerification: !isVerified });
-              return !isVerified;
+              set({ email_verified: isVerified });
+              return isVerified;
             }
 
             return false;
           } catch (error) {
             console.error("Error checking email verification:", error);
             return false;
-          }
-        },
-
-        // Verify email using authAPI
-        verifyEmail: async (token) => {
-          try {
-            const response = await authAPI.verifyEmail(token);
-            const result = response.data;
-
-            if (result.success) {
-              // Update local state
-              set({
-                needsEmailVerification: false,
-                user: { ...get().user, email_verified: true },
-              });
-
-              return { success: true, user: result.data.user };
-            } else {
-              return { success: false, error: result.message };
-            }
-          } catch (error) {
-            const errorMessage = error.response?.data?.message || error.message;
-            console.error("Email verification error:", errorMessage);
-            return { success: false, error: errorMessage };
           }
         },
 
@@ -216,8 +194,13 @@ export const useAuthStore = create(
             const result = response.data;
 
             if (result.success) {
-              set({ user: { ...get().user, ...result.data.user } });
-              return { success: true, user: result.data.user };
+              const updatedUser = { ...get().user, ...result.data.user };
+              set({
+                user: updatedUser,
+                email_verified:
+                  result.data.user?.email_verified || get().email_verified,
+              });
+              return { success: true, user: updatedUser };
             } else {
               return { success: false, error: result.message };
             }
@@ -232,6 +215,7 @@ export const useAuthStore = create(
           try {
             const response = await authAPI.refreshToken();
             const { token } = response.data.data;
+            debugger;
             localStorage.setItem("auth-token", token);
             return { success: true };
           } catch (error) {
@@ -267,7 +251,7 @@ export const useAuthStore = create(
           set({
             user: null,
             session: null,
-            needsEmailVerification: false,
+            email_verified: false,
             isAuthenticated: false,
             permissions: [],
           });
@@ -275,10 +259,12 @@ export const useAuthStore = create(
       }),
       {
         name: "auth-storage",
+        storage: zustandEncryptedStorage,
         partialize: (state) => ({
           user: state.user,
           isAuthenticated: state.isAuthenticated,
           permissions: state.permissions,
+          email_verified: state.email_verified,
         }),
       }
     ),

@@ -8,7 +8,6 @@ import {
   refreshToken,
   requestPasswordReset,
   resetPassword,
-  verifyEmail,
   changePassword,
   deleteAccount,
   sendVerificationEmail,
@@ -111,14 +110,6 @@ router.post("/forgot-password", requestPasswordReset);
  * @body    {string} confirm_password - Confirm new password
  */
 router.post("/reset-password", resetPassword);
-
-/**
- * @route   POST /api/auth/verify-email
- * @desc    Verify email address
- * @access  Public
- * @body    {string} token - Email verification token
- */
-router.post("/verify-email", verifyEmail);
 
 /**
  * @route   POST /api/auth/resend-verification
