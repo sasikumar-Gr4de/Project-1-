@@ -23,7 +23,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: ".",
+    outDir: "dist",
     sourcemap: true,
     rollupOptions: {
       output: {
