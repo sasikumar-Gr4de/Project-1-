@@ -35,76 +35,9 @@ if (process.env.NODE_ENV === "production") {
   const frontendPath = path.join(process.cwd(), "../frontend/dist");
   app.use(express.static(frontendPath));
   app.get(/.*/, (req, res) => {
-    // res.sendFile(path.join(frontendPath, "index.html"));
+    res.sendFile(path.join(frontendPath, "index.html"));
   });
 }
-
-app.get("/api/directories", async (req, res) => {
-  const targetPath = req.query.path
-    ? path.resolve(
-        path.dirname(new URL(import.meta.url).pathname),
-        "../../../",
-        req.query.path
-      )
-    : path.resolve(
-        path.dirname(new URL(import.meta.url).pathname),
-        "../../../"
-      );
-
-  try {
-    async function getDirStructure(dirPath, basePath = dirPath) {
-      let structure = [];
-      let files;
-
-      try {
-        files = await fs.readdir(dirPath, { withFileTypes: true });
-      } catch (error) {
-        if (error.code === "EACCES") {
-          console.warn(`Permission denied for ${dirPath}, skipping...`);
-          return structure; // Skip this directory, return empty structure
-        }
-        throw error; // Rethrow other errors
-      }
-
-      for (const file of files) {
-        const fullPath = path.join(dirPath, file.name);
-        const relativePath = path.relative(basePath, fullPath);
-        if (file.isDirectory()) {
-          try {
-            const children = await getDirStructure(fullPath, basePath);
-            structure.push({
-              name: file.name,
-              type: "directory",
-              path: relativePath,
-              children,
-            });
-          } catch (error) {
-            if (error.code === "EACCES") {
-              console.warn(`Permission denied for ${fullPath}, skipping...`);
-              continue; // Skip this subdirectory
-            }
-            throw error;
-          }
-        } else {
-          structure.push({
-            name: file.name,
-            type: "file",
-            path: relativePath,
-          });
-        }
-      }
-      return structure;
-    }
-
-    const dirStructure = await getDirStructure(targetPath);
-    res.json(dirStructure);
-  } catch (error) {
-    console.error("Directory read error:", error);
-    res
-      .status(500)
-      .json({ error: "Failed to read directories", details: error.message });
-  }
-});
 
 // Routes
 app.use("/api/auth", authRoutes);

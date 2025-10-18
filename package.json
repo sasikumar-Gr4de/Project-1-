@@ -4,7 +4,7 @@
   "description": "Monorepo with a frontend (Vite + React + Tailwind) and a backend (Node.js + Express + Supabase).",
   "main": "index.js",
   "scripts": {
-    "build": "npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend",
+    "build": "npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend && ls",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
