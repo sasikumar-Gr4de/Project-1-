@@ -35,4 +35,5 @@ export default defineConfig({
       },
     },
   },
+  base: "./", // ensures relative paths work when served from Vercel
 });
