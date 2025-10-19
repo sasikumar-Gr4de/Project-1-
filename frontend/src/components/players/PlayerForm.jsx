@@ -163,7 +163,6 @@ const PlayerForm = ({ isOpen, onClose, onSave, player }) => {
                         <Users className="h-10 w-10 sm:h-12 sm:w-12 text-white" />
                       )}
                     </div>
-
                     {previewImage && (
                       <button
                         type="button"

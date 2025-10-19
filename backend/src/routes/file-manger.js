@@ -1,43 +1,34 @@
 import express from "express";
 import multer from "multer";
-import {
-  listFilesController,
-  getFileDetailsController,
-  uploadFileController,
-  deleteFileController,
-  deleteFilesController,
-  createFolderController,
-  getStorageStatsController,
-  testConnectionController,
-  generatePresignedUrlController,
-} from "../controllers/fileManagerController.js";
+import FileManagerController from "../controllers/FileManagerController.js";
 import { protect } from "../middleware/auth.js";
 
 const router = express.Router();
-
-// Configure multer for file uploads
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB limit
-  },
-});
+const upload = multer();
+const fileManagerController = new FileManagerController();
 
 // File operations
-router.get("/", listFilesController);
-router.get("/stats", getStorageStatsController);
-router.get("/test", testConnectionController);
-router.get("/:key", getFileDetailsController);
-
-// Upload operations
-router.post("/upload", upload.single("file"), uploadFileController);
-router.post("/presigned-url", generatePresignedUrlController);
-
-// Delete operations
-router.delete("/:key", deleteFileController);
-router.delete("/", deleteFilesController);
+router.get("/files", protect, fileManagerController.listFiles);
+router.get("/files/:key", protect, fileManagerController.getFileDetails);
+router.post(
+  "/files/upload",
+  protect,
+  upload.single("file"),
+  fileManagerController.uploadFile
+);
+router.post(
+  "/files/presigned-url",
+  protect,
+  fileManagerController.generatePresignedUrl
+);
+router.delete("/files/:key", protect, fileManagerController.deleteFile);
+router.delete("/files", protect, fileManagerController.deleteFiles);
 
 // Folder operations
-router.post("/folders", createFolderController);
+router.post("/folders", protect, fileManagerController.createFolder);
+
+// Storage operations
+router.get("/storage/stats", protect, fileManagerController.getStorageStats);
+router.get("/storage/test", protect, fileManagerController.testConnection);
 
 export default router;

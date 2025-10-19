@@ -1,22 +1,5 @@
 import express from "express";
-import {
-  register,
-  login,
-  getProfile,
-  updateProfile,
-  logout,
-  refreshToken,
-  requestPasswordReset,
-  resetPassword,
-  changePassword,
-  deleteAccount,
-  sendVerificationEmail,
-  checkVerificationStatus,
-  getPermissionsForRole,
-  getStats,
-  getSession,
-} from "../controllers/authController.js";
-
+import AuthController from "../controllers/AuthController.js";
 import { protect, optionalAuth } from "../middleware/auth.js";
 import {
   validateRegistration,
@@ -27,28 +10,37 @@ import {
 const router = express.Router();
 
 // login and registration routes
-router.post("/register", validateRegistration, register);
-router.post("/login", validateLogin, login);
-router.post("/refresh", protect, refreshToken);
-router.post("/logout", protect, logout);
+router.post("/register", validateRegistration, AuthController.register);
+router.post("/login", validateLogin, AuthController.login);
+router.post("/refresh", protect, AuthController.refreshToken);
+router.post("/logout", protect, AuthController.logout);
 
 // profile routes
-router.get("/profile", protect, getProfile);
-router.put("/profile", protect, validateProfileUpdate, updateProfile);
+router.get("/profile", protect, AuthController.getProfile);
+router.put(
+  "/profile",
+  protect,
+  validateProfileUpdate,
+  AuthController.updateProfile
+);
 
 // password management routes
-router.post("/change-password", protect, changePassword);
-router.post("/forgot-password", requestPasswordReset);
-router.post("/reset-password", resetPassword);
+router.post("/forgot-password", AuthController.requestPasswordReset);
+router.post("/change-password", protect, AuthController.changePassword);
+router.post("/reset-password", AuthController.resetPassword);
 
 // email verification routes
-router.post("/resend-verification", protect, sendVerificationEmail);
-router.get("/verification-status", protect, checkVerificationStatus);
+router.post("/send-verification", AuthController.sendVerificationEmail);
+router.get("/verify-status", protect, AuthController.checkVerificationStatus);
 
 // account management routes
-router.delete("/account", protect, deleteAccount);
-router.get("/session", optionalAuth, getSession);
-router.get("/permissions", protect, getPermissionsForRole);
-router.get("/stats", protect, getStats);
+router.delete("/account", protect, AuthController.deleteAccount);
+
+// session and permissions routes
+router.get("/session", optionalAuth, AuthController.getSession);
+router.get("/permissions", protect, AuthController.getPermissionsForRole);
+
+// admin routes
+router.get("/stats", protect, AuthController.getStats);
 
 export default router;
