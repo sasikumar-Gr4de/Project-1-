@@ -21,7 +21,7 @@ import {
   ArrowLeft,
   Shield,
 } from "lucide-react";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/store/auth.store";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);

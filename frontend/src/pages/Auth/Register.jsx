@@ -33,7 +33,7 @@ import {
   CheckCircle,
   XCircle,
 } from "lucide-react";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/store/auth.store";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);

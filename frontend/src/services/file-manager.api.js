@@ -1,4 +1,4 @@
-import api from "./api";
+import api from "./base.api";
 
 export const fileManagerService = {
   // Get files with pagination and filtering

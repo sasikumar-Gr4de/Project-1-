@@ -16,7 +16,7 @@ import {
   Shield, // Add Shield icon for Teams
 } from "lucide-react";
 
-import { useAuthStore } from "../../store/authStore";
+import { useAuthStore } from "../../store/auth.store";
 import { capitalize } from "../../utils/formatters";
 import { Link } from "react-router-dom";
 

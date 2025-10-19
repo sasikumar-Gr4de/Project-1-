@@ -12,7 +12,7 @@ import {
   Trophy,
   AlertCircle,
 } from "lucide-react";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/store/auth.store";
 
 const VerifyEmail = () => {
   const [isLoading, setIsLoading] = useState(false);

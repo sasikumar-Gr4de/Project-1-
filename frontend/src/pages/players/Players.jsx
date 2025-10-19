@@ -36,13 +36,9 @@ import DataTable from "@/components/common/DataTable";
 import MultiSelectFilter from "@/components/common/MultiSelectFilter";
 import PlayerCard from "@/components/players/PlayerCard";
 
-import {
-  DETAILED_POSITIONS,
-  ALL_POSITIONS,
-  STATUS_OPTIONS,
-} from "@/utils/constants";
+import { ALL_POSITIONS, STATUS_OPTIONS } from "@/utils/constants";
 
-import { calculateAge } from "@/utils/calculate";
+import { calculateAge } from "@/utils/calculations";
 import Loading from "@/components/common/Loading";
 import GridView from "@/components/common/GridView";
 

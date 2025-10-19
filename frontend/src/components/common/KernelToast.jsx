@@ -1,7 +1,7 @@
 // components/ui/toast.jsx
 import React, { useEffect, useState } from "react";
 import { CheckCircle, XCircle, AlertCircle, Info, X } from "lucide-react";
-import { useToastStore } from "@/store/toastStore";
+import { useToastStore } from "@/store/toast.store";
 
 const KernelToast = ({ toast }) => {
   const [isLeaving, setIsLeaving] = useState(false);

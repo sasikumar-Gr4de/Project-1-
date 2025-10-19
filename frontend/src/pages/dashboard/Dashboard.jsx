@@ -5,7 +5,7 @@ import RecentPlayers from "@/components/dashboard/RecentPlayers";
 import PerformanceMetrics from "@/components/dashboard/PerformanceMetrics";
 import TopPerformers from "@/components/dashboard/TopPerformers";
 import SystemStatus from "@/components/dashboard/SystemStatus";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/store/auth.store";
 
 const Dashboard = () => {
   // Mock data

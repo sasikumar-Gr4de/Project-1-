@@ -36,7 +36,7 @@ app.use((req, res, next) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/file-manager", fileManagerRoutes);
-app.use("/players", playerRoutes);
+app.use("/api/players", playerRoutes);
 
 app.get("/api/health", async (req, res) => {
   try {

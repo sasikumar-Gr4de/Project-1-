@@ -1,5 +1,5 @@
 import { useNavigate, replace } from "react-router-dom";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/store/auth.store";
 import { useEffect } from "react";
 
 const PublicRoute = ({ children }) => {

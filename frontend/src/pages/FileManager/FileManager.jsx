@@ -33,9 +33,9 @@ import {
 } from "lucide-react";
 import DataTable from "@/components/common/DataTable";
 import GridView from "@/components/common/GridView";
-import { fileManagerService } from "@/services/fileManagerService";
+import { fileManagerService } from "@/services/file-manager.api";
 import { fileTypes } from "@/utils/constants";
-import { useToastStore } from "@/store/toastStore";
+import { useToastStore } from "@/store/toast.store";
 import Loading from "@/components/common/Loading";
 
 const FileManager = () => {

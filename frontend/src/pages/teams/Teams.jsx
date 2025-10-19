@@ -43,7 +43,7 @@ import {
   TEAM_STATUS_OPTIONS,
 } from "@/utils/constants";
 
-import { calculateAge } from "@/utils/calculate";
+import { calculateAge } from "@/utils/calculations";
 import Loading from "@/components/common/Loading";
 
 const Teams = () => {

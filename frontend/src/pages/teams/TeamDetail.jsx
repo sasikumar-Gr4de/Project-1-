@@ -33,7 +33,7 @@ import PlayerAvatar from "@/components/players/PlayerAvatar";
 import PlayerStatusBadge from "@/components/players/PlayerStatusBadge";
 import DataTable from "@/components/common/DataTable";
 import MultiSelectFilter from "@/components/common/MultiSelectFilter";
-import { calculateAge } from "@/utils/calculate";
+import { calculateAge } from "@/utils/calculations";
 import { ALL_POSITIONS, STATUS_OPTIONS } from "@/utils/constants";
 import Loading from "@/components/common/Loading";
 

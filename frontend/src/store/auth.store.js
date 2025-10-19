@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
-import { authAPI } from "@/services/api";
-import { useToastStore } from "@/store/toastStore";
+import { authService } from "@/services/auth.api";
+import { useToastStore } from "@/store/toast.store";
 
 import { zustandEncryptedStorage } from "@/utils/storage";
 
@@ -16,12 +16,12 @@ export const useAuthStore = create(
         session: null,
         email_verified: false,
 
-        // Login function using authAPI
+        // Login function using authService
         login: async (email, password) => {
           debugger;
           set({ isLoading: true });
           try {
-            const response = await authAPI.login(email, password);
+            const response = await authService.login(email, password);
             const result = response.data;
 
             if (result.success) {
@@ -61,11 +61,11 @@ export const useAuthStore = create(
           }
         },
 
-        // Register function using authAPI
+        // Register function using authService
         register: async (userData) => {
           set({ isLoading: true });
           try {
-            const response = await authAPI.register(userData);
+            const response = await authService.register(userData);
             const result = response.data;
 
             if (result.success) {
@@ -94,10 +94,10 @@ export const useAuthStore = create(
           }
         },
 
-        // Logout using authAPI
+        // Logout using authService
         logout: async () => {
           try {
-            await authAPI.logout();
+            await authService.logout();
           } catch (error) {
             console.error("Logout API error:", error);
             // Continue with cleanup even if API call fails
@@ -118,7 +118,7 @@ export const useAuthStore = create(
           return { success: true };
         },
 
-        // Initialize auth using authAPI
+        // Initialize auth using authService
         initializeAuth: async () => {
           try {
             const token = localStorage.getItem("auth-token");
@@ -127,7 +127,7 @@ export const useAuthStore = create(
               return { user: null, email_verified: false };
             }
 
-            const response = await authAPI.getProfile();
+            const response = await authService.getProfile();
             const result = response.data;
 
             if (result.success) {
@@ -157,10 +157,10 @@ export const useAuthStore = create(
           }
         },
 
-        // Check email verification using authAPI
+        // Check email verification using authService
         checkEmailVerification: async () => {
           try {
-            const response = await authAPI.checkVerificationStatus();
+            const response = await authService.checkVerificationStatus();
             const result = response.data;
             debugger;
             if (result.success) {
@@ -176,10 +176,10 @@ export const useAuthStore = create(
           }
         },
 
-        // Resend verification email using authAPI
+        // Resend verification email using authService
         resendVerificationEmail: async (email) => {
           try {
-            const response = await authAPI.resendVerification(email);
+            const response = await authService.resendVerification(email);
             return response.data;
           } catch (error) {
             const errorMessage = error.response?.data?.message || error.message;
@@ -191,10 +191,10 @@ export const useAuthStore = create(
           }
         },
 
-        // Update profile using authAPI
+        // Update profile using authService
         updateProfile: async (userData) => {
           try {
-            const response = await authAPI.updateProfile(userData);
+            const response = await authService.updateProfile(userData);
             const result = response.data;
 
             if (result.success) {
@@ -214,10 +214,10 @@ export const useAuthStore = create(
           }
         },
 
-        // Refresh token using authAPI
+        // Refresh token using authService
         refreshToken: async () => {
           try {
-            const response = await authAPI.refreshToken();
+            const response = await authService.refreshToken();
             const { token } = response.data.data;
             localStorage.setItem("auth-token", token);
             return { success: true };

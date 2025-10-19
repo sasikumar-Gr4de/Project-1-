@@ -3,7 +3,7 @@ import { Outlet } from "react-router-dom";
 import Header from "@/components/layouts/Header";
 import Sidebar from "@/components/layouts/Sidebar";
 import Footer from "@/components/layouts/Footer";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/store/auth.store";
 import ScrollIndicator from "@/components/common/ScrollIndicator";
 
 const Layout = () => {
