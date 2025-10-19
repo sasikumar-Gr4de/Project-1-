@@ -35,7 +35,7 @@ export default defineConfig({
       },
     },
   },
-  base: "./", // ensures relative paths work when served from Vercel
+  base: "/", // ensures relative paths work when served from Vercel
   preview: {
     port: 4173,
     open: true,
