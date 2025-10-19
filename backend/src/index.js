@@ -7,6 +7,7 @@ import { testSupabaseConnection } from "./config/supabase.js";
 import authRoutes from "./routes/auth.js";
 import fileManagerRoutes from "./routes/file-manger.js";
 
+// Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 5000;
 const log = console.log;
@@ -28,6 +29,8 @@ app.use((req, res, next) => {
   log(chalk.green(`${new Date().toISOString()} - ${req.method} ${req.path}`));
   next();
 });
+
+// Mount routes
 
 app.use("/api/auth", authRoutes);
 app.use("/api/file-manager", fileManagerRoutes);
@@ -99,16 +102,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-// if (process.env.NODE_ENV === "development") {
-//   app.listen(PORT, () => {
-//     log(
-//       chalk.blueBright(
-//         `Gr4de Football Analytics Platform API is running on port ${PORT}`
-//       )
-//     );
-//   });
-// }
-
 app.listen(PORT, () => {
   log(
     chalk.blueBright(
@@ -117,5 +110,4 @@ app.listen(PORT, () => {
   );
 });
 
-// export default serverless(app);
 export default app;
