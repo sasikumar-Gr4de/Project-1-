@@ -36,4 +36,10 @@ export default defineConfig({
     },
   },
   base: "./", // ensures relative paths work when served from Vercel
+  preview: {
+    port: 4173,
+    open: true,
+    // When you run `vite preview`, this ensures all unknown routes fall back to index.html
+    strictPort: true,
+  },
 });
