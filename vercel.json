@@ -8,7 +8,9 @@
   ],
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/backend/src/index.js" },
+    { "source": "/assets/(.*)", "destination": "/frontend/assets"},
     { "source": "/(.*)", "destination": "/frontend/index.html" }
+    
     
   ]
 }
