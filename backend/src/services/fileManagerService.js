@@ -8,7 +8,7 @@ import {
   generatePresignedUploadUrl,
   uploadToS3,
   s3Config,
-} from "../config/aws.js";
+} from "../config/aws.config.js";
 
 import { fileTypeMap } from "../utils/constants.js";
 

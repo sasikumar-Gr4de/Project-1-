@@ -1,8 +1,8 @@
 import jwt from "jsonwebtoken";
-import { supabase } from "../config/supabase.js";
-import { User } from "../models/User.js";
+import { supabase } from "../config/supabase.config.js";
+import { User } from "../models/User.model.js";
 import { auth_stats } from "../utils/constants.js";
-import { getPermission } from "../utils/get_mock_data.js";
+import { getPermission } from "../utils/helpers.js";
 
 class AuthController {
   constructor() {

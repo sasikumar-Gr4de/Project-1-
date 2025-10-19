@@ -1,11 +1,12 @@
 import express from "express";
 import cors from "cors";
 import chalk from "chalk";
-import { testSupabaseConnection } from "./config/supabase.js";
 
 // Import routes
-import authRoutes from "./routes/auth.js";
-import fileManagerRoutes from "./routes/file-manger.js";
+import authRoutes from "./routes/auth.routes.js";
+import fileManagerRoutes from "./routes/file-manger.routes.js";
+
+import { testSupabaseConnection } from "./config/supabase.config.js";
 
 // Initialize Express app
 const app = express();
