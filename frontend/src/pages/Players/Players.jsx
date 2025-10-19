@@ -73,13 +73,12 @@ const Players = () => {
         console.error("Error fetching players:", error);
       } finally {
         setIsLoading(false);
+        const teams = Array.from(
+          new Set(players.map((player) => player.current_club))
+        ).map((team) => ({ label: team, value: team }));
+        setTeams(teams);
       }
     };
-
-    const teams = Array.from(
-      new Set(players.map((player) => player.current_club))
-    ).map((team) => ({ label: team, value: team }));
-    setTeams(teams);
 
     fetchPlayers();
   }, [getAllPlayers]);
