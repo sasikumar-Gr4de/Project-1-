@@ -3,6 +3,9 @@ import {
   GetObjectCommand,
   PutObjectCommand,
   DeleteObjectCommand,
+  ListObjectsV2Command,
+  HeadObjectCommand,
+  DeleteObjectsCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import dotenv from "dotenv";
@@ -20,8 +23,8 @@ export const s3Client = new S3Client({
 });
 
 export const s3Config = {
-  bucketName: process.env.AWS_S3_BUCKET_NAME | "gr4de-platform",
-  region: process.env.AWS_REGION | "us-east-1",
+  bucketName: process.env.AWS_S3_BUCKET_NAME || "gr4de-platform",
+  region: process.env.AWS_REGION || "us-east-1",
   baseUrl: `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com`,
 };
 
@@ -32,7 +35,7 @@ export const generatePresignedUploadUrl = async (
   expiresIn = 3600
 ) => {
   const command = new PutObjectCommand({
-    Bucket: s3Config.bucket,
+    Bucket: s3Config.bucketName,
     Key: key,
     ContentType: contentType,
     ACL: "public-read",
@@ -44,7 +47,7 @@ export const generatePresignedUploadUrl = async (
 // Generate pre-signed URL for download
 export const generatePresignedDownloadUrl = async (key, expiresIn = 3600) => {
   const command = new GetObjectCommand({
-    Bucket: s3Config.bucket,
+    Bucket: s3Config.bucketName,
     Key: key,
   });
 
@@ -54,7 +57,7 @@ export const generatePresignedDownloadUrl = async (key, expiresIn = 3600) => {
 // Delete object from S3
 export const deleteObjectFromS3 = async (key) => {
   const command = new DeleteObjectCommand({
-    Bucket: s3Config.bucket,
+    Bucket: s3Config.bucketName,
     Key: key,
   });
 
@@ -67,20 +70,90 @@ export const deleteObjectFromS3 = async (key) => {
   }
 };
 
+// Delete multiple objects from S3
+export const deleteObjectsFromS3 = async (keys) => {
+  const command = new DeleteObjectsCommand({
+    Bucket: s3Config.bucketName,
+    Delete: {
+      Objects: keys.map((key) => ({ Key: key })),
+    },
+  });
+
+  try {
+    const result = await s3Client.send(command);
+    return {
+      success: true,
+      deleted: result.Deleted || [],
+      errors: result.Errors || [],
+    };
+  } catch (error) {
+    console.error("Error deleting objects from S3:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+// List objects in S3 bucket
+export const listObjectsInS3 = async (params = {}) => {
+  const command = new ListObjectsV2Command({
+    Bucket: s3Config.bucketName,
+    MaxKeys: 100,
+    ...params,
+  });
+
+  try {
+    const result = await s3Client.send(command);
+    return { success: true, data: result };
+  } catch (error) {
+    console.error("Error listing objects from S3:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+// Get object metadata
+export const getObjectMetadata = async (key) => {
+  const command = new HeadObjectCommand({
+    Bucket: s3Config.bucketName,
+    Key: key,
+  });
+
+  try {
+    const result = await s3Client.send(command);
+    return { success: true, data: result };
+  } catch (error) {
+    console.error("Error getting object metadata from S3:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+// Create folder in S3
+export const createFolderInS3 = async (folderPath) => {
+  const command = new PutObjectCommand({
+    Bucket: s3Config.bucketName,
+    Key: folderPath.endsWith("/") ? folderPath : `${folderPath}/`,
+    Body: "",
+    ContentType: "application/x-directory",
+  });
+
+  try {
+    await s3Client.send(command);
+    return { success: true };
+  } catch (error) {
+    console.error("Error creating folder in S3:", error);
+    return { success: false, error: error.message };
+  }
+};
+
 // Check S3 connection
 export const testS3Connection = async () => {
   try {
-    const command = new GetObjectCommand({
-      Bucket: s3Config.bucket,
-      Key: "test-connection.txt",
+    const command = new ListObjectsV2Command({
+      Bucket: s3Config.bucketName,
+      MaxKeys: 1,
     });
 
     await s3Client.send(command);
     return { connected: true };
   } catch (error) {
-    if (error.name === "NoSuchKey") {
-      return { connected: true }; // Bucket exists but file doesn't
-    }
     return { connected: false, error: error.message };
   }
 };
