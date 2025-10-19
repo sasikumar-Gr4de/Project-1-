@@ -8,8 +8,10 @@
   ],
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/backend/src/index.js" },
-    { "source": "/assets/(.*)", "destination": "/frontend/assets"},
-    { "source": "/(.*)", "destination": "/frontend/index.html" }
+    {
+      "source": "/((?!assets|favicon\\.ico|robots\\.txt|manifest\\.json).*)",
+      "destination": "/frontend/dist/index.html"
+    }
     
     
   ]
