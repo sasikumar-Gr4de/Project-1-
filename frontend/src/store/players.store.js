@@ -10,17 +10,15 @@ export const usePlayersStore = create(
       (set, get) => ({
         getAllPlayers: async () => {
           const res = await PlayersApiService.getPlayers();
-          const { data } = res.data;
-          console.log(data);
-          return data;
+          return res.data;
         },
         addNewPlayer: async (playerData) => {
-          return await PlayersApiService.createPlayer(playerData);
+          const res = await PlayersApiService.createPlayer(playerData);
+          return res.data;
         },
         updatePlayer: async (id, playerData) => {
           const res = await PlayersApiService.updatePlayer(id, playerData);
-          const { data } = res.data;
-          return data;
+          return res.data;
         },
         deletePlayer: async (id) => {
           const res = await PlayersApiService.deletePlayer(id);

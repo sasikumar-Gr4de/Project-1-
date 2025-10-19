@@ -59,14 +59,14 @@ const Players = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { getAllPlayers, addNewPlayer } = usePlayersStore();
+  const { getAllPlayers, addNewPlayer, updatePlayer } = usePlayersStore();
 
   // Fetch players on component mount
   useEffect(() => {
     const fetchPlayers = async () => {
       setIsLoading(true);
       try {
-        const data = await getAllPlayers();
+        const { data } = await getAllPlayers();
         setPlayers(data);
         setFilteredPlayers(data);
       } catch (error) {
@@ -150,34 +150,23 @@ const Players = () => {
     }
   };
 
-  const handleSavePlayer = (playerData) => {
+  const handleSavePlayer = async (playerData) => {
     if (selectedPlayer) {
       // Update existing player
-      setPlayers(
-        players.map((p) =>
-          p.id === selectedPlayer.id
-            ? {
-                ...playerData,
-                id: selectedPlayer.id,
-                updated_at: new Date().toISOString(),
-                // Preserve performance data if not in form
-                matches_played: selectedPlayer.matches_played,
-                sense_score: selectedPlayer.sense_score,
-                game_time: selectedPlayer.game_time,
-                overall_ability: selectedPlayer.overall_ability,
-              }
-            : p
-        )
-      );
+      const res = await updatePlayer(selectedPlayer.id, playerData);
+      const { success, data } = res;
+
+      if (success) {
+        setPlayers(
+          players.map((p) => (p.id === selectedPlayer.id ? { ...data } : p))
+        );
+      }
     } else {
       // Add new player
-      const newPlayer = {
-        ...playerData,
-      };
-      const res = addNewPlayer(newPlayer);
+      const res = await addNewPlayer(playerData);
       const { success, data } = res;
       if (success) {
-        setPlayers([...players, newPlayer]);
+        setPlayers([...players, data]);
       }
     }
     setIsFormOpen(false);

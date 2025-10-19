@@ -33,9 +33,10 @@ import PlayerAvatar from "@/components/players/PlayerAvatar";
 import PlayerStatusBadge from "@/components/players/PlayerStatusBadge";
 import DataTable from "@/components/common/DataTable";
 import MultiSelectFilter from "@/components/common/MultiSelectFilter";
+import Loading from "@/components/common/Loading";
 import { calculateAge } from "@/utils/calculations";
 import { ALL_POSITIONS, STATUS_OPTIONS } from "@/utils/constants";
-import Loading from "@/components/common/Loading";
+import { formatGameTime } from "@/utils/formatters";
 
 const TeamDetail = () => {
   const { id } = useParams();
@@ -192,12 +193,6 @@ const TeamDetail = () => {
       setIsLoading(false);
     }, 1000);
   }, [id]);
-
-  const formatGameTime = (minutes) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return `${hours}h ${mins}m`;
-  };
 
   const addPlayerToTeam = (player) => {
     if (!team) return;

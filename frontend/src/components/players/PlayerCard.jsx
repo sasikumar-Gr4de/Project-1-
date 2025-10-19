@@ -99,7 +99,7 @@ const PlayerCard = ({ player, onEdit, onDelete, calculateAge }) => {
         <div className="grid grid-cols-3 gap-4 mb-4 p-3 bg-gray-700/50 rounded-lg">
           <div className="text-center">
             <div className="text-2xl font-bold text-blue-400">
-              {player.sense_score}
+              {player.sense_score | 0}
             </div>
             <div className="text-xs text-gray-400">Sense</div>
           </div>
