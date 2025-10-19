@@ -14,6 +14,10 @@
     {
       "src": "/((?!assets|favicon\\.ico|robots\\.txt).*)",
       "dest": "/frontend/index.html"
+    },
+    {
+      "src": "/(assets|favicon\\.ico|robots\\.txt)(.*)",
+      "dest": "/frontend/$1$2"
     }
   ]
 }
