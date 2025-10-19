@@ -12,6 +12,8 @@ import {
   deleteAccount,
   sendVerificationEmail,
   checkVerificationStatus,
+  getPermissionsForRole,
+  getStats,
 } from "../controllers/authController.js";
 
 import { protect, optionalAuth } from "../middleware/auth.js";
@@ -142,41 +144,7 @@ router.delete("/account", protect, deleteAccount);
  * @access  Private (Optional - returns user if authenticated, public access otherwise)
  * @header  [Authorization: Bearer <token>] - Optional
  */
-router.get("/session", optionalAuth, async (req, res) => {
-  try {
-    if (req.user) {
-      res.json({
-        success: true,
-        data: {
-          isAuthenticated: true,
-          user: {
-            id: req.user.userId,
-            email: req.user.email,
-            role: req.user.role,
-            clientType: req.user.clientType,
-          },
-        },
-      });
-    } else {
-      res.json({
-        success: true,
-        data: {
-          isAuthenticated: false,
-          user: null,
-        },
-      });
-    }
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error checking session",
-      error:
-        process.env.NODE_ENV === "development"
-          ? error.message
-          : "Internal server error",
-    });
-  }
-});
+router.get("/session", optionalAuth, getSession);
 
 /**
  * @route   GET /api/auth/permissions
@@ -184,28 +152,7 @@ router.get("/session", optionalAuth, async (req, res) => {
  * @access  Private
  * @header  Authorization: Bearer <token>
  */
-router.get("/permissions", protect, async (req, res) => {
-  try {
-    const permissions = getPermissionsForRole(req.user.role);
-
-    res.json({
-      success: true,
-      data: {
-        permissions,
-        role: req.user.role,
-      },
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error fetching permissions",
-      error:
-        process.env.NODE_ENV === "development"
-          ? error.message
-          : "Internal server error",
-    });
-  }
-});
+router.get("/permissions", protect, getPermissionsForRole);
 
 /**
  * @route   GET /api/auth/stats
@@ -213,125 +160,6 @@ router.get("/permissions", protect, async (req, res) => {
  * @access  Private (Admin)
  * @header  Authorization: Bearer <token>
  */
-router.get("/stats", protect, async (req, res) => {
-  try {
-    // Check if user is admin
-    if (req.user.role !== "admin") {
-      return res.status(403).json({
-        success: false,
-        message: "Access denied. Admin role required.",
-      });
-    }
-
-    // This would typically fetch user statistics from the database
-    // For now, return mock data
-    const stats = {
-      total_users: 150,
-      active_users: 142,
-      new_users_today: 3,
-      new_users_this_week: 15,
-      users_by_role: {
-        admin: 2,
-        "data-reviewer": 5,
-        annotator: 25,
-        coach: 45,
-        scout: 28,
-        client: 45,
-      },
-      verification_stats: {
-        verified: 135,
-        unverified: 15,
-      },
-    };
-
-    res.json({
-      success: true,
-      data: stats,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error fetching user statistics",
-      error:
-        process.env.NODE_ENV === "development"
-          ? error.message
-          : "Internal server error",
-    });
-  }
-});
-
-// Helper function to get permissions for role
-const getPermissionsForRole = (role) => {
-  const rolePermissions = {
-    admin: [
-      "view_dashboard",
-      "manage_users",
-      "manage_players",
-      "manage_matches",
-      "manage_teams",
-      "manage_tournaments",
-      "view_analytics",
-      "export_data",
-      "upload_videos",
-      "manage_lineups",
-      "access_admin_panel",
-      "review_data",
-      "tag_events",
-      "export_team_data",
-      "compare_players",
-      "export_player_data",
-      "create_reports",
-      "system_settings",
-    ],
-    "data-reviewer": [
-      "view_dashboard",
-      "manage_players",
-      "manage_matches",
-      "view_analytics",
-      "export_data",
-      "upload_videos",
-      "review_data",
-      "tag_events",
-      "compare_players",
-      "export_player_data",
-      "create_reports",
-    ],
-    annotator: [
-      "view_dashboard",
-      "view_players",
-      "view_matches",
-      "upload_videos",
-      "tag_events",
-      "view_basic_analytics",
-    ],
-    coach: [
-      "view_dashboard",
-      "view_players",
-      "view_matches",
-      "manage_lineups",
-      "view_analytics",
-      "export_team_data",
-      "compare_players",
-      "create_reports",
-    ],
-    scout: [
-      "view_dashboard",
-      "view_players",
-      "view_matches",
-      "view_analytics",
-      "export_player_data",
-      "compare_players",
-      "create_reports",
-    ],
-    client: [
-      "view_dashboard",
-      "view_players",
-      "view_matches",
-      "view_basic_analytics",
-    ],
-  };
-
-  return rolePermissions[role] || ["view_dashboard"];
-};
+router.get("/stats", protect, getStats);
 
 export default router;

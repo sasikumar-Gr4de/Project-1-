@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken";
 import { supabase } from "../config/supabase.js";
 import { User } from "../models/User.js";
+import { auth_stats } from "../utils/constants.js";
+import getPermissionForRole from "../utils/getPermissionForRole.js";
 
 const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, {
@@ -670,6 +672,93 @@ export const deleteAccount = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error deleting account",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Internal server error",
+    });
+  }
+};
+
+export const getSession = async (req, res) => {
+  try {
+    if (req.user) {
+      res.json({
+        success: true,
+        data: {
+          isAuthenticated: true,
+          user: {
+            id: req.user.userId,
+            email: req.user.email,
+            role: req.user.role,
+            clientType: req.user.clientType,
+          },
+        },
+      });
+    } else {
+      res.json({
+        success: true,
+        data: {
+          isAuthenticated: false,
+          user: null,
+        },
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error checking session",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Internal server error",
+    });
+  }
+};
+
+export const getPermissionsForRole = (req, res) => {
+  try {
+    const permissions = getPermissionForRole(req.user.role);
+
+    res.json({
+      success: true,
+      data: {
+        permissions,
+        role: req.user.role,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching permissions",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Internal server error",
+    });
+  }
+};
+
+export const getStats = async (req, res) => {
+  try {
+    // Check if user is admin
+    if (req.user.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Admin role required.",
+      });
+    }
+
+    const stats = auth_stats;
+
+    res.json({
+      success: true,
+      data: stats,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching user statistics",
       error:
         process.env.NODE_ENV === "development"
           ? error.message
