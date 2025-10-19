@@ -1,5 +1,3 @@
-// This would typically fetch user statistics from the database
-// For now, return mock data
 export const auth_stats = {
   total_users: 150,
   active_users: 142,

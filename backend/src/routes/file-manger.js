@@ -11,7 +11,7 @@ import {
   testConnectionController,
   generatePresignedUrlController,
 } from "../controllers/fileManagerController.js";
-import { authenticateToken } from "../middleware/auth.js";
+import { protect } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -23,9 +23,6 @@ const upload = multer({
   },
 });
 
-// Apply authentication to all routes
-router.use(authenticateToken);
-
 // File operations
 router.get("/", listFilesController);
 router.get("/stats", getStorageStatsController);
@@ -33,14 +30,14 @@ router.get("/test", testConnectionController);
 router.get("/:key", getFileDetailsController);
 
 // Upload operations
-router.post("/upload", upload.single("file"), uploadFileController);
-router.post("/presigned-url", generatePresignedUrlController);
+router.post("/upload", protect, upload.single("file"), uploadFileController);
+router.post("/presigned-url", protect, generatePresignedUrlController);
 
 // Delete operations
-router.delete("/:key", deleteFileController);
-router.delete("/", deleteFilesController);
+router.delete("/:key", protect, deleteFileController);
+router.delete("/", protect, deleteFilesController);
 
 // Folder operations
-router.post("/folders", createFolderController);
+router.post("/folders", protect, createFolderController);
 
 export default router;
