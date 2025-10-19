@@ -1,0 +1,46 @@
+import express from "express";
+import multer from "multer";
+import {
+  listFilesController,
+  getFileDetailsController,
+  uploadFileController,
+  deleteFileController,
+  deleteFilesController,
+  createFolderController,
+  getStorageStatsController,
+  testConnectionController,
+  generatePresignedUrlController,
+} from "../controllers/fileManagerController.js";
+import { authenticateToken } from "../middleware/auth.js";
+
+const router = express.Router();
+
+// Configure multer for file uploads
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+  },
+});
+
+// Apply authentication to all routes
+router.use(authenticateToken);
+
+// File operations
+router.get("/", listFilesController);
+router.get("/stats", getStorageStatsController);
+router.get("/test", testConnectionController);
+router.get("/:key", getFileDetailsController);
+
+// Upload operations
+router.post("/upload", upload.single("file"), uploadFileController);
+router.post("/presigned-url", generatePresignedUrlController);
+
+// Delete operations
+router.delete("/:key", deleteFileController);
+router.delete("/", deleteFilesController);
+
+// Folder operations
+router.post("/folders", createFolderController);
+
+export default router;

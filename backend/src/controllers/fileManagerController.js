@@ -1,6 +1,16 @@
-import fileManagerService from "../services/fileManagerService.js";
+import {
+  listFiles,
+  getFileDetails,
+  uploadFile,
+  deleteFile,
+  deleteFiles,
+  createFolder,
+  getStorageStats,
+  testConnection,
+  getPresignedUploadUrl,
+} from "../services/fileManagerService.js";
 
-export const listFiles = async (req, res) => {
+export const listFilesController = async (req, res) => {
   try {
     const {
       prefix = "",
@@ -9,7 +19,7 @@ export const listFiles = async (req, res) => {
       folder = "",
     } = req.query;
 
-    const result = await fileManagerService.listFiles({
+    const result = await listFiles({
       prefix,
       maxKeys: parseInt(maxKeys),
       continuationToken,
@@ -30,7 +40,7 @@ export const listFiles = async (req, res) => {
   }
 };
 
-export const getFileDetails = async (req, res) => {
+export const getFileDetailsController = async (req, res) => {
   try {
     const { key } = req.params;
 
@@ -41,7 +51,7 @@ export const getFileDetails = async (req, res) => {
       });
     }
 
-    const result = await fileManagerService.getFileDetails(key);
+    const result = await getFileDetails(key);
 
     if (!result.success) {
       return res.status(400).json(result);
@@ -57,10 +67,10 @@ export const getFileDetails = async (req, res) => {
   }
 };
 
-export const uploadFile = async (req, res) => {
+export const uploadFileController = async (req, res) => {
   try {
     const file = req.file;
-    const { path = "" } = req.body;
+    const { path = "", key } = req.body;
 
     if (!file) {
       return res.status(400).json({
@@ -69,7 +79,11 @@ export const uploadFile = async (req, res) => {
       });
     }
 
-    const result = await fileManagerService.uploadFile(file, path);
+    // Generate key if not provided
+    const fileKey =
+      key || `${path ? path + "/" : ""}${Date.now()}-${file.originalname}`;
+
+    const result = await uploadFile(file.buffer, fileKey, file.mimetype);
 
     if (!result.success) {
       return res.status(400).json(result);
@@ -85,7 +99,36 @@ export const uploadFile = async (req, res) => {
   }
 };
 
-export const deleteFile = async (req, res) => {
+// Generate presigned URL for client-side upload
+export const generatePresignedUrlController = async (req, res) => {
+  try {
+    const { key, contentType, expiresIn = 3600 } = req.body;
+
+    if (!key || !contentType) {
+      return res.status(400).json({
+        success: false,
+        error: "Key and content type are required",
+      });
+    }
+
+    const result = await getPresignedUploadUrl(key, contentType, expiresIn);
+
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+
+    res.json(result);
+  } catch (error) {
+    console.error("FileManagerController - generatePresignedUrl error:", error);
+    res.status(500).json({
+      success: false,
+      error: "Failed to generate upload URL",
+    });
+  }
+};
+
+// Delete single file
+export const deleteFileController = async (req, res) => {
   try {
     const { key } = req.params;
 
@@ -96,7 +139,7 @@ export const deleteFile = async (req, res) => {
       });
     }
 
-    const result = await fileManagerService.deleteFile(key);
+    const result = await deleteFile(key);
 
     if (!result.success) {
       return res.status(400).json(result);
@@ -112,7 +155,8 @@ export const deleteFile = async (req, res) => {
   }
 };
 
-export const deleteFiles = async (req, res) => {
+// Delete multiple files
+export const deleteFilesController = async (req, res) => {
   try {
     const { keys } = req.body;
 
@@ -123,7 +167,7 @@ export const deleteFiles = async (req, res) => {
       });
     }
 
-    const result = await fileManagerService.deleteFiles(keys);
+    const result = await deleteFiles(keys);
 
     if (!result.success) {
       return res.status(400).json(result);
@@ -139,7 +183,7 @@ export const deleteFiles = async (req, res) => {
   }
 };
 
-export const createFolder = async (req, res) => {
+export const createFolderController = async (req, res) => {
   try {
     const { folderName, path = "" } = req.body;
 
@@ -150,7 +194,7 @@ export const createFolder = async (req, res) => {
       });
     }
 
-    const result = await fileManagerService.createFolder(folderName, path);
+    const result = await createFolder(folderName, path);
 
     if (!result.success) {
       return res.status(400).json(result);
@@ -166,9 +210,9 @@ export const createFolder = async (req, res) => {
   }
 };
 
-export const getStorageStats = async (req, res) => {
+export const getStorageStatsController = async (req, res) => {
   try {
-    const result = await fileManagerService.getStorageStats();
+    const result = await getStorageStats();
 
     if (!result.success) {
       return res.status(400).json(result);
@@ -184,17 +228,15 @@ export const getStorageStats = async (req, res) => {
   }
 };
 
-export const testConnection = async (req, res) => {
+export const testConnectionController = async (req, res) => {
   try {
-    const result = await fileManagerService.getStorageStats();
+    const result = await testConnection();
 
-    res.json({
-      success: result.success,
-      message: result.success
-        ? "S3 connection successful"
-        : "S3 connection failed",
-      data: result.data,
-    });
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+
+    res.json(result);
   } catch (error) {
     console.error("FileManagerController - testConnection error:", error);
     res.status(500).json({

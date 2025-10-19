@@ -1,12 +1,11 @@
 import express from "express";
 import cors from "cors";
 import chalk from "chalk";
-import serverless from "serverless-http";
 import { testSupabaseConnection } from "./config/supabase.js";
 
 // Import routes
 import authRoutes from "./routes/auth.js";
-import fileManagerRoutes from "./routes/fileManager.js";
+import fileManagerRoutes from "./routes/file-manger.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;

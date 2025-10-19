@@ -105,7 +105,7 @@ function AppContent() {
           <Route path="/teams" element={<Teams />} />
           <Route path="/teams/:id" element={<TeamDetail />} />
           <Route path="/tournaments" element={<Tournaments />} />
-          <Route path="/data-management" element={<FileManager />} />
+          {/* <Route path="/data-management" element={<FileManager />} /> */}
         </Route>
 
         {/* Error Routes */}

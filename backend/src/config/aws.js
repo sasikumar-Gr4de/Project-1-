@@ -28,7 +28,7 @@ export const s3Config = {
   baseUrl: `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com`,
 };
 
-// Generate pre-signed URL for upload
+// Core AWS SDK operations
 export const generatePresignedUploadUrl = async (
   key,
   contentType,
@@ -44,7 +44,6 @@ export const generatePresignedUploadUrl = async (
   return await getSignedUrl(s3Client, command, { expiresIn });
 };
 
-// Generate pre-signed URL for download
 export const generatePresignedDownloadUrl = async (key, expiresIn = 3600) => {
   const command = new GetObjectCommand({
     Bucket: s3Config.bucketName,
@@ -54,8 +53,25 @@ export const generatePresignedDownloadUrl = async (key, expiresIn = 3600) => {
   return await getSignedUrl(s3Client, command, { expiresIn });
 };
 
-// Delete object from S3
-export const deleteObjectFromS3 = async (key) => {
+export const uploadToS3 = async (key, buffer, contentType) => {
+  const command = new PutObjectCommand({
+    Bucket: s3Config.bucketName,
+    Key: key,
+    Body: buffer,
+    ContentType: contentType,
+    ACL: "public-read",
+  });
+
+  try {
+    await s3Client.send(command);
+    return { success: true };
+  } catch (error) {
+    console.error("Error uploading to S3:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+export const deleteFromS3 = async (key) => {
   const command = new DeleteObjectCommand({
     Bucket: s3Config.bucketName,
     Key: key,
@@ -65,13 +81,12 @@ export const deleteObjectFromS3 = async (key) => {
     await s3Client.send(command);
     return { success: true };
   } catch (error) {
-    console.error("Error deleting object from S3:", error);
+    console.error("Error deleting from S3:", error);
     return { success: false, error: error.message };
   }
 };
 
-// Delete multiple objects from S3
-export const deleteObjectsFromS3 = async (keys) => {
+export const deleteMultipleFromS3 = async (keys) => {
   const command = new DeleteObjectsCommand({
     Bucket: s3Config.bucketName,
     Delete: {
@@ -87,13 +102,12 @@ export const deleteObjectsFromS3 = async (keys) => {
       errors: result.Errors || [],
     };
   } catch (error) {
-    console.error("Error deleting objects from S3:", error);
+    console.error("Error deleting multiple from S3:", error);
     return { success: false, error: error.message };
   }
 };
 
-// List objects in S3 bucket
-export const listObjectsInS3 = async (params = {}) => {
+export const listS3Objects = async (params = {}) => {
   const command = new ListObjectsV2Command({
     Bucket: s3Config.bucketName,
     MaxKeys: 100,
@@ -104,13 +118,12 @@ export const listObjectsInS3 = async (params = {}) => {
     const result = await s3Client.send(command);
     return { success: true, data: result };
   } catch (error) {
-    console.error("Error listing objects from S3:", error);
+    console.error("Error listing S3 objects:", error);
     return { success: false, error: error.message };
   }
 };
 
-// Get object metadata
-export const getObjectMetadata = async (key) => {
+export const getS3ObjectMetadata = async (key) => {
   const command = new HeadObjectCommand({
     Bucket: s3Config.bucketName,
     Key: key,
@@ -120,13 +133,12 @@ export const getObjectMetadata = async (key) => {
     const result = await s3Client.send(command);
     return { success: true, data: result };
   } catch (error) {
-    console.error("Error getting object metadata from S3:", error);
+    console.error("Error getting S3 object metadata:", error);
     return { success: false, error: error.message };
   }
 };
 
-// Create folder in S3
-export const createFolderInS3 = async (folderPath) => {
+export const createS3Folder = async (folderPath) => {
   const command = new PutObjectCommand({
     Bucket: s3Config.bucketName,
     Key: folderPath.endsWith("/") ? folderPath : `${folderPath}/`,
@@ -138,12 +150,11 @@ export const createFolderInS3 = async (folderPath) => {
     await s3Client.send(command);
     return { success: true };
   } catch (error) {
-    console.error("Error creating folder in S3:", error);
+    console.error("Error creating S3 folder:", error);
     return { success: false, error: error.message };
   }
 };
 
-// Check S3 connection
 export const testS3Connection = async () => {
   try {
     const command = new ListObjectsV2Command({

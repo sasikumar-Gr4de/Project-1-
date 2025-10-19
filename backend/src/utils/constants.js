@@ -18,3 +18,49 @@ export const auth_stats = {
     unverified: 15,
   },
 };
+
+export const fileTypeMap = {
+  // Images
+  jpg: "image",
+  jpeg: "image",
+  png: "image",
+  gif: "image",
+  webp: "image",
+  svg: "image",
+  bmp: "image",
+  ico: "image",
+
+  // Documents
+  pdf: "document",
+  doc: "document",
+  docx: "document",
+  txt: "document",
+  xls: "document",
+  xlsx: "document",
+  ppt: "document",
+  pptx: "document",
+
+  // Videos
+  mp4: "video",
+  avi: "video",
+  mov: "video",
+  wmv: "video",
+  flv: "video",
+  mkv: "video",
+  webm: "video",
+
+  // Audio
+  mp3: "audio",
+  wav: "audio",
+  ogg: "audio",
+  aac: "audio",
+  flac: "audio",
+  m4a: "audio",
+
+  // Archives
+  zip: "archive",
+  rar: "archive",
+  "7z": "archive",
+  tar: "archive",
+  gz: "archive",
+};
