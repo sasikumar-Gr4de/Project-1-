@@ -14,18 +14,18 @@ import Landing from "@/pages/Home";
 import Login from "@/pages/Auth/Login";
 import Register from "@/pages/Auth/Register";
 
-import Dashboard from "@/pages/dashboard/Dashboard";
+import Dashboard from "@/pages/Dashboard/Dashboard";
 
 import VerifyEmail from "@/pages/Auth/VerifyEmail";
 import ToastContainer from "@/components/common/ToastContainer";
 import Layout from "@/components/layouts/Layout";
-import Matches from "@/pages/matches/Matches";
-import Players from "@/pages/players/Players";
-import PlayerDetail from "@/pages/players/PlayerDetail";
-import Teams from "@/pages/teams/Teams";
-import Tournaments from "@/pages/tournaments/Tournaments";
-import TeamDetail from "@/pages/teams/TeamDetail";
-import MatchDetail from "@/pages/matches/MatchDetail";
+import Matches from "@/pages/Matches/Matches";
+import Players from "@/pages/Players/Players";
+import PlayerDetail from "@/pages/Players/PlayerDetail";
+import Teams from "@/pages/Teams/Teams";
+import Tournaments from "@/pages/Tournaments/Tournaments";
+import TeamDetail from "@/pages/Teams/TeamDetail";
+import MatchDetail from "@/pages/Matches/MatchDetail";
 import FileManager from "./pages/FileManager/FileManager";
 
 import useNavigationLoading from "@/hooks/useNavigationLoading";
