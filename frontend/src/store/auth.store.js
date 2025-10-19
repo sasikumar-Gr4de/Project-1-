@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
-import { authService } from "@/services/auth.api";
 import { useToastStore } from "@/store/toast.store";
+import { AuthApiService } from "@/services/auth.api";
 
 import { zustandEncryptedStorage } from "@/utils/storage";
 
@@ -16,12 +16,11 @@ export const useAuthStore = create(
         session: null,
         email_verified: false,
 
-        // Login function using authService
+        // Login function using AuthApiService
         login: async (email, password) => {
-          debugger;
           set({ isLoading: true });
           try {
-            const response = await authService.login(email, password);
+            const response = await AuthApiService.login(email, password);
             const result = response.data;
 
             if (result.success) {
@@ -31,7 +30,6 @@ export const useAuthStore = create(
                 email_verified: result.data.email_verified || false,
                 isAuthenticated: true,
               });
-              debugger;
               const { token } = result?.data;
               localStorage.setItem("auth-token", token);
 
@@ -61,11 +59,11 @@ export const useAuthStore = create(
           }
         },
 
-        // Register function using authService
+        // Register function using AuthApiService
         register: async (userData) => {
           set({ isLoading: true });
           try {
-            const response = await authService.register(userData);
+            const response = await AuthApiService.register(userData);
             const result = response.data;
 
             if (result.success) {
@@ -94,10 +92,10 @@ export const useAuthStore = create(
           }
         },
 
-        // Logout using authService
+        // Logout using AuthApiService
         logout: async () => {
           try {
-            await authService.logout();
+            await AuthApiService.logout();
           } catch (error) {
             console.error("Logout API error:", error);
             // Continue with cleanup even if API call fails
@@ -118,7 +116,7 @@ export const useAuthStore = create(
           return { success: true };
         },
 
-        // Initialize auth using authService
+        // Initialize auth using AuthApiService
         initializeAuth: async () => {
           try {
             const token = localStorage.getItem("auth-token");
@@ -127,7 +125,7 @@ export const useAuthStore = create(
               return { user: null, email_verified: false };
             }
 
-            const response = await authService.getProfile();
+            const response = await AuthApiService.getProfile();
             const result = response.data;
 
             if (result.success) {
@@ -137,7 +135,7 @@ export const useAuthStore = create(
                 user: user,
                 email_verified: email_verified || user.email_verified || false,
                 isAuthenticated: true,
-                permissions: getPermissionsForRole(user.role),
+                // permissions: getPermissionsForRole(user.role),
               });
 
               return {
@@ -157,10 +155,10 @@ export const useAuthStore = create(
           }
         },
 
-        // Check email verification using authService
+        // Check email verification using AuthApiService
         checkEmailVerification: async () => {
           try {
-            const response = await authService.checkVerificationStatus();
+            const response = await AuthApiService.checkVerificationStatus();
             const result = response.data;
             debugger;
             if (result.success) {
@@ -176,10 +174,10 @@ export const useAuthStore = create(
           }
         },
 
-        // Resend verification email using authService
+        // Resend verification email using AuthApiService
         resendVerificationEmail: async (email) => {
           try {
-            const response = await authService.resendVerification(email);
+            const response = await AuthApiService.resendVerification(email);
             return response.data;
           } catch (error) {
             const errorMessage = error.response?.data?.message || error.message;
@@ -191,10 +189,10 @@ export const useAuthStore = create(
           }
         },
 
-        // Update profile using authService
+        // Update profile using AuthApiService
         updateProfile: async (userData) => {
           try {
-            const response = await authService.updateProfile(userData);
+            const response = await AuthApiService.updateProfile(userData);
             const result = response.data;
 
             if (result.success) {
@@ -214,10 +212,10 @@ export const useAuthStore = create(
           }
         },
 
-        // Refresh token using authService
+        // Refresh token using AuthApiService
         refreshToken: async () => {
           try {
-            const response = await authService.refreshToken();
+            const response = await AuthApiService.refreshToken();
             const { token } = response.data.data;
             localStorage.setItem("auth-token", token);
             return { success: true };
@@ -277,77 +275,3 @@ export const useAuthStore = create(
     }
   )
 );
-
-// Permission definitions
-const getPermissionsForRole = (role) => {
-  const rolePermissions = {
-    admin: [
-      "view_dashboard",
-      "manage_users",
-      "manage_players",
-      "manage_matches",
-      "manage_teams",
-      "manage_tournaments",
-      "view_analytics",
-      "export_data",
-      "upload_videos",
-      "manage_lineups",
-      "access_admin_panel",
-      "review_data",
-      "tag_events",
-      "export_team_data",
-      "compare_players",
-      "export_player_data",
-      "create_reports",
-      "system_settings",
-    ],
-    "data-reviewer": [
-      "view_dashboard",
-      "manage_players",
-      "manage_matches",
-      "view_analytics",
-      "export_data",
-      "upload_videos",
-      "review_data",
-      "tag_events",
-      "compare_players",
-      "export_player_data",
-      "create_reports",
-    ],
-    annotator: [
-      "view_dashboard",
-      "view_players",
-      "view_matches",
-      "upload_videos",
-      "tag_events",
-      "view_basic_analytics",
-    ],
-    coach: [
-      "view_dashboard",
-      "view_players",
-      "view_matches",
-      "manage_lineups",
-      "view_analytics",
-      "export_team_data",
-      "compare_players",
-      "create_reports",
-    ],
-    scout: [
-      "view_dashboard",
-      "view_players",
-      "view_matches",
-      "view_analytics",
-      "export_player_data",
-      "compare_players",
-      "create_reports",
-    ],
-    client: [
-      "view_dashboard",
-      "view_players",
-      "view_matches",
-      "view_basic_analytics",
-    ],
-  };
-
-  return rolePermissions[role] || ["view_dashboard"];
-};

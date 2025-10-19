@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -35,16 +35,19 @@ import PlayerAvatar from "@/components/players/PlayerAvatar";
 import DataTable from "@/components/common/DataTable";
 import MultiSelectFilter from "@/components/common/MultiSelectFilter";
 import PlayerCard from "@/components/players/PlayerCard";
+import Loading from "@/components/common/Loading";
+import GridView from "@/components/common/GridView";
 
 import { ALL_POSITIONS, STATUS_OPTIONS } from "@/utils/constants";
 
 import { calculateAge } from "@/utils/calculations";
-import Loading from "@/components/common/Loading";
-import GridView from "@/components/common/GridView";
+import { formatGameTime } from "@/utils/formatters";
+import { usePlayersStore } from "@/store/players.store";
 
 const Players = () => {
   const [players, setPlayers] = useState([]);
   const [filteredPlayers, setFilteredPlayers] = useState([]);
+  const [teams, setTeams] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPositions, setSelectedPositions] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState("all");
@@ -56,21 +59,30 @@ const Players = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // const teams = Array.from(new Set(mockPlayers.map((p) => p.current_club))).map(
-  //   (club) => ({
-  //     value: club,
-  //     label: club,
-  //   })
-  // );
+  const { getAllPlayers, addNewPlayer } = usePlayersStore();
 
-  // useEffect(() => {
-  //   // Simulate API call
-  //   setTimeout(() => {
-  //     setPlayers(mockPlayers);
-  //     setFilteredPlayers(mockPlayers);
-  //     setIsLoading(false);
-  //   }, 1000);
-  // }, []);
+  // Fetch players on component mount
+  useEffect(() => {
+    const fetchPlayers = async () => {
+      setIsLoading(true);
+      try {
+        const data = await getAllPlayers();
+        setPlayers(data);
+        setFilteredPlayers(data);
+      } catch (error) {
+        console.error("Error fetching players:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const teams = Array.from(
+      new Set(players.map((player) => player.current_club))
+    ).map((team) => ({ label: team, value: team }));
+    setTeams(teams);
+
+    fetchPlayers();
+  }, [getAllPlayers]);
 
   useEffect(() => {
     filterPlayers();
@@ -161,27 +173,15 @@ const Players = () => {
       // Add new player
       const newPlayer = {
         ...playerData,
-        id: Math.max(...players.map((p) => p.id)) + 1,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        status: "active",
-        // Default performance data for new players
-        matches_played: 0,
-        sense_score: 0,
-        game_time: 0,
-        overall_ability: 0,
       };
-      setPlayers([...players, newPlayer]);
+      const res = addNewPlayer(newPlayer);
+      const { success, data } = res;
+      if (success) {
+        setPlayers([...players, newPlayer]);
+      }
     }
     setIsFormOpen(false);
     setSelectedPlayer(null);
-  };
-
-  // Format game time to hours and minutes
-  const formatGameTime = (minutes) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return `${hours}h ${mins}m`;
   };
 
   // Table columns configuration

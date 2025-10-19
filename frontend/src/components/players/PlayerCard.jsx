@@ -17,13 +17,7 @@ import { ALL_POSITIONS } from "@/utils/constants";
 import PlayerAvatar from "@/components/players/PlayerAvatar";
 import PlayerStatusBadge from "@/components/players/PlayerStatusBadge";
 
-const PlayerCard = ({
-  player,
-  onEdit,
-  onDelete,
-  calculateAge,
-  formatGameTime,
-}) => {
+const PlayerCard = ({ player, onEdit, onDelete, calculateAge }) => {
   const [showActions, setShowActions] = useState(false);
 
   return (

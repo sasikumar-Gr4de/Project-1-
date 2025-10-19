@@ -1,6 +1,6 @@
 import api from "@/services/base.api";
 
-export const authService = {
+export const AuthApiService = {
   // User authentication
   login: (email, password) => api.post("/auth/login", { email, password }),
   register: (userData) => api.post("/auth/register", userData),
