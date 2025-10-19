@@ -5,6 +5,7 @@ import chalk from "chalk";
 // Import routes
 import authRoutes from "./routes/auth.routes.js";
 import fileManagerRoutes from "./routes/file-manger.routes.js";
+import playerRoutes from "./routes/player.routes.js";
 
 import { testSupabaseConnection } from "./config/supabase.config.js";
 
@@ -35,6 +36,7 @@ app.use((req, res, next) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/file-manager", fileManagerRoutes);
+app.use("/players", playerRoutes);
 
 app.get("/api/health", async (req, res) => {
   try {

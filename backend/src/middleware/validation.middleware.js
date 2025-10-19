@@ -1,4 +1,4 @@
-import { allowedRoles } from "../utils/constants.js";
+import { allowedRoles, allowedTypes } from "../utils/constants.js";
 
 export const validatePagination = (req, res, next) => {
   const page = parseInt(req.query.page) || 1;
@@ -29,18 +29,6 @@ export const validateFileUpload = (req, res, next) => {
       message: "No file uploaded",
     });
   }
-
-  const allowedTypes = [
-    "image/jpeg",
-    "image/jpg",
-    "image/png",
-    "image/gif",
-    "video/mp4",
-    "video/mov",
-    "video/avi",
-    "text/csv",
-    "application/json",
-  ];
 
   if (!allowedTypes.includes(req.file.mimetype)) {
     return res.status(400).json({

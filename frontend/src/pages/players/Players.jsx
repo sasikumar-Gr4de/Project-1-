@@ -60,143 +60,21 @@ const Players = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Enhanced mock data with additional fields
-  const mockPlayers = [
-    {
-      id: 1,
-      name: "Marcus Johnson",
-      date_of_birth: "2006-05-15",
-      nationality: "England",
-      current_club: "United Academy",
-      primary_position: "ST",
-      height_cm: 178,
-      weight_kg: 72,
-      preferred_foot: "Right",
-      status: "active",
-      profile_picture:
-        "https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=150&h=150&fit=crop&crop=face",
-      created_at: "2024-01-15T10:00:00Z",
-      updated_at: "2024-01-15T10:00:00Z",
-      matches_played: 24,
-      sense_score: 82,
-      game_time: 1890,
-      overall_ability: 78,
-    },
-    {
-      id: 2,
-      name: "Liam Chen",
-      date_of_birth: "2007-08-22",
-      nationality: "England",
-      current_club: "City Youth",
-      primary_position: "CAM",
-      height_cm: 172,
-      weight_kg: 68,
-      preferred_foot: "Left",
-      status: "active",
-      profile_picture: null,
-      created_at: "2024-01-14T09:30:00Z",
-      updated_at: "2024-01-14T09:30:00Z",
-      matches_played: 18,
-      sense_score: 76,
-      game_time: 1420,
-      overall_ability: 74,
-    },
-    {
-      id: 3,
-      name: "Sarah Williams",
-      date_of_birth: "2005-12-03",
-      nationality: "Wales",
-      current_club: "Rovers FC",
-      primary_position: "CB",
-      height_cm: 165,
-      weight_kg: 58,
-      preferred_foot: "Right",
-      status: "injured",
-      profile_picture:
-        "https://images.unsplash.com/photo-1552058544-f2b08422138a?w=150&h=150&fit=crop&crop=face",
-      created_at: "2024-01-13T14:20:00Z",
-      updated_at: "2024-01-13T14:20:00Z",
-      matches_played: 15,
-      sense_score: 71,
-      game_time: 1120,
-      overall_ability: 69,
-    },
-    {
-      id: 4,
-      name: "James Rodriguez",
-      date_of_birth: "2006-03-18",
-      nationality: "Spain",
-      current_club: "Athletic Youth",
-      primary_position: "GK",
-      height_cm: 185,
-      weight_kg: 78,
-      preferred_foot: "Right",
-      status: "active",
-      profile_picture:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-      created_at: "2024-01-12T11:45:00Z",
-      updated_at: "2024-01-12T11:45:00Z",
-      matches_played: 22,
-      sense_score: 79,
-      game_time: 1980,
-      overall_ability: 81,
-    },
-    {
-      id: 5,
-      name: "Alex Turner",
-      date_of_birth: "2006-07-11",
-      nationality: "Scotland",
-      current_club: "United Academy",
-      primary_position: "CDM",
-      height_cm: 175,
-      weight_kg: 70,
-      preferred_foot: "Right",
-      status: "active",
-      profile_picture: null,
-      created_at: "2024-01-11T08:15:00Z",
-      updated_at: "2024-01-11T08:15:00Z",
-      matches_played: 20,
-      sense_score: 84,
-      game_time: 1650,
-      overall_ability: 76,
-    },
-    {
-      id: 6,
-      name: "Mohamed Hassan",
-      date_of_birth: "2005-11-25",
-      nationality: "Egypt",
-      current_club: "City Youth",
-      primary_position: "RW",
-      height_cm: 170,
-      weight_kg: 65,
-      preferred_foot: "Left",
-      status: "suspended",
-      profile_picture:
-        "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&h=150&fit=crop&crop=face",
-      created_at: "2024-01-10T16:45:00Z",
-      updated_at: "2024-01-10T16:45:00Z",
-      matches_played: 16,
-      sense_score: 73,
-      game_time: 1280,
-      overall_ability: 72,
-    },
-  ];
+  // const teams = Array.from(new Set(mockPlayers.map((p) => p.current_club))).map(
+  //   (club) => ({
+  //     value: club,
+  //     label: club,
+  //   })
+  // );
 
-  const teams = Array.from(new Set(mockPlayers.map((p) => p.current_club))).map(
-    (club) => ({
-      value: club,
-      label: club,
-    })
-  );
-
-  useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setPlayers(mockPlayers);
-      setFilteredPlayers(mockPlayers);
-      setIsLoading(false);
-    }, 1000);
-  }, []);
+  // useEffect(() => {
+  //   // Simulate API call
+  //   setTimeout(() => {
+  //     setPlayers(mockPlayers);
+  //     setFilteredPlayers(mockPlayers);
+  //     setIsLoading(false);
+  //   }, 1000);
+  // }, []);
 
   useEffect(() => {
     filterPlayers();

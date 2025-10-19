@@ -71,3 +71,15 @@ export const allowedRoles = [
   "scout",
   "client",
 ];
+
+export const allowedTypes = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/gif",
+  "video/mp4",
+  "video/mov",
+  "video/avi",
+  "text/csv",
+  "application/json",
+];
