@@ -23,7 +23,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: "dist",
+    outDir: "../frontend",
     sourcemap: true,
     rollupOptions: {
       output: {
