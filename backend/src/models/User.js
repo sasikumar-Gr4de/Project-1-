@@ -1,5 +1,4 @@
 import { supabase } from "../config/supabase.js";
-import bcrypt from "bcryptjs";
 
 export class User {
   static async create(userData) {
@@ -99,7 +98,7 @@ export class User {
   static async update(id, updateData) {
     try {
       // Remove fields that shouldn't be updated directly
-      const { id: _, created_at, ...safeUpdates } = updates;
+      const { id: _, created_at, ...safeUpdates } = updateData;
       const { data, error } = await supabase
         .from("users")
         .update(safeUpdates)
@@ -167,6 +166,7 @@ export class User {
       throw err;
     }
   }
+
   static async deactivateUser(id) {
     const { data, error } = await supabase
       .from("users")

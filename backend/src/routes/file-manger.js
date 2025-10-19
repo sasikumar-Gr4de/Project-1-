@@ -30,14 +30,14 @@ router.get("/test", testConnectionController);
 router.get("/:key", getFileDetailsController);
 
 // Upload operations
-router.post("/upload", protect, upload.single("file"), uploadFileController);
-router.post("/presigned-url", protect, generatePresignedUrlController);
+router.post("/upload", upload.single("file"), uploadFileController);
+router.post("/presigned-url", generatePresignedUrlController);
 
 // Delete operations
-router.delete("/:key", protect, deleteFileController);
-router.delete("/", protect, deleteFilesController);
+router.delete("/:key", deleteFileController);
+router.delete("/", deleteFilesController);
 
 // Folder operations
-router.post("/folders", protect, createFolderController);
+router.post("/folders", createFolderController);
 
 export default router;

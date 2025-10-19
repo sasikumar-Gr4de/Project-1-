@@ -62,3 +62,12 @@ export const fileTypeMap = {
   tar: "archive",
   gz: "archive",
 };
+
+export const allowedRoles = [
+  "admin",
+  "data-reviewer",
+  "annotator",
+  "coach",
+  "scout",
+  "client",
+];

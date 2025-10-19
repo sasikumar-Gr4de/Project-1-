@@ -1,4 +1,4 @@
-import { supabase } from "../config/supabase.js";
+import { allowedRoles } from "../utils/constants.js";
 
 export const validatePagination = (req, res, next) => {
   const page = parseInt(req.query.page) || 1;
@@ -85,14 +85,7 @@ export const validateRegistration = (req, res, next) => {
   }
 
   // Role validation
-  const allowedRoles = [
-    "admin",
-    "data-reviewer",
-    "annotator",
-    "coach",
-    "scout",
-    "client",
-  ];
+
   if (!role) {
     errors.push("Role is required");
   } else if (!allowedRoles.includes(role)) {
