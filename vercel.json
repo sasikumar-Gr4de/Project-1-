@@ -12,7 +12,7 @@
       "dest": "/backend/src/index.js"
     },
     {
-      "src": "/(.*)",
+      "src": "/((?!assets|favicon\\.ico|robots\\.txt).*)",
       "dest": "/frontend/index.html"
     }
   ]
