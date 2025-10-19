@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
-import { authAPI } from "../services/api";
-import { useToastStore } from "./toastStore";
+import { authAPI } from "@/services/api";
+import { useToastStore } from "@/store/toastStore";
 
 import { zustandEncryptedStorage } from "@/utils/storage";
 

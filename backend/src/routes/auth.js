@@ -14,6 +14,7 @@ import {
   checkVerificationStatus,
   getPermissionsForRole,
   getStats,
+  getSession,
 } from "../controllers/authController.js";
 
 import { protect, optionalAuth } from "../middleware/auth.js";

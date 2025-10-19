@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { supabase } from "../config/supabase.js";
 import { User } from "../models/User.js";
 import { auth_stats } from "../utils/constants.js";
-import getPermissionForRole from "../utils/getPermissionForRole.js";
+import { getPermission } from "../utils/get_mock_data.js";
 
 const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, {
@@ -718,7 +718,7 @@ export const getSession = async (req, res) => {
 
 export const getPermissionsForRole = (req, res) => {
   try {
-    const permissions = getPermissionForRole(req.user.role);
+    const permissions = getPermission(req.user.role);
 
     res.json({
       success: true,

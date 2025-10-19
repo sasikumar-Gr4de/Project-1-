@@ -451,3 +451,11 @@ export default {
   FEATURE_FLAGS,
   API_ENDPOINTS,
 };
+
+export const fileTypes = {
+  image: ["jpg", "jpeg", "png", "gif", "webp", "svg", "bmp"],
+  video: ["mp4", "avi", "mov", "wmv", "flv", "mkv", "webm"],
+  document: ["pdf", "doc", "docx", "txt", "xls", "xlsx", "ppt", "pptx"],
+  audio: ["mp3", "wav", "ogg", "aac", "flac", "m4a"],
+  archive: ["zip", "rar", "7z", "tar", "gz"],
+};

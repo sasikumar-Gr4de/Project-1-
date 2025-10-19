@@ -1,4 +1,4 @@
-export default getPermissionsForRole = (role) => {
+export const getPermission = (role) => {
   const rolePermissions = {
     admin: [
       "view_dashboard",

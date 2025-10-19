@@ -6,6 +6,7 @@ import { testSupabaseConnection } from "./config/supabase.js";
 
 // Import routes
 import authRoutes from "./routes/auth.js";
+import fileManagerRoutes from "./routes/fileManager.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -30,6 +31,7 @@ app.use((req, res, next) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/file-manager", fileManagerRoutes);
 
 app.get("/api/health", async (req, res) => {
   try {

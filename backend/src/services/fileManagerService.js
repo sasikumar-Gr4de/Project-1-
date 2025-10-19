@@ -90,6 +90,37 @@ export class FileManagerService {
     }
   }
 
+  async uploadFile(fileStream, key) {
+    try {
+      const uploadParams = {
+        Key: key,
+        Body: fileStream,
+        ContentType: fileStream.mimetype,
+      };
+
+      const result = await uploadObjectToS3(uploadParams);
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      return {
+        success: true,
+        message: "File uploaded successfully",
+        data: {
+          key,
+          url: `${s3Config.baseUrl}/${key}`,
+        },
+      };
+    } catch (error) {
+      console.error("FileManagerService - uploadFile error:", error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  }
+
   async getFileDetails(key) {
     try {
       const decodedKey = decodeURIComponent(key);

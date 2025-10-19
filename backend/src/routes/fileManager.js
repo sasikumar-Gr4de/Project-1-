@@ -1,32 +1,72 @@
 import express from "express";
-import fileManagerController from "../controllers/fileManagerController.js";
-import { authenticateToken } from "../middleware/auth.js";
-import { validateRequest } from "../middleware/validation.js";
+import {
+  listFiles,
+  getFileDetails,
+  deleteFile,
+  deleteFiles,
+  createFolder,
+  getStorageStats,
+  uploadFile,
+  testConnection,
+} from "../controllers/fileManagerController.js";
+import { protect } from "../middleware/auth.js";
 
 const router = express.Router();
 
-// Apply authentication to all routes
-router.use(authenticateToken);
+/**
+ * @route   GET /api/file-manager/
+ * @desc    List files and folders
+ * @access  Private
+ */
+router.get("/", protect, listFiles);
 
-// Get files with pagination and filtering
-router.get("/", fileManagerController.listFiles);
+/**
+ * @route   POST /api/file-manager/upload
+ * @desc    Upload a file
+ * @access  Private
+ */
+router.post("/upload", protect, uploadFile);
 
-// Get file details
-router.get("/:key", fileManagerController.getFileDetails);
+/**
+ * @route   GET /api/file-manager/:key
+ * @desc    Get file details by key
+ * @access  Private
+ */
+router.get("/:key", protect, getFileDetails);
 
-// Delete single file
-router.delete("/:key", fileManagerController.deleteFile);
+/**
+ * @route   DELETE /api/file-manager/:key
+ * @desc    Delete a file by key
+ * @access  Private
+ */
+router.delete("/:key", protect, deleteFile);
 
-// Delete multiple files
-router.delete("/", fileManagerController.deleteFiles);
+/**
+ * @route   DELETE /api/file-manager/
+ * @desc    Delete multiple files
+ * @access  Private
+ */
+router.delete("/", protect, deleteFiles);
 
-// Create folder
-router.post("/folders", fileManagerController.createFolder);
+/**
+ * @route   POST /api/file-manager/folders
+ * @desc    Create a new folder
+ * @access  Private
+ */
+router.post("/folders", protect, createFolder);
 
-// Get storage statistics
-router.get("/stats/usage", fileManagerController.getStorageStats);
+/**
+ * @route   GET /api/file-manager/stats/usage
+ * @desc    Get storage usage statistics
+ * @access  Private
+ */
+router.get("/stats/usage", protect, getStorageStats);
 
-// Test S3 connection
-router.get("/test/connection", fileManagerController.testConnection);
+/**
+ * @route   GET /api/file-manager/test/connection
+ * @desc    Test connection to the storage service
+ * @access  Private
+ */
+router.get("/test/connection", protect, testConnection);
 
 export default router;

@@ -1,10 +1,5 @@
-import React, { useEffect } from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  useLocation,
-} from "react-router-dom";
+import { useEffect } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "@/App.css";
 
 import { useAuthStore } from "@/store/authStore";
@@ -31,6 +26,7 @@ import Teams from "@/pages/teams/Teams";
 import Tournaments from "@/pages/tournaments/Tournaments";
 import TeamDetail from "@/pages/teams/TeamDetail";
 import MatchDetail from "@/pages/matches/MatchDetail";
+import FileManager from "./pages/file-manager/FileManager";
 
 import useNavigationLoading from "@/hooks/useNavigationLoading";
 
@@ -109,6 +105,7 @@ function AppContent() {
           <Route path="/teams" element={<Teams />} />
           <Route path="/teams/:id" element={<TeamDetail />} />
           <Route path="/tournaments" element={<Tournaments />} />
+          <Route path="/data-management" element={<FileManager />} />
         </Route>
 
         {/* Error Routes */}
