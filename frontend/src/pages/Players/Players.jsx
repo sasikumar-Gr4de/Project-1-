@@ -68,15 +68,16 @@ const Players = () => {
       try {
         const { data } = await getAllPlayers();
         setPlayers(data);
+        const teams = Array.from(
+          new Set(data.map((player) => player.current_club))
+        ).map((team) => ({ label: team, value: team }));
+        console.log("Derived teams:", teams);
+        setTeams(teams);
         setFilteredPlayers(data);
       } catch (error) {
         console.error("Error fetching players:", error);
       } finally {
         setIsLoading(false);
-        const teams = Array.from(
-          new Set(players.map((player) => player.current_club))
-        ).map((team) => ({ label: team, value: team }));
-        setTeams(teams);
       }
     };
 
