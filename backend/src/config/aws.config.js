@@ -12,7 +12,6 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-// S3 Client Configuration
 export const s3Client = new S3Client({
   region: process.env.AWS_REGION,
   credentials: {

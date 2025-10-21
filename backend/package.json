@@ -1,36 +1,15 @@
 {
   "name": "backend",
-  "type": "module",
   "version": "1.0.0",
-  "description": "Gr4de platfrom backend",
+  "description": "Gr4De platform backend",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Renadli",
+  "author": "",
   "license": "ISC",
-  "devDependencies": {
-    "autoprefixer": "^10.4.21",
-    "nodemon": "^3.1.10",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.14"
-  },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.908.0",
-    "@aws-sdk/s3-request-presigner": "^3.908.0",
-    "@supabase/realtime-js": "^2.75.0",
-    "@supabase/supabase-js": "^2.75.0",
-    "axios": "^1.12.2",
-    "bcryptjs": "^3.0.2",
-    "chalk": "^5.6.2",
     "cors": "^2.8.5",
-    "date-fns": "^4.1.0",
-    "dotenv": "^17.2.3",
-    "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "multer": "^2.0.2",
-    "serverless-http": "^4.0.0"
+    "express": "^5.1.0"
   }
 }

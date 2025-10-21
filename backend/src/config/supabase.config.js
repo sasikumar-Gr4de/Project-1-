@@ -21,25 +21,6 @@ export const supabase = createClient(supabaseUrl, supabaseServiceKey, {
   },
 });
 
-// const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
-// export const supabasePublic = createClient(supabaseUrl, supabaseAnonKey, {
-//   params: {
-//     apikey: supabaseAnonKey,
-//   },
-// });
-
-export const testSupabaseConnection = async () => {
-  try {
-    const { data, error } = await supabase.from("users").select("*").limit(1);
-    if (error) throw error;
-    console.log("Supabase connection successful");
-    return true;
-  } catch (err) {
-    console.error("Supabase connection error:", err.message);
-    return false;
-  }
-};
-
 export const checkDatabaseHealth = async () => {
   try {
     const startTime = Date.now();
@@ -57,5 +38,17 @@ export const checkDatabaseHealth = async () => {
       responseTime: null,
       error: error.message,
     };
+  }
+};
+
+export const testSupabaseConnection = async () => {
+  try {
+    const { data, error } = await supabase.from("users").select("*").limit(1);
+    if (error) throw error;
+    console.log("Supabase connection successful");
+    return true;
+  } catch (err) {
+    console.error("Supabase connection error:", err.message);
+    return false;
   }
 };
