@@ -1,7 +1,7 @@
 import { supabase } from "../config/supabase.config.js";
 import { MATCH_STATUSES, MATCH_QA_STATUS } from "../utils/constants.js";
 
-export class Match {
+export default class Match {
   static async create(matchData) {
     const {
       home_team,

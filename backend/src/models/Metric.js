@@ -1,6 +1,6 @@
 import { supabase } from "../config/supabase.config.js";
 
-export class Metric {
+export default class Metric {
   static async logMetric(matchId, playerId, details = {}) {
     const { data, error } = await supabase.from("metrics").insert([
       {

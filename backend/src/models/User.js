@@ -1,6 +1,5 @@
 import { supabase } from "../config/supabase.config.js";
-
-class User {
+export default class User {
   static async create(userData) {
     const {
       email,
@@ -121,6 +120,7 @@ class User {
         .select("*")
         .eq("id", id)
         .maybeSingle();
+
       if (error) throw error;
       return data;
     } catch (err) {
@@ -187,5 +187,3 @@ class User {
     }
   }
 }
-
-export default User;

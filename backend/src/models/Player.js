@@ -2,7 +2,7 @@ import { supabase } from "../config/supabase.config.js";
 
 import { PLAYER_STATUSES } from "../utils/constants.js";
 
-export class Player {
+export default class Player {
   static async create(playerData) {
     const {
       full_name,

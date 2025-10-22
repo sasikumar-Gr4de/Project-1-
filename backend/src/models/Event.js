@@ -1,6 +1,6 @@
 import { supabase } from "../config/supabase.config.js";
 
-export class Event {
+export default class Event {
   static async create(eventData) {
     const {
       match_id,

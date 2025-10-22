@@ -33,3 +33,6 @@ export const PASSWORD_UPDATE_SUCCESS = "Password updated successfully";
 // verify-email
 export const VERIFY_EMAIL_RESENT = " A verification email has been sent.";
 export const VERIFY_STATUS_ERROR = "Error checking verifcation status";
+export const ACCOUNT_DEACTIVE_ERROR =
+  "Account is deactivated. Please contact support.";
+export const VERIFY_STATUS_CHECK = "Check verfication status by email";

@@ -1,6 +1,6 @@
 import { supabase } from "../config/supabase.config.js";
 
-export class Club {
+export default class Club {
   static async create(clubData) {
     const { club_name, location, found_year, mark_url } = clubData;
     try {

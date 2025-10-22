@@ -19,11 +19,13 @@ import {
   PASSWORD_UPDATE_SUCCESS,
   VERIFY_EMAIL_RESENT,
   VERIFY_STATUS_ERROR,
+  ACCOUNT_DEACTIVE_ERROR,
+  VERIFY_STATUS_CHECK,
 } from "../utils/messages.js";
 import { CLIENT_TYPES, ROLE_TYPES } from "../utils/constants.js";
 import { supabase } from "../config/supabase.config.js";
 
-export class AuthService {
+class AuthService {
   static async registerUser(req, res) {
     try {
       const { ...userData } = req.body;
@@ -76,11 +78,24 @@ export class AuthService {
           return generateResponse(null, INVALID_CREDENTIALS);
       }
 
+      const user = await User.findById(authData.user.id);
+      if (!user) {
+        return generateResponse(null, USER_NOT_FOUND);
+      }
+
+      if (!user.is_active) {
+        return generateResponse(null, ACCOUNT_DEACTIVE_ERROR);
+      }
       // Generate Token
-      const { id: user_id } = data;
-      const token = generateToken(user_id);
+
+      const user_id = authData.user.id;
+      const token = generateToken(authData.user.id);
       User.updateLastLogin(user_id);
-      data["token"] = token;
+
+      const data = {
+        user,
+        token,
+      };
 
       return generateResponse(data, LOGIN_SUCCESS);
     } catch (err) {
@@ -147,7 +162,7 @@ export class AuthService {
   static async sendVerificationEmail(req, res) {
     try {
       const { email } = req.body;
-      const { error } = await supabase.auth.resned({
+      const { error } = await supabase.auth.resend({
         type: "signup",
         email: email,
       });
@@ -172,6 +187,11 @@ export class AuthService {
       if (userError) {
         return generateResponse(null, VERIFY_STATUS_ERROR);
       }
+      const data = {
+        email: user.email,
+        email_confirmed_at: user.email_confirmed_at,
+      };
+      return generateResponse(data, VERIFY_STATUS_CHECK);
     } catch (err) {
       throw err;
     }
@@ -193,4 +213,4 @@ export class AuthService {
   }
 }
 
-export default new AuthService();
+export default AuthService;

@@ -12,11 +12,11 @@ class AuthController {
     try {
       // Validation Test
       const { ...userData } = req.body;
-      validation_result = RegisterInputValidation(userData);
-      if (validataion_result["success"] === false)
+      const validation_result = RegisterInputValidation(userData);
+      if (validation_result["success"] === false)
         return res.status(400).json(validation_result);
 
-      const result = AuthService.registerUser(req, res);
+      const result = await AuthService.registerUser(req, res);
       if (result["success"] === false) return res.status(400).json(result);
       return res.status(200).json(result);
     } catch (err) {
@@ -27,21 +27,22 @@ class AuthController {
   async login(req, res) {
     try {
       const { ...userData } = req.body;
-      validation_result = LoginInputValidation(userData);
-      if (validataion_result["success"] === false)
+      const validation_result = LoginInputValidation(userData);
+      if (validation_result["success"] === false)
         return res.status(400).json(validation_result);
 
-      const result = AuthService.loginUser(req, res);
+      const result = await AuthService.loginUser(req, res);
       if (result["success"] === false) return res.status(400).json(result);
       return res.status(200).json(result);
     } catch (err) {
+      throw err;
       return sendServerErrorResponse(req, res, err);
     }
   }
 
   async getProfile(req, res) {
     try {
-      const result = AuthService.getProfile(req, res);
+      const result = await AuthService.getProfile(req, res);
       if (result["success"] === false) return res.status(400).json(result);
       return res.status(200).json(result);
     } catch (err) {
@@ -51,7 +52,7 @@ class AuthController {
 
   async updateProfile(req, res) {
     try {
-      const result = AuthService.updateProfile(req, res);
+      const result = await AuthService.updateProfile(req, res);
       if (result["success"] === false) return res.status(400).json(result);
       return res.status(200).json(result);
     } catch (err) {
@@ -61,7 +62,7 @@ class AuthController {
 
   async changePassword(req, res) {
     try {
-      const result = AuthService.changePassword(req, res);
+      const result = await AuthService.changePassword(req, res);
       if (result["success"] === false) return res.status(400).json(result);
       return res.status(200).json(result);
     } catch (err) {
@@ -71,7 +72,7 @@ class AuthController {
 
   async sendVerificationEmail(req, res) {
     try {
-      const result = AuthService.changePassword(req, res);
+      const result = await AuthService.sendVerificationEmail(req, res);
       return res.status(200).json(result);
     } catch (err) {
       return sendServerErrorResponse(req, res, err);
@@ -80,7 +81,7 @@ class AuthController {
 
   async checkVerificationStatus(req, res) {
     try {
-      const result = AuthService.changePassword(req, res);
+      const result = await AuthService.checkVerificationStatus(req, res);
       if (result["success"] === false) return res.status(400).json(result);
       return res.status(200).json(result);
     } catch (err) {
