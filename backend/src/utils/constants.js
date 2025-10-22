@@ -18,3 +18,9 @@ export const COMPETITION_TYPES = {
   FRIENDLY: "friendly",
   INTERNATIONAL: "international",
 };
+
+export const MATCH_QA_STATUS = {
+  PENDING: "pending",
+  APPROVED: "approved",
+  REJECTED: "rejected",
+};

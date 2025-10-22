@@ -1,5 +1,5 @@
 import { supabase } from "../config/supabase.config.js";
-import { MATCH_STATUSES } from "../utils/constants.js";
+import { MATCH_STATUSES, MATCH_QA_STATUS } from "../utils/constants.js";
 
 export class Match {
   static async create(matchData) {
@@ -13,6 +13,8 @@ export class Match {
       score_away,
       duration_minutes,
       video_url,
+      tagged_by,
+      qa_status = MATCH_QA_STATUS.PENDING,
       match_status = MATCH_STATUSES.SCHEDULED,
     } = matchData;
     try {
@@ -29,6 +31,8 @@ export class Match {
             score_away,
             duration_minutes,
             video_url,
+            tagged_by,
+            qa_status,
             match_status,
           },
         ])
