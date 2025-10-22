@@ -15,9 +15,14 @@ import {
   COMMON_GET_SUCCESS,
   COMMON_UPDATE_SUCCESS,
   LOGOUT_SUCCESS,
+  CURRENT_PASSWORD_INCORRECT,
+  PASSWORD_UPDATE_SUCCESS,
+  VERIFY_EMAIL_RESENT,
+  VERIFY_STATUS_ERROR,
 } from "../utils/messages";
 import { CLIENT_TYPES, ROLE_TYPES } from "../utils/constants";
 import { supabase } from "../config/supabase.config";
+import { sign } from "crypto";
 
 export class AuthService {
   static async registerUser(req, res) {
@@ -105,6 +110,69 @@ export class AuthService {
       const user = await User.update(userId, updatedData);
 
       return generateResponse(user, COMMON_UPDATE_SUCCESS);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  static async changePassword(req, res) {
+    try {
+      const { current_password, new_password } = req.body;
+      const { userId } = req.user.userId;
+
+      const user = User.findById(userId);
+      if (!user) return generateResponse(null, USER_NOT_FOUND);
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: current_password,
+      });
+
+      if (signInError) {
+        return generateResponse(null, CURRENT_PASSWORD_INCORRECT);
+      }
+
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: new_password,
+      });
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      return generateResponse(user, PASSWORD_UPDATE_SUCCESS);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  static async sendVerificationEmail(req, res) {
+    try {
+      const { email } = req.body;
+      const { error } = await supabase.auth.resned({
+        type: "signup",
+        email: email,
+      });
+      if (error) {
+        throw error;
+      }
+      const data = { email };
+      return generateResponse(data, VERIFY_EMAIL_RESENT);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  static async checkVerificationStatus(req, res) {
+    try {
+      const { userId } = req.user;
+
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.admin.getUserById(userId);
+      if (userError) {
+        return generateResponse(null, VERIFY_STATUS_ERROR);
+      }
     } catch (err) {
       throw err;
     }

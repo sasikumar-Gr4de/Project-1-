@@ -58,6 +58,35 @@ class AuthController {
       return sendServerErrorResponse(req, res, err);
     }
   }
+
+  async changePassword(req, res) {
+    try {
+      const result = AuthService.changePassword(req, res);
+      if (result["success"] === false) return res.status(400).json(result);
+      return res.status(200).json(result);
+    } catch (err) {
+      return sendServerErrorResponse(req, res, err);
+    }
+  }
+
+  async sendVerificationEmail(req, res) {
+    try {
+      const result = AuthService.changePassword(req, res);
+      return res.status(200).json(result);
+    } catch (err) {
+      return sendServerErrorResponse(req, res, err);
+    }
+  }
+
+  async checkVerificationStatus(req, res) {
+    try {
+      const result = AuthService.changePassword(req, res);
+      if (result["success"] === false) return res.status(400).json(result);
+      return res.status(200).json(result);
+    } catch (err) {
+      return sendServerErrorResponse(req, res, err);
+    }
+  }
 }
 
 export default new AuthController();

@@ -11,7 +11,7 @@ export const EMAIL_NOT_CONFIRMED =
 export const USER_NOT_FOUND = "User not found";
 export const EMAIL_VERIFY_REQUIRED =
   "Success! Please verify your email so we can activate your account.";
-export const LOGIN_SUCCESS = "Welcome back! You’ve successfully logged in.";
+export const LOGIN_SUCCESS = "Welcome back! You've successfully logged in.";
 export const REGISTER_SUCCESS_INTERNAL =
   "Your account has been created and is awaiting activation by the admin.";
 export const REGISTER_SUCCESS_EXTERNAL =
@@ -26,3 +26,10 @@ export const LOGOUT_SUCCESS = "Logged out successfully";
 export const COMMON_GET_SUCCESS = "Featched data successfully";
 export const COMMON_UPDATE_SUCCESS = "Data is successfully updated";
 export const COMMON_SERVER_ERROR = "Internal server error";
+
+// change password
+export const CURRENT_PASSWORD_INCORRECT = "Current password is incorrect";
+export const PASSWORD_UPDATE_SUCCESS = "Password updated successfully";
+// verify-email
+export const VERIFY_EMAIL_RESENT = " A verification email has been sent.";
+export const VERIFY_STATUS_ERROR = "Error checking verifcation status";
