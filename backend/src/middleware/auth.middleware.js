@@ -1,6 +1,10 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
-import { INACTIVE_403, NOT_AUTHORIZED_401 } from "../utils/messages.js";
+import {
+  INACTIVE_403,
+  NOT_AUTHORIZED_401,
+  TOKEN_VERFICATION_FAILED,
+} from "../utils/messages.js";
 
 export const protect = async (req, res, next) => {
   try {
@@ -11,7 +15,7 @@ export const protect = async (req, res, next) => {
     ) {
       token = req.headers.authorization.split(" ")[1];
     }
-    console.log(token);
+
     if (!token) {
       return res.status(401).json({
         success: false,
@@ -42,7 +46,7 @@ export const protect = async (req, res, next) => {
     } catch (JWTError) {
       return res.status(401).json({
         success: false,
-        message: "Token verification failed. Please log in again.",
+        message: TOKEN_VERFICATION_FAILED,
       });
     }
   } catch (error) {

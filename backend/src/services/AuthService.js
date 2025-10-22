@@ -21,6 +21,7 @@ import {
   VERIFY_STATUS_ERROR,
   ACCOUNT_DEACTIVE_ERROR,
   VERIFY_STATUS_CHECK,
+  DATABASE_CONNECTION_ERROR,
 } from "../utils/messages.js";
 import { CLIENT_TYPES, ROLE_TYPES } from "../utils/constants.js";
 import { supabase } from "../config/supabase.config.js";
@@ -76,6 +77,7 @@ class AuthService {
           return generateResponse(null, EMAIL_NOT_CONFIRMED);
         else if (authError.message === SUPABASE_INVALID_CREDENTIALS)
           return generateResponse(null, INVALID_CREDENTIALS);
+        else return generateResponse(null, DATABASE_CONNECTION_ERROR);
       }
 
       const user = await User.findById(authData.user.id);

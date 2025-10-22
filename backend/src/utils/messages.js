@@ -3,6 +3,7 @@ export const INVALID_REFERENCE_ID = "Reference id is not valid";
 
 export const SUPABASE_INVALID_CREDENTIALS = "Invalid login credentials";
 export const INVALID_CREDENTIALS = "Invalid email or password";
+export const DATABASE_CONNECTION_ERROR = "Datbase connection timeout";
 
 export const SUPABASE_EMAIL_NOT_CONFIRMED = "Email not confirmed";
 export const EMAIL_NOT_CONFIRMED =
@@ -21,6 +22,8 @@ export const REGISTER_SUCCESS_EXTERNAL =
 export const NOT_AUTHORIZED_401 =
   "Not authorized to access this route. No token provided.";
 export const INACTIVE_403 = "User account is inactive. Please contact support.";
+export const TOKEN_VERFICATION_FAILED =
+  "Token verification failed. Please log in again.";
 
 export const LOGOUT_SUCCESS = "Logged out successfully";
 export const COMMON_GET_SUCCESS = "Featched data successfully";
