@@ -1,7 +1,7 @@
-import User from "../models/User";
-import Club from "../models/Club";
-import Player from "../models/Player";
-import { generateResponse, generateToken } from "../utils/helpers";
+import User from "../models/User.js";
+import Club from "../models/Club.js";
+import Player from "../models/Player.js";
+import { generateResponse, generateToken } from "../utils/helpers.js";
 import {
   EMAIL_ALREADY_EXIST,
   INVALID_REFERENCE_ID,
@@ -19,10 +19,9 @@ import {
   PASSWORD_UPDATE_SUCCESS,
   VERIFY_EMAIL_RESENT,
   VERIFY_STATUS_ERROR,
-} from "../utils/messages";
-import { CLIENT_TYPES, ROLE_TYPES } from "../utils/constants";
-import { supabase } from "../config/supabase.config";
-import { sign } from "crypto";
+} from "../utils/messages.js";
+import { CLIENT_TYPES, ROLE_TYPES } from "../utils/constants.js";
+import { supabase } from "../config/supabase.config.js";
 
 export class AuthService {
   static async registerUser(req, res) {

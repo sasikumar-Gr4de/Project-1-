@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { COMMON_SERVER_ERROR } from "./messages";
+import { COMMON_SERVER_ERROR } from "./messages.js";
 
 export const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, {

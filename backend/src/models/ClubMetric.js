@@ -1,5 +1,4 @@
-import { match } from "assert";
-import { supabase } from "../config/supabase.config";
+import { supabase } from "../config/supabase.config.js";
 
 export class ClubMetric {
   static async logClubMetric(clubId, matchId, details = {}) {

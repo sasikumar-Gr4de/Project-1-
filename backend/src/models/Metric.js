@@ -1,4 +1,4 @@
-import { supabase } from "../config/supabase.config";
+import { supabase } from "../config/supabase.config.js";
 
 export class Metric {
   static async logMetric(matchId, playerId, details = {}) {

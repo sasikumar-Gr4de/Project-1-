@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
-import User from "../models/User";
-import { INACTIVE_403, NOT_AUTHORIZED_401 } from "../utils/messages";
+import User from "../models/User.js";
+import { INACTIVE_403, NOT_AUTHORIZED_401 } from "../utils/messages.js";
 
 export const protect = async (req, res, next) => {
   try {

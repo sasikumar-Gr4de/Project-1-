@@ -1,9 +1,9 @@
 import {
   LoginInputValidation,
   RegisterInputValidation,
-} from "../validation/auth.validation";
-import AuthService from "../services/AuthService";
-import { sendServerErrorResponse } from "../utils/helpers";
+} from "../validation/auth.validation.js";
+import AuthService from "../services/AuthService.js";
+import { sendServerErrorResponse } from "../utils/helpers.js";
 
 class AuthController {
   constructor() {}

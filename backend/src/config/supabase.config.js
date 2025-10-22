@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { RealtimeClient } from "@supabase/realtime-js";
+// import { RealtimeClient } from "@supabase/realtime-js";
 import dotenv from "dotenv";
 
 dotenv.config();

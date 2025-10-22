@@ -2,6 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 
+import authRoutes from "./routes/auth.routes.js";
+
 // Load environment variables from .env file
 dotenv.config();
 
@@ -25,6 +27,8 @@ app.use(
     limit: process.env.MAX_FILE_SIZE,
   })
 );
+
+app.use("/api/auth", authRoutes);
 
 app.get("/api", (req, res) => {
   res.json({ success: true, message: "API is running" });

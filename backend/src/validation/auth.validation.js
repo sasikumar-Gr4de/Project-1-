@@ -1,4 +1,4 @@
-import { generateValidationResult } from "../utils/helpers";
+import { generateValidationResult } from "../utils/helpers.js";
 
 export const RegisterInputValidation = (userInput) => {
   // Required Fields Test
