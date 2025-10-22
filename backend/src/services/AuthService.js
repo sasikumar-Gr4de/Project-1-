@@ -10,9 +10,11 @@ import {
   SUPABASE_INVALID_CREDENTIALS,
   INVALID_CREDENTIALS,
   LOGIN_SUCCESS,
-  REGISTER_SUCCESS_EXTERNAL,
-  REGISTER_SUCCESS_INTERNAL,
   EMAIL_VERIFY_REQUIRED,
+  USER_NOT_FOUND,
+  COMMON_GET_SUCCESS,
+  COMMON_UPDATE_SUCCESS,
+  LOGOUT_SUCCESS,
 } from "../utils/messages";
 import { CLIENT_TYPES, ROLE_TYPES } from "../utils/constants";
 import { supabase } from "../config/supabase.config";
@@ -52,7 +54,6 @@ export class AuthService {
 
       return generateResponse(data, EMAIL_VERIFY_REQUIRED);
     } catch (err) {
-      console.log("Error in AuthService:regiseruser:", err.message);
       throw err;
     }
   }
@@ -79,7 +80,47 @@ export class AuthService {
 
       return generateResponse(data, LOGIN_SUCCESS);
     } catch (err) {
-      console.log("Error in AuthService:loginUser:", err.message);
+      throw err;
+    }
+  }
+
+  static async getProfile(req, res) {
+    try {
+      const { userId } = req.user;
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return generateResponse(null, USER_NOT_FOUND);
+      }
+      return generateResponse(user, COMMON_GET_SUCCESS);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  static async updateProfile(req, res) {
+    try {
+      const { userId } = req.user;
+      const { ...updatedData } = req.body;
+      const user = await User.update(userId, updatedData);
+
+      return generateResponse(user, COMMON_UPDATE_SUCCESS);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  static async logout(req, res) {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.log("Logout error:", error);
+      }
+      return {
+        success: true,
+        message: LOGOUT_SUCCESS,
+      };
+    } catch (err) {
       throw err;
     }
   }

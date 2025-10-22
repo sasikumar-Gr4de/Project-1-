@@ -41,7 +41,6 @@ class User {
       if (error) throw error;
       return data;
     } catch (err) {
-      console.log("Error creating user:", err);
       throw err;
     }
   }
@@ -58,7 +57,6 @@ class User {
       if (error) throw error;
       return data;
     } catch (err) {
-      console.log("Error updating user:", err);
       throw err;
     }
   }
@@ -74,7 +72,6 @@ class User {
       if (error) throw error;
       return data;
     } catch (err) {
-      console.log("Error updating last login:", err);
       throw err;
     }
   }
@@ -98,7 +95,6 @@ class User {
       if (error) throw error;
       return { data, total: count || 0, page, limit };
     } catch (err) {
-      console.log("Error fetching users:", err);
       throw err;
     }
   }
@@ -128,7 +124,6 @@ class User {
       if (error) throw error;
       return data;
     } catch (err) {
-      console.error("Error fetching User by ID:", err);
       throw err;
     }
   }
@@ -144,7 +139,6 @@ class User {
       if (error) throw error;
       return data;
     } catch (err) {
-      console.log("Error activating user:", err);
       throw err;
     }
   }
@@ -160,7 +154,6 @@ class User {
       if (error) throw error;
       return data;
     } catch (err) {
-      console.log("Error deactivating user:", err);
       throw err;
     }
   }
@@ -190,7 +183,6 @@ class User {
       if (refError) throw refError;
       return { client_type, role, reference_data };
     } catch (err) {
-      console.log("Error fetching user reference data:", err);
       throw err;
     }
   }

@@ -8,6 +8,7 @@ export const SUPABASE_EMAIL_NOT_CONFIRMED = "Email not confirmed";
 export const EMAIL_NOT_CONFIRMED =
   "Please verify your email address before logging in";
 
+export const USER_NOT_FOUND = "User not found";
 export const EMAIL_VERIFY_REQUIRED =
   "Success! Please verify your email so we can activate your account.";
 export const LOGIN_SUCCESS = "Welcome back! You’ve successfully logged in.";
@@ -19,5 +20,9 @@ export const REGISTER_SUCCESS_EXTERNAL =
 // Auth middleware
 export const NOT_AUTHORIZED_401 =
   "Not authorized to access this route. No token provided.";
-
 export const INACTIVE_403 = "User account is inactive. Please contact support.";
+
+export const LOGOUT_SUCCESS = "Logged out successfully";
+export const COMMON_GET_SUCCESS = "Featched data successfully";
+export const COMMON_UPDATE_SUCCESS = "Data is successfully updated";
+export const COMMON_SERVER_ERROR = "Internal server error";

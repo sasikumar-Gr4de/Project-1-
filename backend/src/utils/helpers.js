@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import { COMMON_SERVER_ERROR } from "./messages";
 
 export const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, {
@@ -30,4 +31,14 @@ export const generateValidationResult = (message = null) => {
     success: false,
     message,
   };
+};
+
+export const sendServerErrorResponse = (req, res, err) => {
+  return res.status(500).json({
+    success: false,
+    message:
+      process.env.NODE_ENV === "development"
+        ? err.message
+        : COMMON_SERVER_ERROR,
+  });
 };
