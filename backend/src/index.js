@@ -26,8 +26,8 @@ app.use(
   })
 );
 
-app.get("/", (req, res) => {
-  res.send("Gr4de Platform Backend is running!");
+app.get("/api", (req, res) => {
+  res.json({ success: true, message: "API is running" });
 });
 
 app.listen(PORT, () => {
