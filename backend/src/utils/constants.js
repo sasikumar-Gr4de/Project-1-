@@ -24,3 +24,17 @@ export const MATCH_QA_STATUS = {
   APPROVED: "approved",
   REJECTED: "rejected",
 };
+
+export const CLIENT_TYPES = {
+  INTERNAL: "internal",
+  EXTERNAL: "external",
+};
+
+export const ROLE_TYPES = {
+  USER_ADMIN: "admin",
+  USER_DATA_REVIEWER: "data-reviewer",
+  USER_ANNOTATOR: "annotator",
+  USER_COACH: "coach",
+  USER_PARENT: "parent",
+  USER_PLAYER: "player",
+};

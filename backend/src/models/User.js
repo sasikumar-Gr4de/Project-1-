@@ -2,8 +2,15 @@ import { supabase } from "../config/supabase.config.js";
 
 class User {
   static async create(userData) {
-    const { email, password, full_name, client_type, role, phone_number } =
-      userData;
+    const {
+      email,
+      password,
+      full_name,
+      client_type,
+      role,
+      phone_number,
+      is_active,
+    } = userData;
     try {
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
@@ -25,7 +32,7 @@ class User {
             role,
             client_type,
             phone_number,
-            is_active: true,
+            is_active: is_active,
             email_verified: false,
           },
         ])
@@ -92,6 +99,36 @@ class User {
       return { data, total: count || 0, page, limit };
     } catch (err) {
       console.log("Error fetching users:", err);
+      throw err;
+    }
+  }
+
+  static async findByEmail(email) {
+    try {
+      const { data, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("email", email)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      console.log("Error finding user by email:", err.message);
+      throw err;
+    }
+  }
+
+  static async findById(id) {
+    try {
+      const { data, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      console.error("Error fetching User by ID:", err);
       throw err;
     }
   }

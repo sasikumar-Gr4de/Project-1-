@@ -71,7 +71,7 @@ export class Club {
         .from("clubs")
         .select("*")
         .eq("id", id)
-        .single();
+        .maybeSingle();
       if (error) throw error;
       return data;
     } catch (err) {
