@@ -39,3 +39,26 @@ export const VERIFY_STATUS_ERROR = "Error checking verifcation status";
 export const ACCOUNT_DEACTIVE_ERROR =
   "Account is deactivated. Please contact support.";
 export const VERIFY_STATUS_CHECK = "Check verfication status by email";
+
+// Club messages
+export const CLUB_CREATE_SUCCESS = "Club created successfully";
+export const CLUB_GET_SUCCESS = "Club retrieved successfully";
+export const CLUB_UPDATE_SUCCESS = "Club updated successfully";
+export const CLUB_DELETE_SUCCESS = "Club deleted successfully";
+export const CLUB_NOT_FOUND = "Club not found";
+export const CLUB_PLAYERS_GET_SUCCESS = "Club players retrieved successfully";
+
+// Match messages
+export const MATCH_CREATE_SUCCESS = "Match created successfully";
+export const MATCH_GET_SUCCESS = "Match retrieved successfully";
+export const MATCH_UPDATE_SUCCESS = "Match updated successfully";
+export const MATCH_DELETE_SUCCESS = "Match deleted successfully";
+export const MATCH_NOT_FOUND = "Match not found";
+
+// Player messages
+export const PLAYER_CREATE_SUCCESS = "Player created successfully";
+export const PLAYER_GET_SUCCESS = "Player retrieved successfully";
+export const PLAYER_UPDATE_SUCCESS = "Player updated successfully";
+export const PLAYER_DELETE_SUCCESS = "Player deleted successfully";
+export const PLAYER_NOT_FOUND = "Player not found";
+export const PLAYER_CLUB_GET_SUCCESS = "Player club retrieved successfully";

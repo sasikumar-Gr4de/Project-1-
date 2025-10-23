@@ -4,6 +4,9 @@ import cors from "cors";
 
 import authRoutes from "./routes/auth.routes.js";
 import uploadRoutes from "./routes/upload.routes.js";
+import clubsRoutes from "./routes/clubs.routes.js";
+import matchesRoutes from "./routes/matches.routes.js";
+import playersRoutes from "./routes/players.routes.js";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -37,6 +40,9 @@ app.use(
 
 app.use("/api/auth", authRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/clubs", clubsRoutes);
+app.use("/api/matches", matchesRoutes);
+app.use("/api/players", playersRoutes);
 
 app.get("/api", (req, res) => {
   res.json({ success: true, message: "API is running" });

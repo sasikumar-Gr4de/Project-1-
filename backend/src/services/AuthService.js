@@ -136,7 +136,7 @@ class AuthService {
   static async changePassword(req, res) {
     try {
       const { current_password, new_password } = req.body;
-      const { userId } = req.user.userId;
+      const { userId } = req.user;
 
       const user = User.findById(userId);
       if (!user) return generateResponse(null, USER_NOT_FOUND);

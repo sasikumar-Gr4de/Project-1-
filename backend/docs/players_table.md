@@ -7,12 +7,12 @@ CREATE TABLE players (
   player_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), -- Auto-generated UUID
   full_name VARCHAR(100) NOT NULL, -- Increased length for full names
   date_of_birth DATE NOT NULL, -- Made NOT NULL for required data
-  position VARCHAR(50) NOT NULL CHECK (position IN ('Goalkeeper', 'Defender', 'Midfielder', 'Forward', 'Central Midfielder')), -- Enforced valid positions
+  position VARCHAR(50) NOT NULL, -- CHECK (position IN ('Goalkeeper', 'Defender', 'Midfielder', 'Forward', 'Central Midfielder')), -- Enforced valid positions
   height_cm DECIMAL(5,2) CHECK (height_cm > 0 AND height_cm <= 250), -- Positive height constraint
   weight_kg DECIMAL(5,2) CHECK (weight_kg > 0 AND weight_kg <= 200), -- Positive weight constraint
   current_club UUID, -- Nullable to allow free agents
   nationality VARCHAR(50) NOT NULL,
-  status VARCHAR(20) NOT NULL CHECK (status IN ('Active', 'Inactive', 'Injured', 'Retired')), -- Enforced valid statuses
+  status VARCHAR(20) NOT NULL, -- CHECK (status IN ('Active', 'Inactive', 'Injured', 'Retired')), -- Enforced valid statuses
   jersey_number INT CHECK (jersey_number BETWEEN 1 AND 99), -- Realistic jersey number range
   avatar_url VARCHAR(255),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
