@@ -1,14 +1,5 @@
 import { useState } from "react";
-import {
-  Eye,
-  EyeOff,
-  User,
-  Lock,
-  Target,
-  BarChart3,
-  Users,
-  Shield,
-} from "lucide-react";
+import { Eye, EyeOff, User, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,7 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import logo from "@/assets/images/logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthstore } from "@/store/auth.store";
@@ -29,7 +19,6 @@ const Login = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -143,26 +132,15 @@ const Login = () => {
 
                 {/* Remember Me & Forgot Password */}
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="login-remember"
-                      checked={rememberMe}
-                      onCheckedChange={(checked) => setRememberMe(checked)}
-                      className="h-4 w-4"
-                    />
-                    <Label
-                      htmlFor="login-remember"
-                      className="text-sm text-muted-foreground"
+                  <div className="flex items-center space-x-2"></div>
+                  <Link to="/dashboard">
+                    <Button
+                      variant="link"
+                      className="px-0 text-primary hover:text-primary/80 text-sm h-auto font-medium"
                     >
-                      Remember me
-                    </Label>
-                  </div>
-                  <Button
-                    variant="link"
-                    className="px-0 text-primary hover:text-primary/80 text-sm h-auto font-medium"
-                  >
-                    Forgot password?
-                  </Button>
+                      Forgot password?
+                    </Button>
+                  </Link>
                 </div>
 
                 {/* Submit Button */}
