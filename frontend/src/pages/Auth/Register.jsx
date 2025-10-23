@@ -90,7 +90,7 @@ const Register = () => {
   return (
     <div className="min-h-screen bg-background flex">
       {/* Left Side - Form Section */}
-      <div className="flex-1 flex items-center justify-center p-8">
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8 w-full">
         <div className="w-full max-w-md">
           <Card className="border-border bg-card/50 backdrop-blur-sm">
             <CardHeader className="space-y-1">
@@ -357,7 +357,7 @@ const Register = () => {
       </div>
 
       {/* Right Side - Visual Section */}
-      <div className="flex-1 bg-linear-to-br from-primary/20 to-secondary/20 hidden lg:flex items-center justify-center p-12 relative overflow-hidden">
+      <div className="flex-1 bg-linear-to-br from-primary/15 to-secondary/15 hidden lg:flex items-center justify-center p-8 xl:p-12 relative overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-5">
           <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary rounded-full blur-3xl"></div>

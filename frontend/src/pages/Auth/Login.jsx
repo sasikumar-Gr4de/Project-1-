@@ -200,51 +200,97 @@ const Login = () => {
 
           {/* Feature Grid */}
           <div className="grid grid-cols-2 gap-6 mt-8">
-            <div className="text-center space-y-3">
-              <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center mx-auto">
-                <Target className="w-6 h-6 text-primary" />
+            <div className="text-center space-y-2">
+              <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mx-auto">
+                <svg
+                  className="w-6 h-6 text-primary"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  />
+                </svg>
               </div>
-              <h3 className="font-semibold text-foreground text-sm">
-                Smart Adaptation
+              <h3 className="font-semibold text-foreground">
+                Performance Metrics
               </h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Games that learn from your decisions
+              <p className="text-sm text-muted-foreground">
+                Track key performance indicators
               </p>
             </div>
 
-            <div className="text-center space-y-3">
-              <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center mx-auto">
-                <BarChart3 className="w-6 h-6 text-primary" />
+            <div className="text-center space-y-2">
+              <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mx-auto">
+                <svg
+                  className="w-6 h-6 text-primary"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                  />
+                </svg>
               </div>
-              <h3 className="font-semibold text-foreground text-sm">
-                Real-time Analytics
+              <h3 className="font-semibold text-foreground">
+                Progress Tracking
               </h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Track your performance metrics
+              <p className="text-sm text-muted-foreground">
+                Monitor development over time
               </p>
             </div>
 
-            <div className="text-center space-y-3">
-              <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center mx-auto">
-                <Users className="w-6 h-6 text-primary" />
+            <div className="text-center space-y-2">
+              <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mx-auto">
+                <svg
+                  className="w-6 h-6 text-primary"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
+                </svg>
               </div>
-              <h3 className="font-semibold text-foreground text-sm">
-                Community Driven
+              <h3 className="font-semibold text-foreground">
+                Team Collaboration
               </h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Connect with like-minded gamers
+              <p className="text-sm text-muted-foreground">
+                Connect with coaches and players
               </p>
             </div>
 
-            <div className="text-center space-y-3">
-              <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center mx-auto">
-                <Shield className="w-6 h-6 text-primary" />
+            <div className="text-center space-y-2">
+              <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mx-auto">
+                <svg
+                  className="w-6 h-6 text-primary"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                  />
+                </svg>
               </div>
-              <h3 className="font-semibold text-foreground text-sm">
-                Secure Platform
-              </h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Your data is always protected
+              <h3 className="font-semibold text-foreground">Data Security</h3>
+              <p className="text-sm text-muted-foreground">
+                Enterprise-grade protection
               </p>
             </div>
           </div>
