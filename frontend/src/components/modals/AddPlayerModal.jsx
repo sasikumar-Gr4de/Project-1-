@@ -58,11 +58,14 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, clubs }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-        <CardHeader>
+      <Card className="w-full max-w-4xl max-h-[90vh] flex flex-col">
+        {/* Fixed Header */}
+        <CardHeader className="shrink-0 border-b">
           <CardTitle>Add New Player</CardTitle>
         </CardHeader>
-        <CardContent>
+
+        {/* Scrollable Body */}
+        <CardContent className="flex-1 overflow-y-auto p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -235,17 +238,24 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, clubs }) => {
                 </p>
               )}
             </div>
-
-            <div className="flex justify-end space-x-2 pt-4">
-              <Button type="button" variant="outline" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button type="submit" className="bg-primary hover:bg-primary/90">
-                Save Player
-              </Button>
-            </div>
           </form>
         </CardContent>
+
+        {/* Fixed Footer */}
+        <div className="shrink-0 border-t p-6">
+          <div className="flex justify-end space-x-2">
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              onClick={handleSubmit}
+              className="bg-primary hover:bg-primary/90"
+            >
+              Save Player
+            </Button>
+          </div>
+        </div>
       </Card>
     </div>
   );

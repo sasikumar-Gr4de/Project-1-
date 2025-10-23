@@ -304,11 +304,11 @@ const Matches = () => {
             />
           </div>
         </div>
-        <div className="flex items-center space-x-3">
+        {/* <div className="flex items-center space-x-3">
           <div className="text-sm text-muted-foreground">
             Showing {filteredMatches.length} of {matches.length} matches
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Matches Table */}

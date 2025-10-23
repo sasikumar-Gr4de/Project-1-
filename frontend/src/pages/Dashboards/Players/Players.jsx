@@ -180,11 +180,11 @@ const Players = () => {
     },
     {
       header: "Club",
-      accessor: "club_name",
+      accessor: "current_club",
       cell: ({ row }) => (
         <div className="flex items-center space-x-2">
           <Shirt className="w-4 h-4 text-muted-foreground" />
-          <span className="text-foreground">{row.club_name}</span>
+          <span className="text-foreground">{row.current_club}</span>
         </div>
       ),
     },
@@ -284,11 +284,11 @@ const Players = () => {
             />
           </div>
         </div>
-        <div className="flex items-center space-x-3">
+        {/* <div className="flex items-center space-x-3">
           <div className="text-sm text-muted-foreground">
             Showing {filteredPlayers.length} of {players.length} players
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Players Table */}
