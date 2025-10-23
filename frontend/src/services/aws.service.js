@@ -13,10 +13,10 @@ const s3 = new AWS.S3({
 });
 
 export const awsService = {
-  // Upload file to S3
+  // Upload file to S3 with progress tracking
   async uploadFile(file, folder = "") {
     try {
-      const key = `${folder}${Date.now()}-${file.name}`;
+      const key = `${folder}${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
 
       const params = {
         Key: key,
@@ -42,6 +42,44 @@ export const awsService = {
     }
   },
 
+  // Upload with progress tracking
+  async uploadFileWithProgress(file, key, onProgress = null) {
+    return new Promise((resolve, reject) => {
+      const params = {
+        Key: key,
+        Body: file,
+        ContentType: file.type,
+        ACL: "public-read",
+      };
+
+      const options = {
+        partSize: 10 * 1024 * 1024, // 10MB parts
+        queueSize: 1, // Upload parts in parallel
+      };
+
+      const upload = s3.upload(params, options);
+
+      if (onProgress) {
+        upload.on("httpUploadProgress", (progress) => {
+          const percent = Math.round((progress.loaded / progress.total) * 100);
+          onProgress(percent);
+        });
+      }
+
+      upload.send((err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve({
+            success: true,
+            url: data.Location,
+            key: data.Key,
+          });
+        }
+      });
+    });
+  },
+
   // Download file from S3
   async downloadFile(key, fileName) {
     try {
@@ -56,7 +94,7 @@ export const awsService = {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = fileName;
+      link.download = fileName || key.split("/").pop();
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -113,9 +151,7 @@ export const awsService = {
           name: item.Key.split("/").pop(),
           size: item.Size,
           lastModified: item.LastModified,
-          url: `https://${import.meta.env.VITE_AWS_S3_BUCKET}.s3.${
-            import.meta.env.VITE_AWS_REGION
-          }.amazonaws.com/${item.Key}`,
+          url: this.getFileUrl(item.Key),
         })),
       };
     } catch (error) {
@@ -125,6 +161,13 @@ export const awsService = {
         error: error.message,
       };
     }
+  },
+
+  // Get file URL
+  getFileUrl(key) {
+    return `https://${import.meta.env.VITE_AWS_S3_BUCKET}.s3.${
+      import.meta.env.VITE_AWS_REGION
+    }.amazonaws.com/${key}`;
   },
 };
 
