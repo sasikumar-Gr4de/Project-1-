@@ -1,7 +1,8 @@
 import React, { useCallback, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import { Button } from "../ui/button";
+import { Card, CardContent } from "../ui/card";
+import { Progress } from "../ui/progress";
+import fileService from "../../../services/file.service";
 
 const FileUpload = ({
   onUpload,
@@ -10,6 +11,7 @@ const FileUpload = ({
   multiple = false,
   label = "Choose file",
   uploadText = "Upload files",
+  folder = "", // 'player-avatars/', 'team-marks/', 'match-videos/'
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -50,39 +52,74 @@ const FileUpload = ({
     setIsUploading(true);
     setUploadProgress(0);
 
-    // Simulate upload progress
-    const progressInterval = setInterval(() => {
-      setUploadProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(progressInterval);
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 200);
-
     try {
-      await onUpload(files);
-      setUploadProgress(100);
-    } catch (error) {
-      console.error("Upload failed:", error);
-      alert("Upload failed. Please try again.");
-    } finally {
+      // Use direct S3 upload for better performance
+      const uploadPromises = files.map(async (file) => {
+        const result = await fileService.uploadFileDirect(file, folder);
+
+        if (result.success) {
+          return {
+            success: true,
+            url: result.fileUrl,
+            key: result.key,
+            fileName: result.fileName,
+            type: file.type,
+            size: file.size,
+          };
+        } else {
+          return {
+            success: false,
+            error: result.error,
+            fileName: file.name,
+          };
+        }
+      });
+
+      // Simulate progress for better UX
+      const progressInterval = setInterval(() => {
+        setUploadProgress((prev) => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return 90;
+          }
+          return prev + 10;
+        });
+      }, 200);
+
+      const results = await Promise.all(uploadPromises);
+
       clearInterval(progressInterval);
+      setUploadProgress(100);
+
+      // Call the parent's onUpload callback with all results
+      if (onUpload) {
+        onUpload(results);
+      }
+
+      // Reset after successful upload
       setTimeout(() => {
         setIsUploading(false);
         setUploadProgress(0);
       }, 1000);
+    } catch (error) {
+      console.error("Upload failed:", error);
+      alert("Upload failed. Please try again.");
+      setIsUploading(false);
+      setUploadProgress(0);
     }
   };
 
   return (
-    <Card className="border-2 border-dashed border-muted hover:border-primary transition-colors">
+    <Card
+      className={`border-2 border-dashed transition-colors ${
+        isDragging
+          ? "border-primary bg-primary/10"
+          : "border-muted hover:border-primary"
+      }`}
+    >
       <CardContent className="p-6">
         <div
-          className={`flex flex-col items-center justify-center space-y-4 ${
-            isDragging ? "bg-accent/20" : ""
-          }`}
+          className="flex flex-col items-center justify-center space-y-4"
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
@@ -107,6 +144,9 @@ const FileUpload = ({
             <p className="text-xs text-muted-foreground mt-1">
               Maximum file size: {maxSize / 1024 / 1024}MB
             </p>
+            {folder && (
+              <p className="text-xs text-primary mt-1">Folder: {folder}</p>
+            )}
           </div>
 
           <Button
@@ -115,7 +155,7 @@ const FileUpload = ({
             onClick={() => document.getElementById("file-input").click()}
             disabled={isUploading}
           >
-            {label}
+            {isUploading ? "Uploading..." : label}
           </Button>
 
           <input
@@ -125,6 +165,7 @@ const FileUpload = ({
             multiple={multiple}
             onChange={handleFileSelect}
             className="hidden"
+            disabled={isUploading}
           />
 
           {isUploading && (
