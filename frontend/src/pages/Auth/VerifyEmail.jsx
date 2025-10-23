@@ -90,7 +90,7 @@ const VerifyEmail = () => {
               {/* Instructions */}
               <div className="space-y-4 mb-6">
                 <div className="flex items-start space-x-3">
-                  <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                  <CheckCircle className="w-5 h-5 text-primary mt-0.5 shrink-0" />
                   <div>
                     <p className="text-sm font-medium text-foreground">
                       Check your inbox
@@ -103,7 +103,7 @@ const VerifyEmail = () => {
                 </div>
 
                 <div className="flex items-start space-x-3">
-                  <Clock className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                  <Clock className="w-5 h-5 text-primary mt-0.5 shrink-0" />
                   <div>
                     <p className="text-sm font-medium text-foreground">
                       Click the verification link
@@ -115,7 +115,7 @@ const VerifyEmail = () => {
                 </div>
 
                 <div className="flex items-start space-x-3">
-                  <RefreshCw className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                  <RefreshCw className="w-5 h-5 text-primary mt-0.5 shrink-0" />
                   <div>
                     <p className="text-sm font-medium text-foreground">
                       Complete your registration
