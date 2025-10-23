@@ -1,14 +1,6 @@
 // Register.jsx
 import { useState } from "react";
-import {
-  Eye,
-  EyeOff,
-  User,
-  Lock,
-  Mail,
-  UserPlus,
-  ArrowLeft,
-} from "lucide-react";
+import { Eye, EyeOff, User, Lock, Mail, UserPlus } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
