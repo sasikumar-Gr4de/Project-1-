@@ -28,11 +28,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useAuthstore } from "@/store/auth.store.js";
 
-import logo from "@/assets/images/logo.png";
 import { Link } from "react-router-dom";
 
 const Register = () => {
+  const { register: registerUser } = useAuthstore();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
@@ -46,10 +47,20 @@ const Register = () => {
     role: "",
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Registration attempt:", formData);
-    // Handle registration logic here
+
+    window.alert("Registeration Attempt");
+    const userData = {
+      full_name: formData.firstName + " " + formData.lastName,
+      email: formData.email,
+      password: formData.email,
+      client_type: formData.clientType,
+      role: formData.role,
+    };
+
+    console.log(userData);
+    const response = await registerUser(userData);
   };
 
   const handleChange = (e) => {

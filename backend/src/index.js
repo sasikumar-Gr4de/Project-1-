@@ -20,6 +20,12 @@ app.use(
   })
 );
 
+// Request logging
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  next();
+});
+
 app.use(express.json({ limit: process.env.MAX_FILE_SIZE }));
 app.use(
   express.urlencoded({
@@ -36,4 +42,17 @@ app.get("/api", (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+});
+
+// Add at the top of your main server file (app.js or index.js)
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Promise Rejection:");
+  console.error("Reason:", reason);
+  console.error("Promise:", promise);
+  // Don't exit the process, just log the error
+});
+
+process.on("uncaughtException", (error) => {
+  console.error("Uncaught Exception:", error);
+  // Don't exit the process for uncaught exceptions in development
 });

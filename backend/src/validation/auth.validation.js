@@ -9,13 +9,11 @@ export const RegisterInputValidation = (userInput) => {
     message = "Email, password, and full name are required";
   }
 
-  if (
-    !CLIENT_TYPES.EXTERNAL.includes(client_type) &&
-    CLIENT_TYPES.INTERNAL.includes(client_type)
-  )
+  if (!Object.values(CLIENT_TYPES).includes(client_type))
     message = "Client type is not valid";
 
-  if (!ROLE_TYPES.includes(role)) message = "Client role is not valid";
+  if (!Object.values(ROLE_TYPES).includes(role))
+    message = "Client role is not valid";
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {

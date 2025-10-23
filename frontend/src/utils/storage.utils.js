@@ -1,48 +1,9 @@
 import CryptoJS from "crypto-js";
 
-import {
-  isValidJSON,
-  isBase64,
-  isLikelyEncrypted,
-} from "@/utils/helper.utils.js";
+import { isLikelyEncrypted } from "@/utils/helper.utils.js";
 
 // Get encryption key from environment variables with fallback
 const ENCRYPTION_KEY = import.meta.env.VITE_ENCRYPTION_KEY;
-
-// Helper functions
-const isValidJSON = (str) => {
-  if (typeof str !== "string") return false;
-  try {
-    JSON.parse(str);
-    return true;
-  } catch {
-    return false;
-  }
-};
-
-const isBase64 = (str) => {
-  if (typeof str !== "string") return false;
-  try {
-    return btoa(atob(str)) === str;
-  } catch {
-    return false;
-  }
-};
-
-const isLikelyEncrypted = (data) => {
-  if (!data || typeof data !== "string") return false;
-
-  // Check if it's base64 encoded
-  if (!isBase64(data)) return false;
-
-  // If it's base64 but not valid JSON when decoded, it's likely encrypted
-  try {
-    const decoded = atob(data);
-    return !isValidJSON(decoded);
-  } catch {
-    return false;
-  }
-};
 
 // Main encrypted storage implementation
 export const encryptedStorage = {

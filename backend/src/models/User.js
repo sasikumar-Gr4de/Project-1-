@@ -1,25 +1,18 @@
 import { supabase } from "../config/supabase.config.js";
 export default class User {
   static async create(userData) {
-    const {
-      email,
-      password,
-      full_name,
-      client_type,
-      role,
-      phone_number,
-      is_active,
-    } = userData;
+    const { email, password, full_name, client_type, role, phone_number } =
+      userData;
+
     try {
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          data: { full_name, role, client_type, phone_number },
-        },
+        options: { data: { full_name, role, client_type, phone_number } },
       });
-
-      if (authError) throw authError;
+      if (authError) {
+        throw authError;
+      }
 
       const { data, error } = await supabase
         .from("users")
@@ -31,13 +24,15 @@ export default class User {
             role,
             client_type,
             phone_number,
-            is_active: is_active,
-            email_verified: false,
+            is_active: true,
           },
         ])
         .select()
         .single();
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
+
       return data;
     } catch (err) {
       throw err;

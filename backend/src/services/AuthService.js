@@ -31,18 +31,22 @@ class AuthService {
     try {
       const { ...userData } = req.body;
       const { email, client_type, role } = userData;
-      const existing_user = User.findByEmail(email);
+      const existing_user = await User.findByEmail(email);
+
       if (existing_user) return generateResponse(null, EMAIL_ALREADY_EXIST);
 
       if (client_type === CLIENT_TYPES.INTERNAL) userData["is_active"] = false;
       else if (client_type === CLIENT_TYPES.EXTERNAL) {
         let check = false;
-        if (role === ROLE_TYPES.USER_COACH && Club.findById(reference_id))
+        if (
+          role === ROLE_TYPES.USER_COACH &&
+          (await Club.findById(reference_id))
+        )
           check = true;
         if (
           (role === ROLE_TYPES.USER_PARENT ||
             role === ROLE_TYPES.USER_PLAYER) &&
-          Player.findById(reference_id)
+          (await Player.findById(reference_id))
         )
           check = true;
         if (check === false) {
@@ -51,14 +55,14 @@ class AuthService {
         }
       }
 
-      const data = User.create(userData);
+      const data = await User.create(userData);
 
       // Generate Token
       const { id: user_id } = data;
+
       const token = generateToken(user_id);
       User.updateLastLogin(user_id);
       data["token"] = token;
-
       return generateResponse(data, EMAIL_VERIFY_REQUIRED);
     } catch (err) {
       throw err;
