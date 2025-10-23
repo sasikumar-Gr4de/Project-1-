@@ -54,7 +54,7 @@ const AddMatchModal = ({ isOpen, onClose, onSave, clubs }) => {
     setUploadedVideo(file);
 
     // Simulate AWS upload
-    const awsService = await import("../../../services/aws.service");
+    const awsService = await import("@/services/aws.service");
     const result = await awsService.uploadFile(file, "match-videos/");
 
     if (result.success) {

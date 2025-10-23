@@ -45,7 +45,7 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, clubs }) => {
     setUploadedFile(file);
 
     // Simulate AWS upload
-    const awsService = await import("../../../services/aws.service");
+    const awsService = await import("@/services/aws.service");
     const result = await awsService.uploadFile(file, "player-avatars/");
 
     if (result.success) {

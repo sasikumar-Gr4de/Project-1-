@@ -32,3 +32,9 @@ export const isLikelyEncrypted = (data) => {
     return false;
   }
 };
+
+// Capitalize first letter
+export const capitalize = (text) => {
+  if (!text || typeof text !== "string") return text;
+  return text.charAt(0).toUpperCase() + text.slice(1);
+};
