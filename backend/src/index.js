@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 
 import authRoutes from "./routes/auth.routes.js";
+import uploadRoutes from "./routes/upload.routes.js";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -35,6 +36,7 @@ app.use(
 );
 
 app.use("/api/auth", authRoutes);
+app.use("/api/upload", uploadRoutes);
 
 app.get("/api", (req, res) => {
   res.json({ success: true, message: "API is running" });

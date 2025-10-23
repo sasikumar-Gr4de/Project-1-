@@ -6,6 +6,7 @@ import {
   ListObjectsV2Command,
   HeadObjectCommand,
   DeleteObjectsCommand,
+  PutBucketCorsCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import dotenv from "dotenv";
@@ -26,6 +27,38 @@ export const s3Config = {
   region: process.env.AWS_REGION || "us-east-1",
   baseUrl: `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com`,
 };
+
+// export const configureBucketCORS = async () => {
+//   const command = new PutBucketCorsCommand({
+//     Bucket: s3Config.bucketName,
+//     CORSConfiguration: {
+//       CORSRules: [
+//         {
+//           AllowedHeaders: ["*"],
+//           AllowedMethods: ["GET", "PUT", "POST", "DELETE", "HEAD"],
+//           AllowedOrigins: [
+//             "http://localhost:5173",
+//             "http://localhost:5000",
+//             // "https://yourdomain.com" // Replace with your production domain
+//           ],
+//           ExposeHeaders: ["ETag"],
+//           MaxAgeSeconds: 3000,
+//         },
+//       ],
+//     },
+//   });
+
+//   try {
+//     await s3Client.send(command);
+//     console.log("S3 bucket CORS configured successfully");
+//     return { success: true };
+//   } catch (error) {
+//     console.error("Error configuring S3 bucket CORS:", error);
+//     return { success: false, error: error.message };
+//   }
+// };
+
+// configureBucketCORS();
 
 // Core AWS SDK operations
 export const generatePresignedUploadUrl = async (

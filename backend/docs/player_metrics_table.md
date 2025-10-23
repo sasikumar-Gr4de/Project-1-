@@ -1,7 +1,9 @@
 ```sql
+-- Enable the uuid-ossp extension (run separately if permitted)
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE metrics (
-  metric_id UUID PRIMARY KEY DEFAULT gen_random_uuid()
+  metric_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   player_id UUID NOT NULL,
   match_id UUID NOT NULL,
   session_id VARCHAR(36),
@@ -90,11 +92,25 @@ CREATE TABLE metrics (
   FOREIGN KEY (player_id) REFERENCES players(player_id),
   FOREIGN KEY (match_id) REFERENCES events(match_id)
 );
--- Example Data
-INSERT INTO metrics ('550e8400-e29b-41d4-a716-446655440000', '550e8400-e29b-41d4-a716-446655440000', session_id, talent_index_score, current_ability, growth_trajectory, technical_proficiency, tactical_intelligence, spatial_intelligence, team_elevation_effect, passing_options_created, intelligent_defensive_work, defensive_transition_reaction, press_success_rate, clutch_mentality, consistency_score)
+
+-- Create trigger function to update updated_at (if needed, though not in original)
+CREATE OR REPLACE FUNCTION update_metrics_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.calculated_at = CURRENT_TIMESTAMP; -- Use calculated_at instead of updated_at
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create trigger to call the function on update
+CREATE TRIGGER update_metrics_calculated_at
+BEFORE UPDATE ON metrics
+FOR EACH ROW
+EXECUTE FUNCTION update_metrics_updated_at();
+
+-- Corrected Example Data
+INSERT INTO metrics (metric_id, player_id, match_id, session_id, talent_index_score, current_ability, growth_trajectory, technical_proficiency, tactical_intelligence, spatial_intelligence, team_elevation_effect, passing_options_created, intelligent_defensive_work, defensive_transition_reaction, press_success_rate, clutch_mentality, consistency_score)
 VALUES
-  (1, 1, 'S2025-10-20', 83.60, 82.00, 93.00, 84.00, 87.00, 94.00, 24.00, 4.60, 91.00, 93.00, 61.00, 91.00, 89.00);
- 
-the above used to palyers_metrics so ,how can I evalute team_metrics make schema that evaluate based on team players.
+  ('550e8400-e29b-41d4-a716-446655440000', '550e8401-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440000', 'S2025-10-20', 83.60, 82.00, 93.00, 84.00, 87.00, 94.00, 24.00, 4.60, 91.00, 93.00, 61.00, 91.00, 89.00);
 
 ```

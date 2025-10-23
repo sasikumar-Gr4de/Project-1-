@@ -25,18 +25,24 @@ const AddClubModal = ({ isOpen, onClose, onSave }) => {
     onClose();
   };
 
-  const handleFileUpload = async (files) => {
+  const handleFileUpload = async (results) => {
     // In a real app, you would upload to AWS S3 here
-    const file = files[0];
-    setUploadedFile(file);
-
-    // Simulate AWS upload
-    const awsService = await import("@/services/aws.service");
-    const result = await awsService.uploadFile(file, "team-marks/");
-
-    if (result.success) {
-      setFormData((prev) => ({ ...prev, mark_url: result.url }));
-    }
+    // const file = files[0];
+    // setUploadedFile(file);
+    // // Simulate AWS upload
+    // const awsService = await import("@/services/aws.service");
+    // const result = await awsService.uploadFile(file, "team-marks/");
+    // if (result.success) {
+    //   setFormData((prev) => ({ ...prev, mark_url: result.url }));
+    // }
+    results.forEach((result) => {
+      if (result.success) {
+        console.log("Uploaded:", result.url);
+        // Save to your database
+      } else {
+        console.error("Failed:", result.error);
+      }
+    });
   };
 
   return (

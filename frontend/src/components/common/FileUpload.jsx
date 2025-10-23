@@ -1,8 +1,9 @@
+// components/FileUpload.jsx
 import React, { useCallback, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import fileService from "@/services/file.service";
+import { Button } from "../ui/button";
+import { Card, CardContent } from "../ui/card";
+import { Progress } from "../ui/progress";
+import uploadService from "../../services/upload.service";
 
 const FileUpload = ({
   onUpload,
@@ -79,32 +80,13 @@ const FileUpload = ({
     setUploadProgress(0);
 
     try {
-      // Use the progress callback for real progress tracking
-      const progressCallback = (progress) => {
-        setUploadProgress(progress);
-      };
-
-      let results;
-
-      if (files.length === 1) {
-        // Single file upload with progress
-        const result = await fileService.uploadFileDirect(
-          files[0],
-          folder,
-          progressCallback
-        );
-        results = [result];
-      } else {
-        // Multiple files upload
-        results = await fileService.uploadMultipleFiles(
-          files,
-          folder,
-          progressCallback
-        );
-      }
-
-      // Ensure progress shows 100% at completion
-      setUploadProgress(100);
+      const results = await uploadService.uploadMultipleFiles(
+        files,
+        folder,
+        (progress) => {
+          setUploadProgress(progress);
+        }
+      );
 
       // Call the parent's onUpload callback with all results
       if (onUpload) {
@@ -129,8 +111,7 @@ const FileUpload = ({
   };
 
   const handleCancelUpload = () => {
-    // Note: This would need proper abort controller implementation
-    // for actual upload cancellation
+    // Note: For actual cancellation, you'd need to implement abort controller
     setIsUploading(false);
     setUploadProgress(0);
     setSelectedFiles([]);
@@ -192,7 +173,7 @@ const FileUpload = ({
               <p className="text-muted-foreground">
                 {selectedFiles.length} file(s) selected
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground truncate max-w-xs">
                 {selectedFiles.map((file) => file.name).join(", ")}
               </p>
             </div>
