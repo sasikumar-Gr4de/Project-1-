@@ -11,12 +11,16 @@ import {
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import logo from "@/assets/images/logo.png";
-import { Link } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuthstore } from "@/store/auth.store";
 
 const VerifyEmail = () => {
+  const location = useLocation();
+  const { user, checkVerificationStatus } = useAuthstore();
   const [countdown, setCountdown] = useState(60);
   const [isResending, setIsResending] = useState(false);
-  const [email, setEmail] = useState("user@example.com"); // This would come from your auth context
+  const navigate = useNavigate();
+  const [email, setEmail] = useState(location?.state?.email); // This would come from your auth context
 
   useEffect(() => {
     if (countdown > 0) {
@@ -24,6 +28,28 @@ const VerifyEmail = () => {
       return () => clearTimeout(timer);
     }
   }, [countdown]);
+
+  useEffect(() => {
+    // If a user is already verified, redirect to dashboard
+    const checkStatus = async () => {
+      try {
+        const { email_verified } = user;
+
+        if (email_verified === true) navigate("/dashboard");
+        else {
+          const res = await checkVerificationStatus();
+          const { success, data } = res;
+          if (success === true) {
+            const { email_verified } = data;
+            if (email_verified) navigate("/dashboard");
+          }
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    checkStatus();
+  }, [user, navigate, checkVerificationStatus]);
 
   const handleResendEmail = async () => {
     setIsResending(true);
@@ -39,19 +65,6 @@ const VerifyEmail = () => {
       {/* Form Section - Always visible */}
       <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8 w-full">
         <div className="w-full max-w-[360px] sm:max-w-[400px] mx-auto">
-          {/* Back to Login */}
-          {/* <div className="mb-4 sm:mb-6">
-            <Link to="/login">
-              <Button
-                variant="ghost"
-                className="pl-0 text-muted-foreground hover:text-foreground text-sm h-8"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Login
-              </Button>
-            </Link>
-          </div> */}
-
           {/* Logo */}
           <div className="flex justify-center mb-6 sm:mb-8">
             <img
@@ -165,19 +178,6 @@ const VerifyEmail = () => {
                   </div>
                 )}
               </div>
-
-              {/* Support Link */}
-              {/* <div className="mt-6 pt-4 border-t border-border">
-                <p className="text-center text-xs text-muted-foreground">
-                  Having trouble?{" "}
-                  <Button
-                    variant="link"
-                    className="px-1 text-primary hover:text-primary/80 text-xs h-auto font-medium"
-                  >
-                    Contact Support
-                  </Button>
-                </p>
-              </div> */}
             </CardContent>
           </Card>
         </div>

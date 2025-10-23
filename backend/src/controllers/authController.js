@@ -35,7 +35,6 @@ class AuthController {
       if (result["success"] === false) return res.status(400).json(result);
       return res.status(200).json(result);
     } catch (err) {
-      throw err;
       return sendServerErrorResponse(req, res, err);
     }
   }

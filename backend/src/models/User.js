@@ -24,6 +24,7 @@ export default class User {
             role,
             client_type,
             phone_number,
+            email_verified: false,
             is_active: true,
           },
         ])

@@ -15,6 +15,7 @@ CREATE TABLE users (
     last_login TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    email_verified BOOLEAN DEFAULT FALSE,
     is_active BOOLEAN DEFAULT TRUE,
     CONSTRAINT chk_reference_id_role CHECK (
         (role IN ('admin', 'data-reviewer', 'annotator') AND reference_id IS NULL) OR

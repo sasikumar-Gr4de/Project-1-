@@ -92,6 +92,7 @@ class AuthService {
       if (!user.is_active) {
         return generateResponse(null, ACCOUNT_DEACTIVE_ERROR);
       }
+
       // Generate Token
 
       const user_id = authData.user.id;
@@ -193,10 +194,19 @@ class AuthService {
       if (userError) {
         return generateResponse(null, VERIFY_STATUS_ERROR);
       }
+
+      const { user_metadata } = user;
+      const isVerified = user_metadata?.email_verified;
+
+      if (isVerified) {
+        User.update(userId, { email_verified: true });
+      }
+
       const data = {
-        email: user.email,
-        email_confirmed_at: user.email_confirmed_at,
+        email_verified: isVerified,
+        user_id: userId,
       };
+
       return generateResponse(data, VERIFY_STATUS_CHECK);
     } catch (err) {
       throw err;

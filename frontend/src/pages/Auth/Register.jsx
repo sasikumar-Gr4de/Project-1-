@@ -9,9 +9,11 @@ import {
   UserPlus,
   ArrowLeft,
 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
 import {
   Card,
   CardContent,
@@ -30,13 +32,13 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useAuthstore } from "@/store/auth.store.js";
 
-import { Link } from "react-router-dom";
-
 const Register = () => {
+  const navigate = useNavigate();
   const { register: registerUser } = useAuthstore();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -50,7 +52,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    window.alert("Registeration Attempt");
+    setIsLoading(true);
     const userData = {
       full_name: formData.firstName + " " + formData.lastName,
       email: formData.email,
@@ -59,8 +61,16 @@ const Register = () => {
       role: formData.role,
     };
 
-    console.log(userData);
-    const response = await registerUser(userData);
+    const res = await registerUser(userData);
+    const { success, data } = res;
+    setIsLoading(false);
+    if (success === true) {
+      // Redirect to verfication page
+      navigate("/verify-email", {
+        replace: true,
+        state: { email: data.email },
+      });
+    }
   };
 
   const handleChange = (e) => {
@@ -345,7 +355,14 @@ const Register = () => {
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
                   disabled={!agreeToTerms}
                 >
-                  Create Account
+                  {isLoading ? (
+                    <div className="flex items-center space-x-2">
+                      <div className="w-4 h-4 border-2 border-secondary-foreground border-t-transparent rounded-full animate-spin" />
+                      <span>Creating account...</span>
+                    </div>
+                  ) : (
+                    "Create Account"
+                  )}
                 </Button>
               </form>
 

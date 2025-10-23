@@ -21,9 +21,13 @@ import {
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import logo from "@/assets/images/logo.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuthstore } from "@/store/auth.store";
 
 const Login = () => {
+  const { login: loginUser } = useAuthstore();
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [formData, setFormData] = useState({
@@ -31,9 +35,21 @@ const Login = () => {
     password: "",
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Login attempt:", formData);
+  const handleSubmit = async (e) => {
+    try {
+      e.preventDefault();
+      window.alert("submit");
+      setIsLoading(true);
+
+      const email = formData.email;
+      const password = formData.email;
+      const res = await loginUser(email, password);
+      const { success } = res;
+      setIsLoading(false);
+      if (success) navigate("/dashboard");
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleChange = (e) => {
@@ -154,7 +170,14 @@ const Login = () => {
                   type="submit"
                   className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-medium text-sm transition-all duration-200"
                 >
-                  Sign In
+                  {isLoading ? (
+                    <div className="flex items-center space-x-2">
+                      <div className="w-4 h-4 border-2 border-secondary-foreground border-t-transparent rounded-full animate-spin" />
+                      <span>Sign In...</span>
+                    </div>
+                  ) : (
+                    "Sign In"
+                  )}
                 </Button>
               </form>
 

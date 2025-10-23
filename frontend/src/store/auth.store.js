@@ -3,6 +3,7 @@ import { persist, devtools } from "zustand/middleware";
 
 import { zustandEncryptedStorage } from "@/utils/storage.utils.js";
 import api from "@/services/base.api.js";
+import { data } from "react-router-dom";
 
 export const useAuthstore = create(
   devtools(
@@ -11,12 +12,19 @@ export const useAuthstore = create(
         user: null,
         isAuthenticated: false,
         permissions: [],
-        email_verified: false,
+
         login: async (email, password) => {
           try {
-            const response = await api.login(email, password);
+            const response = await api.post("/auth/login", { email, password });
             const result = response.data;
-            console.log(result);
+            if (result.success) {
+              const {
+                data: { token },
+              } = result;
+              window.alert(token);
+              set({ user: data });
+              localStorage.setItem("auth-token", token);
+            }
           } catch (error) {
             const errorMsg = error.response?.data?.message || error.message;
             return {
@@ -29,14 +37,16 @@ export const useAuthstore = create(
           try {
             console.log("register axios");
             const response = await api.post("/auth/register", userData);
-            console.log(response);
-            if (response.success) {
-              const { token, data } = result.data;
+            const result = response.data;
+
+            if (result.success) {
+              const { data } = result;
+              const { token } = data;
               localStorage.setItem("auth-token", token);
-              console.log(token);
+              set({ user: data, isAuthenticated: true });
               return {
                 success: true,
-                user: data,
+                data,
               };
             } else {
               return { success: false, error: result.message };
@@ -58,6 +68,25 @@ export const useAuthstore = create(
             isAuthenticated: false,
             email_verified: false,
           });
+        },
+
+        checkVerificationStatus: async () => {
+          try {
+            const response = await api.get("/auth/verify-status");
+            const result = response.data;
+            const { success, data } = result;
+            if (success === true) {
+              const { email_verified } = data;
+              set({ user: { ...get().user, email_verified } });
+            }
+            return result;
+          } catch (error) {
+            const errorMsg = error.response?.data?.message || error.message;
+            return {
+              success: false,
+              error: errorMsg,
+            };
+          }
         },
       }),
       {
