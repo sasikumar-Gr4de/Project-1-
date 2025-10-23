@@ -74,17 +74,8 @@ class AuthService {
       const { ...userData } = req.body;
       const { email, password } = userData;
 
-      const { data: authData, error: authError } =
-        await supabase.auth.signInWithPassword({ email, password });
-      if (authError) {
-        if (authError.message === SUPABASE_EMAIL_NOT_CONFIRMED)
-          return generateResponse(null, EMAIL_NOT_CONFIRMED);
-        else if (authError.message === SUPABASE_INVALID_CREDENTIALS)
-          return generateResponse(null, INVALID_CREDENTIALS);
-        else return generateResponse(null, DATABASE_CONNECTION_ERROR);
-      }
+      const user = await User.findByEmail(email);
 
-      const user = await User.findById(authData.user.id);
       if (!user) {
         return generateResponse(null, USER_NOT_FOUND);
       }
@@ -93,18 +84,24 @@ class AuthService {
         return generateResponse(null, ACCOUNT_DEACTIVE_ERROR);
       }
 
-      // Generate Token
+      const user_id = user.id;
+      const token = generateToken(user_id);
 
-      const user_id = authData.user.id;
-      const token = generateToken(authData.user.id);
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (authError) {
+        if (authError.message === SUPABASE_EMAIL_NOT_CONFIRMED) {
+          return generateResponse({ user, token }, EMAIL_NOT_CONFIRMED);
+        } else if (authError.message === SUPABASE_INVALID_CREDENTIALS)
+          return generateResponse(null, INVALID_CREDENTIALS);
+        else return generateResponse(null, DATABASE_CONNECTION_ERROR);
+      }
+
       User.updateLastLogin(user_id);
 
-      const data = {
-        user,
-        token,
-      };
-
-      return generateResponse(data, LOGIN_SUCCESS);
+      return generateResponse({ user, token }, LOGIN_SUCCESS);
     } catch (err) {
       throw err;
     }

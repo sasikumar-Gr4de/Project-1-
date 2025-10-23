@@ -27,15 +27,19 @@ const Login = () => {
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
-      window.alert("submit");
+
       setIsLoading(true);
 
       const email = formData.email;
       const password = formData.email;
       const res = await loginUser(email, password);
-      const { success } = res;
+      const { success, data } = res;
       setIsLoading(false);
-      if (success) navigate("/dashboard");
+      if (success) {
+        const { email_verified } = data;
+        if (email_verified) navigate("/dashboard");
+        else navigate("/verify-email", { replace: true, state: { email } });
+      }
     } catch (err) {
       console.log(err);
     }

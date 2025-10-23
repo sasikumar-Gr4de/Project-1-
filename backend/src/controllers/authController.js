@@ -71,6 +71,7 @@ class AuthController {
 
   async sendVerificationEmail(req, res) {
     try {
+      console.log("resend");
       const result = await AuthService.sendVerificationEmail(req, res);
       return res.status(200).json(result);
     } catch (err) {

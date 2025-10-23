@@ -16,11 +16,12 @@ import { useAuthstore } from "@/store/auth.store";
 
 const VerifyEmail = () => {
   const location = useLocation();
-  const { user, checkVerificationStatus } = useAuthstore();
+  const navigate = useNavigate();
+  const { user, checkVerificationStatus, sendVerificationEmail } =
+    useAuthstore();
   const [countdown, setCountdown] = useState(60);
   const [isResending, setIsResending] = useState(false);
-  const navigate = useNavigate();
-  const [email, setEmail] = useState(location?.state?.email); // This would come from your auth context
+  const [email, setEmail] = useState(location.state?.email || ""); // This would come from your auth context
 
   useEffect(() => {
     if (countdown > 0) {
@@ -31,30 +32,31 @@ const VerifyEmail = () => {
 
   useEffect(() => {
     // If a user is already verified, redirect to dashboard
+
     const checkStatus = async () => {
       try {
-        const { email_verified } = user;
-
-        if (email_verified === true) navigate("/dashboard");
-        else {
-          const res = await checkVerificationStatus();
-          const { success, data } = res;
-          if (success === true) {
-            const { email_verified } = data;
-            if (email_verified) navigate("/dashboard");
-          }
+        if (user) {
+          const { email_verified } = user;
+          if (email_verified === true) navigate("/dashboard");
+        }
+        const res = await checkVerificationStatus();
+        const { success, data } = res;
+        if (success === true) {
+          const { email_verified } = data;
+          if (email_verified) navigate("/dashboard");
         }
       } catch (err) {
         console.log(err);
       }
     };
     checkStatus();
-  }, [user, navigate, checkVerificationStatus]);
+  }, []);
 
   const handleResendEmail = async () => {
     setIsResending(true);
     // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    // await new Promise((resolve) => setTimeout(resolve, 1500));
+    sendVerificationEmail(email);
     setCountdown(60);
     setIsResending(false);
     // Here you would call your resend verification email API

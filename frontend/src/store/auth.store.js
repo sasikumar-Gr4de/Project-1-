@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
-
 import { zustandEncryptedStorage } from "@/utils/storage.utils.js";
 import api from "@/services/base.api.js";
 import { data } from "react-router-dom";
@@ -19,21 +18,24 @@ export const useAuthstore = create(
             const response = await api.post("/auth/login", { email, password });
             const result = response.data;
             if (result.success) {
+              const { email_verified } = result.data;
+              if (email_verified === false) return result;
               const {
                 data: { token },
               } = result;
               set({ user: data });
               localStorage.setItem("auth-token", token);
             }
+            return result;
           } catch (error) {
             const errorMsg = error.response?.data?.message || error.message;
-
             return {
               success: false,
               error: errorMsg,
             };
           }
         },
+
         register: async (userData) => {
           try {
             console.log("register axios");
@@ -81,6 +83,18 @@ export const useAuthstore = create(
               set({ user: { ...get().user, email_verified } });
             }
             return result;
+          } catch (error) {
+            const errorMsg = error.response?.data?.message || error.message;
+            return {
+              success: false,
+              error: errorMsg,
+            };
+          }
+        },
+
+        sendVerificationEmail: async (email) => {
+          try {
+            await api.post("/auth/verify-resend", { email });
           } catch (error) {
             const errorMsg = error.response?.data?.message || error.message;
             return {
