@@ -7,10 +7,10 @@ const ProtectedRoute = ({ children }) => {
   const { user } = useAuthStore();
 
   useEffect(() => {
-    window.alert("Check");
+    // window.alert("Check");
     const checkAuth = async () => {
       const token = localStorage.getItem("auth-token");
-      window.alert(!user || !token);
+      //   window.alert(!user || !token);
       if (!user || !token) {
         navigate("/login");
       } else if (!user.email_verified) {
@@ -20,6 +20,14 @@ const ProtectedRoute = ({ children }) => {
     checkAuth();
   }, [user, navigate]);
   if (!user) {
+    return (
+      <div className="min-h-screen bg-secondary-foreground flex items-center justify-center">
+        <div className="text-white text-center">
+          <div className="w-8 h-8 border-2 text-secondary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p>Checking authentication...</p>
+        </div>
+      </div>
+    );
   }
   return children;
 };

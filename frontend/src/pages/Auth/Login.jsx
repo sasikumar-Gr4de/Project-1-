@@ -15,7 +15,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/auth.store";
 
 const Login = () => {
-  const { login: loginUser } = useAuthstore();
+  const { login: loginUser } = useAuthStore();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
