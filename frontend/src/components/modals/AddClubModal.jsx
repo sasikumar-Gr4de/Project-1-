@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import FileUpload from "@/components/common/FileUpload";
+import AvatarUpload from "@/components/common/AvatarUpload";
 import { X } from "lucide-react";
 
 const AddClubModal = ({ isOpen, onClose, onSave, club }) => {
@@ -23,34 +23,31 @@ const AddClubModal = ({ isOpen, onClose, onSave, club }) => {
     });
   }, [club]);
 
-  const [uploadedFile, setUploadedFile] = useState(null);
-
   if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSending(true);
+
     const clubData = {
       ...club,
       ...formData,
       founded_year: parseInt(formData.founded_year),
-      mark_url: uploadedFile ? uploadedFile.name : "",
+      // mark_url is already set from the AvatarUpload component
     };
+
     await onSave(clubData);
     setIsSending(false);
     onClose();
   };
 
-  const handleFileUpload = async (results) => {
-    results.forEach((result) => {
-      if (result.success) {
-        console.log("Uploaded:", result.url);
-        setUploadedFile(result.url);
-        // Save to your database
-      } else {
-        console.error("Failed:", result.error);
-      }
-    });
+  const handleAvatarUpload = (result) => {
+    if (result.success) {
+      setFormData((prev) => ({
+        ...prev,
+        mark_url: result.url || "",
+      }));
+    }
   };
 
   return (
@@ -74,6 +71,23 @@ const AddClubModal = ({ isOpen, onClose, onSave, club }) => {
         {/* Scrollable Body */}
         <CardContent className="flex-1 overflow-y-auto p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Club Avatar */}
+            <div className="flex flex-col items-center space-y-4">
+              {/* <h3 className="text-lg font-semibold self-start">Club Avatar</h3> */}
+              <AvatarUpload
+                onUpload={handleAvatarUpload}
+                existingUrl={formData.mark_url}
+                folder="club-avatars"
+                maxSize={2 * 1024 * 1024} // 2MB
+                disabled={isSending}
+                size="xl"
+              />
+              <p className="text-xs text-muted-foreground text-center max-w-md">
+                Recommended: Square image, PNG or JPG, max 2MB. The image will
+                be cropped to a circle.
+              </p>
+            </div>
+
             {/* Basic Information */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Basic Information</h3>
@@ -131,27 +145,6 @@ const AddClubModal = ({ isOpen, onClose, onSave, club }) => {
                 </div>
               </div>
             </div>
-
-            {/* Club Mark Upload */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Club Mark</h3>
-              <div className="space-y-2">
-                {/* <label className="text-sm font-medium">Club Logo/Mark</label> */}
-                <FileUpload
-                  onUpload={handleFileUpload}
-                  accept="image/*"
-                  maxSize={5 * 1024 * 1024} // 5MB
-                  folder="club-marks"
-                  label="Select club mark"
-                  uploadText="Upload mark"
-                  existingUrl={formData.mark_url}
-                  disabled={isSending}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Recommended: Square image, PNG or JPG, max 5MB
-                </p>
-              </div>
-            </div>
           </form>
         </CardContent>
 
@@ -165,11 +158,12 @@ const AddClubModal = ({ isOpen, onClose, onSave, club }) => {
               type="submit"
               onClick={handleSubmit}
               className="bg-primary hover:bg-primary/90"
+              disabled={isSending}
             >
               {isSending ? (
                 <div className="flex items-center space-x-2">
                   <div className="w-4 h-4 border-2 border-secondary-foreground border-t-transparent rounded-full animate-spin" />
-                  <span>Save Club...</span>
+                  <span>Saving...</span>
                 </div>
               ) : (
                 "Save Club"

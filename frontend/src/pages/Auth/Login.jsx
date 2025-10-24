@@ -137,8 +137,9 @@ const Login = () => {
                 {/* Remember Me & Forgot Password */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2"></div>
-                  <Link to="/dashboard">
+                  <Link to="/forget-password">
                     <Button
+                      type="button"
                       variant="link"
                       className="px-0 text-primary hover:text-primary/80 text-sm h-auto font-medium"
                     >

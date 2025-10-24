@@ -12,18 +12,21 @@ import {
   LogOut,
   X,
 } from "lucide-react";
+import { useAuthstore } from "@/store/auth.store";
 
 const Header = ({ onMenuToggle }) => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
 
-  // Mock user data
-  const user = {
-    name: "John Doe",
-    email: "john.doe@gr4de.com",
-    avatar: null,
-    role: "Admin",
-  };
+  const { user, logout } = useAuthstore();
+
+  // // Mock user data
+  // const user = {
+  //   name: "John Doe",
+  //   email: "john.doe@gr4de.com",
+  //   avatar: null,
+  //   role: "Admin",
+  // };
 
   // Mock notifications
   const notifications = [
@@ -158,10 +161,10 @@ const Header = ({ onMenuToggle }) => {
               className="flex items-center space-x-2 p-2"
               onClick={() => setUserMenuOpen(!userMenuOpen)}
             >
-              {user.avatar ? (
+              {user.avatar_url ? (
                 <img
-                  src={user.avatar}
-                  alt={user.name}
+                  src={user.avatar_url}
+                  alt={user.full_name}
                   className="w-8 h-8 rounded-full"
                 />
               ) : (
@@ -171,7 +174,7 @@ const Header = ({ onMenuToggle }) => {
               )}
               <div className="hidden sm:block text-left">
                 <p className="text-sm font-medium text-foreground">
-                  {user.name}
+                  {user.full_name}
                 </p>
                 <p className="text-xs text-muted-foreground">{user.role}</p>
               </div>
@@ -182,7 +185,7 @@ const Header = ({ onMenuToggle }) => {
               <div className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-lg z-50">
                 <div className="p-4 border-b border-border">
                   <p className="text-sm font-medium text-foreground">
-                    {user.name}
+                    {user.full_name}
                   </p>
                   <p className="text-xs text-muted-foreground">{user.email}</p>
                 </div>
@@ -202,7 +205,10 @@ const Header = ({ onMenuToggle }) => {
                   ))}
                 </div>
                 <div className="p-2 border-t border-border">
-                  <button className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-destructive hover:bg-destructive/10 rounded-md transition-colors">
+                  <button
+                    className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-destructive hover:bg-destructive/10 rounded-md transition-colors"
+                    onClick={() => logout()}
+                  >
                     <LogOut className="w-4 h-4" />
                     <span>Sign out</span>
                   </button>

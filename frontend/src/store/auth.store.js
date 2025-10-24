@@ -16,8 +16,6 @@ export const useAuthstore = create(
             const response = await api.post("/auth/login", { email, password });
             const result = response.data;
             if (result.success) {
-              console.log(result);
-              debugger;
               const {
                 user,
                 user: { email_verified },
@@ -68,12 +66,14 @@ export const useAuthstore = create(
 
         logout: async () => {
           localStorage.removeItem("auth-token");
+          localStorage.removeItem("auth-storage");
           set({
             user: null,
             permissions: [],
             isAuthenticated: false,
             email_verified: false,
           });
+          window.location = "/";
         },
 
         checkVerificationStatus: async () => {

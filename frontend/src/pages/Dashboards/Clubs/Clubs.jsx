@@ -127,11 +127,11 @@ const Clubs = () => {
   };
 
   // Default avatar component for clubs
-  const DefaultAvatar = ({ className = "w-6 h-6" }) => (
+  const DefaultAvatar = ({ className = "w-10 h-10" }) => (
     <div
       className={`${className} rounded-full bg-linear-to-br from-green-500 to-green-600 flex items-center justify-center text-white`}
     >
-      <Shield className="w-4 h-4" />
+      <Shield className="w-6 h-6" />
     </div>
   );
 
@@ -239,6 +239,7 @@ const Clubs = () => {
         isLoading={isLoading}
         onAdd={() => setShowAddModal(true)}
         addButtonText="Add New Club"
+        searchable={false}
         searchPlaceholder="Search Clubs ... "
         // Pagination props
         pagination={pagination}

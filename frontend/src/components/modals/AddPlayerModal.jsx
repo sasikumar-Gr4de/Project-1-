@@ -9,9 +9,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import FileUpload from "@/components/common/FileUpload";
+import AvatarUpload from "@/components/common/AvatarUpload";
+import { X } from "lucide-react";
 
 const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
+  const [isSending, setIsSending] = useState(false);
   const [formData, setFormData] = useState({
     full_name: "",
     date_of_birth: "",
@@ -24,7 +26,6 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
     jersey_number: "",
     avatar_url: "",
   });
-  const [uploadedFile, setUploadedFile] = useState(null);
 
   useEffect(() => {
     if (player) {
@@ -58,39 +59,54 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const submitData = {
-      ...formData,
-      height_cm: formData.height_cm ? parseFloat(formData.height_cm) : null,
-      weight_kg: formData.weight_kg ? parseFloat(formData.weight_kg) : null,
-      jersey_number: formData.jersey_number
-        ? parseInt(formData.jersey_number)
-        : null,
-    };
-
-    if (player) {
-      submitData.player_id = player.player_id;
+    // Validate required fields
+    if (!formData.full_name.trim()) {
+      alert("Full name is required");
+      return;
     }
 
-    onSave(submitData);
+    setIsSending(true);
+
+    try {
+      const submitData = {
+        ...formData,
+        height_cm: formData.height_cm ? parseFloat(formData.height_cm) : null,
+        weight_kg: formData.weight_kg ? parseFloat(formData.weight_kg) : null,
+        jersey_number: formData.jersey_number
+          ? parseInt(formData.jersey_number)
+          : null,
+      };
+
+      if (player) {
+        submitData.player_id = player.player_id;
+      }
+
+      await onSave(submitData);
+      onClose();
+    } catch (error) {
+      console.error("Error saving player:", error);
+      alert("Failed to save player. Please try again.");
+    } finally {
+      setIsSending(false);
+    }
   };
 
-  const handleFileUpload = async (files) => {
-    const file = files[0];
-    setUploadedFile(file);
-
-    // Simulate AWS upload
-    try {
-      const awsService = await import("@/services/aws.service");
-      const result = await awsService.uploadFile(file, "player-avatars/");
-
-      if (result.success) {
-        setFormData((prev) => ({ ...prev, avatar_url: result.url }));
-      }
-    } catch (error) {
-      console.error("Error uploading file:", error);
+  const handleAvatarUpload = (result) => {
+    if (result.success) {
+      setFormData((prev) => ({
+        ...prev,
+        avatar_url: result.url || "",
+      }));
+    } else {
+      // If upload failed, clear the avatar_url
+      setFormData((prev) => ({
+        ...prev,
+        avatar_url: "",
+      }));
+      alert(`Avatar upload failed: ${result.error}`);
     }
   };
 
@@ -102,182 +118,211 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
       <Card className="w-full max-w-4xl max-h-[90vh] flex flex-col">
         {/* Fixed Header */}
         <CardHeader className="shrink-0 border-b">
-          <CardTitle>{player ? "Edit Player" : "Add New Player"}</CardTitle>
+          <CardTitle className="flex items-center justify-between">
+            <span>{player ? "Edit Player" : "Add New Player"}</span>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="h-8 w-8"
+              disabled={isSending}
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </CardTitle>
         </CardHeader>
 
         {/* Scrollable Body */}
         <CardContent className="flex-1 overflow-y-auto p-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Full Name *</label>
-                <Input
-                  required
-                  value={formData.full_name}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      full_name: e.target.value,
-                    }))
-                  }
-                  placeholder="Enter full name"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Date of Birth</label>
-                <Input
-                  type="date"
-                  value={formData.date_of_birth}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      date_of_birth: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Position</label>
-                <Select
-                  value={formData.position}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, position: value }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select position" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {positions.map((position) => (
-                      <SelectItem key={position} value={position}>
-                        {position}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Current Club</label>
-                <Select
-                  value={formData.current_club}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, current_club: value }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select club" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {clubs.map((club) => (
-                      <SelectItem key={club.club_id} value={club.club_id}>
-                        {club.club_name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Height (cm)</label>
-                <Input
-                  type="number"
-                  step="0.1"
-                  value={formData.height_cm}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      height_cm: e.target.value,
-                    }))
-                  }
-                  placeholder="Enter height"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Weight (kg)</label>
-                <Input
-                  type="number"
-                  step="0.1"
-                  value={formData.weight_kg}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      weight_kg: e.target.value,
-                    }))
-                  }
-                  placeholder="Enter weight"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Nationality</label>
-                <Input
-                  value={formData.nationality}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      nationality: e.target.value,
-                    }))
-                  }
-                  placeholder="Enter nationality"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Jersey Number</label>
-                <Input
-                  type="number"
-                  value={formData.jersey_number}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      jersey_number: e.target.value,
-                    }))
-                  }
-                  placeholder="Enter jersey number"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Status</label>
-                <Select
-                  value={formData.status}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, status: value }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {statuses.map((status) => (
-                      <SelectItem key={status} value={status}>
-                        {status}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Player Avatar Section */}
+            <div className="flex flex-col items-center space-y-4">
+              {/* <h3 className="text-lg font-semibold self-start">
+                Player Avatar
+              </h3> */}
+              <AvatarUpload
+                onUpload={handleAvatarUpload}
+                existingUrl={formData.avatar_url}
+                folder="player-avatars"
+                maxSize={2 * 1024 * 1024} // 2MB
+                disabled={isSending}
+                size="xl"
+              />
+              <p className="text-xs text-muted-foreground text-center max-w-md">
+                Click the circle to upload a player avatar. Recommended: Square
+                image, PNG or JPG, max 2MB.
+              </p>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">
-                Player Avatar (Optional)
-              </label>
-              <FileUpload
-                onUpload={handleFileUpload}
-                accept="image/*"
-                maxSize={2 * 1024 * 1024}
-                label="Upload Avatar"
-              />
-              {uploadedFile && (
-                <p className="text-sm text-muted-foreground">
-                  Selected: {uploadedFile.name}
-                </p>
-              )}
+            {/* Player Information */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Player Information</h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">
+                    Full Name <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    required
+                    value={formData.full_name}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        full_name: e.target.value,
+                      }))
+                    }
+                    placeholder="Enter full name"
+                    disabled={isSending}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Date of Birth</label>
+                  <Input
+                    type="date"
+                    value={formData.date_of_birth}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        date_of_birth: e.target.value,
+                      }))
+                    }
+                    disabled={isSending}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Position</label>
+                  <Select
+                    value={formData.position}
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({ ...prev, position: value }))
+                    }
+                    disabled={isSending}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select position" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {positions.map((position) => (
+                        <SelectItem key={position} value={position}>
+                          {position}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Current Club</label>
+                  <Select
+                    value={formData.current_club}
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({ ...prev, current_club: value }))
+                    }
+                    disabled={isSending}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select club" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {clubs.map((club) => (
+                        <SelectItem key={club.club_id} value={club.club_id}>
+                          {club.club_name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Height (cm)</label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={formData.height_cm}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        height_cm: e.target.value,
+                      }))
+                    }
+                    placeholder="Enter height"
+                    disabled={isSending}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Weight (kg)</label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={formData.weight_kg}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        weight_kg: e.target.value,
+                      }))
+                    }
+                    placeholder="Enter weight"
+                    disabled={isSending}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Nationality</label>
+                  <Input
+                    value={formData.nationality}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        nationality: e.target.value,
+                      }))
+                    }
+                    placeholder="Enter nationality"
+                    disabled={isSending}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Jersey Number</label>
+                  <Input
+                    type="number"
+                    value={formData.jersey_number}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        jersey_number: e.target.value,
+                      }))
+                    }
+                    placeholder="Enter jersey number"
+                    disabled={isSending}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Status</label>
+                  <Select
+                    value={formData.status}
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({ ...prev, status: value }))
+                    }
+                    disabled={isSending}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {statuses.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {status}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </div>
           </form>
         </CardContent>
@@ -285,15 +330,30 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
         {/* Fixed Footer */}
         <div className="shrink-0 border-t p-6">
           <div className="flex justify-end space-x-2">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={isSending}
+            >
               Cancel
             </Button>
             <Button
               type="submit"
               onClick={handleSubmit}
               className="bg-primary hover:bg-primary/90"
+              disabled={isSending}
             >
-              {player ? "Update Player" : "Save Player"}
+              {isSending ? (
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>{player ? "Updating..." : "Creating..."}</span>
+                </div>
+              ) : player ? (
+                "Update Player"
+              ) : (
+                "Save Player"
+              )}
             </Button>
           </div>
         </div>

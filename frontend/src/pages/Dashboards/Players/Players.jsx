@@ -331,7 +331,7 @@ const Players = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      {/* <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex flex-1 max-w-md">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
@@ -343,7 +343,7 @@ const Players = () => {
             />
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Players Table */}
       <DataTable
