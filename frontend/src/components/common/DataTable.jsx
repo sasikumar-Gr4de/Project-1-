@@ -283,17 +283,6 @@ const DataTable = ({
               className="pl-10"
             />
           </div>
-
-          {/* Results Count */}
-          <div className="text-sm text-muted-foreground whitespace-nowrap">
-            {isLoading ? (
-              <div className="flex items-center">Loading...</div>
-            ) : displayTotal === 0 ? (
-              "No records found"
-            ) : (
-              `Found ${displayTotal} record${displayTotal !== 1 ? "s" : ""}`
-            )}
-          </div>
         </div>
       )}
 
