@@ -53,7 +53,7 @@ export default class Player {
       const { data, error } = await supabase
         .from("players")
         .update(updateData)
-        .eq("id", id)
+        .eq("player_id", id)
         .select()
         .single();
       if (error) throw error;
@@ -64,21 +64,19 @@ export default class Player {
     }
   }
 
-  static async findAll(filters = {}, pagination = { page: 1, pageSize: 10 }) {
-    const { page, limit } = pagination;
-    const offset = (page - 1) * limit;
+  static async findAll(filters = {}, pagination) {
+    const { page, pageSize } = pagination;
+    const offset = (page - 1) * pageSize;
     try {
       let query = supabase.from("players").select("*", { count: "exact" });
-
       // Apply filters
       for (const key in filters) {
         if (filters[key]) {
           query = query.eq(key, filters[key]);
         }
       }
-
       const { data, error, count } = await query
-        .range(offset, offset + limit - 1)
+        .range(offset, offset + pageSize - 1)
         .order("created_at", { ascending: false });
       if (error) throw error;
 
@@ -87,12 +85,12 @@ export default class Player {
         pagination: {
           total: count || 0,
           page,
-          limit,
-          totalPages: Math.ceil((count || 0) / limit),
+          pageSize,
+          totalPages: Math.ceil((count || 0) / pageSize) || 0,
         },
       };
     } catch (err) {
-      console.error("Error fetching players:", err);
+      console.error("Error fetching clubs:", err);
       throw err;
     }
   }
@@ -102,7 +100,7 @@ export default class Player {
       const { data, error } = await supabase
         .from("players")
         .select("*")
-        .eq("id", id)
+        .eq("player_id", id)
         .maybeSingle();
       if (error) throw error;
       return data;
@@ -117,7 +115,7 @@ export default class Player {
       const { data, error } = await supabase
         .from("players")
         .select("current_club ( club_name )")
-        .eq("id", playerId)
+        .eq("player_id", playerId)
         .single();
       if (error) throw error;
       return data;
@@ -132,7 +130,7 @@ export default class Player {
       const { data, error } = await supabase
         .from("players")
         .delete()
-        .eq("id", id)
+        .eq("player_id", id)
         .select();
       if (error) throw error;
       return data;
