@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 import "./App.css";
@@ -15,12 +15,18 @@ import Clubs from "@/pages/Dashboards/Clubs/Clubs";
 import Matches from "@/pages/Dashboards/Matches/Matches";
 import Players from "@/pages/Dashboards/Players/Players";
 import Landing from "@/pages/Landing";
+import ServerFileUpload from "@/pages/Assist/ServerFileUpload";
 import ProtectedRoute from "@/components/common/ProtectedRoute";
+import Unauthorized from "@/pages/Error/Unauthorized";
+import NotFound from "@/pages/Error/NotFoundPage";
 
 function App() {
   return (
     <Router>
       <Routes>
+        {/* <Route path="/server"> */}
+        <Route path="/server/upload-image" element={<ServerFileUpload />} />
+        {/* </Route> */}
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -66,6 +72,9 @@ function App() {
             }
           />
         </Route>
+        {/* Error pages */}
+        <Route path="/unauthorized" element={<Unauthorized />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );

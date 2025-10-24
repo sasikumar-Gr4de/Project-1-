@@ -1,67 +1,58 @@
-#root{
+#root {
   user-select: none;
 }
 
-/* Add this to your index.css file */
-
-/* iPhone-style scrollbar for the entire platform */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(118, 195, 112, 0.3) transparent;
+/* Main solution for modern browsers */
+html {
+  overflow-y: overlay !important;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-/* Webkit browsers (Chrome, Safari, Edge) */
+body {
+  overflow-y: overlay !important;
+}
+
+/* Hide scrollbar by default */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
+  width: 0px;
   background: transparent;
-  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(118, 195, 112, 0.3);
-  border-radius: 3px;
-  transition: all 0.3s ease;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(118, 195, 112, 0.5);
-}
-
-::-webkit-scrollbar-thumb:active {
-  background: rgba(118, 195, 112, 0.7);
-}
-
-::-webkit-scrollbar-corner {
   background: transparent;
 }
 
-/* Optional: More subtle version for specific elements */
-.scrollbar-minimal {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(118, 195, 112, 0.2) transparent;
+/* Show overlay scrollbar when scrolling */
+html.scrolling::-webkit-scrollbar {
+  width: 8px;
 }
 
-.scrollbar-minimal::-webkit-scrollbar {
-  width: 4px;
+html.scrolling::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.scrollbar-minimal::-webkit-scrollbar-thumb {
-  background: rgba(118, 195, 112, 0.2);
+html.scrolling::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
 }
 
-.scrollbar-minimal::-webkit-scrollbar-thumb:hover {
-  background: rgba(118, 195, 112, 0.3);
+/* Fallback for Firefox */
+@supports (scrollbar-width: thin) {
+  html.scrolling {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+  }
 }
 
 
 
-/* Ensure body has proper scrollbar */
-body {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(118, 195, 112, 0.3) transparent;
+/* Prevent any layout shift */
+.container {
+  width: 100vw;
+  overflow-x: hidden;
 }
 

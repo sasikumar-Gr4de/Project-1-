@@ -9,9 +9,9 @@ import {
   Users,
   Star,
   TrendingUp,
-  ArrowRight,
-  Play,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const Landing = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -19,8 +19,49 @@ const Landing = () => {
   useEffect(() => {
     setIsVisible(true);
   }, []);
+
+  // Example images - replace these with your actual images
+  const galleryImages = [
+    {
+      id: 1,
+      src: "https://amzn-gr4de-bucket.s3.eu-north-1.amazonaws.com/server1.jpg-1761338438160-rmsqr6wybrn",
+      alt: "Football match analysis",
+      title: "Match Performance Tracking",
+      description: "Real-time data collection during live matches",
+    },
+    {
+      id: 2,
+      src: "https://amzn-gr4de-bucket.s3.eu-north-1.amazonaws.com/server2.jpg-1761338488620-0rdjp464vtg",
+      alt: "Player analytics dashboard",
+      title: "Performance Dashboard",
+      description: "Comprehensive player insights and metrics",
+    },
+    {
+      id: 3,
+      src: "https://amzn-gr4de-bucket.s3.eu-north-1.amazonaws.com/server3.jpg-1761338527588-i8o4q27ndl",
+      alt: "Team strategic analysis",
+      title: "Team Performance",
+      description: "Team-wide analytics and strategic insights",
+    },
+    {
+      id: 4,
+      src: "https://amzn-gr4de-bucket.s3.eu-north-1.amazonaws.com/server8.jpg-1761338560319-85ae20q13as",
+      alt: "Youth football training",
+      title: "Talent Development",
+      description: "Identifying and nurturing young football talent",
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-background text-foreground">
+      {/* <div
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat bg-fixed z-0"
+        style={{
+          backgroundImage:
+            'linear-gradient(rgba(26, 29, 33, 0.7), rgba(26, 29, 33, 0.8)), url("https://images.unsplash.com/photo-1575361204480-aadea25e6e68?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80")',
+        }}
+      /> */}
+
       {/* Navigation */}
       <nav className="sticky top-0 z-50 bg-card/80 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-4 py-4">
@@ -33,7 +74,7 @@ const Landing = () => {
             </div>
 
             <div className="hidden md:flex space-x-8">
-              <a
+              {/* <a
                 href="#features"
                 className="text-foreground hover:text-primary transition-colors"
               >
@@ -56,18 +97,19 @@ const Landing = () => {
                 className="text-foreground hover:text-primary transition-colors"
               >
                 Contact
-              </a>
+              </a> */}
             </div>
-
-            <button className="btn-primary px-6 py-2 rounded-md font-medium">
-              Get Started
-            </button>
+            <Link to="/login">
+              <Button className=" px-6 py-2 rounded-md font-medium">
+                Get Started
+              </Button>
+            </Link>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="py-20 px-4">
+      <section className="py-20 px-4 ">
         <div className="container mx-auto max-w-6xl">
           <div
             className={`flex flex-col lg:flex-row items-center justify-between transition-all duration-700 ${
@@ -107,10 +149,10 @@ const Landing = () => {
                 <div className="absolute -top-6 -right-6 w-72 h-72 bg-primary/10 rounded-full blur-3xl"></div>
                 <div className="absolute -bottom-6 -left-6 w-72 h-72 bg-secondary/10 rounded-full blur-3xl"></div>
 
-                <div className="relative bg-card border border-border rounded-2xl p-8 shadow-2xl card-hover">
-                  <div className="space-y-6">
+                <div className="relative bg-card border border-border rounded-2xl p-8 shadow-2xl overflow-visible">
+                  <div className="space-y-6 overflow-visible">
                     {/* Performance Score Card */}
-                    <div className="bg-linear-to-br from-card to-muted rounded-xl p-6 border border-border">
+                    <div className="bbg-linear-to-br from-card to-muted rounded-xl p-6 border border-border overflow-visible">
                       <div className="flex justify-between items-start mb-4">
                         <div>
                           <h3 className="font-semibold text-lg">
@@ -152,7 +194,7 @@ const Landing = () => {
                     </div>
 
                     {/* Metrics */}
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-4 overflow-visible">
                       <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50">
                         <BarChart3 className="h-5 w-5 text-primary" />
                         <div>
@@ -308,6 +350,48 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* Gallery Section - Always Visible Text with Enhanced Hover */}
+      <section className="py-16 px-4 bg-card/30">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">GR4DE In Action</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              See how clubs and academies are transforming talent assessment
+              with our platform
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {galleryImages.map((image) => (
+              <div
+                key={image.id}
+                className="group bg-card border border-border rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105"
+              >
+                <div className="aspect-square overflow-hidden relative">
+                  <img
+                    src={image.src}
+                    alt={image.alt}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  {/* Simple overlay on image only */}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
+                </div>
+
+                {/* Text content always visible */}
+                <div className="p-4">
+                  <h3 className="font-semibold text-lg mb-2 text-foreground group-hover:text-primary transition-colors">
+                    {image.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground group-hover:text-foreground/80 transition-colors">
+                    {image.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 px-4 bg-card/30">
         <div className="container mx-auto max-w-4xl text-center">
@@ -318,14 +402,6 @@ const Landing = () => {
             Join clubs and academies worldwide using GR4DE to objectively
             measure and develop football talent
           </p>
-          {/* <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-            <button className="btn-primary px-8 py-4 rounded-lg font-medium text-lg">
-              Start Your Free Trial
-            </button>
-            <button className="btn-secondary px-8 py-4 rounded-lg font-medium text-lg">
-              Schedule a Demo
-            </button>
-          </div> */}
         </div>
       </section>
 
