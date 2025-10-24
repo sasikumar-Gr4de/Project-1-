@@ -20,6 +20,7 @@ import { Link, useLocation } from "react-router-dom";
 
 const Sidebar = ({ isOpen, onClose }) => {
   const location = useLocation();
+
   const menuGroups = [
     {
       name: "Dashboard",
@@ -59,91 +60,94 @@ const Sidebar = ({ isOpen, onClose }) => {
     },
   ];
 
+  const handleLinkClick = () => {
+    // Close sidebar on mobile when link is clicked
+    if (window.innerWidth < 768) {
+      onClose();
+    }
+  };
+
   return (
-    <>
-      {/* Mobile Overlay */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+    <div className="flex flex-col h-full bg-card">
+      {/* Close button for mobile */}
+      <div className="flex items-center justify-between p-4 border-b border-border md:hidden shrink-0">
+        <span className="font-bold text-foreground text-lg">Menu</span>
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={onClose}
-        />
-      )}
+          className="h-9 w-9"
+        >
+          <X className="w-5 h-5" />
+        </Button>
+      </div>
 
-      {/* Sidebar */}
-      <div
-        className={`
-        w-64 bg-card border-r border-border h-full transform transition-transform duration-300 ease-in-out
-        ${isOpen ? "translate-x-0" : "-translate-x-full"} 
-        md:translate-x-0
-      `}
-      >
-        <div className="flex flex-col h-full">
-          {/* Close button for mobile */}
-          <div className="flex items-center justify-between p-4 border-b border-border md:hidden">
-            <span className="font-bold text-foreground">Menu</span>
-            <Button variant="ghost" size="icon" onClick={onClose}>
-              <X className="w-5 h-5" />
-            </Button>
-          </div>
-
-          {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto p-4 space-y-8">
-            {menuGroups.map((group) => (
-              <div key={group.name}>
-                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                  {group.name}
-                </h3>
-                <ul className="space-y-1">
-                  {group.items.map((item) => (
-                    <li key={item.name}>
-                      <Link
-                        to={item.href}
-                        onClick={() => window.innerWidth < 768 && onClose()} // Close on mobile click
-                        className={`
-                          flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors
-                          ${
-                            location.pathname === item.href
-                              ? "bg-primary text-primary-foreground"
-                              : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                          }
-                        `}
-                      >
-                        <div className="flex items-center space-x-3">
-                          <div className="bg-primary p-1 rounded-sm">
-                            <item.icon className="w-4 h-4 text-secondary-foreground" />
-                          </div>
-                          <span>{item.name}</span>
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto p-4 space-y-6">
+        {menuGroups.map((group) => (
+          <div key={group.name} className="space-y-2">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-2">
+              {group.name}
+            </h3>
+            <ul className="space-y-1">
+              {group.items.map((item) => {
+                const isActive = location.pathname === item.href;
+                return (
+                  <li key={item.name}>
+                    <Link
+                      to={item.href}
+                      onClick={handleLinkClick}
+                      className={`
+                        flex items-center justify-between w-full px-3 py-3 rounded-lg text-sm font-medium transition-all duration-200
+                        ${
+                          isActive
+                            ? "bg-primary text-primary-foreground shadow-sm"
+                            : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                        }
+                      `}
+                    >
+                      <div className="flex items-center space-x-3 min-w-0">
+                        <div
+                          className={`p-1.5 rounded-sm flex-shrink-0 ${
+                            isActive
+                              ? "bg-primary-foreground/20"
+                              : "bg-primary/10"
+                          }`}
+                        >
+                          <item.icon
+                            className={`w-4 h-4 ${
+                              isActive
+                                ? "text-primary-foreground"
+                                : "text-primary"
+                            }`}
+                          />
                         </div>
-                        {/* {item.badge && (
-                          <span className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
-                            {item.badge}
-                          </span>
-                        )} */}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </nav>
-
-          {/* Sidebar Footer */}
-          <div className="p-4 border-t border-border">
-            <div className="bg-accent/50 rounded-lg p-3">
-              <div className="flex items-center space-x-3 mb-2">
-                <Circle className="w-2 h-2 fill-green-500 text-green-500 animate-pulse" />
-                <span className="text-xs font-medium text-foreground">
-                  System Online
-                </span>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                All services are running smoothly
-              </p>
-            </div>
+                        <span className="truncate">{item.name}</span>
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
+        ))}
+      </nav>
+
+      {/* Sidebar Footer */}
+      <div className="p-4 border-t border-border shrink-0">
+        <div className="bg-accent/50 rounded-lg p-3">
+          <div className="flex items-center space-x-2 mb-1">
+            <Circle className="w-2 h-2 fill-green-500 text-green-500 animate-pulse flex-shrink-0" />
+            <span className="text-xs font-medium text-foreground truncate">
+              System Online
+            </span>
+          </div>
+          <p className="text-xs text-muted-foreground truncate">
+            All services are running smoothly
+          </p>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

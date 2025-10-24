@@ -11,8 +11,10 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import VideoUpload from "@/components/common/VideoUpload";
+import { X } from "lucide-react";
 
 const AddMatchModal = ({ isOpen, onClose, onSave, match, clubs }) => {
+  const [isSending, setIsSending] = useState(false);
   const [formData, setFormData] = useState({
     home_club_id: "",
     away_club_id: "",
@@ -28,6 +30,8 @@ const AddMatchModal = ({ isOpen, onClose, onSave, match, clubs }) => {
     notes: "",
   });
   const [uploadedVideo, setUploadedVideo] = useState(null);
+  const [isUploadingVideo, setIsUploadingVideo] = useState(false);
+  const [videoUploadProgress, setVideoUploadProgress] = useState(0);
 
   useEffect(() => {
     if (match) {
@@ -71,42 +75,63 @@ const AddMatchModal = ({ isOpen, onClose, onSave, match, clubs }) => {
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (formData.home_club_id === formData.away_club_id) {
       alert("Home and away clubs cannot be the same");
       return;
     }
 
-    const submitData = {
-      ...formData,
-      score_home: formData.score_home ? parseInt(formData.score_home) : null,
-      score_away: formData.score_away ? parseInt(formData.score_away) : null,
-      duration_minutes: formData.duration_minutes
-        ? parseInt(formData.duration_minutes)
-        : null,
-    };
-
-    if (match) {
-      submitData.match_id = match.match_id;
-    }
-
-    onSave(submitData);
-  };
-
-  const handleVideoUpload = async (files) => {
-    const file = files[0];
-    setUploadedVideo(file);
+    setIsSending(true);
 
     try {
-      const awsService = await import("@/services/aws.service");
-      const result = await awsService.uploadFile(file, "match-videos/");
+      const submitData = {
+        ...formData,
+        score_home: formData.score_home ? parseInt(formData.score_home) : null,
+        score_away: formData.score_away ? parseInt(formData.score_away) : null,
+        duration_minutes: formData.duration_minutes
+          ? parseInt(formData.duration_minutes)
+          : null,
+      };
 
-      if (result.success) {
-        setFormData((prev) => ({ ...prev, video_url: result.url }));
+      if (match) {
+        submitData.match_id = match.match_id;
       }
+
+      await onSave(submitData);
+      onClose();
     } catch (error) {
-      console.error("Error uploading video:", error);
+      console.error("Error saving match:", error);
+      alert("Failed to save match. Please try again.");
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleVideoUpload = async (results) => {
+    const result = results[0];
+    if (result.success) {
+      window.alert(result.url);
+      setFormData((prev) => ({
+        ...prev,
+        video_url: result.url || "",
+      }));
+    } else {
+      // If upload failed, clear the video_url
+      setFormData((prev) => ({
+        ...prev,
+        video_url: "",
+      }));
+      alert(`Video upload failed: ${result.error}`);
+    }
+  };
+
+  const handleRemoveVideo = () => {
+    setUploadedVideo(null);
+    setFormData((prev) => ({ ...prev, video_url: "" }));
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
@@ -114,24 +139,38 @@ const AddMatchModal = ({ isOpen, onClose, onSave, match, clubs }) => {
   const qaStatuses = ["pending", "approved", "rejected"];
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <Card className="w-full max-w-4xl max-h-[90vh] flex flex-col">
         {/* Fixed Header */}
         <CardHeader className="shrink-0 border-b">
-          <CardTitle>{match ? "Edit Match" : "Add New Match"}</CardTitle>
+          <CardTitle className="flex items-center justify-between">
+            <span>{match ? "Edit Match" : "Add New Match"}</span>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="h-8 w-8"
+              disabled={isSending || isUploadingVideo}
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </CardTitle>
         </CardHeader>
 
         {/* Scrollable Body */}
         <CardContent className="flex-1 overflow-y-auto p-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Home Club *</label>
+                <label className="text-sm font-medium">
+                  Home Club <span className="text-destructive">*</span>
+                </label>
                 <Select
                   value={formData.home_club_id}
                   onValueChange={(value) =>
                     setFormData((prev) => ({ ...prev, home_club_id: value }))
                   }
+                  disabled={isSending}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select home club" />
@@ -147,12 +186,15 @@ const AddMatchModal = ({ isOpen, onClose, onSave, match, clubs }) => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Away Club *</label>
+                <label className="text-sm font-medium">
+                  Away Club <span className="text-destructive">*</span>
+                </label>
                 <Select
                   value={formData.away_club_id}
                   onValueChange={(value) =>
                     setFormData((prev) => ({ ...prev, away_club_id: value }))
                   }
+                  disabled={isSending}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select away club" />
@@ -168,7 +210,9 @@ const AddMatchModal = ({ isOpen, onClose, onSave, match, clubs }) => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Match Date *</label>
+                <label className="text-sm font-medium">
+                  Match Date <span className="text-destructive">*</span>
+                </label>
                 <Input
                   type="datetime-local"
                   required
@@ -179,6 +223,7 @@ const AddMatchModal = ({ isOpen, onClose, onSave, match, clubs }) => {
                       match_date: e.target.value,
                     }))
                   }
+                  disabled={isSending}
                 />
               </div>
 
@@ -190,6 +235,7 @@ const AddMatchModal = ({ isOpen, onClose, onSave, match, clubs }) => {
                     setFormData((prev) => ({ ...prev, venue: e.target.value }))
                   }
                   placeholder="Enter venue"
+                  disabled={isSending}
                 />
               </div>
 
@@ -204,6 +250,7 @@ const AddMatchModal = ({ isOpen, onClose, onSave, match, clubs }) => {
                     }))
                   }
                   placeholder="e.g., La Liga Juvenil"
+                  disabled={isSending}
                 />
               </div>
 
@@ -214,6 +261,7 @@ const AddMatchModal = ({ isOpen, onClose, onSave, match, clubs }) => {
                   onValueChange={(value) =>
                     setFormData((prev) => ({ ...prev, match_status: value }))
                   }
+                  disabled={isSending}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
@@ -242,6 +290,7 @@ const AddMatchModal = ({ isOpen, onClose, onSave, match, clubs }) => {
                         }))
                       }
                       placeholder="Home score"
+                      disabled={isSending}
                     />
                   </div>
 
@@ -257,6 +306,7 @@ const AddMatchModal = ({ isOpen, onClose, onSave, match, clubs }) => {
                         }))
                       }
                       placeholder="Away score"
+                      disabled={isSending}
                     />
                   </div>
 
@@ -274,6 +324,7 @@ const AddMatchModal = ({ isOpen, onClose, onSave, match, clubs }) => {
                         }))
                       }
                       placeholder="e.g., 90"
+                      disabled={isSending}
                     />
                   </div>
                 </>
@@ -286,6 +337,7 @@ const AddMatchModal = ({ isOpen, onClose, onSave, match, clubs }) => {
                   onValueChange={(value) =>
                     setFormData((prev) => ({ ...prev, qa_status: value }))
                   }
+                  disabled={isSending}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select QA status" />
@@ -301,15 +353,70 @@ const AddMatchModal = ({ isOpen, onClose, onSave, match, clubs }) => {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">
-                Match Video (Optional)
-              </label>
-              <VideoUpload onUpload={handleVideoUpload} />
+            {/* Video Upload Section */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium">
+                  Match Video (Optional)
+                </label>
+                {formData.video_url && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => window.open(formData.video_url, "_blank")}
+                    disabled={isSending}
+                  >
+                    View Current Video
+                  </Button>
+                )}
+              </div>
+
+              <VideoUpload
+                onUpload={handleVideoUpload}
+                disabled={isSending || isUploadingVideo}
+              />
+
+              {isUploadingVideo && (
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Uploading video...</span>
+                    <span>{videoUploadProgress}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-primary h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${videoUploadProgress}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )}
+
               {uploadedVideo && (
-                <p className="text-sm text-muted-foreground">
-                  Selected: {uploadedVideo.name}
-                </p>
+                <div className="flex items-center justify-between p-3 border rounded-lg bg-muted/20">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                      <span className="text-primary font-medium">VID</span>
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm">
+                        {uploadedVideo.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Size: {(uploadedVideo.size / 1024 / 1024).toFixed(2)}MB
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleRemoveVideo}
+                    disabled={isUploadingVideo}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
               )}
             </div>
 
@@ -322,6 +429,7 @@ const AddMatchModal = ({ isOpen, onClose, onSave, match, clubs }) => {
                 }
                 placeholder="Additional comments or observations"
                 rows={3}
+                disabled={isSending}
               />
             </div>
           </form>
@@ -330,15 +438,30 @@ const AddMatchModal = ({ isOpen, onClose, onSave, match, clubs }) => {
         {/* Fixed Footer */}
         <div className="shrink-0 border-t p-6">
           <div className="flex justify-end space-x-2">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={isSending || isUploadingVideo}
+            >
               Cancel
             </Button>
             <Button
               type="submit"
               onClick={handleSubmit}
               className="bg-primary hover:bg-primary/90"
+              disabled={isSending || isUploadingVideo}
             >
-              {match ? "Update Match" : "Save Match"}
+              {isSending ? (
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>{match ? "Updating..." : "Creating..."}</span>
+                </div>
+              ) : match ? (
+                "Update Match"
+              ) : (
+                "Save Match"
+              )}
             </Button>
           </div>
         </div>

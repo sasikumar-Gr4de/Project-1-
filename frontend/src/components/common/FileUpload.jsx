@@ -2,7 +2,7 @@ import React, { useCallback, useState, useRef } from "react";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 import { Progress } from "../ui/progress";
-import { X, Upload, Image, File } from "lucide-react";
+import { X, Upload, Image, File, Video, FileText } from "lucide-react";
 import uploadService from "../../services/upload.service";
 
 const FileUpload = ({
@@ -71,9 +71,17 @@ const FileUpload = ({
     const invalidFiles = files.filter((file) => {
       return !acceptedTypes.some((type) => {
         if (type.startsWith(".")) {
-          return file.name.toLowerCase().endsWith(type.toLowerCase());
+          // Handle file extensions like .pdf, .doc, .mp4
+          return file.name
+            .toLowerCase()
+            .endsWith(type.toLowerCase().replace(".", ""));
+        } else if (type.includes("*")) {
+          // Handle wildcard types like image/*, video/*, application/*
+          const [category] = type.split("/*");
+          return file.type.startsWith(category);
         } else {
-          return file.type.match(new RegExp(type.replace("*", ".*")));
+          // Handle specific MIME types
+          return file.type === type;
         }
       });
     });
@@ -85,10 +93,16 @@ const FileUpload = ({
 
     setSelectedFiles(files);
 
-    // Create preview for images
-    if (files[0] && files[0].type.startsWith("image/")) {
-      const objectUrl = URL.createObjectURL(files[0]);
-      setPreviewUrl(objectUrl);
+    // Create preview for images and videos
+    if (files[0]) {
+      if (files[0].type.startsWith("image/")) {
+        const objectUrl = URL.createObjectURL(files[0]);
+        setPreviewUrl(objectUrl);
+      } else if (files[0].type.startsWith("video/")) {
+        const objectUrl = URL.createObjectURL(files[0]);
+        setPreviewUrl(objectUrl);
+      }
+      // For other file types, we don't create object URLs as they can't be previewed
     }
 
     // Auto-upload if files are selected
@@ -102,8 +116,16 @@ const FileUpload = ({
     setUploadProgress(0);
 
     try {
+      debugger;
+      // Prepare files with required metadata
+      const filesWithMetadata = files.map((file) => ({
+        file,
+        fileName: file.name,
+        fileType: file.type,
+      }));
+
       const results = await uploadService.uploadMultipleFiles(
-        files,
+        filesWithMetadata,
         folder,
         (progress) => {
           setUploadProgress(progress);
@@ -156,7 +178,27 @@ const FileUpload = ({
     if (fileType.startsWith("image/")) {
       return <Image className="w-8 h-8 text-blue-500" />;
     }
+    if (fileType.startsWith("video/")) {
+      return <Video className="w-8 h-8 text-red-500" />;
+    }
+    if (fileType.includes("pdf")) {
+      return <FileText className="w-8 h-8 text-red-500" />;
+    }
+    if (fileType.includes("word") || fileType.includes("document")) {
+      return <FileText className="w-8 h-8 text-blue-500" />;
+    }
     return <File className="w-8 h-8 text-gray-500" />;
+  };
+
+  const getFileTypeDisplay = (fileType) => {
+    if (fileType.startsWith("image/")) return "Image";
+    if (fileType.startsWith("video/")) return "Video";
+    if (fileType.includes("pdf")) return "PDF Document";
+    if (fileType.includes("word") || fileType.includes("document"))
+      return "Word Document";
+    if (fileType.includes("spreadsheet") || fileType.includes("excel"))
+      return "Spreadsheet";
+    return "File";
   };
 
   return (
@@ -173,12 +215,28 @@ const FileUpload = ({
                     alt="Preview"
                     className="w-16 h-16 object-cover rounded-lg border"
                   />
+                ) : previewUrl &&
+                  selectedFiles[0]?.type.startsWith("video/") ? (
+                  <video
+                    src={previewUrl}
+                    className="w-16 h-16 object-cover rounded-lg border"
+                    muted
+                  />
                 ) : (
                   getFileIcon(selectedFiles[0]?.type || "image/*")
                 )}
                 <div>
                   <p className="font-medium text-sm">
                     {selectedFiles[0]?.name || "Existing file"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {getFileTypeDisplay(selectedFiles[0]?.type || "")}
+                    {selectedFiles[0]?.size && (
+                      <>
+                        {" "}
+                        • {(selectedFiles[0]?.size / 1024 / 1024).toFixed(2)}MB
+                      </>
+                    )}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {previewUrl ? (
@@ -258,7 +316,8 @@ const FileUpload = ({
                     Ready to upload: {selectedFiles[0]?.name}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Size: {(selectedFiles[0]?.size / 1024 / 1024).toFixed(2)}MB
+                    Type: {getFileTypeDisplay(selectedFiles[0]?.type)} • Size:{" "}
+                    {(selectedFiles[0]?.size / 1024 / 1024).toFixed(2)}MB
                   </p>
                 </div>
               )}

@@ -23,8 +23,6 @@ class UploadService {
         }
       );
 
-      console.log("Presigned URL response:", response);
-
       if (response.status !== 200) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -42,6 +40,7 @@ class UploadService {
   async uploadFile(file, folder = "", onProgress = null) {
     return new Promise(async (resolve, reject) => {
       try {
+        debugger;
         console.log(
           "Starting upload for file:",
           file.name,
@@ -153,9 +152,9 @@ class UploadService {
     const results = [];
     const totalFiles = files.length;
     let completedFiles = 0;
-
+    debugger;
     for (let i = 0; i < totalFiles; i++) {
-      const file = files[i];
+      const { file } = files[i];
       try {
         const result = await this.uploadFile(file, folder, (progress) => {
           if (onProgress) {

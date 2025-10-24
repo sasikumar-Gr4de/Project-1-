@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Button } from "../ui/button";
 import {
   Menu,
@@ -17,18 +17,29 @@ import { useAuthstore } from "@/store/auth.store";
 const Header = ({ onMenuToggle }) => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const userMenuRef = useRef(null);
+  const notificationsRef = useRef(null);
 
   const { user, logout } = useAuthstore();
 
-  // // Mock user data
-  // const user = {
-  //   name: "John Doe",
-  //   email: "john.doe@gr4de.com",
-  //   avatar: null,
-  //   role: "Admin",
-  // };
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setUserMenuOpen(false);
+      }
+      if (
+        notificationsRef.current &&
+        !notificationsRef.current.contains(event.target)
+      ) {
+        setNotificationsOpen(false);
+      }
+    };
 
-  // Mock notifications
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const notifications = [
     {
       id: 1,
@@ -56,57 +67,42 @@ const Header = ({ onMenuToggle }) => {
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
-    <header className="bg-card border-b border-border sticky top-0 z-40">
-      <div className="flex items-center justify-between h-16 px-4 sm:px-6">
+    <header className="bg-card border-b border-border sticky top-0 z-50 w-full">
+      <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8 max-w-full">
         {/* Left Section - Menu Button and Logo */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-3 sm:space-x-4">
           <Button
             variant="ghost"
             size="icon"
             onClick={onMenuToggle}
-            className="md:hidden"
+            className="md:hidden h-9 w-9 flex-shrink-0"
           >
             <Menu className="w-5 h-5" />
           </Button>
 
-          <div className="flex items-center space-x-3">
-            {/* <img src="/GR4DE.png" alt="GR4DE" className="h-8 w-8" /> */}
+          <div className="flex items-center space-x-3 min-w-0">
             <div className="hidden sm:block">
-              <h1 className="text-xl font-bold text-foreground">
+              <h1 className="text-xl font-bold text-foreground truncate">
                 GR4DE Platform
+              </h1>
+            </div>
+            <div className="sm:hidden">
+              <h1 className="text-lg font-bold text-foreground truncate">
+                GR4DE
               </h1>
             </div>
           </div>
         </div>
 
-        {/* Center Section - Navigation Menu */}
-        {/* <nav className="hidden md:flex items-center space-x-1">
-          {[
-            { name: "Matches", href: "/matches", icon: Trophy },
-            { name: "Clubs", href: "/clubs", icon: Users },
-            { name: "Players", href: "/players", icon: User },
-            { name: "Analytics", href: "/analytics", icon: BarChart3 },
-          ].map((item) => (
-            <a
-              key={item.name}
-              href={item.href}
-              className="flex items-center space-x-1 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-            >
-              <item.icon className="w-4 h-4" />
-              <span>{item.name}</span>
-            </a>
-          ))}
-        </nav> */}
-
         {/* Right Section - User Menu and Notifications */}
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2 sm:space-x-3">
           {/* Notifications */}
-          <div className="relative">
+          <div className="relative" ref={notificationsRef}>
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setNotificationsOpen(!notificationsOpen)}
-              className="relative"
+              className="relative h-9 w-9"
             >
               <Bell className="w-5 h-5" />
               {unreadCount > 0 && (
@@ -117,9 +113,9 @@ const Header = ({ onMenuToggle }) => {
             </Button>
 
             {notificationsOpen && (
-              <div className="absolute right-0 mt-2 w-80 bg-card border border-border rounded-lg shadow-lg z-50">
+              <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-card border border-border rounded-lg shadow-lg z-50 max-h-[80vh] overflow-hidden">
                 <div className="p-4 border-b border-border">
-                  <h3 className="font-semibold text-foreground">
+                  <h3 className="font-semibold text-foreground text-sm sm:text-base">
                     Notifications
                   </h3>
                 </div>
@@ -127,19 +123,19 @@ const Header = ({ onMenuToggle }) => {
                   {notifications.map((notification) => (
                     <div
                       key={notification.id}
-                      className={`p-4 border-b border-border hover:bg-accent cursor-pointer ${
+                      className={`p-3 sm:p-4 border-b border-border hover:bg-accent cursor-pointer transition-colors ${
                         !notification.read ? "bg-accent/50" : ""
                       }`}
                     >
-                      <div className="flex justify-between items-start">
-                        <h4 className="font-medium text-foreground text-sm">
-                          {notification.title}
+                      <div className="flex justify-between items-start gap-2">
+                        <h4 className="font-medium text-foreground text-sm flex-1 min-w-0">
+                          <span className="truncate">{notification.title}</span>
                         </h4>
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-xs text-muted-foreground whitespace-nowrap flex-shrink-0">
                           {notification.time}
                         </span>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1">
+                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
                         {notification.message}
                       </p>
                     </div>
@@ -155,61 +151,70 @@ const Header = ({ onMenuToggle }) => {
           </div>
 
           {/* User Menu */}
-          <div className="relative">
+          <div className="relative" ref={userMenuRef}>
             <Button
               variant="ghost"
-              className="flex items-center space-x-2 p-2"
+              className="flex items-center space-x-2 p-1 sm:p-2 h-auto min-w-0"
               onClick={() => setUserMenuOpen(!userMenuOpen)}
             >
-              {user.avatar_url ? (
-                <img
-                  src={user.avatar_url}
-                  alt={user.full_name}
-                  className="w-8 h-8 rounded-full"
-                />
-              ) : (
-                <div className="w-8 h-8 rounded-full bg-linear-to-br from-primary to-primary/70 flex items-center justify-center">
-                  <User className="w-4 h-4 text-primary-foreground" />
+              <div className="flex items-center space-x-2 min-w-0">
+                {user.avatar_url ? (
+                  <img
+                    src={user.avatar_url}
+                    alt={user.full_name}
+                    className="w-8 h-8 rounded-full flex-shrink-0"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center flex-shrink-0">
+                    <User className="w-4 h-4 text-primary-foreground" />
+                  </div>
+                )}
+                <div className="hidden sm:block text-left min-w-0 max-w-[120px]">
+                  <p className="text-sm font-medium text-foreground truncate">
+                    {user.full_name}
+                  </p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {user.role}
+                  </p>
                 </div>
-              )}
-              <div className="hidden sm:block text-left">
-                <p className="text-sm font-medium text-foreground">
-                  {user.full_name}
-                </p>
-                <p className="text-xs text-muted-foreground">{user.role}</p>
               </div>
-              <ChevronDown className="w-4 h-4 text-muted-foreground" />
+              <ChevronDown
+                className={`w-4 h-4 text-muted-foreground flex-shrink-0 transition-transform ${
+                  userMenuOpen ? "rotate-180" : ""
+                }`}
+              />
             </Button>
 
             {userMenuOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-lg z-50">
-                <div className="p-4 border-b border-border">
-                  <p className="text-sm font-medium text-foreground">
+              <div className="absolute right-0 mt-2 w-48 sm:w-56 bg-card border border-border rounded-lg shadow-lg z-50">
+                <div className="p-3 sm:p-4 border-b border-border">
+                  <p className="text-sm font-medium text-foreground truncate">
                     {user.full_name}
                   </p>
-                  <p className="text-xs text-muted-foreground">{user.email}</p>
+                  <p className="text-xs text-muted-foreground truncate mt-1">
+                    {user.email}
+                  </p>
                 </div>
-                <div className="p-2">
+                <div className="p-1">
                   {[
                     { name: "Profile", icon: User },
                     { name: "Settings", icon: Settings },
-                    { name: "Team", icon: Users },
                   ].map((item) => (
                     <button
                       key={item.name}
                       className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors"
                     >
-                      <item.icon className="w-4 h-4" />
-                      <span>{item.name}</span>
+                      <item.icon className="w-4 h-4 flex-shrink-0" />
+                      <span className="truncate">{item.name}</span>
                     </button>
                   ))}
                 </div>
-                <div className="p-2 border-t border-border">
+                <div className="p-1 border-t border-border">
                   <button
                     className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-destructive hover:bg-destructive/10 rounded-md transition-colors"
                     onClick={() => logout()}
                   >
-                    <LogOut className="w-4 h-4" />
+                    <LogOut className="w-4 h-4 flex-shrink-0" />
                     <span>Sign out</span>
                   </button>
                 </div>
