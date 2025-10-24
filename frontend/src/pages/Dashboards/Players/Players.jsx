@@ -165,23 +165,33 @@ const Players = () => {
     return club ? club.club_name : "Unknown Club";
   };
 
-  // Default avatar component for players
-  const DefaultAvatar = ({ className = "w-12 h-12", name }) => (
-    <div
-      className={`${className} rounded-full bg-linear-to-br from-green-500 to-green-600 flex items-center justify-center text-white font-semibold shadow-sm`}
-    >
-      {name ? (
-        <span className="text-lg">
-          {name
-            .split(" ")
-            .map((n) => n[0])
-            .join("")}
-        </span>
-      ) : (
-        <User className="w-6 h-6" />
-      )}
-    </div>
-  );
+  // Beautiful gradient avatars for players
+  const PlayerAvatar = ({ player, className = "w-10 h-10" }) => {
+    const gradientClass = `bg-gradient-to-br from-primary/80 to-primary/60`;
+
+    return (
+      <div
+        className={`${className} rounded-full ${gradientClass} flex items-center justify-center text-primary-foreground shadow-sm border border-primary/20`}
+      >
+        {player?.avatar_url ? (
+          <img
+            src={player.avatar_url}
+            alt={player.full_name}
+            className="w-full h-full rounded-full object-cover"
+          />
+        ) : player?.full_name ? (
+          <span className="text-sm font-semibold">
+            {player.full_name
+              .split(" ")
+              .map((n) => n[0])
+              .join("")}
+          </span>
+        ) : (
+          <User className="w-5 h-5" />
+        )}
+      </div>
+    );
+  };
 
   // Get status badge variant
   const getStatusVariant = (status) => {
@@ -199,42 +209,61 @@ const Players = () => {
     }
   };
 
-  // Table columns
+  // Beautiful always-visible action buttons
+  const ActionButton = ({
+    icon: Icon,
+    onClick,
+    variant = "ghost",
+    color = "primary",
+    size = "sm",
+    tooltip,
+  }) => (
+    <Button
+      variant={variant}
+      size={size}
+      onClick={onClick}
+      className={`
+        h-8 w-8 p-0 transition-all duration-200 rounded-md
+        ${
+          color === "primary"
+            ? "bg-primary/5 text-primary border border-primary/20 hover:bg-primary/10 hover:border-primary/30"
+            : color === "secondary"
+            ? "bg-secondary/5 text-secondary border border-secondary/20 hover:bg-secondary/10 hover:border-secondary/30"
+            : "bg-destructive/5 text-destructive border border-destructive/20 hover:bg-destructive/10 hover:border-destructive/30"
+        }
+        shadow-sm hover:shadow-md
+      `}
+      title={tooltip}
+    >
+      <Icon className="w-4 h-4" />
+    </Button>
+  );
+
+  // Enhanced table columns with compact design
   const playerColumns = [
     {
       header: "Player",
       accessor: "full_name",
       cell: ({ row }) => (
-        <div className="flex items-center space-x-4">
-          {row.avatar_url ? (
-            <img
-              src={`${row.avatar_url}?t=${Date.now()}`} // Cache busting
-              alt={row.full_name}
-              className="w-12 h-12 rounded-full object-cover border shadow-sm"
-              onError={(e) => {
-                // If image fails to load, fallback to default avatar
-                e.target.style.display = "none";
-              }}
-            />
-          ) : (
-            <DefaultAvatar name={row.full_name} />
-          )}
-          <div>
-            <p className="font-semibold text-foreground">{row.full_name}</p>
-            <p className="text-sm text-muted-foreground">
-              #{row.jersey_number}
+        <div className="flex items-center space-x-3 min-w-0">
+          <PlayerAvatar player={row} />
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-foreground text-sm truncate">
+              {row.full_name}
             </p>
+            <div className="flex items-center space-x-2 mt-1">
+              <Badge
+                variant="secondary"
+                className="text-xs font-medium bg-secondary/10 text-secondary-foreground border border-secondary/20"
+              >
+                {row.position}
+              </Badge>
+              <span className="text-xs text-muted-foreground">
+                #{row.jersey_number}
+              </span>
+            </div>
           </div>
         </div>
-      ),
-    },
-    {
-      header: "Position",
-      accessor: "position",
-      cell: ({ row }) => (
-        <Badge variant="secondary" className="font-medium">
-          {row.position}
-        </Badge>
       ),
     },
     {
@@ -242,8 +271,8 @@ const Players = () => {
       accessor: "current_club",
       cell: ({ row }) => (
         <div className="flex items-center space-x-2">
-          <Shirt className="w-4 h-4 text-muted-foreground" />
-          <span className="text-foreground">
+          <Shirt className="w-3.5 h-3.5 text-muted-foreground/70" />
+          <span className="text-sm text-foreground/90 truncate">
             {getClubName(row.current_club)}
           </span>
         </div>
@@ -254,8 +283,10 @@ const Players = () => {
       accessor: "date_of_birth",
       cell: ({ row }) => (
         <div className="flex items-center space-x-2">
-          <Calendar className="w-4 h-4 text-muted-foreground" />
-          <span>{calculateAge(row.date_of_birth)}</span>
+          <Calendar className="w-3.5 h-3.5 text-muted-foreground/70" />
+          <span className="text-sm font-medium text-foreground/90">
+            {calculateAge(row.date_of_birth)}
+          </span>
         </div>
       ),
     },
@@ -264,28 +295,30 @@ const Players = () => {
       accessor: "nationality",
       cell: ({ row }) => (
         <div className="flex items-center space-x-2">
-          <MapPin className="w-4 h-4 text-muted-foreground" />
-          <span>{row.nationality}</span>
+          <MapPin className="w-3.5 h-3.5 text-muted-foreground/70" />
+          <span className="text-sm text-foreground/90 truncate">
+            {row.nationality}
+          </span>
         </div>
       ),
     },
     {
-      header: "Height",
+      header: "Physical",
       accessor: "height_cm",
       cell: ({ row }) => (
-        <div className="flex items-center space-x-2">
-          <Ruler className="w-4 h-4 text-muted-foreground" />
-          <span>{row.height_cm} cm</span>
-        </div>
-      ),
-    },
-    {
-      header: "Weight",
-      accessor: "weight_kg",
-      cell: ({ row }) => (
-        <div className="flex items-center space-x-2">
-          <Scale className="w-4 h-4 text-muted-foreground" />
-          <span>{row.weight_kg} kg</span>
+        <div className="space-y-1">
+          <div className="flex items-center space-x-2">
+            <Ruler className="w-3 h-3 text-muted-foreground/70" />
+            <span className="text-xs text-foreground/90">
+              {row.height_cm} cm
+            </span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Scale className="w-3 h-3 text-muted-foreground/70" />
+            <span className="text-xs text-foreground/90">
+              {row.weight_kg} kg
+            </span>
+          </div>
         </div>
       ),
     },
@@ -293,60 +326,74 @@ const Players = () => {
       header: "Status",
       accessor: "status",
       cell: ({ row }) => (
-        <Badge variant={getStatusVariant(row.status)} className="font-medium">
+        <Badge
+          variant={getStatusVariant(row.status)}
+          className="text-xs font-medium bg-primary/10 text-primary border border-primary/20"
+        >
           {row.status}
         </Badge>
       ),
     },
   ];
 
-  // Table actions
+  // Beautiful always-visible actions
   const playerActions = ({ row }) => (
-    <div className="flex items-center space-x-1">
-      <Button
-        variant="ghost"
-        size="sm"
-        className="hover:bg-blue-500/10 hover:text-blue-600"
-      >
-        <Eye className="w-4 h-4" />
-      </Button>
-      <Button
-        variant="ghost"
-        size="sm"
+    <div className="flex items-center space-x-2 transition-all duration-200">
+      <ActionButton
+        icon={Eye}
+        onClick={() => console.log("View player", row)}
+        color="secondary"
+        tooltip="View player"
+      />
+      <ActionButton
+        icon={Edit}
         onClick={() => handleEditPlayer(row)}
-        className="hover:bg-primary/10 hover:text-primary"
-      >
-        <Edit className="w-4 h-4" />
-      </Button>
-      <Button
-        variant="ghost"
-        size="sm"
+        color="primary"
+        tooltip="Edit player"
+      />
+      <ActionButton
+        icon={Trash2}
         onClick={() =>
           setDeleteModal({ isOpen: true, playerId: row.player_id })
         }
-        className="hover:bg-destructive/10 hover:text-destructive"
-      >
-        <Trash2 className="w-4 h-4" />
-      </Button>
+        color="destructive"
+        tooltip="Delete player"
+      />
     </div>
   );
 
   return (
     <div className="space-y-6">
+      {/* Header Section */}
+      <div className="flex items-center justify-between">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">
+            Players
+          </h1>
+          <p className="text-muted-foreground">
+            Manage football players and their profiles
+          </p>
+        </div>
+      </div>
+
       {/* Players Table */}
       <DataTable
         data={players}
         columns={playerColumns}
-        title="All Players"
-        searchable={false}
+        title=""
+        searchable={true}
+        searchPlaceholder="Search players..."
         actions={playerActions}
         isLoading={isLoading}
         onAdd={() => setShowAddModal(true)}
-        addButtonText="Add New Player"
+        addButtonText="Add Player"
         // Pagination props
         pagination={pagination}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
+        emptyStateTitle="No Players Found"
+        emptyStateDescription="Get started by adding your first football player to the system."
+        tableHeight="500px"
       />
 
       {/* Add/Edit Player Modal */}

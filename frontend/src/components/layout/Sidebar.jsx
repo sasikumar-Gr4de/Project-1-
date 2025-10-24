@@ -13,7 +13,6 @@ import {
   FileText,
   PieChart,
   TrendingUp,
-  X,
   Circle,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
@@ -69,21 +68,8 @@ const Sidebar = ({ isOpen, onClose }) => {
 
   return (
     <div className="flex flex-col h-full bg-card">
-      {/* Close button for mobile */}
-      <div className="flex items-center justify-between p-4 border-b border-border md:hidden shrink-0">
-        <span className="font-bold text-foreground text-lg">Menu</span>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onClose}
-          className="h-9 w-9"
-        >
-          <X className="w-5 h-5" />
-        </Button>
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto p-4 space-y-6">
+      {/* Navigation - Removed the mobile header with Menu/X */}
+      <nav className="flex-1 overflow-y-auto p-4 space-y-6 mt-4 md:mt-0">
         {menuGroups.map((group) => (
           <div key={group.name} className="space-y-2">
             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-2">
@@ -108,7 +94,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                     >
                       <div className="flex items-center space-x-3 min-w-0">
                         <div
-                          className={`p-1.5 rounded-sm flex-shrink-0 ${
+                          className={`p-1.5 rounded-sm shrink-0 ${
                             isActive
                               ? "bg-primary-foreground/20"
                               : "bg-primary/10"
@@ -137,7 +123,7 @@ const Sidebar = ({ isOpen, onClose }) => {
       <div className="p-4 border-t border-border shrink-0">
         <div className="bg-accent/50 rounded-lg p-3">
           <div className="flex items-center space-x-2 mb-1">
-            <Circle className="w-2 h-2 fill-green-500 text-green-500 animate-pulse flex-shrink-0" />
+            <Circle className="w-2 h-2 fill-green-500 text-green-500 animate-pulse shrink-0" />
             <span className="text-xs font-medium text-foreground truncate">
               System Online
             </span>

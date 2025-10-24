@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import DataTable from "@/components/common/DataTable";
 import AddMatchModal from "@/components/modals/AddMatchModal";
@@ -8,13 +7,13 @@ import DeleteConfirmModal from "@/components/common/DeleteConfirmModal";
 import { useMatchesStore } from "@/store/matches.store";
 import { useClubsStore } from "@/store/clubs.store";
 import {
-  Search,
   Trophy,
   Edit,
   Trash2,
   Eye,
   CalendarDays,
   Building,
+  MapPin,
 } from "lucide-react";
 import { capitalize } from "@/utils/helper.utils";
 import { formatDate } from "@/utils/formatter.util";
@@ -187,40 +186,70 @@ const Matches = () => {
     return club ? club.club_name : "Unknown Club";
   };
 
-  // Table columns
+  // Beautiful always-visible action buttons
+  const ActionButton = ({
+    icon: Icon,
+    onClick,
+    variant = "ghost",
+    color = "primary",
+    size = "sm",
+    tooltip,
+  }) => (
+    <Button
+      variant={variant}
+      size={size}
+      onClick={onClick}
+      className={`
+        h-8 w-8 p-0 transition-all duration-200 rounded-md
+        ${
+          color === "primary"
+            ? "bg-primary/5 text-primary border border-primary/20 hover:bg-primary/10 hover:border-primary/30"
+            : color === "secondary"
+            ? "bg-secondary/5 text-secondary border border-secondary/20 hover:bg-secondary/10 hover:border-secondary/30"
+            : "bg-destructive/5 text-destructive border border-destructive/20 hover:bg-destructive/10 hover:border-destructive/30"
+        }
+        shadow-sm hover:shadow-md
+      `}
+      title={tooltip}
+    >
+      <Icon className="w-4 h-4" />
+    </Button>
+  );
+
+  // Enhanced table columns with compact design
   const matchColumns = [
     {
       header: "Match",
       accessor: "home_club_id",
       cell: ({ row }) => (
-        <div className="flex items-center justify-between space-x-4">
+        <div className="flex items-center justify-between space-x-4 min-w-0">
           {/* Home Team - Right Aligned */}
-          <div className="flex-1 text-right mr-2">
-            <p className="font-semibold text-foreground">
+          <div className="flex-1 text-right min-w-0">
+            <p className="font-semibold text-foreground text-sm truncate">
               {getClubName(row.home_club_id)}
             </p>
-            <p className="text-sm text-muted-foreground">Home</p>
+            <p className="text-xs text-muted-foreground">Home</p>
           </div>
 
-          <div className="flex flex-col items-center mx-4">
-            <div className="px-3 py-1 bg-muted rounded-lg">
-              <span className="font-bold text-lg text-foreground">
+          <div className="flex flex-col items-center mx-2 shrink-0">
+            <div className="px-2 py-1 bg-muted/50 rounded-md border border-border/40">
+              <span className="font-bold text-sm text-foreground">
                 {formatScore(row)}
               </span>
             </div>
             <Badge
               variant={getStatusVariant(row.match_status)}
-              className="mt-1 text-xs"
+              className="mt-1 text-xs font-medium bg-primary/10 text-primary border-primary/20"
             >
               {capitalize(row.match_status)}
             </Badge>
           </div>
 
-          <div className="flex-1 text-left ml-2">
-            <p className="font-semibold text-foreground">
+          <div className="flex-1 text-left min-w-0">
+            <p className="font-semibold text-foreground text-sm truncate">
               {getClubName(row.away_club_id)}
             </p>
-            <p className="text-sm text-muted-foreground">Away</p>
+            <p className="text-xs text-muted-foreground">Away</p>
           </div>
         </div>
       ),
@@ -230,8 +259,10 @@ const Matches = () => {
       accessor: "competition",
       cell: ({ row }) => (
         <div className="flex items-center space-x-2">
-          <Trophy className="w-4 h-4 text-muted-foreground" />
-          <span className="font-medium">{row.competition}</span>
+          <Trophy className="w-3.5 h-3.5 text-muted-foreground/70" />
+          <span className="text-sm font-medium text-foreground/90 truncate">
+            {row.competition}
+          </span>
         </div>
       ),
     },
@@ -240,8 +271,10 @@ const Matches = () => {
       accessor: "venue",
       cell: ({ row }) => (
         <div className="flex items-center space-x-2">
-          <Building className="w-4 h-4 text-muted-foreground" />
-          <span>{row.venue}</span>
+          <MapPin className="w-3.5 h-3.5 text-muted-foreground/70" />
+          <span className="text-sm text-foreground/90 truncate">
+            {row.venue}
+          </span>
         </div>
       ),
     },
@@ -250,9 +283,9 @@ const Matches = () => {
       accessor: "match_date",
       cell: ({ row }) => (
         <div className="flex items-center space-x-2">
-          <CalendarDays className="w-4 h-4 text-muted-foreground" />
-          <div>
-            <p className="text-sm font-medium">
+          <CalendarDays className="w-3.5 h-3.5 text-muted-foreground/70" />
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-foreground/90 whitespace-nowrap">
               {formatDate(new Date(row.match_date))}
             </p>
             <p className="text-xs text-muted-foreground">
@@ -266,80 +299,75 @@ const Matches = () => {
       ),
     },
     {
-      header: "Analysis Status",
+      header: "Analysis",
       accessor: "qa_status",
       cell: ({ row }) => (
-        <div className="flex items-center space-x-2">
-          <Badge
-            variant={getAnalysisVarient(row.qa_status)}
-            className="mt-1 text-xs"
-          >
-            {capitalize(row.qa_status)}
-          </Badge>
-        </div>
+        <Badge
+          variant={getAnalysisVarient(row.qa_status)}
+          className="text-xs font-medium bg-secondary/10 text-secondary-foreground border-secondary/20"
+        >
+          {capitalize(row.qa_status)}
+        </Badge>
       ),
     },
   ];
 
-  // Table actions
+  // Beautiful always-visible actions
   const matchActions = ({ row }) => (
-    <div className="flex items-center space-x-1">
-      <Button
-        variant="ghost"
-        size="sm"
-        className="hover:bg-blue-500/10 hover:text-blue-600"
-      >
-        <Eye className="w-4 h-4" />
-      </Button>
-      <Button
-        variant="ghost"
-        size="sm"
+    <div className="flex items-center space-x-2 transition-all duration-200">
+      <ActionButton
+        icon={Eye}
+        onClick={() => console.log("View match", row)}
+        color="secondary"
+        tooltip="View match"
+      />
+      <ActionButton
+        icon={Edit}
         onClick={() => handleEditMatch(row)}
-        className="hover:bg-primary/10 hover:text-primary"
-      >
-        <Edit className="w-4 h-4" />
-      </Button>
-      <Button
-        variant="ghost"
-        size="sm"
+        color="primary"
+        tooltip="Edit match"
+      />
+      <ActionButton
+        icon={Trash2}
         onClick={() => setDeleteModal({ isOpen: true, matchId: row.match_id })}
-        className="hover:bg-destructive/10 hover:text-destructive"
-      >
-        <Trash2 className="w-4 h-4" />
-      </Button>
+        color="destructive"
+        tooltip="Delete match"
+      />
     </div>
   );
 
   return (
     <div className="space-y-6">
-      {/* <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex flex-1 max-w-md">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder="Search matches by teams, venue, or league..."
-                value={searchTerm}
-                onChange={(e) => handleSearch(e.target.value)}
-                className="pl-10 pr-4"
-              />
-            </div>
-          </div>
-        </div> */}
+      {/* Header Section */}
+      <div className="flex items-center justify-between">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">
+            Matches
+          </h1>
+          <p className="text-muted-foreground">
+            Manage football matches and schedules
+          </p>
+        </div>
+      </div>
 
       {/* Matches Table */}
       <DataTable
         data={matches}
         columns={matchColumns}
-        title="All Matches"
-        searchable={false}
+        title=""
+        searchable={true}
+        searchPlaceholder="Search matches..."
         actions={matchActions}
         isLoading={isLoading}
         onAdd={() => setShowAddModal(true)}
-        addButtonText="Add New Match"
+        addButtonText="Add Match"
         // Pagination props
         pagination={pagination}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
+        emptyStateTitle="No Matches Found"
+        emptyStateDescription="Get started by adding your first football match to the system."
+        tableHeight="500px"
       />
 
       {/* Add/Edit Match Modal */}

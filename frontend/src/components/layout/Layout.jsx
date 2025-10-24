@@ -42,11 +42,12 @@ const Layout = ({}) => {
   }, [sidebarOpen, isMobile]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="h-screen flex flex-col bg-background overflow-hidden">
       {/* Header - Fixed */}
       <Header onMenuToggle={handleMenuToggle} />
 
-      <div className="flex flex-1 flex-col md:flex-row overflow-hidden">
+      {/* Main Content Area */}
+      <div className="flex flex-1 overflow-hidden">
         {/* Mobile Overlay */}
         {sidebarOpen && isMobile && (
           <div
@@ -69,18 +70,20 @@ const Layout = ({}) => {
           <Sidebar isOpen={sidebarOpen} onClose={handleSidebarClose} />
         </div>
 
-        {/* Main Content Area */}
-        <main className="flex-1 flex flex-col min-h-0">
-          {/* Page Content - Scrollable */}
-          <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 w-full">
-            <div className="max-w-full">
+        {/* Content Area with Footer at Bottom */}
+        <div className="flex-1 flex flex-col min-h-0 w-full">
+          {/* Scrollable Content Area - Takes all available space */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="p-4 md:p-6 lg:p-8 min-h-full">
               <Outlet />
             </div>
           </div>
 
-          {/* Footer */}
-          <Footer />
-        </main>
+          {/* Footer - Always at bottom */}
+          <div className="shrink-0 border-t border-border">
+            <Footer />
+          </div>
+        </div>
       </div>
     </div>
   );

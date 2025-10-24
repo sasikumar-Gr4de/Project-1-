@@ -17,7 +17,7 @@ export const usePlayersStore = create(
               },
             });
             const result = response.data;
-            console.log(result);
+
             return result;
           } catch (error) {
             const errorMsg = error.response?.data?.message || error.message;

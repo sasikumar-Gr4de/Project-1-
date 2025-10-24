@@ -2,15 +2,12 @@ import React, { useState, useRef, useEffect } from "react";
 import { Button } from "../ui/button";
 import {
   Menu,
-  Trophy,
-  Users,
-  User,
-  BarChart3,
   Bell,
   ChevronDown,
   Settings,
   LogOut,
   X,
+  User,
 } from "lucide-react";
 import { useAuthstore } from "@/store/auth.store";
 
@@ -44,7 +41,7 @@ const Header = ({ onMenuToggle }) => {
     {
       id: 1,
       title: "New match added",
-      message: "Barcelona vs Real Madrid match was added",
+      message: "Barcelona vs Real Madrid match was added to the system",
       time: "5 min ago",
       read: false,
     },
@@ -58,7 +55,7 @@ const Header = ({ onMenuToggle }) => {
     {
       id: 3,
       title: "System update",
-      message: "Platform updated to version 1.2.0",
+      message: "Platform updated to version 1.2.0 with new features",
       time: "2 hours ago",
       read: true,
     },
@@ -75,7 +72,7 @@ const Header = ({ onMenuToggle }) => {
             variant="ghost"
             size="icon"
             onClick={onMenuToggle}
-            className="md:hidden h-9 w-9 flex-shrink-0"
+            className="md:hidden h-9 w-9 shrink-0"
           >
             <Menu className="w-5 h-5" />
           </Button>
@@ -113,36 +110,69 @@ const Header = ({ onMenuToggle }) => {
             </Button>
 
             {notificationsOpen && (
-              <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-card border border-border rounded-lg shadow-lg z-50 max-h-[80vh] overflow-hidden">
-                <div className="p-4 border-b border-border">
-                  <h3 className="font-semibold text-foreground text-sm sm:text-base">
-                    Notifications
-                  </h3>
-                </div>
-                <div className="max-h-96 overflow-y-auto">
-                  {notifications.map((notification) => (
-                    <div
-                      key={notification.id}
-                      className={`p-3 sm:p-4 border-b border-border hover:bg-accent cursor-pointer transition-colors ${
-                        !notification.read ? "bg-accent/50" : ""
-                      }`}
+              <div
+                className="absolute right-0 mt-2 bg-card border border-border rounded-lg shadow-lg z-50 max-h-[70vh] overflow-hidden 
+                            w-[85vw] max-w-xs sm:max-w-sm md:max-w-md 
+                            scale-90 sm:scale-100 origin-top-right"
+              >
+                {" "}
+                {/* Scale down on mobile */}
+                {/* Header */}
+                <div className="p-2 sm:p-3 border-b border-border">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-foreground text-sm sm:text-base">
+                      Notifications
+                    </h3>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setNotificationsOpen(false)}
+                      className="h-6 w-6 sm:h-7 sm:w-7"
                     >
-                      <div className="flex justify-between items-start gap-2">
-                        <h4 className="font-medium text-foreground text-sm flex-1 min-w-0">
-                          <span className="truncate">{notification.title}</span>
-                        </h4>
-                        <span className="text-xs text-muted-foreground whitespace-nowrap flex-shrink-0">
-                          {notification.time}
-                        </span>
+                      <X className="w-3 h-3 sm:w-4 sm:h-4" />
+                    </Button>
+                  </div>
+                </div>
+                {/* Notifications List */}
+                <div className="max-h-48 sm:max-h-64 overflow-y-auto">
+                  {notifications.length > 0 ? (
+                    notifications.map((notification) => (
+                      <div
+                        key={notification.id}
+                        className={`p-2 sm:p-3 border-b border-border hover:bg-accent cursor-pointer transition-colors ${
+                          !notification.read ? "bg-accent/50" : ""
+                        }`}
+                      >
+                        <div className="flex justify-between items-start gap-1 sm:gap-2">
+                          <h4 className="font-medium text-foreground text-xs sm:text-sm flex-1 min-w-0">
+                            <span className="truncate block">
+                              {notification.title}
+                            </span>
+                          </h4>
+                          <span className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap shrink-0">
+                            {notification.time}
+                          </span>
+                        </div>
+                        <p className="text-[11px] sm:text-xs text-muted-foreground mt-1 line-clamp-2 leading-tight">
+                          {notification.message}
+                        </p>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                        {notification.message}
+                    ))
+                  ) : (
+                    <div className="p-3 sm:p-4 text-center">
+                      <p className="text-xs sm:text-sm text-muted-foreground">
+                        No notifications
                       </p>
                     </div>
-                  ))}
+                  )}
                 </div>
-                <div className="p-2 border-t border-border">
-                  <Button variant="ghost" size="sm" className="w-full text-xs">
+                {/* Footer */}
+                <div className="p-1 sm:p-2 border-t border-border">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full text-[10px] sm:text-xs h-7 sm:h-8 px-2"
+                  >
                     Mark all as read
                   </Button>
                 </div>
@@ -162,10 +192,10 @@ const Header = ({ onMenuToggle }) => {
                   <img
                     src={user.avatar_url}
                     alt={user.full_name}
-                    className="w-8 h-8 rounded-full flex-shrink-0"
+                    className="w-8 h-8 rounded-full shrink-0"
                   />
                 ) : (
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-linear-to-br from-primary to-primary/70 flex items-center justify-center shrink-0">
                     <User className="w-4 h-4 text-primary-foreground" />
                   </div>
                 )}
@@ -179,7 +209,7 @@ const Header = ({ onMenuToggle }) => {
                 </div>
               </div>
               <ChevronDown
-                className={`w-4 h-4 text-muted-foreground flex-shrink-0 transition-transform ${
+                className={`w-4 h-4 text-muted-foreground shrink-0 transition-transform ${
                   userMenuOpen ? "rotate-180" : ""
                 }`}
               />
@@ -204,7 +234,7 @@ const Header = ({ onMenuToggle }) => {
                       key={item.name}
                       className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors"
                     >
-                      <item.icon className="w-4 h-4 flex-shrink-0" />
+                      <item.icon className="w-4 h-4 shrink-0" />
                       <span className="truncate">{item.name}</span>
                     </button>
                   ))}
@@ -214,7 +244,7 @@ const Header = ({ onMenuToggle }) => {
                     className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-destructive hover:bg-destructive/10 rounded-md transition-colors"
                     onClick={() => logout()}
                   >
-                    <LogOut className="w-4 h-4 flex-shrink-0" />
+                    <LogOut className="w-4 h-4 shrink-0" />
                     <span>Sign out</span>
                   </button>
                 </div>

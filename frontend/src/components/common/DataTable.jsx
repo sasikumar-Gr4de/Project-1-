@@ -18,6 +18,7 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  MoreHorizontal,
 } from "lucide-react";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 
@@ -41,6 +42,7 @@ const DataTable = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [internalPage, setInternalPage] = useState(1);
   const [internalPageSize, setInternalPageSize] = useState(10);
+  const [mobileActionMenu, setMobileActionMenu] = useState(null);
 
   // Use external pagination if provided, otherwise use internal
   const isExternalPagination = !!externalPagination;
@@ -175,17 +177,17 @@ const DataTable = ({
 
   // No Data State
   const NoDataState = () => (
-    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+    <div className="flex flex-col items-center justify-center py-16 px-4 text-center bg-muted/20 rounded-lg border border-border/50">
       <div className="relative mb-6">
-        <div className="w-24 h-24 bg-muted/50 rounded-full flex items-center justify-center mb-2 border border-border/50">
-          <Inbox className="w-12 h-12 text-muted-foreground" />
+        <div className="w-20 h-20 bg-linear-to-br from-primary/10 to-primary/5 rounded-full flex items-center justify-center mb-2 border border-primary/20">
+          <Inbox className="w-8 h-8 text-primary/60" />
         </div>
-        <div className="absolute -top-2 -right-2 w-8 h-8 bg-primary rounded-full flex items-center justify-center shadow-sm">
-          <Database className="w-4 h-4 text-primary-foreground" />
+        <div className="absolute -top-1 -right-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center shadow-sm">
+          <Database className="w-3 h-3 text-primary-foreground" />
         </div>
       </div>
 
-      <h4 className="text-2xl font-bold text-foreground mb-3">
+      <h4 className="text-xl font-semibold text-foreground mb-3">
         {emptyStateTitle}
       </h4>
 
@@ -194,20 +196,28 @@ const DataTable = ({
           ? "No records match your search criteria. Try adjusting your search terms."
           : emptyStateDescription}
       </p>
+
+      {onAdd && !searchTerm && (
+        <Button onClick={onAdd} className="bg-primary hover:bg-primary/90">
+          <Plus className="w-4 h-4 mr-2" />
+          {addButtonText}
+        </Button>
+      )}
     </div>
   );
 
   // Empty search results state
   const EmptySearchState = () => (
-    <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-      <div className="w-16 h-16 bg-muted/30 rounded-full flex items-center justify-center mb-4">
-        <Search className="w-8 h-8 text-muted-foreground" />
+    <div className="flex flex-col items-center justify-center py-12 px-4 text-center bg-muted/20 rounded-lg border border-border/50">
+      <div className="w-14 h-14 bg-muted/30 rounded-full flex items-center justify-center mb-4">
+        <Search className="w-6 h-6 text-muted-foreground" />
       </div>
       <h4 className="text-lg font-semibold text-foreground mb-2">
         No results found
       </h4>
-      <p className="text-muted-foreground mb-4">
-        No records match "<span className="font-medium">{searchTerm}</span>"
+      <p className="text-muted-foreground mb-4 text-sm">
+        No records match "
+        <span className="font-medium text-foreground">{searchTerm}</span>"
       </p>
       <Button
         variant="outline"
@@ -223,12 +233,19 @@ const DataTable = ({
   const displayTotal = isExternalPagination ? totalItems : filteredData.length;
 
   return (
-    <div className="w-full">
+    <div className="w-full space-y-6">
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6">
-        <div className="text-2xl font-bold text-foreground">{title}</div>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <h2 className="text-2xl font-bold text-foreground">{title}</h2>
+          {!isLoading && displayTotal > 0 && (
+            <p className="text-sm text-muted-foreground">
+              {displayTotal} {displayTotal === 1 ? "record" : "records"} found
+            </p>
+          )}
+        </div>
 
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
           {/* Items per page selector */}
           <div className="flex items-center space-x-2 order-2 sm:order-1">
             <span className="text-sm text-muted-foreground whitespace-nowrap">
@@ -238,7 +255,7 @@ const DataTable = ({
               value={itemsPerPage.toString()}
               onValueChange={handleItemsPerPageChange}
             >
-              <SelectTrigger className="w-20">
+              <SelectTrigger className="w-20 h-9">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -248,16 +265,13 @@ const DataTable = ({
                 <SelectItem value="50">50</SelectItem>
               </SelectContent>
             </Select>
-            <span className="text-sm text-muted-foreground whitespace-nowrap">
-              entries
-            </span>
           </div>
 
           {/* Add Button */}
           {onAdd && (
             <Button
               onClick={onAdd}
-              className="bg-primary hover:bg-primary/90 order-1 sm:order-2 w-full sm:w-auto"
+              className="bg-primary hover:bg-primary/90 order-1 sm:order-2 w-full sm:w-auto h-9"
             >
               <Plus className="w-4 h-4 mr-2" />
               {addButtonText}
@@ -268,25 +282,23 @@ const DataTable = ({
 
       {/* Search Section */}
       {searchable && (
-        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input
-              placeholder={searchPlaceholder}
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                if (!isExternalPagination) {
-                  setInternalPage(1);
-                }
-              }}
-              className="pl-10"
-            />
-          </div>
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+          <Input
+            placeholder={searchPlaceholder}
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              if (!isExternalPagination) {
+                setInternalPage(1);
+              }
+            }}
+            className="pl-10 h-11 bg-background border-border/60 focus:border-primary/50"
+          />
         </div>
       )}
 
-      <div className="relative w-full overflow-auto">
+      <div className="relative w-full overflow-hidden rounded-lg border border-border/60 bg-background">
         {isLoading ? (
           <TableLoadingState />
         ) : displayTotal === 0 ? (
@@ -297,82 +309,175 @@ const DataTable = ({
           )
         ) : (
           <>
-            {/* Table */}
-            <table className="w-full caption-bottom text-sm">
-              <thead className="border-b bg-muted/50">
-                <tr>
-                  {columns.map((column, index) => (
-                    <th
-                      key={index}
-                      className="h-12 px-4 text-left align-middle font-medium text-muted-foreground whitespace-nowrap"
-                    >
-                      {column.header}
-                    </th>
-                  ))}
-                  {actions && (
-                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground whitespace-nowrap">
-                      Actions
-                    </th>
-                  )}
-                </tr>
-              </thead>
-              <tbody>
-                {displayData.map((row, rowIndex) => (
-                  <tr
-                    key={rowIndex}
-                    className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
-                  >
-                    {columns.map((column, colIndex) => (
-                      <td key={colIndex} className="p-4 align-middle">
-                        {column.cell ? (
-                          column.cell({
-                            row,
-                          })
-                        ) : column.accessor ? (
-                          column.badge ? (
-                            <Badge
-                              variant={getBadgeVariant(row[column.accessor])}
-                              className="whitespace-nowrap"
-                            >
-                              {row[column.accessor]}
-                            </Badge>
-                          ) : (
-                            <span className="whitespace-nowrap">
-                              {row[column.accessor]}
-                            </span>
-                          )
-                        ) : null}
-                      </td>
+            {/* Desktop Table */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/40 border-b border-border/60">
+                  <tr>
+                    {columns.map((column, index) => (
+                      <th
+                        key={index}
+                        className="h-12 px-6 text-left align-middle font-semibold text-foreground/80 whitespace-nowrap text-xs uppercase tracking-wide"
+                      >
+                        {column.header}
+                      </th>
                     ))}
                     {actions && (
-                      <td className="p-4 align-middle">
-                        <div className="flex flex-wrap gap-2">
-                          {actions({ row })}
-                        </div>
-                      </td>
+                      <th className="h-12 px-6 text-left align-middle font-semibold text-foreground/80 whitespace-nowrap text-xs uppercase tracking-wide w-20">
+                        Actions
+                      </th>
                     )}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-border/40">
+                  {displayData.map((row, rowIndex) => (
+                    <tr
+                      key={rowIndex}
+                      className="group transition-all duration-200 hover:bg-muted/20 even:bg-muted/5"
+                    >
+                      {columns.map((column, colIndex) => (
+                        <td key={colIndex} className="p-6 align-middle">
+                          {column.cell ? (
+                            column.cell({ row })
+                          ) : column.accessor ? (
+                            column.badge ? (
+                              <Badge
+                                variant={getBadgeVariant(row[column.accessor])}
+                                className="whitespace-nowrap text-xs font-medium"
+                              >
+                                {row[column.accessor]}
+                              </Badge>
+                            ) : (
+                              <span className="text-foreground whitespace-nowrap">
+                                {row[column.accessor]}
+                              </span>
+                            )
+                          ) : null}
+                        </td>
+                      ))}
+                      {actions && (
+                        <td className="p-6 align-middle">
+                          <div className="flex items-center gap-1 opacity-30 group-hover:opacity-100 transition-opacity duration-200">
+                            {actions({ row })}
+                          </div>
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Cards */}
+            <div className="block md:hidden space-y-3 p-4">
+              {displayData.map((row, rowIndex) => (
+                <div
+                  key={rowIndex}
+                  className="bg-card border border-border/40 rounded-lg p-4 space-y-3 shadow-sm hover:shadow-md transition-shadow duration-200"
+                >
+                  {/* Main content */}
+                  <div className="space-y-2">
+                    {columns.slice(0, 2).map((column, colIndex) => (
+                      <div
+                        key={colIndex}
+                        className="flex justify-between items-start"
+                      >
+                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                          {column.header}:
+                        </span>
+                        <div className="text-right max-w-[60%]">
+                          {column.cell ? (
+                            column.cell({ row })
+                          ) : column.accessor ? (
+                            column.badge ? (
+                              <Badge
+                                variant={getBadgeVariant(row[column.accessor])}
+                                className="text-xs font-medium"
+                              >
+                                {row[column.accessor]}
+                              </Badge>
+                            ) : (
+                              <span className="text-foreground text-sm font-medium truncate block">
+                                {row[column.accessor]}
+                              </span>
+                            )
+                          ) : null}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Additional fields with show more */}
+                  {columns.length > 2 && (
+                    <div className="pt-2 border-t border-border/20">
+                      <div className="space-y-2">
+                        {columns.slice(2).map((column, colIndex) => (
+                          <div
+                            key={colIndex}
+                            className="flex justify-between items-start"
+                          >
+                            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                              {column.header}:
+                            </span>
+                            <div className="text-right max-w-[60%]">
+                              {column.cell ? (
+                                column.cell({ row })
+                              ) : column.accessor ? (
+                                column.badge ? (
+                                  <Badge
+                                    variant={getBadgeVariant(
+                                      row[column.accessor]
+                                    )}
+                                    className="text-xs font-medium"
+                                  >
+                                    {row[column.accessor]}
+                                  </Badge>
+                                ) : (
+                                  <span className="text-foreground text-sm truncate block">
+                                    {row[column.accessor]}
+                                  </span>
+                                )
+                              ) : null}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Actions for mobile */}
+                  {actions && (
+                    <div className="pt-3 border-t border-border/20">
+                      <div className="flex justify-end">
+                        <div className="flex items-center gap-2">
+                          {actions({ row })}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </>
         )}
       </div>
 
       {/* Pagination - Only show if there's data and not loading */}
       {!isLoading && displayTotal > 0 && totalPages > 1 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-border/40">
           {/* Results info */}
           <div className="text-sm text-muted-foreground">
             Showing{" "}
-            <span className="font-medium">
+            <span className="font-medium text-foreground">
               {(currentPage - 1) * itemsPerPage + 1}
             </span>{" "}
             to{" "}
-            <span className="font-medium">
+            <span className="font-medium text-foreground">
               {Math.min(currentPage * itemsPerPage, displayTotal)}
             </span>{" "}
-            of <span className="font-medium">{displayTotal}</span> entries
+            of{" "}
+            <span className="font-medium text-foreground">{displayTotal}</span>{" "}
+            entries
           </div>
 
           {/* Pagination controls */}
@@ -383,9 +488,9 @@ const DataTable = ({
               size="sm"
               onClick={goToFirstPage}
               disabled={currentPage === 1}
-              className="h-9 w-9 p-0"
+              className="h-8 w-8 p-0 border-border/60"
             >
-              <ChevronsLeft className="w-4 h-4" />
+              <ChevronsLeft className="w-3.5 h-3.5" />
               <span className="sr-only">First page</span>
             </Button>
 
@@ -395,9 +500,9 @@ const DataTable = ({
               size="sm"
               onClick={() => goToPage(currentPage - 1)}
               disabled={currentPage === 1}
-              className="h-9 w-9 p-0"
+              className="h-8 w-8 p-0 border-border/60"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-3.5 h-3.5" />
               <span className="sr-only">Previous page</span>
             </Button>
 
@@ -411,8 +516,8 @@ const DataTable = ({
                 disabled={page === "..."}
                 className={
                   page === "..."
-                    ? "h-9 w-9 p-0 cursor-default"
-                    : "h-9 w-9 p-0 min-w-9"
+                    ? "h-8 w-8 p-0 border-border/60 cursor-default text-muted-foreground"
+                    : "h-8 w-8 p-0 min-w-8 border-border/60"
                 }
               >
                 {page}
@@ -425,9 +530,9 @@ const DataTable = ({
               size="sm"
               onClick={() => goToPage(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="h-9 w-9 p-0"
+              className="h-8 w-8 p-0 border-border/60"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-3.5 h-3.5" />
               <span className="sr-only">Next page</span>
             </Button>
 
@@ -437,9 +542,9 @@ const DataTable = ({
               size="sm"
               onClick={goToLastPage}
               disabled={currentPage === totalPages}
-              className="h-9 w-9 p-0"
+              className="h-8 w-8 p-0 border-border/60"
             >
-              <ChevronsRight className="w-4 h-4" />
+              <ChevronsRight className="w-3.5 h-3.5" />
               <span className="sr-only">Last page</span>
             </Button>
           </div>
@@ -447,10 +552,11 @@ const DataTable = ({
       )}
 
       {/* Mobile pagination info */}
-      {!isLoading && displayTotal > 0 && (
-        <div className="block sm:hidden text-center text-sm text-muted-foreground mt-4">
-          Page <span className="font-medium">{currentPage}</span> of{" "}
-          <span className="font-medium">{totalPages}</span>
+      {!isLoading && displayTotal > 0 && totalPages > 1 && (
+        <div className="block sm:hidden text-center text-sm text-muted-foreground pt-4 border-t border-border/40">
+          Page{" "}
+          <span className="font-medium text-foreground">{currentPage}</span> of{" "}
+          <span className="font-medium text-foreground">{totalPages}</span>
         </div>
       )}
     </div>

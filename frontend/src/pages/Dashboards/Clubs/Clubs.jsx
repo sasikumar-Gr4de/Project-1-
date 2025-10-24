@@ -1,24 +1,23 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import DataTable from "@/components/common/DataTable";
 import AddClubModal from "@/components/modals/AddClubModal";
 import DeleteConfirmModal from "@/components/common/DeleteConfirmModal";
 import {
-  Search,
   Edit,
   MapPin,
   Calendar,
   Users,
   Trophy,
   Shield,
-  TrashIcon,
+  Trash2,
+  MoreHorizontal,
 } from "lucide-react";
 import { useClubsStore } from "@/store/clubs.store";
+import { Badge } from "@/components/ui/badge";
 
 const Clubs = () => {
   const [clubs, setClubs] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, clubId: "" });
   const [selectedClub, setSelectedClub] = useState(null);
@@ -67,7 +66,7 @@ const Clubs = () => {
   };
 
   const handlePageSizeChange = (newPageSize) => {
-    fetchAllClubs(1, newPageSize); // Reset to first page when changing page size
+    fetchAllClubs(1, newPageSize);
   };
 
   const handleAddClub = async (clubData) => {
@@ -76,7 +75,6 @@ const Clubs = () => {
       if (result.success) {
         const newClub = result.data;
         setClubs((prev) => [newClub, ...prev]);
-        // Refresh to get updated pagination
         fetchAllClubs(pagination.page, pagination.pageSize);
       }
     } catch (err) {
@@ -116,7 +114,6 @@ const Clubs = () => {
         prev.filter((club) => club.club_id !== deleteModal.clubId)
       );
       setDeleteModal({ isOpen: false, clubId: "" });
-      // Refresh to get updated pagination
       fetchAllClubs(pagination.page, pagination.pageSize);
     }
   };
@@ -126,44 +123,77 @@ const Clubs = () => {
     setShowAddModal(true);
   };
 
-  // Default avatar component for clubs
-  const DefaultAvatar = ({ className = "w-10 h-10" }) => (
-    <div
-      className={`${className} rounded-full bg-linear-to-br from-green-500 to-green-600 flex items-center justify-center text-white`}
+  // Beautiful gradient avatars for clubs
+  const ClubAvatar = ({ club, className = "w-8 h-8" }) => {
+    const gradientClass = club?.club_id
+      ? `bg-gradient-to-br from-primary/80 to-primary/60`
+      : `bg-gradient-to-br from-green-500/80 to-green-600/60`;
+
+    return (
+      <div
+        className={`${className} rounded-full ${gradientClass} flex items-center justify-center text-primary-foreground shadow-sm border border-primary/20`}
+      >
+        {club?.mark_url ? (
+          <img
+            src={club.mark_url}
+            alt={club.club_name}
+            className="w-full h-full rounded-full object-cover"
+          />
+        ) : (
+          <Shield className="w-4 h-4" />
+        )}
+      </div>
+    );
+  };
+
+  // Beautiful always-visible action buttons
+  const ActionButton = ({
+    icon: Icon,
+    onClick,
+    variant = "ghost",
+    color = "primary",
+    size = "sm",
+    tooltip,
+  }) => (
+    <Button
+      variant={variant}
+      size={size}
+      onClick={onClick}
+      className={`
+        h-8 w-8 p-0 transition-all duration-200 rounded-md
+        ${
+          color === "primary"
+            ? "bg-primary/5 text-primary border border-primary/20 hover:bg-primary/10 hover:border-primary/30"
+            : color === "secondary"
+            ? "bg-secondary/5 text-secondary border border-secondary/20 hover:bg-secondary/10 hover:border-secondary/30"
+            : "bg-destructive/5 text-destructive border border-destructive/20 hover:bg-destructive/10 hover:border-destructive/30"
+        }
+        shadow-sm hover:shadow-md
+      `}
+      title={tooltip}
     >
-      <Shield className="w-6 h-6" />
-    </div>
+      <Icon className="w-4 h-4" />
+    </Button>
   );
 
-  // Table columns
+  // Enhanced table columns with compact design
   const clubColumns = [
     {
       header: "Club",
       accessor: "club_name",
       cell: ({ row }) => (
-        <div className="flex items-center space-x-3">
-          {row.mark_url ? (
-            <img
-              src={row.mark_url}
-              alt={row.club_name}
-              className="w-10 h-10 rounded-full object-cover border shadow-sm"
-            />
-          ) : (
-            <DefaultAvatar />
-          )}
-          <div>
-            <p className="font-medium text-foreground">{row.club_name}</p>
+        <div className="flex items-center space-x-3 min-w-0">
+          <ClubAvatar club={row} />
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-foreground text-sm truncate">
+              {row.club_name}
+            </p>
+            {row.location && (
+              <p className="text-xs text-muted-foreground truncate">
+                {row.location}
+              </p>
+            )}
           </div>
-        </div>
-      ),
-    },
-    {
-      header: "Location",
-      accessor: "location",
-      cell: ({ row }) => (
-        <div className="flex items-center space-x-2">
-          <MapPin className="w-4 h-4 text-muted-foreground" />
-          <span>{row.location}</span>
         </div>
       ),
     },
@@ -172,8 +202,10 @@ const Clubs = () => {
       accessor: "founded_year",
       cell: ({ row }) => (
         <div className="flex items-center space-x-2">
-          <Calendar className="w-4 h-4 text-muted-foreground" />
-          <span>{row.founded_year}</span>
+          <Calendar className="w-3.5 h-3.5 text-muted-foreground/70" />
+          <span className="text-sm font-medium text-foreground/90">
+            {row.founded_year || "N/A"}
+          </span>
         </div>
       ),
     },
@@ -182,8 +214,13 @@ const Clubs = () => {
       accessor: "player_count",
       cell: ({ row }) => (
         <div className="flex items-center space-x-2">
-          <Users className="w-4 h-4 text-muted-foreground" />
-          <span>{row.player_count || 0}</span>
+          <Users className="w-3.5 h-3.5 text-muted-foreground/70" />
+          <Badge
+            variant="secondary"
+            className="text-xs font-medium bg-secondary/10 text-secondary-foreground border border-secondary/20"
+          >
+            {row.player_count || 0}
+          </Badge>
         </div>
       ),
     },
@@ -192,59 +229,85 @@ const Clubs = () => {
       accessor: "match_count",
       cell: ({ row }) => (
         <div className="flex items-center space-x-2">
-          <Trophy className="w-4 h-4 text-muted-foreground" />
-          <span>{row.match_count || 0}</span>
+          <Trophy className="w-3.5 h-3.5 text-muted-foreground/70" />
+          <Badge
+            variant="outline"
+            className="text-xs font-medium bg-background border-border/40"
+          >
+            {row.match_count || 0}
+          </Badge>
         </div>
+      ),
+    },
+    {
+      header: "Status",
+      accessor: "status",
+      cell: ({ row }) => (
+        <Badge
+          variant="default"
+          className="text-xs font-medium bg-primary/10 text-primary border border-primary/20"
+        >
+          Active
+        </Badge>
       ),
     },
   ];
 
-  // Table actions
+  // Beautiful always-visible actions
   const clubActions = ({ row }) => (
-    <div className="flex items-center space-x-1">
-      <Button
-        variant="ghost"
-        size="sm"
+    <div className="flex items-center space-x-2 transition-all duration-200">
+      <ActionButton
+        icon={Edit}
         onClick={() => handleEditClub(row)}
-        className="hover:bg-primary/10 hover:text-primary"
-      >
-        <Edit className="w-4 h-4" />
-      </Button>
-      <Button
-        variant="ghost"
-        size="sm"
-        className="hover:bg-blue-500/10 hover:text-blue-600"
-      >
-        <Users className="w-4 h-4" />
-      </Button>
-      <Button
-        variant="ghost"
-        size="sm"
+        color="primary"
+        tooltip="Edit club"
+      />
+      <ActionButton
+        icon={Users}
+        onClick={() => console.log("View players", row)}
+        color="secondary"
+        tooltip="View players"
+      />
+      <ActionButton
+        icon={Trash2}
         onClick={() => setDeleteModal({ isOpen: true, clubId: row.club_id })}
-        className="hover:bg-destructive/10 hover:text-destructive"
-      >
-        <TrashIcon className="w-4 h-4" />
-      </Button>
+        color="destructive"
+        tooltip="Delete club"
+      />
     </div>
   );
 
   return (
     <div className="space-y-6">
+      {/* Header Section */}
+      <div className="flex items-center justify-between">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">
+            Clubs
+          </h1>
+          <p className="text-muted-foreground">
+            Manage football clubs and their information
+          </p>
+        </div>
+      </div>
+
       {/* Clubs Table */}
       <DataTable
         data={clubs}
         columns={clubColumns}
-        title="All Clubs"
+        title=""
         actions={clubActions}
         isLoading={isLoading}
         onAdd={() => setShowAddModal(true)}
-        addButtonText="Add New Club"
-        searchable={false}
-        searchPlaceholder="Search Clubs ... "
+        addButtonText="Add Club"
+        searchable={true}
+        searchPlaceholder="Search clubs..."
         // Pagination props
         pagination={pagination}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
+        emptyStateTitle="No Clubs Found"
+        emptyStateDescription="Get started by adding your first football club to the system."
       />
 
       {/* Add/Edit Club Modal */}
