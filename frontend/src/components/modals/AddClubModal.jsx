@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import FileUpload from "@/components/common/FileUpload";
+import { useClubsStore } from "@/store/clubs.store";
 
 const AddClubModal = ({ isOpen, onClose, onSave }) => {
   const [formData, setFormData] = useState({
@@ -12,17 +13,22 @@ const AddClubModal = ({ isOpen, onClose, onSave }) => {
     mark_url: "",
   });
   const [uploadedFile, setUploadedFile] = useState(null);
+  const { createClub } = useClubsStore();
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSave({
+    const clubData = {
       ...formData,
       founded_year: parseInt(formData.founded_year),
       mark_url: uploadedFile ? uploadedFile.name : "",
-    });
-    onClose();
+    };
+    const result = await createClub(clubData);
+    if (result.success === true) {
+      onSave(clubData);
+      onClose();
+    }
   };
 
   const handleFileUpload = async (results) => {
@@ -38,6 +44,7 @@ const AddClubModal = ({ isOpen, onClose, onSave }) => {
     results.forEach((result) => {
       if (result.success) {
         console.log("Uploaded:", result.url);
+        setUploadedFile(result.url);
         // Save to your database
       } else {
         console.error("Failed:", result.error);

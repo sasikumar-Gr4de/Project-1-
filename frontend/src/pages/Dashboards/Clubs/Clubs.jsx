@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import DataTable from "@/components/common/DataTable";
@@ -17,27 +17,32 @@ import {
   TrashIcon,
 } from "lucide-react";
 import { formatDate } from "@/utils/formatter.util";
+import { useClubsStore } from "@/store/clubs.store";
 
 const Clubs = () => {
-  const [clubs, setClubs] = useState(mockClubs);
+  const [clubs, setClubs] = useState();
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, clubId: "" });
   const [selectedClub, setSelectedClub] = useState(null);
+  const { getAllClubs } = useClubsStore();
+
+  useEffect(() => {
+    const fetchAllClubs = async () => {
+      const result = await getAllClubs();
+      const { data } = result.data;
+
+      if (result.success === true) setClubs(data);
+    };
+    fetchAllClubs();
+  }, []);
 
   // Filter clubs based on search
-  const filteredClubs = clubs.filter(
-    (club) =>
-      club.club_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      club.location.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // Stats calculation
-  const stats = {
-    total: clubs.length,
-    active: clubs.filter((club) => club.status === "active").length,
-    locations: new Set(clubs.map((club) => club.location)).size,
-  };
+  // const filteredClubs = clubs.filter(
+  //   (club) =>
+  //     club.club_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //     club.location.toLowerCase().includes(searchTerm.toLowerCase())
+  // );
 
   const handleAddClub = (clubData) => {
     const newClub = {
@@ -86,10 +91,10 @@ const Clubs = () => {
 
   // Table columns
   const clubColumns = [
-    {
-      header: "Club ID",
-      accessor: "club_id",
-    },
+    // {
+    //   header: "Club ID",
+    //   accessor: "club_id",
+    // },
     {
       header: "Club",
       accessor: "club_name",
@@ -211,7 +216,7 @@ const Clubs = () => {
 
       {/* Clubs Table */}
       <DataTable
-        data={filteredClubs}
+        data={clubs}
         columns={clubColumns}
         title="All Clubs"
         searchable={false}

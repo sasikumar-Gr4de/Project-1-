@@ -13,7 +13,7 @@ import {
 import { Search, Plus, Database, Inbox } from "lucide-react";
 
 const DataTable = ({
-  data,
+  data = [],
   columns,
   searchable = true,
   searchPlaceholder = "Search...",

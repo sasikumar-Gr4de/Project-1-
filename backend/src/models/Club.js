@@ -2,13 +2,15 @@ import { supabase } from "../config/supabase.config.js";
 
 export default class Club {
   static async create(clubData) {
-    const { club_name, location, found_year, mark_url } = clubData;
+    const { club_name, location, founded_year, mark_url } = clubData;
     try {
       const { data, error } = await supabase
         .from("clubs")
-        .insert([{ club_name, location, found_year, mark_url }])
+        .insert([{ club_name, location, founded_year, mark_url }])
         .select()
         .single();
+      if (error) throw error;
+
       return data;
     } catch (err) {
       console.error("Error creating club:", err);
@@ -32,9 +34,10 @@ export default class Club {
     }
   }
 
-  static async findAll(filters = {}, pagination = { page: 1, pageSize: 10 }) {
-    const { page, limit } = pagination;
-    const offset = (page - 1) * limit;
+  static async findAll(filters = {}, pagination) {
+    const { page, pageSize } = pagination;
+    console.log(pagination);
+    const offset = (page - 1) * pageSize;
     try {
       let query = supabase.from("clubs").select("*", { count: "exact" });
 
@@ -44,10 +47,11 @@ export default class Club {
           query = query.eq(key, filters[key]);
         }
       }
-
+      console.log(offset, offset + pageSize - 1);
       const { data, error, count } = await query
-        .range(offset, offset + limit - 1)
+        .range(offset, offset + pageSize - 1)
         .order("created_at", { ascending: false });
+      console.log(data);
       if (error) throw error;
 
       return {
@@ -55,8 +59,8 @@ export default class Club {
         pagination: {
           total: count || 0,
           page,
-          limit,
-          totalPages: Math.ceil((count || 0) / limit),
+          pageSize,
+          totalPages: Math.ceil((count || 0) / pageSize) || 0,
         },
       };
     } catch (err) {

@@ -2,8 +2,6 @@ import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
 import { zustandEncryptedStorage } from "@/utils/storage.utils.js";
 import api from "@/services/base.api.js";
-import { data } from "react-router-dom";
-import { EMAIL_NOT_CONFIRMED } from "@/utils/constants";
 
 export const useAuthstore = create(
   devtools(
