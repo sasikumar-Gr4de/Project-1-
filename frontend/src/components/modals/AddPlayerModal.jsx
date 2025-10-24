@@ -83,7 +83,7 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
       if (player) {
         submitData.player_id = player.player_id;
       }
-
+      console.log(submitData);
       await onSave(submitData);
       onClose();
     } catch (error) {
@@ -96,6 +96,7 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
 
   const handleAvatarUpload = (result) => {
     if (result.success) {
+      window.alert(result.url);
       setFormData((prev) => ({
         ...prev,
         avatar_url: result.url || "",
@@ -114,7 +115,7 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
   const statuses = ["Active", "Injured", "Suspended", "Inactive"];
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <Card className="w-full max-w-4xl max-h-[90vh] flex flex-col">
         {/* Fixed Header */}
         <CardHeader className="shrink-0 border-b">
@@ -137,13 +138,10 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Player Avatar Section */}
             <div className="flex flex-col items-center space-y-4">
-              {/* <h3 className="text-lg font-semibold self-start">
-                Player Avatar
-              </h3> */}
               <AvatarUpload
                 onUpload={handleAvatarUpload}
                 existingUrl={formData.avatar_url}
-                folder="player-avatars"
+                folder="player-avatars" // Changed from club-avatars to player-avatars
                 maxSize={2 * 1024 * 1024} // 2MB
                 disabled={isSending}
                 size="xl"

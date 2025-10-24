@@ -12,6 +12,7 @@ export default class Player {
       weight_kg,
       current_club,
       nationality,
+      avatar_url,
       jersey_number,
     } = playerData;
     try {
@@ -26,6 +27,7 @@ export default class Player {
             weight_kg,
             current_club,
             nationality,
+            avatar_url,
             jersey_number,
             status: PLAYER_STATUSES.ACTIVE,
           },

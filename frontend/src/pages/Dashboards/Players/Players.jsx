@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import DataTable from "@/components/common/DataTable";
 import AddPlayerModal from "@/components/modals/AddPlayerModal";
@@ -8,7 +7,6 @@ import DeleteConfirmModal from "@/components/common/DeleteConfirmModal";
 import { usePlayersStore } from "@/store/players.store";
 import { useClubsStore } from "@/store/clubs.store";
 import {
-  Search,
   Calendar,
   MapPin,
   Ruler,
@@ -210,9 +208,13 @@ const Players = () => {
         <div className="flex items-center space-x-4">
           {row.avatar_url ? (
             <img
-              src={row.avatar_url}
+              src={`${row.avatar_url}?t=${Date.now()}`} // Cache busting
               alt={row.full_name}
               className="w-12 h-12 rounded-full object-cover border shadow-sm"
+              onError={(e) => {
+                // If image fails to load, fallback to default avatar
+                e.target.style.display = "none";
+              }}
             />
           ) : (
             <DefaultAvatar name={row.full_name} />
@@ -331,20 +333,6 @@ const Players = () => {
 
   return (
     <div className="space-y-6">
-      {/* <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex flex-1 max-w-md">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input
-              placeholder="Search players by name, position, or nationality..."
-              value={searchTerm}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="pl-10 pr-4"
-            />
-          </div>
-        </div>
-      </div> */}
-
       {/* Players Table */}
       <DataTable
         data={players}
