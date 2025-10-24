@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import FileUpload from "@/components/common/FileUpload";
 
-const AddPlayerModal = ({ isOpen, onClose, onSave, clubs }) => {
+const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
   const [formData, setFormData] = useState({
     full_name: "",
     date_of_birth: "",
@@ -26,18 +26,55 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, clubs }) => {
   });
   const [uploadedFile, setUploadedFile] = useState(null);
 
+  useEffect(() => {
+    if (player) {
+      setFormData({
+        full_name: player.full_name || "",
+        date_of_birth: player.date_of_birth || "",
+        position: player.position || "",
+        height_cm: player.height_cm || "",
+        weight_kg: player.weight_kg || "",
+        current_club: player.current_club || "",
+        nationality: player.nationality || "",
+        status: player.status || "Active",
+        jersey_number: player.jersey_number || "",
+        avatar_url: player.avatar_url || "",
+      });
+    } else {
+      setFormData({
+        full_name: "",
+        date_of_birth: "",
+        position: "",
+        height_cm: "",
+        weight_kg: "",
+        current_club: "",
+        nationality: "",
+        status: "Active",
+        jersey_number: "",
+        avatar_url: "",
+      });
+    }
+  }, [player]);
+
   if (!isOpen) return null;
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave({
+
+    const submitData = {
       ...formData,
-      height_cm: parseFloat(formData.height_cm),
-      weight_kg: parseFloat(formData.weight_kg),
-      jersey_number: parseInt(formData.jersey_number),
-      avatar_url: uploadedFile ? uploadedFile.name : "",
-    });
-    onClose();
+      height_cm: formData.height_cm ? parseFloat(formData.height_cm) : null,
+      weight_kg: formData.weight_kg ? parseFloat(formData.weight_kg) : null,
+      jersey_number: formData.jersey_number
+        ? parseInt(formData.jersey_number)
+        : null,
+    };
+
+    if (player) {
+      submitData.player_id = player.player_id;
+    }
+
+    onSave(submitData);
   };
 
   const handleFileUpload = async (files) => {
@@ -45,11 +82,15 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, clubs }) => {
     setUploadedFile(file);
 
     // Simulate AWS upload
-    const awsService = await import("@/services/aws.service");
-    const result = await awsService.uploadFile(file, "player-avatars/");
+    try {
+      const awsService = await import("@/services/aws.service");
+      const result = await awsService.uploadFile(file, "player-avatars/");
 
-    if (result.success) {
-      setFormData((prev) => ({ ...prev, avatar_url: result.url }));
+      if (result.success) {
+        setFormData((prev) => ({ ...prev, avatar_url: result.url }));
+      }
+    } catch (error) {
+      console.error("Error uploading file:", error);
     }
   };
 
@@ -61,7 +102,7 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, clubs }) => {
       <Card className="w-full max-w-4xl max-h-[90vh] flex flex-col">
         {/* Fixed Header */}
         <CardHeader className="shrink-0 border-b">
-          <CardTitle>Add New Player</CardTitle>
+          <CardTitle>{player ? "Edit Player" : "Add New Player"}</CardTitle>
         </CardHeader>
 
         {/* Scrollable Body */}
@@ -252,7 +293,7 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, clubs }) => {
               onClick={handleSubmit}
               className="bg-primary hover:bg-primary/90"
             >
-              Save Player
+              {player ? "Update Player" : "Save Player"}
             </Button>
           </div>
         </div>

@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import DataTable from "@/components/common/DataTable";
 import AddPlayerModal from "@/components/modals/AddPlayerModal";
 import DeleteConfirmModal from "@/components/common/DeleteConfirmModal";
-import { mockPlayers, mockClubs } from "@/mock/data";
+import { usePlayersStore } from "@/store/players.store";
+import { useClubsStore } from "@/store/clubs.store";
 import {
   Search,
   Calendar,
@@ -20,7 +21,8 @@ import {
 } from "lucide-react";
 
 const Players = () => {
-  const [players, setPlayers] = useState(mockPlayers);
+  const [players, setPlayers] = useState([]);
+  const [clubs, setClubs] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState({
@@ -28,68 +30,117 @@ const Players = () => {
     playerId: "",
   });
   const [selectedPlayer, setSelectedPlayer] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Filter players based on search
-  const filteredPlayers = players.filter(
-    (player) =>
-      player.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      player.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      player.nationality.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Pagination state
+  const [pagination, setPagination] = useState({
+    page: 1,
+    pageSize: 10,
+    total: 0,
+    totalPages: 0,
+  });
 
-  // Stats calculation
-  const stats = {
-    total: players.length,
-    active: players.filter((player) => player.status === "Active").length,
-    clubs: new Set(players.map((player) => player.current_club)).size,
+  const { getAllPlayers, createPlayer, updatePlayer, deletePlayer } =
+    usePlayersStore();
+  const { getAllClubs } = useClubsStore();
+
+  const fetchAllPlayers = async (
+    page = pagination.page,
+    pageSize = pagination.pageSize,
+    search = ""
+  ) => {
+    setIsLoading(true);
+    try {
+      const filters = {};
+      if (search) {
+        filters.search = search;
+      }
+
+      const result = await getAllPlayers(page, pageSize, filters);
+      if (result.success === true) {
+        const { data, pagination: paginationData } = result.data;
+        setPlayers(data || []);
+        setPagination({
+          page: paginationData.page,
+          pageSize: paginationData.pageSize,
+          total: paginationData.total,
+          totalPages: paginationData.totalPages,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching players:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleAddPlayer = (playerData) => {
-    const club = mockClubs.find(
-      (club) => club.club_id === playerData.current_club
-    );
-
-    const newPlayer = {
-      ...playerData,
-      player_id: `player-${Date.now()}`,
-      club_name: club?.club_name || "Unknown Club",
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-    setPlayers((prev) => [...prev, newPlayer]);
+  const fetchClubs = async () => {
+    try {
+      const result = await getAllClubs();
+      if (result.success === true) {
+        setClubs(result.data?.data || []);
+      }
+    } catch (error) {
+      console.error("Error fetching clubs:", error);
+    }
   };
 
-  const handleDeletePlayer = () => {
-    setPlayers((prev) =>
-      prev.filter((player) => player.player_id !== deleteModal.playerId)
-    );
-    setDeleteModal({ isOpen: false, playerId: "" });
+  useEffect(() => {
+    fetchAllPlayers();
+    fetchClubs();
+  }, []);
+
+  const handlePageChange = (newPage) => {
+    fetchAllPlayers(newPage, pagination.pageSize, searchTerm);
   };
 
-  const handleEditPlayer = (player) => {
+  const handlePageSizeChange = (newPageSize) => {
+    fetchAllPlayers(1, newPageSize, searchTerm);
+  };
+
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+    fetchAllPlayers(1, pagination.pageSize, value);
+  };
+
+  const handleAddPlayer = async (playerData) => {
+    try {
+      const result = await createPlayer(playerData);
+      if (result.success) {
+        fetchAllPlayers(pagination.page, pagination.pageSize, searchTerm);
+        setShowAddModal(false);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleUpdatePlayer = async (updatedData) => {
+    try {
+      const { player_id } = updatedData;
+      const result = await updatePlayer(player_id, updatedData);
+      if (result.success) {
+        fetchAllPlayers(pagination.page, pagination.pageSize, searchTerm);
+        setSelectedPlayer(null);
+        setShowAddModal(false);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleDeletePlayer = async () => {
+    const result = await deletePlayer(deleteModal.playerId);
+    const { success } = result;
+    if (success === true) {
+      fetchAllPlayers(pagination.page, pagination.pageSize, searchTerm);
+      setDeleteModal({ isOpen: false, playerId: "" });
+    }
+  };
+
+  const handleEditPlayer = async (player) => {
     setSelectedPlayer(player);
     setShowAddModal(true);
-  };
-
-  const handleUpdatePlayer = (updatedData) => {
-    const club = mockClubs.find(
-      (club) => club.club_id === updatedData.current_club
-    );
-
-    const updatedPlayer = {
-      ...updatedData,
-      club_name: club?.club_name || "Unknown Club",
-      updated_at: new Date().toISOString(),
-    };
-
-    setPlayers((prev) =>
-      prev.map((player) =>
-        player.player_id === selectedPlayer.player_id
-          ? { ...player, ...updatedPlayer }
-          : player
-      )
-    );
-    setSelectedPlayer(null);
   };
 
   // Calculate age from date of birth
@@ -108,6 +159,12 @@ const Players = () => {
     }
 
     return age;
+  };
+
+  // Get club name by ID
+  const getClubName = (clubId) => {
+    const club = clubs.find((club) => club.club_id === clubId);
+    return club ? club.club_name : "Unknown Club";
   };
 
   // Default avatar component for players
@@ -184,7 +241,9 @@ const Players = () => {
       cell: ({ row }) => (
         <div className="flex items-center space-x-2">
           <Shirt className="w-4 h-4 text-muted-foreground" />
-          <span className="text-foreground">{row.current_club}</span>
+          <span className="text-foreground">
+            {getClubName(row.current_club)}
+          </span>
         </div>
       ),
     },
@@ -279,27 +338,27 @@ const Players = () => {
             <Input
               placeholder="Search players by name, position, or nationality..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => handleSearch(e.target.value)}
               className="pl-10 pr-4"
             />
           </div>
         </div>
-        {/* <div className="flex items-center space-x-3">
-          <div className="text-sm text-muted-foreground">
-            Showing {filteredPlayers.length} of {players.length} players
-          </div>
-        </div> */}
       </div>
 
       {/* Players Table */}
       <DataTable
-        data={filteredPlayers}
+        data={players}
         columns={playerColumns}
         title="All Players"
         searchable={false}
         actions={playerActions}
+        isLoading={isLoading}
         onAdd={() => setShowAddModal(true)}
         addButtonText="Add New Player"
+        // Pagination props
+        pagination={pagination}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
       />
 
       {/* Add/Edit Player Modal */}
@@ -311,7 +370,7 @@ const Players = () => {
         }}
         onSave={selectedPlayer ? handleUpdatePlayer : handleAddPlayer}
         player={selectedPlayer}
-        clubs={mockClubs}
+        clubs={clubs}
       />
 
       {/* Delete Confirmation Modal */}

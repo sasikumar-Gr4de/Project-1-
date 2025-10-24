@@ -6,7 +6,6 @@ import {
   PLAYER_UPDATE_SUCCESS,
   PLAYER_DELETE_SUCCESS,
   PLAYER_NOT_FOUND,
-  PLAYER_CLUB_GET_SUCCESS,
   COMMON_GET_SUCCESS,
 } from "../utils/messages.js";
 
@@ -14,7 +13,8 @@ class PlayersService {
   static async createPlayer(playerData) {
     try {
       const data = await Player.create(playerData);
-      return generateResponse(data, PLAYER_CREATE_SUCCESS);
+      if (data) return generateResponse(data, PLAYER_CREATE_SUCCESS);
+      return generateResponse(null, "Creating Error");
     } catch (err) {
       throw err;
     }
@@ -67,11 +67,11 @@ class PlayersService {
 
   static async getPlayerClub(playerId) {
     try {
-      const data = await Player.findPlayerClubName(playerId);
+      const data = await Player.findPlayerClub(playerId);
       if (!data) {
         return generateResponse(null, PLAYER_NOT_FOUND);
       }
-      return generateResponse(data, PLAYER_CLUB_GET_SUCCESS);
+      return generateResponse(data, "Player club retrieved successfully");
     } catch (err) {
       throw err;
     }
