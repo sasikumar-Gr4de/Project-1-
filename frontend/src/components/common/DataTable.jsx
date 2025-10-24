@@ -185,11 +185,11 @@ const DataTable = ({
         </div>
       </div>
 
-      <h3 className="text-2xl font-bold text-foreground mb-3">
+      <h4 className="text-2xl font-bold text-foreground mb-3">
         {emptyStateTitle}
-      </h3>
+      </h4>
 
-      <p className="text-muted-foreground max-w-md mb-6 text-lg">
+      <p className="text-muted-foreground max-w-md mb-6 text-sm">
         {searchTerm
           ? "No records match your search criteria. Try adjusting your search terms."
           : emptyStateDescription}

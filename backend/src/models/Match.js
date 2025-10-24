@@ -4,8 +4,8 @@ import { MATCH_STATUSES, MATCH_QA_STATUS } from "../utils/constants.js";
 export default class Match {
   static async create(matchData) {
     const {
-      home_team,
-      away_team,
+      home_club_id,
+      away_club_id,
       match_date,
       venue,
       competition,
@@ -22,8 +22,8 @@ export default class Match {
         .from("matches")
         .insert([
           {
-            home_team,
-            away_team,
+            home_club_id,
+            away_club_id,
             match_date,
             venue,
             competition,
@@ -123,7 +123,7 @@ export default class Match {
       let query = supabase
         .from("matches")
         .select("*", { count: "exact" })
-        .or(`home_team.eq.${clubId},away_team.eq.${clubId}`);
+        .or(`home_club_id.eq.${clubId},away_club_id.eq.${clubId}`);
 
       const { data, error, count } = await query
         .range(offset, offset + limit - 1)
@@ -166,7 +166,7 @@ export default class Match {
       let query = supabase
         .from("matches")
         .select("*", { count: "exact" })
-        .or(`home_team.eq.${clubId},away_team.eq.${clubId}`);
+        .or(`home_club_id.eq.${clubId},away_club_id.eq.${clubId}`);
 
       const { data, error, count } = await query
         .range(offset, offset + limit - 1)

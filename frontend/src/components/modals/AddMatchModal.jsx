@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,7 +12,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import VideoUpload from "@/components/common/VideoUpload";
 
-const AddMatchModal = ({ isOpen, onClose, onSave, clubs }) => {
+const AddMatchModal = ({ isOpen, onClose, onSave, match, clubs }) => {
   const [formData, setFormData] = useState({
     home_club_id: "",
     away_club_id: "",
@@ -29,6 +29,46 @@ const AddMatchModal = ({ isOpen, onClose, onSave, clubs }) => {
   });
   const [uploadedVideo, setUploadedVideo] = useState(null);
 
+  useEffect(() => {
+    if (match) {
+      // Format date for datetime-local input
+      const matchDate = match.match_date
+        ? new Date(match.match_date)
+        : new Date();
+      const formattedDate = matchDate.toISOString().slice(0, 16);
+
+      setFormData({
+        home_club_id: match.home_club_id || "",
+        away_club_id: match.away_club_id || "",
+        match_date: formattedDate,
+        venue: match.venue || "",
+        competition: match.competition || "",
+        match_status: match.match_status || "scheduled",
+        score_home: match.score_home?.toString() || "",
+        score_away: match.score_away?.toString() || "",
+        duration_minutes: match.duration_minutes?.toString() || "",
+        video_url: match.video_url || "",
+        qa_status: match.qa_status || "pending",
+        notes: match.notes || "",
+      });
+    } else {
+      setFormData({
+        home_club_id: "",
+        away_club_id: "",
+        match_date: new Date().toISOString().slice(0, 16),
+        venue: "",
+        competition: "",
+        match_status: "scheduled",
+        score_home: "",
+        score_away: "",
+        duration_minutes: "",
+        video_url: "",
+        qa_status: "pending",
+        notes: "",
+      });
+    }
+  }, [match]);
+
   if (!isOpen) return null;
 
   const handleSubmit = (e) => {
@@ -38,27 +78,35 @@ const AddMatchModal = ({ isOpen, onClose, onSave, clubs }) => {
       return;
     }
 
-    onSave({
+    const submitData = {
       ...formData,
       score_home: formData.score_home ? parseInt(formData.score_home) : null,
       score_away: formData.score_away ? parseInt(formData.score_away) : null,
       duration_minutes: formData.duration_minutes
         ? parseInt(formData.duration_minutes)
         : null,
-    });
-    onClose();
+    };
+
+    if (match) {
+      submitData.match_id = match.match_id;
+    }
+
+    onSave(submitData);
   };
 
   const handleVideoUpload = async (files) => {
     const file = files[0];
     setUploadedVideo(file);
 
-    // Simulate AWS upload
-    const awsService = await import("@/services/aws.service");
-    const result = await awsService.uploadFile(file, "match-videos/");
+    try {
+      const awsService = await import("@/services/aws.service");
+      const result = await awsService.uploadFile(file, "match-videos/");
 
-    if (result.success) {
-      setFormData((prev) => ({ ...prev, video_url: result.url }));
+      if (result.success) {
+        setFormData((prev) => ({ ...prev, video_url: result.url }));
+      }
+    } catch (error) {
+      console.error("Error uploading video:", error);
     }
   };
 
@@ -70,7 +118,7 @@ const AddMatchModal = ({ isOpen, onClose, onSave, clubs }) => {
       <Card className="w-full max-w-4xl max-h-[90vh] flex flex-col">
         {/* Fixed Header */}
         <CardHeader className="shrink-0 border-b">
-          <CardTitle>Add New Match</CardTitle>
+          <CardTitle>{match ? "Edit Match" : "Add New Match"}</CardTitle>
         </CardHeader>
 
         {/* Scrollable Body */}
@@ -173,7 +221,7 @@ const AddMatchModal = ({ isOpen, onClose, onSave, clubs }) => {
                   <SelectContent>
                     {matchStatuses.map((status) => (
                       <SelectItem key={status} value={status}>
-                        {status}
+                        {status.charAt(0).toUpperCase() + status.slice(1)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -245,7 +293,7 @@ const AddMatchModal = ({ isOpen, onClose, onSave, clubs }) => {
                   <SelectContent>
                     {qaStatuses.map((status) => (
                       <SelectItem key={status} value={status}>
-                        {status}
+                        {status.charAt(0).toUpperCase() + status.slice(1)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -290,7 +338,7 @@ const AddMatchModal = ({ isOpen, onClose, onSave, clubs }) => {
               onClick={handleSubmit}
               className="bg-primary hover:bg-primary/90"
             >
-              Save Match
+              {match ? "Update Match" : "Save Match"}
             </Button>
           </div>
         </div>

@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import DataTable from "@/components/common/DataTable";
 import AddMatchModal from "@/components/modals/AddMatchModal";
 import DeleteConfirmModal from "@/components/common/DeleteConfirmModal";
-import { mockMatches, mockClubs } from "@/mock/data";
+import { useMatchesStore } from "@/store/matches.store";
+import { useClubsStore } from "@/store/clubs.store";
 import {
   Search,
   Trophy,
@@ -19,7 +20,8 @@ import { capitalize } from "@/utils/helper.utils";
 import { formatDate } from "@/utils/formatter.util";
 
 const Matches = () => {
-  const [matches, setMatches] = useState(mockMatches);
+  const [matches, setMatches] = useState([]);
+  const [clubs, setClubs] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState({
@@ -27,120 +29,117 @@ const Matches = () => {
     matchId: "",
   });
   const [selectedMatch, setSelectedMatch] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Filter matches based on search
-  const filteredMatches = matches.filter(
-    (match) =>
-      match.home_club.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      match.away_club.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      match.venue.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      match.competition?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Pagination state
+  const [pagination, setPagination] = useState({
+    page: 1,
+    pageSize: 10,
+    total: 0,
+    totalPages: 0,
+  });
 
-  // Stats calculation
-  const stats = {
-    total: matches.length,
-    completed: matches.filter((match) => match.match_status === "completed")
-      .length,
-    upcoming: matches.filter((match) => match.match_status === "scheduled")
-      .length,
+  const { getAllMatches, createMatch, updateMatch, deleteMatch } =
+    useMatchesStore();
+  const { getAllClubs } = useClubsStore();
+
+  const fetchAllMatches = async (
+    page = pagination.page,
+    pageSize = pagination.pageSize,
+    search = ""
+  ) => {
+    setIsLoading(true);
+    try {
+      const filters = {};
+      if (search) {
+        filters.search = search;
+      }
+
+      const result = await getAllMatches(page, pageSize, filters);
+      if (result.success === true) {
+        const { data, pagination: paginationData } = result.data;
+        setMatches(data || []);
+        setPagination({
+          page: paginationData.page,
+          pageSize: paginationData.pageSize,
+          total: paginationData.total,
+          totalPages: paginationData.totalPages,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching matches:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleAddMatch = (matchData) => {
-    const homeClub = mockClubs.find(
-      (club) => club.club_id === matchData.home_club_id
-    );
-    const awayClub = mockClubs.find(
-      (club) => club.club_id === matchData.away_club_id
-    );
-
-    const newMatch = {
-      ...matchData,
-      match_id: `match-${Date.now()}`,
-      home_club: homeClub?.club_name || "Unknown Club",
-      away_club: awayClub?.club_name || "Unknown Club",
-      home_score: matchData.score_home,
-      away_score: matchData.score_away,
-      league: matchData.competition,
-      match_date: matchData.match_date,
-      match_time: new Date(matchData.match_date).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      status: matchData.match_status,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-    setMatches((prev) => [...prev, newMatch]);
+  const fetchClubs = async () => {
+    try {
+      const result = await getAllClubs();
+      if (result.success === true) {
+        setClubs(result.data?.data || []);
+      }
+    } catch (error) {
+      console.error("Error fetching clubs:", error);
+    }
   };
 
-  const handleDeleteMatch = () => {
-    setMatches((prev) =>
-      prev.filter((match) => match.match_id !== deleteModal.matchId)
-    );
-    setDeleteModal({ isOpen: false, matchId: "" });
+  useEffect(() => {
+    fetchAllMatches();
+    fetchClubs();
+  }, []);
+
+  const handlePageChange = (newPage) => {
+    fetchAllMatches(newPage, pagination.pageSize, searchTerm);
   };
 
-  const handleEditMatch = (match) => {
-    // Convert existing match data to match AddMatchModal structure
-    const homeClub = mockClubs.find(
-      (club) => club.club_name === match.home_club
-    );
-    const awayClub = mockClubs.find(
-      (club) => club.club_name === match.away_club
-    );
+  const handlePageSizeChange = (newPageSize) => {
+    fetchAllMatches(1, newPageSize, searchTerm);
+  };
 
-    const editData = {
-      home_club_id: homeClub?.club_id || "",
-      away_club_id: awayClub?.club_id || "",
-      match_date: match.match_date,
-      venue: match.venue,
-      competition: match.league,
-      match_status: match.status,
-      score_home: match.home_score?.toString() || "",
-      score_away: match.away_score?.toString() || "",
-      duration_minutes: match.duration_minutes?.toString() || "",
-      video_url: match.video_url || "",
-      qa_status: match.qa_status || "pending",
-      notes: match.notes || "",
-    };
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+    fetchAllMatches(1, pagination.pageSize, value);
+  };
 
-    setSelectedMatch({ ...match, ...editData });
+  const handleAddMatch = async (matchData) => {
+    try {
+      const result = await createMatch(matchData);
+      if (result.success) {
+        fetchAllMatches(pagination.page, pagination.pageSize, searchTerm);
+        setShowAddModal(false);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleUpdateMatch = async (updatedData) => {
+    try {
+      const { match_id } = updatedData;
+      const result = await updateMatch(match_id, updatedData);
+      if (result.success) {
+        fetchAllMatches(pagination.page, pagination.pageSize, searchTerm);
+        setSelectedMatch(null);
+        setShowAddModal(false);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleDeleteMatch = async () => {
+    const result = await deleteMatch(deleteModal.matchId);
+    const { success } = result;
+    if (success === true) {
+      fetchAllMatches(pagination.page, pagination.pageSize, searchTerm);
+      setDeleteModal({ isOpen: false, matchId: "" });
+    }
+  };
+
+  const handleEditMatch = async (match) => {
+    setSelectedMatch(match);
     setShowAddModal(true);
-  };
-
-  const handleUpdateMatch = (updatedData) => {
-    const homeClub = mockClubs.find(
-      (club) => club.club_id === updatedData.home_club_id
-    );
-    const awayClub = mockClubs.find(
-      (club) => club.club_id === updatedData.away_club_id
-    );
-
-    const updatedMatch = {
-      ...updatedData,
-      home_club: homeClub?.club_name || "Unknown Club",
-      away_club: awayClub?.club_name || "Unknown Club",
-      home_score: updatedData.score_home,
-      away_score: updatedData.score_away,
-      league: updatedData.competition,
-      match_date: updatedData.match_date,
-      match_time: new Date(updatedData.match_date).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      status: updatedData.match_status,
-      updated_at: new Date().toISOString(),
-    };
-
-    setMatches((prev) =>
-      prev.map((match) =>
-        match.match_id === selectedMatch.match_id
-          ? { ...match, ...updatedMatch }
-          : match
-      )
-    );
-    setSelectedMatch(null);
   };
 
   // Format match score
@@ -171,21 +170,35 @@ const Matches = () => {
     switch (status) {
       case "completed":
         return "default";
+      case "approved":
+        return "default";
       case "pending":
         return "destructive";
+      case "rejected":
+        return "outline";
+      default:
+        return "secondary";
     }
+  };
+
+  // Get club name by ID
+  const getClubName = (clubId) => {
+    const club = clubs.find((club) => club.club_id === clubId);
+    return club ? club.club_name : "Unknown Club";
   };
 
   // Table columns
   const matchColumns = [
     {
       header: "Match",
-      accessor: "home_club",
+      accessor: "home_club_id",
       cell: ({ row }) => (
         <div className="flex items-center justify-between space-x-4">
           {/* Home Team - Right Aligned */}
           <div className="flex-1 text-right mr-2">
-            <p className="font-semibold text-foreground">{row.home_club}</p>
+            <p className="font-semibold text-foreground">
+              {getClubName(row.home_club_id)}
+            </p>
             <p className="text-sm text-muted-foreground">Home</p>
           </div>
 
@@ -196,15 +209,17 @@ const Matches = () => {
               </span>
             </div>
             <Badge
-              variant={getStatusVariant(row.status)}
+              variant={getStatusVariant(row.match_status)}
               className="mt-1 text-xs"
             >
-              {row.status}
+              {capitalize(row.match_status)}
             </Badge>
           </div>
 
           <div className="flex-1 text-left ml-2">
-            <p className="font-semibold text-foreground">{row.away_club}</p>
+            <p className="font-semibold text-foreground">
+              {getClubName(row.away_club_id)}
+            </p>
             <p className="text-sm text-muted-foreground">Away</p>
           </div>
         </div>
@@ -240,7 +255,12 @@ const Matches = () => {
             <p className="text-sm font-medium">
               {formatDate(new Date(row.match_date))}
             </p>
-            <p className="text-xs text-muted-foreground">{row.match_time}</p>
+            <p className="text-xs text-muted-foreground">
+              {new Date(row.match_date).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </p>
           </div>
         </div>
       ),
@@ -299,27 +319,27 @@ const Matches = () => {
             <Input
               placeholder="Search matches by teams, venue, or league..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => handleSearch(e.target.value)}
               className="pl-10 pr-4"
             />
           </div>
         </div>
-        {/* <div className="flex items-center space-x-3">
-          <div className="text-sm text-muted-foreground">
-            Showing {filteredMatches.length} of {matches.length} matches
-          </div>
-        </div> */}
       </div>
 
       {/* Matches Table */}
       <DataTable
-        data={filteredMatches}
+        data={matches}
         columns={matchColumns}
         title="All Matches"
         searchable={false}
         actions={matchActions}
+        isLoading={isLoading}
         onAdd={() => setShowAddModal(true)}
         addButtonText="Add New Match"
+        // Pagination props
+        pagination={pagination}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
       />
 
       {/* Add/Edit Match Modal */}
@@ -331,7 +351,7 @@ const Matches = () => {
         }}
         onSave={selectedMatch ? handleUpdateMatch : handleAddMatch}
         match={selectedMatch}
-        clubs={mockClubs}
+        clubs={clubs}
       />
 
       {/* Delete Confirmation Modal */}
