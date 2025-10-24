@@ -35,10 +35,9 @@ const Sidebar = ({ isOpen, onClose }) => {
           name: "Matches",
           icon: Trophy,
           href: "/dashboard/matches",
-          badge: 12,
         },
-        { name: "Clubs", icon: Users, href: "/dashboard/clubs", badge: 8 },
-        { name: "Players", icon: User, href: "/dashboard/players", badge: 45 },
+        { name: "Clubs", icon: Users, href: "/dashboard/clubs" },
+        { name: "Players", icon: User, href: "/dashboard/players" },
       ],
     },
     {
@@ -47,7 +46,7 @@ const Sidebar = ({ isOpen, onClose }) => {
         { name: "SenseVS", icon: Video, href: "/sensevs" },
         { name: "Playlist", icon: PlayCircle, href: "/playlist" },
         { name: "Feedback", icon: MessageSquare, href: "/feedback" },
-        { name: "File Manager", icon: Folder, href: "/files", badge: 23 },
+        { name: "File Manager", icon: Folder, href: "/files" },
       ],
     },
     {
@@ -73,27 +72,19 @@ const Sidebar = ({ isOpen, onClose }) => {
       {/* Sidebar */}
       <div
         className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform transition-transform duration-300 ease-in-out
+        w-64 bg-card border-r border-border h-full transform transition-transform duration-300 ease-in-out
         ${isOpen ? "translate-x-0" : "-translate-x-full"} 
-        md:translate-x-0 md:static md:z-auto
+        md:translate-x-0
       `}
       >
         <div className="flex flex-col h-full">
-          {/* Sidebar Header */}
-          {/* <div className="flex items-center justify-between p-4 border-b border-border">
-            <div className="flex items-center space-x-3">
-              <img src="/GR4DE.png" alt="GR4DE" className="h-8 w-8" />
-              <span className="font-bold text-foreground">GR4DE</span>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onClose}
-              className="md:hidden"
-            >
+          {/* Close button for mobile */}
+          <div className="flex items-center justify-between p-4 border-b border-border md:hidden">
+            <span className="font-bold text-foreground">Menu</span>
+            <Button variant="ghost" size="icon" onClick={onClose}>
               <X className="w-5 h-5" />
             </Button>
-          </div> */}
+          </div>
 
           {/* Navigation */}
           <nav className="flex-1 overflow-y-auto p-4 space-y-8">
@@ -107,6 +98,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                     <li key={item.name}>
                       <Link
                         to={item.href}
+                        onClick={() => window.innerWidth < 768 && onClose()} // Close on mobile click
                         className={`
                           flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors
                           ${
@@ -123,16 +115,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                           <span>{item.name}</span>
                         </div>
                         {/* {item.badge && (
-                          <span
-                            className={`
-                            px-2 py-1 text-xs rounded-full
-                            ${
-                              item.active
-                                ? "bg-primary-foreground text-primary"
-                                : "bg-primary text-primary-foreground"
-                            }
-                          `}
-                          >
+                          <span className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
                             {item.badge}
                           </span>
                         )} */}

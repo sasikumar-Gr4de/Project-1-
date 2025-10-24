@@ -1,46 +1,47 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import FileUpload from "@/components/common/FileUpload";
-import { useClubsStore } from "@/store/clubs.store";
+import { X } from "lucide-react";
 
-const AddClubModal = ({ isOpen, onClose, onSave }) => {
+const AddClubModal = ({ isOpen, onClose, onSave, club }) => {
+  const [isSending, setIsSending] = useState(false);
   const [formData, setFormData] = useState({
     club_name: "",
     location: "",
     founded_year: "",
     mark_url: "",
   });
+
+  useEffect(() => {
+    setFormData({
+      club_name: club?.club_name || "",
+      location: club?.location || "",
+      founded_year: club?.founded_year || "",
+      mark_url: club?.mark_url || "",
+    });
+  }, [club]);
+
   const [uploadedFile, setUploadedFile] = useState(null);
-  const { createClub } = useClubsStore();
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSending(true);
     const clubData = {
+      ...club,
       ...formData,
       founded_year: parseInt(formData.founded_year),
       mark_url: uploadedFile ? uploadedFile.name : "",
     };
-    const result = await createClub(clubData);
-    if (result.success === true) {
-      onSave(clubData);
-      onClose();
-    }
+    await onSave(clubData);
+    setIsSending(false);
+    onClose();
   };
 
   const handleFileUpload = async (results) => {
-    // In a real app, you would upload to AWS S3 here
-    // const file = files[0];
-    // setUploadedFile(file);
-    // // Simulate AWS upload
-    // const awsService = await import("@/services/aws.service");
-    // const result = await awsService.uploadFile(file, "team-marks/");
-    // if (result.success) {
-    //   setFormData((prev) => ({ ...prev, mark_url: result.url }));
-    // }
     results.forEach((result) => {
       if (result.success) {
         console.log("Uploaded:", result.url);
@@ -53,77 +54,103 @@ const AddClubModal = ({ isOpen, onClose, onSave }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <Card className="w-full max-w-2xl max-h-[90vh] flex flex-col">
         {/* Fixed Header */}
-        <CardHeader className="shrink-0 border-b">
-          <CardTitle>Add New Club</CardTitle>
+        <CardHeader className="shrink-0 border-b bg-card">
+          <CardTitle className="flex items-center justify-between">
+            <span>{club ? "Edit Club" : "Add New Club"}</span>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="h-8 w-8"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </CardTitle>
         </CardHeader>
 
         {/* Scrollable Body */}
         <CardContent className="flex-1 overflow-y-auto p-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Club Name *</label>
-                <Input
-                  required
-                  value={formData.club_name}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      club_name: e.target.value,
-                    }))
-                  }
-                  placeholder="Enter club name"
-                />
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Basic Information */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Basic Information</h3>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Location</label>
-                <Input
-                  value={formData.location}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      location: e.target.value,
-                    }))
-                  }
-                  placeholder="Enter location"
-                />
-              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">
+                    Club Name <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    required
+                    value={formData.club_name}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        club_name: e.target.value,
+                      }))
+                    }
+                    placeholder="Enter club name"
+                    disabled={isSending}
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Founded Year</label>
-                <Input
-                  type="number"
-                  value={formData.founded_year}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      founded_year: e.target.value,
-                    }))
-                  }
-                  placeholder="Enter founded year"
-                />
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Location</label>
+                  <Input
+                    value={formData.location}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        location: e.target.value,
+                      }))
+                    }
+                    placeholder="Enter location"
+                    disabled={isSending}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Founded Year</label>
+                  <Input
+                    type="number"
+                    min="1800"
+                    max={new Date().getFullYear()}
+                    value={formData.founded_year}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        founded_year: e.target.value,
+                      }))
+                    }
+                    placeholder="Enter founded year"
+                    disabled={isSending}
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">
-                Club Mark (Optional)
-              </label>
-              <FileUpload
-                onUpload={handleFileUpload}
-                accept="image/*"
-                maxSize={2 * 1024 * 1024}
-                label="Upload Club Mark"
-              />
-              {uploadedFile && (
-                <p className="text-sm text-muted-foreground">
-                  Selected: {uploadedFile.name}
+            {/* Club Mark Upload */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Club Mark</h3>
+              <div className="space-y-2">
+                {/* <label className="text-sm font-medium">Club Logo/Mark</label> */}
+                <FileUpload
+                  onUpload={handleFileUpload}
+                  accept="image/*"
+                  maxSize={5 * 1024 * 1024} // 5MB
+                  folder="club-marks"
+                  label="Select club mark"
+                  uploadText="Upload mark"
+                  existingUrl={formData.mark_url}
+                  disabled={isSending}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Recommended: Square image, PNG or JPG, max 5MB
                 </p>
-              )}
+              </div>
             </div>
           </form>
         </CardContent>
@@ -139,7 +166,14 @@ const AddClubModal = ({ isOpen, onClose, onSave }) => {
               onClick={handleSubmit}
               className="bg-primary hover:bg-primary/90"
             >
-              Save Club
+              {isSending ? (
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 border-2 border-secondary-foreground border-t-transparent rounded-full animate-spin" />
+                  <span>Save Club...</span>
+                </div>
+              ) : (
+                "Save Club"
+              )}
             </Button>
           </div>
         </div>

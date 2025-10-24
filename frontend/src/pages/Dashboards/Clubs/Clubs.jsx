@@ -4,11 +4,9 @@ import { Input } from "@/components/ui/input";
 import DataTable from "@/components/common/DataTable";
 import AddClubModal from "@/components/modals/AddClubModal";
 import DeleteConfirmModal from "@/components/common/DeleteConfirmModal";
-import { mockClubs } from "@/mock/data";
 import {
   Search,
   Edit,
-  BarChart3,
   MapPin,
   Calendar,
   Users,
@@ -16,85 +14,129 @@ import {
   Shield,
   TrashIcon,
 } from "lucide-react";
-import { formatDate } from "@/utils/formatter.util";
 import { useClubsStore } from "@/store/clubs.store";
 
 const Clubs = () => {
-  const [clubs, setClubs] = useState();
+  const [clubs, setClubs] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, clubId: "" });
   const [selectedClub, setSelectedClub] = useState(null);
-  const { getAllClubs } = useClubsStore();
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Pagination state
+  const [pagination, setPagination] = useState({
+    page: 1,
+    pageSize: 10,
+    total: 0,
+    totalPages: 0,
+  });
+
+  const { getAllClubs, createClub, updateClub, deleteClub } = useClubsStore();
+
+  const fetchAllClubs = async (
+    page = pagination.page,
+    pageSize = pagination.pageSize
+  ) => {
+    setIsLoading(true);
+    try {
+      const result = await getAllClubs(page, pageSize);
+      if (result.success === true) {
+        const { data, pagination: paginationData } = result.data;
+        setClubs(data || []);
+        setPagination({
+          page: paginationData.page,
+          pageSize: paginationData.pageSize,
+          total: paginationData.total,
+          totalPages: paginationData.totalPages,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching clubs:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchAllClubs = async () => {
-      const result = await getAllClubs();
-      const { data } = result.data;
-
-      if (result.success === true) setClubs(data);
-    };
     fetchAllClubs();
   }, []);
 
-  // Filter clubs based on search
-  // const filteredClubs = clubs.filter(
-  //   (club) =>
-  //     club.club_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //     club.location.toLowerCase().includes(searchTerm.toLowerCase())
-  // );
-
-  const handleAddClub = (clubData) => {
-    const newClub = {
-      ...clubData,
-      club_id: `club-${Date.now()}`,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      status: "active",
-      player_count: 0,
-      match_count: 0,
-    };
-    setClubs((prev) => [...prev, newClub]);
+  const handlePageChange = (newPage) => {
+    fetchAllClubs(newPage, pagination.pageSize);
   };
 
-  const handleDeleteClub = () => {
-    setClubs((prev) =>
-      prev.filter((club) => club.club_id !== deleteModal.clubId)
-    );
-    setDeleteModal({ isOpen: false, clubId: "" });
+  const handlePageSizeChange = (newPageSize) => {
+    fetchAllClubs(1, newPageSize); // Reset to first page when changing page size
   };
 
-  const handleEditClub = (club) => {
+  const handleAddClub = async (clubData) => {
+    try {
+      const result = await createClub(clubData);
+      if (result.success) {
+        const newClub = result.data;
+        setClubs((prev) => [newClub, ...prev]);
+        // Refresh to get updated pagination
+        fetchAllClubs(pagination.page, pagination.pageSize);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleUpdateClub = async (updatedData) => {
+    try {
+      const { club_id } = updatedData;
+      const result = await updateClub(club_id, updatedData);
+      if (result.success) {
+        setClubs((prev) =>
+          prev.map((club) =>
+            club.club_id === club_id
+              ? {
+                  ...club,
+                  ...updatedData,
+                  updated_at: new Date().toISOString(),
+                }
+              : club
+          )
+        );
+        setSelectedClub(null);
+        setShowAddModal(false);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleDeleteClub = async () => {
+    const result = await deleteClub(deleteModal.clubId);
+    const { success } = result;
+    if (success === true) {
+      setClubs((prev) =>
+        prev.filter((club) => club.club_id !== deleteModal.clubId)
+      );
+      setDeleteModal({ isOpen: false, clubId: "" });
+      // Refresh to get updated pagination
+      fetchAllClubs(pagination.page, pagination.pageSize);
+    }
+  };
+
+  const handleEditClub = async (club) => {
     setSelectedClub(club);
     setShowAddModal(true);
   };
 
-  const handleUpdateClub = (updatedData) => {
-    setClubs((prev) =>
-      prev.map((club) =>
-        club.club_id === selectedClub.club_id
-          ? { ...club, ...updatedData, updated_at: new Date().toISOString() }
-          : club
-      )
-    );
-    setSelectedClub(null);
-  };
-
   // Default avatar component for clubs
-  const DefaultAvatar = ({ className = "w-10 h-10" }) => (
+  const DefaultAvatar = ({ className = "w-6 h-6" }) => (
     <div
-      className={`${className} rounded-full bg-linear-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white`}
+      className={`${className} rounded-full bg-linear-to-br from-green-500 to-green-600 flex items-center justify-center text-white`}
     >
-      <Shield className="w-5 h-5" />
+      <Shield className="w-4 h-4" />
     </div>
   );
 
   // Table columns
   const clubColumns = [
-    // {
-    //   header: "Club ID",
-    //   accessor: "club_id",
-    // },
     {
       header: "Club",
       accessor: "club_name",
@@ -111,7 +153,6 @@ const Clubs = () => {
           )}
           <div>
             <p className="font-medium text-foreground">{row.club_name}</p>
-            {/* <p className="text-xs text-muted-foreground">{row.club_id}</p> */}
           </div>
         </div>
       ),
@@ -156,14 +197,6 @@ const Clubs = () => {
         </div>
       ),
     },
-
-    {
-      header: "Created",
-      accessor: "created_at",
-      cell: ({ row }) => {
-        formatDate(new Date(row.created_at));
-      },
-    },
   ];
 
   // Table actions
@@ -182,7 +215,7 @@ const Clubs = () => {
         size="sm"
         className="hover:bg-blue-500/10 hover:text-blue-600"
       >
-        <BarChart3 className="w-4 h-4" />
+        <Users className="w-4 h-4" />
       </Button>
       <Button
         variant="ghost"
@@ -197,32 +230,20 @@ const Clubs = () => {
 
   return (
     <div className="space-y-6">
-      {/* Search and Filters */}
-      {/* <Card className="bg-card border-border/50 shadow-card">
-        <CardContent className="p-6"> */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex flex-1 max-w-md">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input
-              placeholder="Search clubs by name or location..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 shadow-sm"
-            />
-          </div>
-        </div>
-      </div>
-
       {/* Clubs Table */}
       <DataTable
         data={clubs}
         columns={clubColumns}
         title="All Clubs"
-        searchable={false}
         actions={clubActions}
+        isLoading={isLoading}
         onAdd={() => setShowAddModal(true)}
         addButtonText="Add New Club"
+        searchPlaceholder="Search Clubs ... "
+        // Pagination props
+        pagination={pagination}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
       />
 
       {/* Add/Edit Club Modal */}

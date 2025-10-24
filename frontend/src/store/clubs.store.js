@@ -7,11 +7,17 @@ export const useClubsStore = create(
   devtools(
     persist(
       (set, get) => ({
-        getAllClubs: async () => {
+        getAllClubs: async (page = 1, pageSize = 10, filters = {}) => {
           try {
-            const response = await api.get("/clubs");
+            const response = await api.get("/clubs", {
+              params: {
+                page,
+                pageSize,
+                ...filters,
+              },
+            });
             const result = response.data;
-            console.log(result);
+
             return result;
           } catch (error) {
             const errorMsg = error.response?.data?.message || error.message;
@@ -26,6 +32,32 @@ export const useClubsStore = create(
             const response = await api.post("/clubs", clubData);
             const result = response.data;
             return result;
+          } catch (error) {
+            const errorMsg = error.response?.data?.message || error.message;
+            return {
+              success: false,
+              error: errorMsg,
+            };
+          }
+        },
+        updateClub: async (id, updatedData) => {
+          try {
+            const response = await api.put(`/clubs/${id}`, updatedData);
+            const result = response.data;
+            return result;
+          } catch (error) {
+            const errorMsg = error.response?.data?.message || error.message;
+            return {
+              success: false,
+              error: errorMsg,
+            };
+          }
+        },
+        deleteClub: async (id) => {
+          try {
+            const response = await api.delete(`/clubs/${id}`);
+            const { data } = response;
+            return data;
           } catch (error) {
             const errorMsg = error.response?.data?.message || error.message;
             return {

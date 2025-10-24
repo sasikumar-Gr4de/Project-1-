@@ -23,7 +23,7 @@ export default class Club {
       const { data, error } = await supabase
         .from("clubs")
         .update(updateData)
-        .eq("id", id)
+        .eq("club_id", id)
         .select()
         .single();
       if (error) throw error;
@@ -36,22 +36,18 @@ export default class Club {
 
   static async findAll(filters = {}, pagination) {
     const { page, pageSize } = pagination;
-    console.log(pagination);
     const offset = (page - 1) * pageSize;
     try {
       let query = supabase.from("clubs").select("*", { count: "exact" });
-
       // Apply filters
       for (const key in filters) {
         if (filters[key]) {
           query = query.eq(key, filters[key]);
         }
       }
-      console.log(offset, offset + pageSize - 1);
       const { data, error, count } = await query
         .range(offset, offset + pageSize - 1)
         .order("created_at", { ascending: false });
-      console.log(data);
       if (error) throw error;
 
       return {
@@ -74,7 +70,7 @@ export default class Club {
       const { data, error } = await supabase
         .from("clubs")
         .select("*")
-        .eq("id", id)
+        .eq("club_id", id)
         .maybeSingle();
       if (error) throw error;
       return data;
@@ -103,7 +99,7 @@ export default class Club {
       const { data_clubs, error_clubs } = await supabase
         .from("clubs")
         .delete()
-        .eq("id", id)
+        .eq("club_id", id)
         .select();
 
       if (error_clubs) throw error_clubs;

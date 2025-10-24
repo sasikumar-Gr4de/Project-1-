@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -11,7 +11,14 @@ const DeleteConfirmModal = ({
   confirmText = "Delete",
   cancelText = "Cancel",
 }) => {
+  const [isLoading, setIsLoading] = useState();
   if (!isOpen) return null;
+
+  const confirmHandler = async () => {
+    setIsLoading(true);
+    await onConfirm();
+    setIsLoading(false);
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -25,8 +32,15 @@ const DeleteConfirmModal = ({
             <Button variant="outline" onClick={onClose}>
               {cancelText}
             </Button>
-            <Button variant="destructive" onClick={onConfirm}>
-              {confirmText}
+            <Button variant="destructive" onClick={confirmHandler}>
+              {isLoading ? (
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Delete..</span>
+                </div>
+              ) : (
+                "Delete"
+              )}
             </Button>
           </div>
         </CardContent>

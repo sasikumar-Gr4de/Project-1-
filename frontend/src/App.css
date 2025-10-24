@@ -59,8 +59,11 @@
 
 /* For Firefox - ensure smooth scrolling */
 html {
-  scroll-behavior: smooth;
+  
+  /* scroll-behavior: smooth; */
+  overflow-y: hidden;
 }
+
 
 /* Ensure body has proper scrollbar */
 body {

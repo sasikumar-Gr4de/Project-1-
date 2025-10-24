@@ -16,12 +16,17 @@ export const useAuthstore = create(
             const response = await api.post("/auth/login", { email, password });
             const result = response.data;
             if (result.success) {
-              const { email_verified } = result.data;
-              if (email_verified === false) return result;
+              console.log(result);
+              debugger;
               const {
-                data: { token },
-              } = result;
-              set({ user: data });
+                user,
+                user: { email_verified },
+                token,
+              } = result.data;
+
+              if (email_verified === false) return result;
+
+              set({ user: user });
               localStorage.setItem("auth-token", token);
             }
             return result;
