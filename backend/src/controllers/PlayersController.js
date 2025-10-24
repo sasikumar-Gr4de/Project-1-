@@ -25,10 +25,12 @@ class PlayersController {
   async getAllPlayers(req, res) {
     try {
       const { page = 1, pageSize = 10, ...filters } = req.query;
+
       const result = await PlayersService.getAllPlayers(filters, {
         page: parseInt(page),
         pageSize: parseInt(pageSize),
       });
+
       return res.status(200).json(result);
     } catch (err) {
       return sendServerErrorResponse(req, res, err);

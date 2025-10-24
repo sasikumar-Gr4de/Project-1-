@@ -80,6 +80,8 @@ export default class Player {
       const { data, error, count } = await query
         .range(offset, offset + pageSize - 1)
         .order("created_at", { ascending: false });
+
+      // console.log(data, error);
       if (error) throw error;
 
       return {
