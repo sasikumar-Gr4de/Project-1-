@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import logo from "@/assets/images/logo.png";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuthstore } from "@/store/auth.store";
+import { useAuthStore } from "@/store/auth.store";
 
 const Login = () => {
   const { login: loginUser } = useAuthstore();

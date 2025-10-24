@@ -22,11 +22,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useAuthstore } from "@/store/auth.store.js";
+import { useAuthStore } from "@/store/auth.store.js";
 
 const Register = () => {
   const navigate = useNavigate();
-  const { register: registerUser } = useAuthstore();
+  const { register: registerUser } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);

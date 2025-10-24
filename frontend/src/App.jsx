@@ -14,20 +14,57 @@ import Home from "@/pages/Dashboards/Home";
 import Clubs from "@/pages/Dashboards/Clubs/Clubs";
 import Matches from "@/pages/Dashboards/Matches/Matches";
 import Players from "@/pages/Dashboards/Players/Players";
+import Landing from "@/pages/Landing";
+import ProtectedRoute from "@/components/common/ProtectedRoute";
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* <Route path="/" element={<h1>Welcome to GR4DE</h1>} /> */}
+        <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
-        <Route path="/dashboard" element={<Layout />}>
-          <Route path="" element={<Home />} />
-          <Route path="clubs" element={<Clubs />} />
-          <Route path="players" element={<Players />} />
-          <Route path="matches" element={<Matches />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          }
+        >
+          <Route
+            path=""
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="clubs"
+            element={
+              <ProtectedRoute>
+                <Clubs />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="players"
+            element={
+              <ProtectedRoute>
+                <Players />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="matches"
+            element={
+              <ProtectedRoute>
+                <Matches />
+              </ProtectedRoute>
+            }
+          />
         </Route>
       </Routes>
     </Router>

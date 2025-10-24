@@ -9,7 +9,7 @@ import {
   X,
   User,
 } from "lucide-react";
-import { useAuthstore } from "@/store/auth.store";
+import { useAuthStore } from "@/store/auth.store";
 
 const Header = ({ onMenuToggle }) => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -17,7 +17,7 @@ const Header = ({ onMenuToggle }) => {
   const userMenuRef = useRef(null);
   const notificationsRef = useRef(null);
 
-  const { user, logout } = useAuthstore();
+  const { user, logout } = useAuthStore();
 
   // Close dropdowns when clicking outside
   useEffect(() => {

@@ -12,13 +12,13 @@ import {
 import { Progress } from "@/components/ui/progress";
 import logo from "@/assets/images/logo.png";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAuthstore } from "@/store/auth.store";
+import { useAuthStore } from "@/store/auth.store";
 
 const VerifyEmail = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, checkVerificationStatus, sendVerificationEmail } =
-    useAuthstore();
+    useAuthStore();
   const [countdown, setCountdown] = useState(60);
   const [isResending, setIsResending] = useState(false);
   const [email, setEmail] = useState(location.state?.email || ""); // This would come from your auth context

@@ -3,7 +3,7 @@ import { persist, devtools } from "zustand/middleware";
 import { zustandEncryptedStorage } from "@/utils/storage.utils.js";
 import api from "@/services/base.api.js";
 
-export const useAuthstore = create(
+export const useAuthStore = create(
   devtools(
     persist(
       (set, get) => ({
