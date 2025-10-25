@@ -1,244 +1,278 @@
-// src/components/players/PlayerActivityField.jsx
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import FootballPitch from "@/components/common/FootballPitch";
-import MetricCard from "@/components/common/MetricCard";
-import { Target, Move, Navigation, Zap } from "lucide-react";
 
-const PlayerActivityField = ({ player, metrics }) => {
-  if (!player) return null;
+const PlayerActivityField = ({
+  eventsData = {},
+  category = "Passing",
+  className = "",
+}) => {
+  const [selectedSubcategories, setSelectedSubcategories] = useState({});
+  const [pitchDimensions, setPitchDimensions] = useState(null);
+  const [hoveredCell, setHoveredCell] = useState(null);
 
-  const positionActivities = {
-    activities: [
-      { x: 35, y: 40, size: 10, successful: true, color: "#3b82f6" },
-      { x: 45, y: 55, size: 8, successful: true, color: "#3b82f6" },
-      { x: 60, y: 35, size: 12, successful: false, color: "#ef4444" },
-      { x: 50, y: 45, size: 6, successful: true, color: "#3b82f6" },
-      { x: 40, y: 60, size: 9, successful: true, color: "#3b82f6" },
-    ],
-    distribution: [
-      { x: 40, y: 45, intensity: 0.9 },
-      { x: 50, y: 50, intensity: 0.7 },
-      { x: 55, y: 35, intensity: 0.6 },
-      { x: 35, y: 55, intensity: 0.8 },
-    ],
+  // Grid configuration
+  const GRID_COLS = 10;
+  const GRID_ROWS = 8;
+
+  const categoryData = eventsData[category] || {};
+  const subcategories = Object.keys(categoryData);
+
+  // Initialize all subcategories as selected
+  useEffect(() => {
+    const initialSelection = {};
+    subcategories.forEach((subcat) => {
+      initialSelection[subcat] = true;
+    });
+    setSelectedSubcategories(initialSelection);
+  }, [category]);
+
+  // Process activities for grid
+  const processActivitiesData = () => {
+    if (!pitchDimensions) return { grid: [], totalCount: 0 };
+
+    const { width: pitchWidth, height: pitchHeight } = pitchDimensions;
+
+    // Initialize grid
+    const grid = Array(GRID_ROWS)
+      .fill()
+      .map((_, row) =>
+        Array(GRID_COLS)
+          .fill()
+          .map((_, col) => ({
+            row,
+            col,
+            successful: 0,
+            unsuccessful: 0,
+            total: 0,
+            activities: [],
+          }))
+      );
+
+    let totalCount = 0;
+
+    // Process events
+    Object.entries(selectedSubcategories).forEach(([subcat, isSelected]) => {
+      if (!isSelected) return;
+
+      const subcategoryData = categoryData[subcat];
+      if (!subcategoryData) return;
+
+      Object.entries(subcategoryData).forEach(([actionType, events]) => {
+        events.forEach((event) => {
+          if (!event.position_x || !event.position_y) return;
+
+          // Convert coordinates to grid cells
+          const cellX = Math.floor((event.position_x / 110) * GRID_COLS);
+          const cellY = Math.floor((event.position_y / 68) * GRID_ROWS);
+
+          if (
+            cellX >= 0 &&
+            cellX < GRID_COLS &&
+            cellY >= 0 &&
+            cellY < GRID_ROWS
+          ) {
+            const cell = grid[cellY][cellX];
+            const isUnsuccessful =
+              actionType.includes("Unsuccessful") ||
+              actionType.includes("Lost") ||
+              actionType.includes("Off Target");
+
+            if (isUnsuccessful) {
+              cell.unsuccessful++;
+            } else {
+              cell.successful++;
+            }
+            cell.total++;
+            cell.activities.push({
+              ...event,
+              actionType,
+              subcategory: subcat,
+              successful: !isUnsuccessful,
+            });
+            totalCount++;
+          }
+        });
+      });
+    });
+
+    return { grid: grid.flat(), totalCount };
   };
 
-  const defenseActivities = {
-    activities: [
-      { x: 25, y: 50, size: 11, successful: true, color: "#10b981" },
-      { x: 30, y: 45, size: 7, successful: true, color: "#10b981" },
-      { x: 35, y: 55, size: 9, successful: false, color: "#ef4444" },
-    ],
-    distribution: [
-      { x: 28, y: 48, intensity: 0.8 },
-      { x: 32, y: 52, intensity: 0.9 },
-    ],
+  const { grid, totalCount } = processActivitiesData();
+  const maxCellCount = Math.max(...grid.map((cell) => cell.total), 1);
+
+  const handleSubcategoryToggle = (subcategory) => {
+    setSelectedSubcategories((prev) => ({
+      ...prev,
+      [subcategory]: !prev[subcategory],
+    }));
   };
 
-  const attackActivities = {
-    activities: [
-      { x: 70, y: 40, size: 14, successful: true, color: "#f59e0b" },
-      { x: 75, y: 35, size: 10, successful: true, color: "#f59e0b" },
-      { x: 65, y: 45, size: 8, successful: false, color: "#ef4444" },
-    ],
-    distribution: [
-      { x: 72, y: 38, intensity: 0.9 },
-      { x: 68, y: 42, intensity: 0.7 },
-    ],
+  // Handle mouse move for hover effects
+  const handleMouseMove = (event, cell) => {
+    setHoveredCell(cell);
   };
 
-  const physicalActivities = {
-    activities: [
-      { x: 50, y: 50, size: 15, successful: true, color: "#8b5cf6" },
-      { x: 45, y: 55, size: 12, successful: true, color: "#8b5cf6" },
-      { x: 55, y: 45, size: 13, successful: true, color: "#8b5cf6" },
-    ],
-    distribution: [
-      { x: 50, y: 50, intensity: 1.0 },
-      { x: 48, y: 52, intensity: 0.8 },
-      { x: 52, y: 48, intensity: 0.9 },
-    ],
+  const handleMouseLeave = () => {
+    setHoveredCell(null);
   };
-
-  const positionStats = [
-    { label: "Successful Attempts", value: "18", icon: Target, progress: 85 },
-    { label: "Total Actions", value: "24", icon: Move },
-    { label: "Attribute Count", value: "156", icon: Navigation },
-    { label: "Special Actions", value: "12", icon: Zap },
-  ];
 
   return (
-    <div className="space-y-6 p-6">
-      {/* Position Group */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Position Group Analysis</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="flex justify-center">
-              <FootballPitch
-                width={500}
-                height={350}
-                activities={positionActivities.activities}
-                distribution={positionActivities.distribution}
-                showHeatmap={true}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              {positionStats.map((stat, index) => (
-                <MetricCard
-                  key={index}
-                  title={stat.label}
-                  value={stat.value}
-                  icon={stat.icon}
-                  progress={stat.progress}
-                  className="text-center"
-                />
+    <Card className={className}>
+      <CardHeader>
+        <CardTitle>{category} Activity Field</CardTitle>
+        <p className="text-sm text-muted-foreground">
+          {GRID_COLS}×{GRID_ROWS} grid showing activity density
+        </p>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {/* Subcategory Selection */}
+          <div className="bg-muted p-4 rounded-lg">
+            <Label className="text-sm font-medium mb-2 block">
+              Show Subcategories:
+            </Label>
+            <div className="flex flex-wrap gap-4">
+              {subcategories.map((subcat) => (
+                <div key={subcat} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`activity-${subcat}`}
+                    checked={selectedSubcategories[subcat] || false}
+                    onCheckedChange={() => handleSubcategoryToggle(subcat)}
+                  />
+                  <Label htmlFor={`activity-${subcat}`} className="text-sm">
+                    {subcat}
+                  </Label>
+                </div>
               ))}
             </div>
           </div>
-        </CardContent>
-      </Card>
+          {/* Pitch Visualization */}
+          <div className="relative">
+            <FootballPitch onDimensionsChange={setPitchDimensions}>
+              {pitchDimensions && (
+                <div
+                  className="absolute inset-0 grid pointer-events-auto"
+                  style={{
+                    gridTemplateColumns: `repeat(${GRID_COLS}, 1fr)`,
+                    gridTemplateRows: `repeat(${GRID_ROWS}, 1fr)`,
+                    padding: "8px 16px",
+                  }}
+                >
+                  {grid.map((cell) => {
+                    const cellWidth = pitchDimensions.width / GRID_COLS;
+                    const cellHeight = pitchDimensions.height / GRID_ROWS;
 
-      {/* Defense Group */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Defense Group Analysis</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="flex justify-center">
-              <FootballPitch
-                width={500}
-                height={350}
-                activities={defenseActivities.activities}
-                distribution={defenseActivities.distribution}
-                showHeatmap={true}
-              />
+                    // Calculate color intensity
+                    const intensity = cell.total / maxCellCount;
+                    const baseColor =
+                      cell.unsuccessful > cell.successful
+                        ? "#ef4444"
+                        : "#10b981";
+                    const backgroundColor = `${baseColor}${Math.floor(
+                      30 + intensity * 70
+                    )
+                      .toString(16)
+                      .padStart(2, "0")}`;
+
+                    return (
+                      <div
+                        key={`${cell.row}-${cell.col}`}
+                        className="relative border border-white/30 flex items-center justify-center transition-all duration-200"
+                        style={{
+                          backgroundColor:
+                            cell.total > 0 ? backgroundColor : "transparent",
+                        }}
+                        onMouseMove={(e) => handleMouseMove(e, cell)}
+                        onMouseLeave={handleMouseLeave}
+                      >
+                        {/* Cell count */}
+                        {cell.total > 0 && (
+                          <div className="text-white text-xs font-bold drop-shadow-lg">
+                            {cell.total}
+                          </div>
+                        )}
+
+                        {/* Hover tooltip */}
+                        {hoveredCell?.row === cell.row &&
+                          hoveredCell?.col === cell.col && (
+                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-black/90 text-white text-xs rounded p-2 whitespace-nowrap z-20">
+                              <div>
+                                Cell ({cell.col}, {cell.row})
+                              </div>
+                              <div>Total: {cell.total}</div>
+                              <div>Successful: {cell.successful}</div>
+                              <div>Unsuccessful: {cell.unsuccessful}</div>
+                            </div>
+                          )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </FootballPitch>
+          </div>
+          {/* Statistics */}
+          {totalCount > 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="text-center p-3 bg-blue-50 rounded-lg">
+                <div className="text-2xl font-bold text-blue-600">
+                  {totalCount}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Total Activities
+                </div>
+              </div>
+              <div className="text-center p-3 bg-green-50 rounded-lg">
+                <div className="text-2xl font-bold text-green-600">
+                  {grid.filter((cell) => cell.total > 0).length}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Active Cells
+                </div>
+              </div>
+              <div className="text-center p-3 bg-yellow-50 rounded-lg">
+                <div className="text-2xl font-bold text-yellow-600">
+                  {maxCellCount}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Max per Cell
+                </div>
+              </div>
+              <div className="text-center p-3 bg-purple-50 rounded-lg">
+                <div className="text-2xl font-bold text-purple-600">
+                  {(
+                    (grid.filter((cell) => cell.total > 0).length /
+                      (GRID_COLS * GRID_ROWS)) *
+                    100
+                  ).toFixed(1)}
+                  %
+                </div>
+                <div className="text-sm text-muted-foreground">Coverage</div>
+              </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <MetricCard
-                title="Successful Tackles"
-                value="24"
-                progress={80}
-                className="text-center"
-              />
-              <MetricCard
-                title="Interceptions"
-                value="18"
-                progress={75}
-                className="text-center"
-              />
-              <MetricCard
-                title="Clearances"
-                value="12"
-                progress={60}
-                className="text-center"
-              />
-              <MetricCard
-                title="Defensive Actions"
-                value="54"
-                progress={72}
-                className="text-center"
-              />
+          )}
+          {/* Legend */}
+          <div className="flex justify-center items-center gap-6 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-green-500/50 rounded"></div>
+              <span>Successful</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-red-500/50 rounded"></div>
+              <span>Unsuccessful</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-gray-500/30 rounded border border-white/30"></div>
+              <span>No Activity</span>
             </div>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Attack Group */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Attack Group Analysis</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="flex justify-center">
-              <FootballPitch
-                width={500}
-                height={350}
-                activities={attackActivities.activities}
-                distribution={attackActivities.distribution}
-                showHeatmap={true}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <MetricCard
-                title="Shots on Target"
-                value="8"
-                progress={67}
-                className="text-center"
-              />
-              <MetricCard
-                title="Key Passes"
-                value="12"
-                progress={80}
-                className="text-center"
-              />
-              <MetricCard
-                title="Successful Dribbles"
-                value="15"
-                progress={83}
-                className="text-center"
-              />
-              <MetricCard
-                title="Attacking Actions"
-                value="35"
-                progress={78}
-                className="text-center"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Physical Group */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Physical Group Analysis</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="flex justify-center">
-              <FootballPitch
-                width={500}
-                height={350}
-                activities={physicalActivities.activities}
-                distribution={physicalActivities.distribution}
-                showHeatmap={true}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <MetricCard
-                title="Distance Covered"
-                value="11.2km"
-                progress={85}
-                className="text-center"
-              />
-              <MetricCard
-                title="Sprint Distance"
-                value="2.8km"
-                progress={90}
-                className="text-center"
-              />
-              <MetricCard
-                title="High Intensity"
-                value="156"
-                progress={78}
-                className="text-center"
-              />
-              <MetricCard
-                title="Physical Actions"
-                value="89"
-                progress={82}
-                className="text-center"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

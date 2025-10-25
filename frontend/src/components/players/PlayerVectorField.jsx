@@ -1,312 +1,251 @@
-// src/components/players/PlayerVectorField.jsx
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import FootballPitch from "@/components/common/FootballPitch";
-import MetricCard from "@/components/common/MetricCard";
-import { Navigation, ArrowUpRight, Target, Zap } from "lucide-react";
 
-const PlayerVectorField = ({ player, metrics }) => {
-  if (!player) return null;
+const PlayerVectorField = ({
+  eventsData = {},
+  category = "Passing",
+  className = "",
+}) => {
+  const [selectedSubcategories, setSelectedSubcategories] = useState({});
+  const [pitchDimensions, setPitchDimensions] = useState(null);
 
-  const positionVectors = {
-    vectors: [
-      {
-        startX: 35,
-        startY: 40,
-        endX: 50,
-        endY: 55,
-        color: "#3b82f6",
-        width: 3,
-      },
-      {
-        startX: 40,
-        startY: 45,
-        endX: 55,
-        endY: 40,
-        color: "#3b82f6",
-        width: 2,
-      },
-      {
-        startX: 45,
-        startY: 50,
-        endX: 60,
-        endY: 45,
-        color: "#3b82f6",
-        width: 4,
-      },
-      {
-        startX: 50,
-        startY: 35,
-        endX: 65,
-        endY: 50,
-        color: "#3b82f6",
-        width: 3,
-      },
-    ],
+  // Color mapping for third-level categories
+  const ACTION_COLORS = {
+    Unsuccessful: "#ef4444", // Red
+    "Simple Pass": "#3b82f6", // Blue
+    "Key Pass": "#f59e0b", // Orange
+    Assist: "#10b981", // Green
+    Successful: "#10b981", // Green
+    Crucial: "#8b5cf6", // Purple
+    "Off Target": "#ef4444", // Red
+    "Simple Shot": "#3b82f6", // Blue
+    "Brilliant Shot": "#f59e0b", // Orange
+    "Hit Goal Post": "#8b5cf6", // Purple
+    "Duel Lost": "#ef4444", // Red
+    "Duel Won": "#10b981", // Green
+    "Ball Carry Short": "#3b82f6", // Blue
+    "Ball Carry Medium": "#f59e0b", // Orange
+    "Ball Carry Long": "#ef4444", // Red
   };
 
-  const defenseVectors = {
-    vectors: [
-      {
-        startX: 25,
-        startY: 50,
-        endX: 35,
-        endY: 45,
-        color: "#10b981",
-        width: 3,
-      },
-      {
-        startX: 30,
-        startY: 55,
-        endX: 40,
-        endY: 50,
-        color: "#10b981",
-        width: 2,
-      },
-      {
-        startX: 35,
-        startY: 48,
-        endX: 45,
-        endY: 52,
-        color: "#10b981",
-        width: 4,
-      },
-    ],
+  const categoryData = eventsData[category] || {};
+  const subcategories = Object.keys(categoryData);
+
+  // Initialize all subcategories as selected
+  useEffect(() => {
+    const initialSelection = {};
+    subcategories.forEach((subcat) => {
+      initialSelection[subcat] = true;
+    });
+    setSelectedSubcategories(initialSelection);
+  }, [category]);
+
+  // Process vectors data
+  const processVectorsData = () => {
+    if (!pitchDimensions) return [];
+
+    const { width: pitchWidth, height: pitchHeight } = pitchDimensions;
+    const vectors = [];
+
+    Object.entries(selectedSubcategories).forEach(([subcat, isSelected]) => {
+      if (!isSelected) return;
+
+      const subcategoryData = categoryData[subcat];
+      if (!subcategoryData) return;
+
+      Object.entries(subcategoryData).forEach(([actionType, events]) => {
+        events.forEach((event) => {
+          if (
+            !event.position_x ||
+            !event.position_y ||
+            !event.position_x_end ||
+            !event.position_y_end
+          )
+            return;
+
+          // Convert coordinates to pitch pixels (attack direction: left to right)
+          const startX = (event.position_x / 110) * pitchWidth;
+          const startY = (event.position_y / 68) * pitchHeight;
+          const endX = (event.position_x_end / 110) * pitchWidth;
+          const endY = (event.position_y_end / 68) * pitchHeight;
+
+          vectors.push({
+            startX,
+            startY,
+            endX,
+            endY,
+            color: ACTION_COLORS[actionType] || "#6b7280",
+            actionType,
+            subcategory: subcat,
+          });
+        });
+      });
+    });
+
+    return vectors;
   };
 
-  const attackVectors = {
-    vectors: [
-      {
-        startX: 65,
-        startY: 40,
-        endX: 75,
-        endY: 35,
-        color: "#f59e0b",
-        width: 4,
-      },
-      {
-        startX: 60,
-        startY: 45,
-        endX: 70,
-        endY: 40,
-        color: "#f59e0b",
-        width: 3,
-      },
-      {
-        startX: 70,
-        startY: 38,
-        endX: 80,
-        endY: 32,
-        color: "#f59e0b",
-        width: 5,
-      },
-    ],
+  const vectors = processVectorsData();
+
+  const handleSubcategoryToggle = (subcategory) => {
+    setSelectedSubcategories((prev) => ({
+      ...prev,
+      [subcategory]: !prev[subcategory],
+    }));
   };
 
-  const physicalVectors = {
-    vectors: [
-      {
-        startX: 45,
-        startY: 55,
-        endX: 55,
-        endY: 45,
-        color: "#8b5cf6",
-        width: 4,
-      },
-      {
-        startX: 50,
-        startY: 50,
-        endX: 60,
-        endY: 55,
-        color: "#8b5cf6",
-        width: 3,
-      },
-      {
-        startX: 55,
-        startY: 45,
-        endX: 65,
-        endY: 50,
-        color: "#8b5cf6",
-        width: 5,
-      },
-    ],
+  // Get unique action types for legend
+  const getUniqueActionTypes = () => {
+    const actionTypes = new Set();
+    Object.values(categoryData).forEach((subcatData) => {
+      Object.keys(subcatData).forEach((actionType) => {
+        actionTypes.add(actionType);
+      });
+    });
+    return Array.from(actionTypes);
   };
 
-  const vectorStats = [
-    {
-      label: "Progressive Vectors",
-      value: "24",
-      icon: ArrowUpRight,
-      progress: 80,
-    },
-    { label: "Vector Length Avg", value: "18.5m", icon: Navigation },
-    { label: "Successful Vectors", value: "32", icon: Target },
-    { label: "Special Vectors", value: "8", icon: Zap },
-  ];
+  const uniqueActionTypes = getUniqueActionTypes();
 
   return (
-    <div className="space-y-6 p-6">
-      {/* Position Group Vectors */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Position Group Vector Analysis</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="flex justify-center">
-              <FootballPitch
-                width={500}
-                height={350}
-                vectors={positionVectors.vectors}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              {vectorStats.map((stat, index) => (
-                <MetricCard
-                  key={index}
-                  title={stat.label}
-                  value={stat.value}
-                  icon={stat.icon}
-                  progress={stat.progress}
-                  className="text-center"
-                />
+    <Card className={className}>
+      <CardHeader>
+        <CardTitle>{category} Vector Field</CardTitle>
+        <p className="text-sm text-muted-foreground">
+          Vector visualization of player actions
+        </p>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {/* Subcategory Selection */}
+          <div className="bg-muted p-4 rounded-lg">
+            <Label className="text-sm font-medium mb-2 block">
+              Show Subcategories:
+            </Label>
+            <div className="flex flex-wrap gap-4">
+              {subcategories.map((subcat) => (
+                <div key={subcat} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`vector-${subcat}`}
+                    checked={selectedSubcategories[subcat] || false}
+                    onCheckedChange={() => handleSubcategoryToggle(subcat)}
+                  />
+                  <Label htmlFor={`vector-${subcat}`} className="text-sm">
+                    {subcat}
+                  </Label>
+                </div>
               ))}
             </div>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Defense Group Vectors */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Defense Group Vector Analysis</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="flex justify-center">
-              <FootballPitch
-                width={500}
-                height={350}
-                vectors={defenseVectors.vectors}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <MetricCard
-                title="Defensive Vectors"
-                value="18"
-                progress={75}
-                className="text-center"
-              />
-              <MetricCard
-                title="Interception Vectors"
-                value="12"
-                progress={80}
-                className="text-center"
-              />
-              <MetricCard
-                title="Pressure Vectors"
-                value="15"
-                progress={70}
-                className="text-center"
-              />
-              <MetricCard
-                title="Recovery Vectors"
-                value="9"
-                progress={65}
-                className="text-center"
-              />
-            </div>
+          {/* Pitch Visualization */}
+          <div className="relative">
+            <FootballPitch onDimensionsChange={setPitchDimensions}>
+              {pitchDimensions && vectors.length > 0 && (
+                <svg
+                  className="absolute inset-0 pointer-events-none"
+                  width={pitchDimensions.width}
+                  height={pitchDimensions.height}
+                  style={{ padding: "8px 16px" }}
+                >
+                  {vectors.map((vector, index) => (
+                    <g key={index}>
+                      {/* Vector line */}
+                      <line
+                        x1={vector.startX}
+                        y1={vector.startY}
+                        x2={vector.endX}
+                        y2={vector.endY}
+                        stroke={vector.color}
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                      />
+                      {/* Arrowhead */}
+                      <defs>
+                        <marker
+                          id={`arrow-${index}`}
+                          markerWidth="10"
+                          markerHeight="10"
+                          refX="9"
+                          refY="3"
+                          orient="auto"
+                          markerUnits="strokeWidth"
+                        >
+                          <path d="M0,0 L0,6 L9,3 z" fill={vector.color} />
+                        </marker>
+                      </defs>
+                      <line
+                        x1={vector.startX}
+                        y1={vector.startY}
+                        x2={vector.endX}
+                        y2={vector.endY}
+                        stroke={vector.color}
+                        strokeWidth="2"
+                        markerEnd={`url(#arrow-${index})`}
+                      />
+                    </g>
+                  ))}
+                </svg>
+              )}
+            </FootballPitch>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Attack Group Vectors */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Attack Group Vector Analysis</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="flex justify-center">
-              <FootballPitch
-                width={500}
-                height={350}
-                vectors={attackVectors.vectors}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <MetricCard
-                title="Attacking Vectors"
-                value="22"
-                progress={85}
-                className="text-center"
-              />
-              <MetricCard
-                title="Assist Vectors"
-                value="8"
-                progress={90}
-                className="text-center"
-              />
-              <MetricCard
-                title="Shot Vectors"
-                value="14"
-                progress={78}
-                className="text-center"
-              />
-              <MetricCard
-                title="Creation Vectors"
-                value="16"
-                progress={82}
-                className="text-center"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          {/* Statistics */}
+          {vectors.length > 0 && (
+            <div className="bg-muted p-4 rounded-lg">
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-semibold">Total Vectors:</span>
+                <span className="text-lg font-bold">{vectors.length}</span>
+              </div>
 
-      {/* Physical Group Vectors */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Physical Group Vector Analysis</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="flex justify-center">
-              <FootballPitch
-                width={500}
-                height={350}
-                vectors={physicalVectors.vectors}
-              />
+              {/* Vector count by subcategory */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3">
+                {subcategories
+                  .filter((subcat) => selectedSubcategories[subcat])
+                  .map((subcat) => {
+                    const count = vectors.filter(
+                      (v) => v.subcategory === subcat
+                    ).length;
+                    return count > 0 ? (
+                      <div key={subcat} className="text-center">
+                        <div className="text-sm text-muted-foreground">
+                          {subcat}
+                        </div>
+                        <div className="text-lg font-bold">{count}</div>
+                      </div>
+                    ) : null;
+                  })}
+              </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <MetricCard
-                title="Movement Vectors"
-                value="28"
-                progress={88}
-                className="text-center"
-              />
-              <MetricCard
-                title="Sprint Vectors"
-                value="15"
-                progress={92}
-                className="text-center"
-              />
-              <MetricCard
-                title="Recovery Vectors"
-                value="12"
-                progress={75}
-                className="text-center"
-              />
-              <MetricCard
-                title="Physical Vectors"
-                value="55"
-                progress={85}
-                className="text-center"
-              />
+          )}
+
+          {/* Legend */}
+          {uniqueActionTypes.length > 0 && (
+            <div className="bg-muted p-4 rounded-lg">
+              <Label className="text-sm font-medium mb-3 block">
+                Action Type Legend:
+              </Label>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {uniqueActionTypes.map((actionType) => (
+                  <div key={actionType} className="flex items-center gap-2">
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{
+                        backgroundColor: ACTION_COLORS[actionType] || "#6b7280",
+                      }}
+                    />
+                    <span className="text-sm">{actionType}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

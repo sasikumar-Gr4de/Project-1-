@@ -2,99 +2,7 @@ export const player_events = {
   Passing: {
     "Shot Pass": {
       Unsuccessful: [],
-      "Simple Pass": [
-        {
-          position_x: 54.93,
-          position_y: 42.71,
-          position_x_end: 64.78,
-          position_y_end: 42.71,
-        },
-        {
-          position_x: 64.78,
-          position_y: 42.71,
-          position_x_end: 64.78,
-          position_y_end: 57.29,
-        },
-        {
-          position_x: 64.78,
-          position_y: 42.71,
-          position_y_end: 57.29,
-          position_x_end: 64.78,
-          position_y_end: 57.29,
-        },
-        {
-          position_x: 54.93,
-          position_y: 57.29,
-          position_x_end: 45.07,
-          position_y_end: 42.71,
-        },
-        {
-          position_x: 45.07,
-          position_y: 28.46,
-          position_x_end: 45.07,
-          position_y_end: 15.95,
-        },
-        {
-          position_x: 45.07,
-          position_y: 28.46,
-          position_x_end: 45.07,
-          position_y_end: 57.29,
-        },
-        {
-          position_x: 45.07,
-          position_y: 68.0,
-          position_x_end: 45.07,
-          position_y_end: 68.0,
-        },
-        {
-          position_x: 35.22,
-          position_y: 68.0,
-          position_x_end: 45.07,
-          position_y_end: 57.29,
-        },
-        {
-          position_x: 84.5,
-          position_y: 42.71,
-          position_x_end: 84.5,
-          position_y_end: 68.0,
-        },
-        {
-          position_x: 54.93,
-          position_y: 57.29,
-          position_x_end: 64.78,
-          position_y_end: 57.29,
-        },
-        {
-          position_x: 74.63,
-          position_y: 57.29,
-          position_x_end: 74.63,
-          position_y_end: 28.46,
-        },
-        {
-          position_x: 74.63,
-          position_y: 42.71,
-          position_x_end: 74.63,
-          position_y_end: 57.29,
-        },
-        {
-          position_x: 74.63,
-          position_y: 57.29,
-          position_x_end: 64.78,
-          position_y_end: 57.29,
-        },
-        {
-          position_x: 64.78,
-          position_y: 57.29,
-          position_x_end: 64.78,
-          position_y_end: 42.71,
-        },
-        {
-          position_x: 74.63,
-          position_y: 28.46,
-          position_x_end: 64.78,
-          position_y_end: 42.71,
-        },
-      ],
+      "Simple Pass": [],
       "Key Pass": [
         {
           position_x: 35.22,
@@ -134,16 +42,16 @@ export const player_events = {
       ],
       "Simple Pass": [
         {
-          position_x: 54.93,
-          position_y: 42.71,
-          position_x_end: 64.78,
-          position_y_end: 68.0,
+          position_x: 40,
+          position_y: 1,
+          position_x_end: 40,
+          position_y_end: 67.0,
         },
         {
-          position_x: 64.78,
-          position_y: 68.0,
-          position_x_end: 64.78,
-          position_y_end: 42.71,
+          position_x: 1,
+          position_y: 10,
+          position_x_end: 108,
+          position_y_end: 10,
         },
       ],
       "Key Pass": [],
