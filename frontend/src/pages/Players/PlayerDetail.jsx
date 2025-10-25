@@ -6,7 +6,7 @@ import Tabs from "@/components/common/Tabs";
 import PlayerProfile from "@/components/players/PlayerProfile";
 import PlayerActivityField from "@/components/players/PlayerActivityField";
 import PlayerVectorField from "@/components/players/PlayerVectorField";
-import PlayerSpotlight from "@/components/players/PlayerSpotlight";
+import PlayerSpotlight from "@/pages/Players/PlayerSpotlight";
 import { mockPlayersData, mockPlayerMetrics } from "@/mock/playerData";
 import { generatePlayerPDF } from "@/utils/pdfGenerator";
 
@@ -115,7 +115,6 @@ const PlayerDetail = () => {
             </Button>
           </div>
         </div>
-
         {/* Tabs Section */}
         <div className="bg-card border border-border rounded-xl overflow-hidden">
           <Tabs
@@ -125,11 +124,6 @@ const PlayerDetail = () => {
             size="md"
             responsive={true}
           />
-        </div>
-
-        {/* Hidden element for PDF generation */}
-        <div id="player-report" className="hidden">
-          <PlayerProfile player={player} metrics={metrics} isPdf={true} />
         </div>
       </div>
     </div>

@@ -21,6 +21,7 @@ import ProtectedRoute from "@/components/common/ProtectedRoute";
 import Unauthorized from "@/pages/Error/Unauthorized";
 import NotFound from "@/pages/Error/NotFoundPage";
 import MatchDetail from "@/pages/Matches/MatchDetail";
+import PlayerDetail from "@/pages/Players/PlayerDetail";
 
 function App() {
   return (
@@ -56,6 +57,17 @@ function App() {
           }
         >
           <Route index element={<MatchDetail />} />
+        </Route>
+
+        <Route
+          path="/players/:id"
+          element={
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<PlayerDetail />} />
         </Route>
 
         {/* Error pages */}
