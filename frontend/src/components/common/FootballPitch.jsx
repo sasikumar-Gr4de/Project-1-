@@ -170,7 +170,7 @@ const FootballPitch = ({
   return (
     <div
       ref={containerRef}
-      className={`relative bg-green-800 p-2 sm:p-4 rounded-lg w-full ${className}`}
+      className={`relative w-full ${className}`} // Removed: bg-green-800 p-2 sm:p-4 rounded-lg
       style={{ maxWidth: "100%" }}
     >
       <canvas
@@ -186,8 +186,8 @@ const FootballPitch = ({
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          padding: "calc(0.5rem + 2px) calc(1rem + 2px)",
-          margin: "-2px",
+          padding: "0", // Changed from "calc(0.5rem + 2px) calc(1rem + 2px)"
+          margin: "0", // Changed from "-2px"
         }}
       >
         {children &&

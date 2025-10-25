@@ -185,6 +185,14 @@ const PlayerActivityField = ({
                         style={{
                           backgroundColor:
                             cell.total > 0 ? backgroundColor : "transparent",
+                          transform:
+                            hoveredCell?.row === cell.row &&
+                            hoveredCell?.col === cell.col,
+                          zIndex:
+                            hoveredCell?.row === cell.row &&
+                            hoveredCell?.col === cell.col
+                              ? 10
+                              : 1,
                         }}
                         onMouseMove={(e) => handleMouseMove(e, cell)}
                         onMouseLeave={handleMouseLeave}
