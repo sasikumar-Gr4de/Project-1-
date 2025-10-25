@@ -1,16 +1,28 @@
+// src/components/chat/Chatbot.jsx
 import React, { useState, useEffect } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import ChatbotButton from "./ChatbotButton";
-import ChatbotWindow from "./ChatbotWindow";
+import { useToast } from "@/hooks/use-toast";
+import ChatbotButton from "@/components/chat/ChatbotButton";
+import ChatbotWindow from "@/components/chat/ChatbotWindow";
 
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
-  const { toast } = useToast();
 
-  // Load chat history from localStorage on component mount
+  // Simple toast fallback if useToast doesn't exist
+  const toast = {
+    toast: (props) => {
+      console.log("Toast:", props);
+      // You can implement a simple toast here or add shadcn/ui toast later
+      const { title, description, variant } = props;
+      alert(
+        `${variant === "destructive" ? "Error: " : ""}${title} - ${description}`
+      );
+    },
+  };
+
+  // Load chat history from localStorage
   useEffect(() => {
     const savedChat = localStorage.getItem("chatbot-history");
     if (savedChat) {
@@ -18,21 +30,21 @@ const Chatbot = () => {
         setMessages(JSON.parse(savedChat));
       } catch (error) {
         console.error("Error loading chat history:", error);
-        toast({
+        toast.toast({
           title: "Error",
           description: "Failed to load chat history",
           variant: "destructive",
         });
       }
     }
-  }, [toast]);
+  }, []);
 
-  // Save messages to localStorage whenever messages change
+  // Save messages to localStorage
   useEffect(() => {
     localStorage.setItem("chatbot-history", JSON.stringify(messages));
   }, [messages]);
 
-  // Update unread count when window opens/closes
+  // Update unread count
   useEffect(() => {
     if (isOpen) {
       setUnreadCount(0);
@@ -75,7 +87,6 @@ const Chatbot = () => {
 
       setMessages((prev) => [...prev, botMessage]);
 
-      // Increment unread count if window is closed
       if (!isOpen) {
         setUnreadCount((prev) => prev + 1);
       }
@@ -90,7 +101,7 @@ const Chatbot = () => {
 
       setMessages((prev) => [...prev, errorMessage]);
 
-      toast({
+      toast.toast({
         title: "Connection Error",
         description: "Failed to send message. Please check your connection.",
         variant: "destructive",

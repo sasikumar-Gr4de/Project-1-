@@ -1,12 +1,13 @@
+// src/components/chat/ChatbotWindow.jsx
 import React, { useState, useRef, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardHeader,
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -19,7 +20,6 @@ const ChatbotWindow = ({
 }) => {
   const [inputMessage, setInputMessage] = useState("");
   const messagesEndRef = useRef(null);
-  const textareaRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -29,24 +29,11 @@ const ChatbotWindow = ({
     scrollToBottom();
   }, [messages]);
 
-  // Auto-resize textarea
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height =
-        textareaRef.current.scrollHeight + "px";
-    }
-  }, [inputMessage]);
-
   const handleSubmit = (e) => {
     e.preventDefault();
     if (inputMessage.trim() && !isLoading) {
       onSendMessage(inputMessage.trim());
       setInputMessage("");
-      // Reset textarea height
-      if (textareaRef.current) {
-        textareaRef.current.style.height = "auto";
-      }
     }
   };
 
@@ -60,7 +47,7 @@ const ChatbotWindow = ({
   if (!isOpen) return null;
 
   return (
-    <Card className="fixed bottom-20 right-6 w-80 md:w-96 h-[500px] flex flex-col z-50 animate-in slide-in-from-bottom-5 duration-300 shadow-2xl">
+    <Card className="fixed bottom-20 right-6 w-80 md:w-96 h-[500px] flex flex-col z-50 shadow-2xl">
       {/* Header */}
       <CardHeader className="flex-row items-center justify-between space-y-0 pb-4">
         <div className="flex items-center space-x-3">
@@ -85,7 +72,6 @@ const ChatbotWindow = ({
           variant="ghost"
           size="icon"
           className="h-8 w-8"
-          aria-label="Close chat"
         >
           <svg
             className="w-4 h-4"
@@ -186,21 +172,17 @@ const ChatbotWindow = ({
       {/* Input Area */}
       <CardFooter className="border-t pt-4">
         <form onSubmit={handleSubmit} className="flex w-full space-x-2">
-          <Textarea
-            ref={textareaRef}
+          <Input
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyDown={handleKeyPress}
             placeholder="Type your message..."
-            className="min-h-10 max-h-[120px] resize-none"
-            rows={1}
             disabled={isLoading}
           />
           <Button
             type="submit"
             size="icon"
             disabled={!inputMessage.trim() || isLoading}
-            className="shrink-0"
           >
             {isLoading ? (
               <svg

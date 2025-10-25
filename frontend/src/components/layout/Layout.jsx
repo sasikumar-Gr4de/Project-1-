@@ -1,7 +1,9 @@
+// src/components/layout/Layout.jsx
 import React, { useState, useEffect } from "react";
 import Header from "@/components/layout/Header";
 import Sidebar from "@/components/layout/Sidebar";
 import Footer from "@/components/layout/Footer";
+import Chatbot from "@/components/chat/Chatbot";
 import { Outlet } from "react-router-dom";
 
 const Layout = ({}) => {
@@ -85,6 +87,9 @@ const Layout = ({}) => {
           </div>
         </div>
       </div>
+
+      {/* Chatbot Integration */}
+      <Chatbot />
     </div>
   );
 };
