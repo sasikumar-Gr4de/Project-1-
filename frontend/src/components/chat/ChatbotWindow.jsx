@@ -1,4 +1,3 @@
-// src/components/chat/ChatbotWindow.jsx
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,7 +9,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { X } from "lucide-react";
 
 const ChatbotWindow = ({
   isOpen,
@@ -48,11 +46,11 @@ const ChatbotWindow = ({
   if (!isOpen) return null;
 
   return (
-    <Card className="fixed bottom-20 right-6 w-80 md:w-96 h-[500px] flex flex-col z-50 shadow-2xl">
-      {/* Header */}
-      <CardHeader className="flex-row items-center justify-between space-y-0 pb-4">
+    <Card className="fixed bottom-20 right-4 left-4 sm:left-auto sm:right-6 w-auto sm:w-80 md:w-96 h-[70vh] sm:h-[500px] max-h-[600px] flex flex-col z-50 shadow-2xl">
+      {/* Header - Fixed alignment */}
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 py-4 px-4 sm:px-6">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+          <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center shrink-0">
             <svg
               className="w-4 h-4 text-primary-foreground"
               fill="currentColor"
@@ -61,8 +59,8 @@ const ChatbotWindow = ({
               <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
             </svg>
           </div>
-          <div>
-            <h3 className="font-semibold">AI Assistant</h3>
+          <div className="min-w-0">
+            <h3 className="font-semibold truncate">AI Assistant</h3>
             <Badge variant="secondary" className="text-xs">
               Online
             </Badge>
@@ -72,9 +70,21 @@ const ChatbotWindow = ({
           onClick={onClose}
           variant="ghost"
           size="icon"
-          className="h-8 w-8"
+          className="h-8 w-8 shrink-0 ml-2"
         >
-          <X />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
         </Button>
       </CardHeader>
 
@@ -108,13 +118,13 @@ const ChatbotWindow = ({
                   }`}
                 >
                   <div
-                    className={`max-w-[80%] rounded-lg p-3 ${
+                    className={`max-w-[85%] sm:max-w-[80%] rounded-lg p-3 ${
                       message.sender === "user"
                         ? "bg-primary text-primary-foreground rounded-br-none"
                         : "bg-muted text-card-foreground rounded-bl-none"
                     }`}
                   >
-                    <p className="text-sm whitespace-pre-wrap">
+                    <p className="text-sm whitespace-pre-wrap wrap-break-word">
                       {message.text}
                     </p>
                     <p
@@ -137,7 +147,7 @@ const ChatbotWindow = ({
             {/* Loading indicator */}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-muted text-card-foreground rounded-lg rounded-bl-none p-3 max-w-[80%]">
+                <div className="bg-muted text-card-foreground rounded-lg rounded-bl-none p-3 max-w-[85%] sm:max-w-[80%]">
                   <div className="flex space-x-2">
                     <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
                     <div
@@ -159,7 +169,7 @@ const ChatbotWindow = ({
       </CardContent>
 
       {/* Input Area */}
-      <CardFooter className="border-t pt-4">
+      <CardFooter className="border-t py-4 px-4 sm:px-6">
         <form onSubmit={handleSubmit} className="flex w-full space-x-2">
           <Input
             value={inputMessage}
@@ -167,11 +177,13 @@ const ChatbotWindow = ({
             onKeyDown={handleKeyPress}
             placeholder="Type your message..."
             disabled={isLoading}
+            className="flex-1 min-w-0"
           />
           <Button
             type="submit"
             size="icon"
             disabled={!inputMessage.trim() || isLoading}
+            className="shrink-0"
           >
             {isLoading ? (
               <svg

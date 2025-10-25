@@ -122,12 +122,12 @@ const Chatbot = () => {
         isLoading={isLoading}
       />
 
-      {/* Toast container */}
-      <div className="fixed top-4 right-4 z-50 space-y-2">
+      {/* Toast container - Responsive positioning */}
+      <div className="fixed top-4 right-4 left-4 sm:left-auto sm:right-4 z-60 space-y-2">
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`p-4 rounded-lg shadow-lg border max-w-sm animate-in slide-in-from-right-full duration-300 ${
+            className={`p-4 rounded-lg shadow-lg border max-w-sm mx-auto sm:mx-0 animate-in slide-in-from-right-full duration-300 ${
               toast.variant === "destructive"
                 ? "bg-destructive text-destructive-foreground border-destructive/50"
                 : "bg-background text-foreground border-border"

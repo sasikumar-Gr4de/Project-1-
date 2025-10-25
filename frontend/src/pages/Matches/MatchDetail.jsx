@@ -1,6 +1,6 @@
 // src/pages/Matches/MatchDetail.jsx
 import { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { ArrowLeft, Video, Download, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import StepProgress from "@/components/matches/StepProgress";
@@ -14,7 +14,6 @@ import MatchPrepareStep from "@/pages/Matches/MatchPrepareStep";
 
 const MatchDetail = () => {
   const { id } = useParams();
-  const location = useLocation();
   const [currentStep, setCurrentStep] = useState(0);
   const [activeTab, setActiveTab] = useState(0);
 
