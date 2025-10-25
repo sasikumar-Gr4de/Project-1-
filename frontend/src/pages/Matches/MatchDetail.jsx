@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { ArrowLeft, Video, Download, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import StepProgress from "@/components/common/StepProgress";
+import StepProgress from "@/components/matches/StepProgress";
 import Tabs from "@/components/common/Tabs";
 import VideoPlayer from "@/components/matches/VideoPlayer";
 import MatchOverviewStep from "@/pages/Matches/MatchOverviewStep";

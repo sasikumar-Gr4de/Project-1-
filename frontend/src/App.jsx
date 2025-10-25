@@ -19,6 +19,7 @@ import ServerFileUpload from "@/pages/Assist/ServerFileUpload";
 import ProtectedRoute from "@/components/common/ProtectedRoute";
 import Unauthorized from "@/pages/Error/Unauthorized";
 import NotFound from "@/pages/Error/NotFoundPage";
+import MatchDetail from "@/pages/Matches/MatchDetail";
 
 function App() {
   return (
