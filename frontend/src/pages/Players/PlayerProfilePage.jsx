@@ -5,7 +5,7 @@ import PlayerVectorField from "@/components/players/PlayerVectorField";
 import PlayerActivityField from "@/components/players/PlayerActivityField";
 import { player_events } from "@/mock/eventData";
 
-const PlayerProfile = ({ playerId }) => {
+const PlayerProfile = ({ player, player_events }) => {
   const [selectedCategory, setSelectedCategory] = useState("Passing");
 
   const categories = [

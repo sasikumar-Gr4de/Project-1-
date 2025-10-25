@@ -12,6 +12,7 @@ const PlayerActivityField = ({
   const [selectedSubcategories, setSelectedSubcategories] = useState({});
   const [pitchDimensions, setPitchDimensions] = useState(null);
   const [hoveredCell, setHoveredCell] = useState(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   // Grid configuration
   const GRID_COLS = 10;
@@ -111,13 +112,9 @@ const PlayerActivityField = ({
     }));
   };
 
-  // Handle mouse move for hover effects
   const handleMouseMove = (event, cell) => {
     setHoveredCell(cell);
-  };
-
-  const handleMouseLeave = () => {
-    setHoveredCell(null);
+    setMousePosition({ x: event.clientX, y: event.clientY });
   };
 
   return (
@@ -150,21 +147,26 @@ const PlayerActivityField = ({
               ))}
             </div>
           </div>
+
           {/* Pitch Visualization */}
           <div className="relative">
             <FootballPitch onDimensionsChange={setPitchDimensions}>
               {pitchDimensions && (
-                <div
-                  className="absolute inset-0 grid pointer-events-auto"
+                <svg
+                  className="absolute inset-0 pointer-events-auto"
+                  width={pitchDimensions.width}
+                  height={pitchDimensions.height}
                   style={{
-                    gridTemplateColumns: `repeat(${GRID_COLS}, 1fr)`,
-                    gridTemplateRows: `repeat(${GRID_ROWS}, 1fr)`,
-                    padding: "8px 16px",
+                    padding: "0",
+                    margin: "0",
                   }}
                 >
+                  {/* Render grid cells */}
                   {grid.map((cell) => {
                     const cellWidth = pitchDimensions.width / GRID_COLS;
                     const cellHeight = pitchDimensions.height / GRID_ROWS;
+                    const cellX = cell.col * cellWidth;
+                    const cellY = cell.row * cellHeight;
 
                     // Calculate color intensity
                     const intensity = cell.total / maxCellCount;
@@ -172,57 +174,73 @@ const PlayerActivityField = ({
                       cell.unsuccessful > cell.successful
                         ? "#ef4444"
                         : "#10b981";
-                    const backgroundColor = `${baseColor}${Math.floor(
-                      30 + intensity * 70
-                    )
-                      .toString(16)
-                      .padStart(2, "0")}`;
+                    const opacity = cell.total > 0 ? 0.3 + intensity * 0.7 : 0;
 
                     return (
-                      <div
-                        key={`${cell.row}-${cell.col}`}
-                        className="relative border border-white/30 flex items-center justify-center transition-all duration-200"
-                        style={{
-                          backgroundColor:
-                            cell.total > 0 ? backgroundColor : "transparent",
-                          transform:
-                            hoveredCell?.row === cell.row &&
-                            hoveredCell?.col === cell.col,
-                          zIndex:
-                            hoveredCell?.row === cell.row &&
-                            hoveredCell?.col === cell.col
-                              ? 10
-                              : 1,
-                        }}
-                        onMouseMove={(e) => handleMouseMove(e, cell)}
-                        onMouseLeave={handleMouseLeave}
-                      >
+                      <g key={`${cell.row}-${cell.col}`}>
+                        {/* Grid cell */}
+                        <rect
+                          x={cellX}
+                          y={cellY}
+                          width={cellWidth}
+                          height={cellHeight}
+                          fill={cell.total > 0 ? baseColor : "transparent"}
+                          fillOpacity={opacity}
+                          stroke="rgba(255, 255, 255, 0.3)"
+                          strokeWidth="1"
+                          className="transition-all duration-200 cursor-pointer"
+                          onMouseEnter={(e) => handleMouseMove(e, cell)}
+                          onMouseLeave={() => setHoveredCell(null)}
+                        />
+
                         {/* Cell count */}
                         {cell.total > 0 && (
-                          <div className="text-white text-xs font-bold drop-shadow-lg">
+                          <text
+                            x={cellX + cellWidth / 2}
+                            y={cellY + cellHeight / 2}
+                            textAnchor="middle"
+                            dominantBaseline="middle"
+                            className="text-white text-xs font-bold pointer-events-none"
+                            fill="white"
+                            style={{
+                              fontSize: Math.max(
+                                10,
+                                Math.min(14, cellWidth * 0.15)
+                              ),
+                              filter:
+                                "drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.8))",
+                            }}
+                          >
                             {cell.total}
-                          </div>
+                          </text>
                         )}
-
-                        {/* Hover tooltip */}
-                        {hoveredCell?.row === cell.row &&
-                          hoveredCell?.col === cell.col && (
-                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-black/90 text-white text-xs rounded p-2 whitespace-nowrap z-20">
-                              <div>
-                                Cell ({cell.col}, {cell.row})
-                              </div>
-                              <div>Total: {cell.total}</div>
-                              <div>Successful: {cell.successful}</div>
-                              <div>Unsuccessful: {cell.unsuccessful}</div>
-                            </div>
-                          )}
-                      </div>
+                      </g>
                     );
                   })}
-                </div>
+                </svg>
               )}
             </FootballPitch>
+
+            {/* Tooltip - Follows mouse cursor */}
+            {hoveredCell && (
+              <div
+                className="absolute bg-black/90 text-white text-xs rounded p-2 whitespace-nowrap z-50 pointer-events-none border border-white/20"
+                style={{
+                  left: `${mousePosition.x}px`,
+                  top: `${mousePosition.y - 80}px`,
+                  transform: "translateX(-50%)",
+                }}
+              >
+                <div className="font-semibold border-b border-white/20 pb-1 mb-1">
+                  Cell ({hoveredCell.col}, {hoveredCell.row})
+                </div>
+                <div>Total: {hoveredCell.total}</div>
+                <div>Successful: {hoveredCell.successful}</div>
+                <div>Unsuccessful: {hoveredCell.unsuccessful}</div>
+              </div>
+            )}
           </div>
+
           {/* Statistics */}
           {totalCount > 0 && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -263,6 +281,7 @@ const PlayerActivityField = ({
               </div>
             </div>
           )}
+
           {/* Legend */}
           <div className="flex justify-center items-center gap-6 text-sm">
             <div className="flex items-center gap-2">

@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Play, Calendar, Trophy, MapPin, Star } from "lucide-react";
 
-const PlayerSpotlight = ({ player, playerId }) => {
+const PlayerSpotlight = ({ player }) => {
   if (!player) return null;
 
   const matches = [

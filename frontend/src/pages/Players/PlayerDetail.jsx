@@ -3,12 +3,14 @@ import { useParams } from "react-router-dom";
 import { ArrowLeft, Download, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Tabs from "@/components/common/Tabs";
-import PlayerProfile from "@/components/players/PlayerProfile";
-import PlayerActivityField from "@/components/players/PlayerActivityField";
-import PlayerVectorField from "@/components/players/PlayerVectorField";
-import PlayerSpotlight from "@/pages/Players/PlayerSpotlight";
-import { mockPlayersData, mockPlayerMetrics } from "@/mock/playerData";
+import PlayerProfilePage from "@/pages/players/PlayerProfilePage";
+import PlayerActivityPage from "@/pages/players/PlayerActivityPage";
+import PlayerVectorPage from "@/pages/players/PlayerVectorPage";
+import PlayerSpotlightPage from "@/pages/Players/PlayerSpotlightPage";
+import PlayerDistributionMapPage from "@/pages/Players/PlayerDistributionMapPage";
 import { generatePlayerPDF } from "@/utils/pdfGenerator";
+import { mockPlayersData, mockPlayerMetrics } from "@/mock/playerData";
+import { player_events } from "@/mock/eventData";
 
 const PlayerDetail = () => {
   const { id } = useParams();
@@ -41,22 +43,29 @@ const PlayerDetail = () => {
     {
       id: "profile",
       label: "Profile & Performance",
-      content: <PlayerProfile player={player} metrics={metrics} />,
+      content: (
+        <PlayerProfilePage player={player} player_events={player_events} />
+      ),
     },
     {
       id: "activity",
       label: "Activity Field",
-      content: <PlayerActivityField player={player} metrics={metrics} />,
+      content: <PlayerActivityPage player_events={player_events} />,
     },
     {
       id: "vector",
       label: "Vector Field",
-      content: <PlayerVectorField player={player} metrics={metrics} />,
+      content: <PlayerVectorPage player_events={player_events} />,
+    },
+    {
+      id: "distribution",
+      label: "Distribution Map Field",
+      content: <PlayerDistributionMapPage player_events={player_events} />,
     },
     {
       id: "spotlight",
       label: "Spotlight",
-      content: <PlayerSpotlight player={player} playerId={id} />,
+      content: <PlayerSpotlightPage player={player} />,
     },
   ];
 
