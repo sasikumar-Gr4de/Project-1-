@@ -71,7 +71,10 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route path="/matches/:id" element={<MatchDetail />} />
         </Route>
+
         {/* Error pages */}
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route path="*" element={<NotFound />} />
