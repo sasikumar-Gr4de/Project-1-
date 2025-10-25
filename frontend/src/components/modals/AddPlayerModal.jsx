@@ -9,6 +9,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
+// Get all football positions
+import { FOOTBALL_POSITIONS, PLAYER_STATUSES } from "@/utils/constants";
+
 import AvatarUpload from "@/components/common/AvatarUpload";
 import { X } from "lucide-react";
 
@@ -111,9 +115,6 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
     }
   };
 
-  const positions = ["Goalkeeper", "Defender", "Midfielder", "Forward"];
-  const statuses = ["Active", "Injured", "Suspended", "Inactive"];
-
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <Card className="w-full max-w-4xl max-h-[90vh] flex flex-col">
@@ -203,9 +204,12 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
                       <SelectValue placeholder="Select position" />
                     </SelectTrigger>
                     <SelectContent>
-                      {positions.map((position) => (
-                        <SelectItem key={position} value={position}>
-                          {position}
+                      {FOOTBALL_POSITIONS.map((position) => (
+                        <SelectItem
+                          key={position.abbreviation}
+                          value={position.abbreviation}
+                        >
+                          {`${position.abbreviation} (${position.position})`}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -312,7 +316,7 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent>
-                      {statuses.map((status) => (
+                      {PLAYER_STATUSES.map((status) => (
                         <SelectItem key={status} value={status}>
                           {status}
                         </SelectItem>

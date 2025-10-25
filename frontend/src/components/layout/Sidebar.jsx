@@ -24,7 +24,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     {
       name: "Dashboard",
       items: [
-        { name: "Home", icon: Home, href: "/" },
+        { name: "Home", icon: Home, href: "/home" },
         { name: "Overview", icon: BarChart3, href: "/overview" },
       ],
     },

@@ -357,7 +357,7 @@ const DataTable = ({
                       ))}
                       {actions && (
                         <td className="p-6 align-middle">
-                          <div className="flex items-center gap-1 opacity-30 group-hover:opacity-100 transition-opacity duration-200">
+                          <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity duration-200">
                             {actions({ row })}
                           </div>
                         </td>
