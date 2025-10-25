@@ -79,7 +79,7 @@ const MatchPrepareStep = ({ matchId, currentStep, onStepComplete }) => {
   );
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 p-3">
       {/* Preparation Header */}
       <div className="bg-card border border-border rounded-xl p-6">
         <div className="flex items-center justify-between mb-6">

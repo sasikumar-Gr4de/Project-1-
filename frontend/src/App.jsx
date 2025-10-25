@@ -1,3 +1,4 @@
+// src/App.jsx
 import { useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
@@ -25,13 +26,13 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* <Route path="/server"> */}
         <Route path="/server/upload-image" element={<ServerFileUpload />} />
-        {/* </Route> */}
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
+
+        {/* Dashboard Routes */}
         <Route
           path="/dashboard"
           element={
@@ -40,48 +41,22 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route
-            path=""
-            element={
-              <ProtectedRoute>
-                <Home />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="clubs"
-            element={
-              <ProtectedRoute>
-                <Clubs />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="players"
-            element={
-              <ProtectedRoute>
-                <Players />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="matches"
-            element={
-              <ProtectedRoute>
-                <Matches />
-              </ProtectedRoute>
-            }
-          />
+          <Route index element={<Home />} />
+          <Route path="clubs" element={<Clubs />} />
+          <Route path="players" element={<Players />} />
+          <Route path="matches" element={<Matches />} />
         </Route>
 
         <Route
           path="/matches/:id"
           element={
-            <Layout>
-              <MatchDetail />
-            </Layout>
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
           }
-        />
+        >
+          <Route index element={<MatchDetail />} />
+        </Route>
 
         {/* Error pages */}
         <Route path="/unauthorized" element={<Unauthorized />} />

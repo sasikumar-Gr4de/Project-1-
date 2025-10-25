@@ -116,7 +116,7 @@ const MatchOverviewStep = ({ matchId, currentStep }) => {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-3">
       {/* Section 1: Overall Match Metrics */}
       <div className="bg-card border border-border rounded-xl p-6">
         <h2 className="text-xl font-bold mb-6 flex items-center gap-2">

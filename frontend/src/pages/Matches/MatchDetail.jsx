@@ -19,18 +19,35 @@ const MatchDetail = () => {
 
   // Mock steps data
   const steps = [
-    { id: "overview", label: "Overview", description: "Match Analysis" },
+    // { id: "overview", label: "Overview", description: "Match Analysis" },
     { id: "prepare", label: "Prepare", description: "Data Setup" },
     { id: "analysis", label: "Analysis", description: "Performance Metrics" },
     { id: "review", label: "Review", description: "QA & Assessment" },
     { id: "complete", label: "Complete", description: "Final Report" },
   ];
 
-  useEffect(() => {
-    window.alert("MatchDetail");
-  }, []);
+  const handleStepClick = (stepIndex) => {
+    if (stepIndex <= currentStep) {
+      setCurrentStep(stepIndex);
+      setActiveTab(stepIndex);
+    }
+  };
 
-  // Mock tabs data
+  const handleNextStep = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+      setActiveTab(currentStep + 1);
+    }
+  };
+
+  const handlePrevStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+      setActiveTab(currentStep - 1);
+    }
+  };
+
+  // Mock tabs data - moved after function definitions
   const tabs = [
     {
       id: "overview",
@@ -64,27 +81,6 @@ const MatchDetail = () => {
       content: <MatchCompleteStep matchId={id} currentStep={currentStep} />,
     },
   ];
-
-  const handleStepClick = (stepIndex) => {
-    if (stepIndex <= currentStep) {
-      setCurrentStep(stepIndex);
-      setActiveTab(stepIndex);
-    }
-  };
-
-  const handleNextStep = () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-      setActiveTab(currentStep + 1);
-    }
-  };
-
-  const handlePrevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-      setActiveTab(currentStep - 1);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
