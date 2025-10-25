@@ -1,5 +1,5 @@
 // src/pages/Matches/MatchDetail.jsx
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { ArrowLeft, Video, Download, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,10 @@ const MatchDetail = () => {
     { id: "review", label: "Review", description: "QA & Assessment" },
     { id: "complete", label: "Complete", description: "Final Report" },
   ];
+
+  useEffect(() => {
+    window.alert("MatchDetail");
+  }, []);
 
   // Mock tabs data
   const tabs = [

@@ -1,4 +1,3 @@
-// src/components/chat/Chatbot.jsx
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import ChatbotButton from "@/components/chat/ChatbotButton";
@@ -9,35 +8,24 @@ const Chatbot = () => {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
-
-  // Simple toast fallback if useToast doesn't exist
-  const toast = {
-    toast: (props) => {
-      console.log("Toast:", props);
-      // You can implement a simple toast here or add shadcn/ui toast later
-      const { title, description, variant } = props;
-      alert(
-        `${variant === "destructive" ? "Error: " : ""}${title} - ${description}`
-      );
-    },
-  };
+  const { toast, toasts } = useToast();
 
   // Load chat history from localStorage
-  useEffect(() => {
-    const savedChat = localStorage.getItem("chatbot-history");
-    if (savedChat) {
-      try {
-        setMessages(JSON.parse(savedChat));
-      } catch (error) {
-        console.error("Error loading chat history:", error);
-        toast.toast({
-          title: "Error",
-          description: "Failed to load chat history",
-          variant: "destructive",
-        });
-      }
-    }
-  }, []);
+  // useEffect(() => {
+  //   const savedChat = localStorage.getItem("chatbot-history");
+  //   if (savedChat) {
+  //     try {
+  //       setMessages(JSON.parse(savedChat));
+  //     } catch (error) {
+  //       console.error("Error loading chat history:", error);
+  //       toast({
+  //         title: "Error",
+  //         description: "Failed to load chat history",
+  //         variant: "destructive",
+  //       });
+  //     }
+  //   }
+  // }, [toast]);
 
   // Save messages to localStorage
   useEffect(() => {
@@ -62,6 +50,7 @@ const Chatbot = () => {
     setIsLoading(true);
 
     try {
+      // Mock API call - replace with your actual API endpoint
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
@@ -101,7 +90,7 @@ const Chatbot = () => {
 
       setMessages((prev) => [...prev, errorMessage]);
 
-      toast.toast({
+      toast({
         title: "Connection Error",
         description: "Failed to send message. Please check your connection.",
         variant: "destructive",
@@ -132,6 +121,25 @@ const Chatbot = () => {
         onSendMessage={handleSendMessage}
         isLoading={isLoading}
       />
+
+      {/* Toast container */}
+      <div className="fixed top-4 right-4 z-50 space-y-2">
+        {toasts.map((toast) => (
+          <div
+            key={toast.id}
+            className={`p-4 rounded-lg shadow-lg border max-w-sm animate-in slide-in-from-right-full duration-300 ${
+              toast.variant === "destructive"
+                ? "bg-destructive text-destructive-foreground border-destructive/50"
+                : "bg-background text-foreground border-border"
+            }`}
+          >
+            <div className="font-semibold">{toast.title}</div>
+            {toast.description && (
+              <div className="text-sm mt-1">{toast.description}</div>
+            )}
+          </div>
+        ))}
+      </div>
     </>
   );
 };

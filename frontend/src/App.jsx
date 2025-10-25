@@ -72,9 +72,16 @@ function App() {
               </ProtectedRoute>
             }
           />
-
-          <Route path="/matches/:id" element={<MatchDetail />} />
         </Route>
+
+        <Route
+          path="/matches/:id"
+          element={
+            <Layout>
+              <MatchDetail />
+            </Layout>
+          }
+        />
 
         {/* Error pages */}
         <Route path="/unauthorized" element={<Unauthorized />} />
