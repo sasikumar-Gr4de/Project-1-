@@ -44,12 +44,12 @@ const Layout = ({}) => {
   }, [sidebarOpen, isMobile]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="h-screen flex flex-col bg-background overflow-hidden">
       {/* Header - Fixed */}
       <Header onMenuToggle={handleMenuToggle} />
 
       {/* Main Content Area */}
-      <div className="flex flex-1 flex-col md:flex-row min-h-0">
+      <div className="flex flex-1 overflow-hidden">
         {/* Mobile Overlay */}
         {sidebarOpen && isMobile && (
           <div
@@ -61,27 +61,25 @@ const Layout = ({}) => {
         {/* Sidebar */}
         <div
           className={`
-            fixed md:relative inset-y-0 left-0 z-40
+            fixed md:static inset-y-0 left-0 z-50
             w-64 bg-card border-r border-border
             transform transition-transform duration-300 ease-in-out
-            md:translate-x-0 md:z-auto
+            h-[calc(100vh-4rem)] mt-16 md:mt-0
             ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} 
-            md:static
+            md:translate-x-0 md:z-auto
           `}
         >
-          <div className="h-full overflow-y-auto">
-            <Sidebar isOpen={sidebarOpen} onClose={handleSidebarClose} />
-          </div>
+          <Sidebar isOpen={sidebarOpen} onClose={handleSidebarClose} />
         </div>
 
         {/* Content Area with Footer at Bottom */}
         <div className="flex-1 flex flex-col min-h-0 w-full">
           {/* Scrollable Content Area - Takes all available space */}
-          <main className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto">
             <div className="p-4 md:p-6 lg:p-8 min-h-full">
               <Outlet />
             </div>
-          </main>
+          </div>
 
           {/* Footer - Always at bottom */}
           <div className="shrink-0 border-t border-border">

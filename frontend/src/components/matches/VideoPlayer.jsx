@@ -179,13 +179,13 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
               {error || "Please check the video source and try again."}
             </p>
           </div>
-          <Button
+          {/* <Button
             variant="outline"
             onClick={() => window.location.reload()}
             className="mt-4"
           >
             Retry
-          </Button>
+          </Button> */}
         </div>
       </div>
     );

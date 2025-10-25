@@ -97,7 +97,7 @@ const MatchDetail = () => {
             </Button>
             <div>
               <h1 className="text-2xl lg:text-3xl font-bold">Match Analysis</h1>
-              <p className="text-muted-foreground">ID: {id}</p>
+              {/* <p className="text-muted-foreground">ID: {id}</p> */}
             </div>
           </div>
 
@@ -151,10 +151,7 @@ const MatchDetail = () => {
 
         {/* Video Player Section */}
         <div className="mb-6">
-          <VideoPlayer
-            videoUrl="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-            title="Match Highlights"
-          />
+          <VideoPlayer videoUrl={null} title="Match Highlights" />
         </div>
 
         {/* Tabs Section */}

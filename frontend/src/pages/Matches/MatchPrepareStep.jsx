@@ -11,6 +11,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import VideoUpload from "@/components/common/VideoUpload";
 
 const MatchPrepareStep = ({ matchId, currentStep, onStepComplete }) => {
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -42,30 +43,10 @@ const MatchPrepareStep = ({ matchId, currentStep, onStepComplete }) => {
     },
   ]);
 
-  const handleFileUpload = () => {
-    setIsProcessing(true);
-    setPreparationSteps((steps) =>
-      steps.map((step) =>
-        step.id === "video" ? { ...step, status: "in-progress" } : step
-      )
-    );
-
-    // Simulate upload progress
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += 5;
-      setUploadProgress(progress);
-
-      if (progress >= 100) {
-        clearInterval(interval);
-        setPreparationSteps((steps) =>
-          steps.map((step) =>
-            step.id === "video" ? { ...step, status: "completed" } : step
-          )
-        );
-        setIsProcessing(false);
-      }
-    }, 100);
+  const handleFileUpload = (results) => {
+    const result = results[0];
+    window.alert("Video File Uload");
+    console.log(result);
   };
 
   const handleStartAnalysis = () => {
@@ -81,8 +62,8 @@ const MatchPrepareStep = ({ matchId, currentStep, onStepComplete }) => {
   return (
     <div className="space-y-8 p-3">
       {/* Preparation Header */}
-      <div className="bg-card border border-border rounded-xl p-6">
-        <div className="flex items-center justify-between mb-6">
+      <div className="bg-card p-2">
+        <div className="flex items-center justify-between mb-2">
           <div>
             <h2 className="text-2xl font-bold mb-2">Match Preparation</h2>
             <p className="text-muted-foreground">
@@ -124,34 +105,10 @@ const MatchPrepareStep = ({ matchId, currentStep, onStepComplete }) => {
           </div>
 
           <div className="space-y-4">
-            <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary/50 transition-colors">
-              <Upload className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground mb-4">
-                Drag and drop your match video or click to browse
-              </p>
-              <Button
-                onClick={handleFileUpload}
-                disabled={isProcessing}
-                className="gap-2"
-              >
-                <Upload className="h-4 w-4" />
-                {isProcessing ? "Uploading..." : "Select Video File"}
-              </Button>
-
-              {isProcessing && (
-                <div className="mt-4">
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div
-                      className="bg-primary h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${uploadProgress}%` }}
-                    />
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    {uploadProgress}% Complete
-                  </p>
-                </div>
-              )}
-            </div>
+            <VideoUpload
+              maxSize={2 * 1024 * 1024 * 1024}
+              onUpload={handleFileUpload}
+            />
 
             <div className="text-sm text-muted-foreground">
               <strong>Supported formats:</strong> MP4, MOV, AVI

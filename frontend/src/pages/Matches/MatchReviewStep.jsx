@@ -10,7 +10,7 @@ const MatchReviewStep = ({ matchId, currentStep }) => {
           Complete Analysis First
         </h3>
         <p className="text-muted-foreground">
-          Please complete the match analysis to access the review section.
+          You have to complete the Performance Analysis step first
         </p>
       </div>
     );

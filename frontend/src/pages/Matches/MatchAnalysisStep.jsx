@@ -26,10 +26,10 @@ const MatchAnalysisStep = ({ matchId, currentStep }) => {
       <div className="text-center py-12">
         <Target className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
         <h3 className="text-lg font-semibold text-muted-foreground mb-2">
-          Complete Overview First
+          Complete match preparation first
         </h3>
         <p className="text-muted-foreground">
-          Please complete the match overview to access detailed analysis.
+          Please complete the match previous step to start analysis.
         </p>
       </div>
     );
