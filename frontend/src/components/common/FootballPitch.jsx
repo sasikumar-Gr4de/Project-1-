@@ -1,18 +1,13 @@
-// src/components/common/FootballPitch.jsx
 import { useRef, useEffect, useState } from "react";
 
 const FootballPitch = ({
   width = "100%",
   height = 400,
-  vectors = [],
-  activities = [],
-  distribution = [],
-  showGrid = true,
-  showHeatmap = false,
-  showArrows = true,
   className = "",
   pitchColor = "#0a7c42",
   lineColor = "#ffffff",
+  children,
+  onDimensionsChange,
 }) => {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
@@ -23,12 +18,14 @@ const FootballPitch = ({
     const updateDimensions = () => {
       if (containerRef.current) {
         const containerWidth = containerRef.current.offsetWidth;
-        const aspectRatio = 467 / 290; // Original aspect ratio from sample
+        const aspectRatio = 467 / 290;
         const calculatedHeight = containerWidth / aspectRatio;
-        setDimensions({
+        const newDimensions = {
           width: containerWidth,
           height: calculatedHeight,
-        });
+        };
+        setDimensions(newDimensions);
+        onDimensionsChange?.(newDimensions);
       }
     };
 
@@ -36,7 +33,7 @@ const FootballPitch = ({
     window.addEventListener("resize", updateDimensions);
 
     return () => window.removeEventListener("resize", updateDimensions);
-  }, []);
+  }, [onDimensionsChange]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -45,7 +42,6 @@ const FootballPitch = ({
     const ctx = canvas.getContext("2d");
     const { width: pitchWidth, height: pitchHeight } = dimensions;
 
-    // Set canvas dimensions
     canvas.width = pitchWidth;
     canvas.height = pitchHeight;
 
@@ -56,7 +52,7 @@ const FootballPitch = ({
     ctx.fillStyle = pitchColor;
     ctx.fillRect(0, 0, pitchWidth, pitchHeight);
 
-    // Draw pitch markings (based on sample SVG)
+    // Draw pitch markings
     ctx.strokeStyle = lineColor;
     ctx.lineWidth = 2;
     ctx.fillStyle = lineColor;
@@ -83,57 +79,28 @@ const FootballPitch = ({
 
     // Center spot
     ctx.beginPath();
-    ctx.arc(pitchWidth / 2, pitchHeight / 2, 3, 0, 2 * Math.PI);
+    ctx.arc(pitchWidth / 2, pitchHeight / 2, 2, 0, 2 * Math.PI);
     ctx.fill();
 
-    // Penalty areas - Left
-    const penaltyWidth = pitchWidth * 0.2; // 20% of pitch width
-    const penaltyHeight = pitchHeight * 0.507; // 50.7% of pitch height
+    // Penalty areas
+    const penaltyWidth = pitchWidth * 0.2;
+    const penaltyHeight = pitchHeight * 0.507;
     const penaltyY = (pitchHeight - penaltyHeight) / 2;
 
     ctx.strokeRect(0, penaltyY, penaltyWidth, penaltyHeight);
-
-    // Goal area - Left
-    const goalAreaWidth = pitchWidth * 0.05; // 5% of pitch width
-    const goalAreaHeight = pitchHeight * 0.264; // 26.4% of pitch height
-    const goalAreaY = (pitchHeight - goalAreaHeight) / 2;
-
-    ctx.strokeRect(0, goalAreaY, goalAreaWidth, goalAreaHeight);
-
-    // Penalty spot - Left
-    ctx.beginPath();
-    ctx.arc(penaltyWidth * 0.6, pitchHeight / 2, 2, 0, 2 * Math.PI);
-    ctx.fill();
-
-    // Penalty arc - Left
-    ctx.beginPath();
-    ctx.arc(
-      penaltyWidth,
-      pitchHeight / 2,
-      pitchHeight * 0.182,
-      -Math.PI * 0.5,
-      Math.PI * 0.5,
-      false
-    );
-    ctx.stroke();
-
-    // Corner arc - Top Left
-    ctx.beginPath();
-    ctx.arc(0, 0, 5, 0, Math.PI * 0.5);
-    ctx.stroke();
-
-    // Corner arc - Bottom Left
-    ctx.beginPath();
-    ctx.arc(0, pitchHeight, 5, -Math.PI * 0.5, 0);
-    ctx.stroke();
-
-    // Right side markings (mirrored)
     ctx.strokeRect(
       pitchWidth - penaltyWidth,
       penaltyY,
       penaltyWidth,
       penaltyHeight
     );
+
+    // Goal areas
+    const goalAreaWidth = pitchWidth * 0.05;
+    const goalAreaHeight = pitchHeight * 0.264;
+    const goalAreaY = (pitchHeight - goalAreaHeight) / 2;
+
+    ctx.strokeRect(0, goalAreaY, goalAreaWidth, goalAreaHeight);
     ctx.strokeRect(
       pitchWidth - goalAreaWidth,
       goalAreaY,
@@ -141,7 +108,10 @@ const FootballPitch = ({
       goalAreaHeight
     );
 
-    // Penalty spot - Right
+    // Penalty spots
+    ctx.beginPath();
+    ctx.arc(penaltyWidth * 0.6, pitchHeight / 2, 2, 0, 2 * Math.PI);
+    ctx.fill();
     ctx.beginPath();
     ctx.arc(
       pitchWidth - penaltyWidth * 0.6,
@@ -152,130 +122,55 @@ const FootballPitch = ({
     );
     ctx.fill();
 
-    // Penalty arc - Right
+    // Penalty arcs
+    const penaltyArcRadius = pitchHeight * 0.182;
+    ctx.beginPath();
+    ctx.arc(
+      penaltyWidth,
+      pitchHeight / 2,
+      penaltyArcRadius,
+      -Math.PI * 0.5,
+      Math.PI * 0.5,
+      false
+    );
+    ctx.stroke();
     ctx.beginPath();
     ctx.arc(
       pitchWidth - penaltyWidth,
       pitchHeight / 2,
-      pitchHeight * 0.182,
+      penaltyArcRadius,
       Math.PI * 0.5,
       Math.PI * 1.5,
       false
     );
     ctx.stroke();
 
-    // Corner arc - Top Right
+    // Corner arcs
+    const cornerRadius = 5;
     ctx.beginPath();
-    ctx.arc(pitchWidth, 0, 5, Math.PI * 0.5, Math.PI);
+    ctx.arc(0, 0, cornerRadius, 0, Math.PI * 0.5);
     ctx.stroke();
-
-    // Corner arc - Bottom Right
     ctx.beginPath();
-    ctx.arc(pitchWidth, pitchHeight, 5, Math.PI, Math.PI * 1.5);
+    ctx.arc(0, pitchHeight, cornerRadius, -Math.PI * 0.5, 0);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(pitchWidth, 0, cornerRadius, Math.PI * 0.5, Math.PI);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(pitchWidth, pitchHeight, cornerRadius, Math.PI, Math.PI * 1.5);
     ctx.stroke();
 
     // Goals
-    ctx.fillStyle = lineColor;
-    ctx.fillRect(
-      0,
-      pitchHeight / 2 - pitchHeight * 0.124,
-      4,
-      pitchHeight * 0.248
-    );
-    ctx.fillRect(
-      pitchWidth - 4,
-      pitchHeight / 2 - pitchHeight * 0.124,
-      4,
-      pitchHeight * 0.248
-    );
-
-    // Draw distribution map (heatmap)
-    if (showHeatmap && distribution.length > 0) {
-      distribution.forEach((point) => {
-        const x = (point.x / 100) * pitchWidth;
-        const y = (point.y / 100) * pitchHeight;
-        const radius = point.intensity * 30;
-
-        const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
-        gradient.addColorStop(0, `rgba(255, 0, 0, ${point.intensity * 0.8})`);
-        gradient.addColorStop(1, "rgba(255, 0, 0, 0)");
-
-        ctx.fillStyle = gradient;
-        ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
-      });
-    }
-
-    // Draw activities
-    activities.forEach((activity) => {
-      const x = (activity.x / 100) * pitchWidth;
-      const y = (activity.y / 100) * pitchHeight;
-      const size = activity.size || 6;
-
-      ctx.fillStyle = activity.color || "#ef4444";
-      ctx.beginPath();
-      ctx.arc(x, y, size, 0, 2 * Math.PI);
-      ctx.fill();
-
-      // Add border for successful attempts
-      if (activity.successful) {
-        ctx.strokeStyle = "#22c55e";
-        ctx.lineWidth = 2;
-        ctx.stroke();
-      }
-    });
-
-    // Draw vectors with arrows
-    vectors.forEach((vector) => {
-      const startX = (vector.startX / 100) * pitchWidth;
-      const startY = (vector.startY / 100) * pitchHeight;
-      const endX = (vector.endX / 100) * pitchWidth;
-      const endY = (vector.endY / 100) * pitchHeight;
-
-      ctx.strokeStyle = vector.color || "#3b82f6";
-      ctx.lineWidth = vector.width || 2;
-      ctx.lineCap = "round";
-
-      // Draw line
-      ctx.beginPath();
-      ctx.moveTo(startX, startY);
-      ctx.lineTo(endX, endY);
-      ctx.stroke();
-
-      // Draw arrowhead if enabled
-      if (showArrows) {
-        const angle = Math.atan2(endY - startY, endX - startX);
-        const arrowSize = 8;
-
-        ctx.fillStyle = vector.color || "#3b82f6";
-        ctx.beginPath();
-        ctx.moveTo(endX, endY);
-        ctx.lineTo(
-          endX - arrowSize * Math.cos(angle - Math.PI / 6),
-          endY - arrowSize * Math.sin(angle - Math.PI / 6)
-        );
-        ctx.lineTo(
-          endX - arrowSize * Math.cos(angle + Math.PI / 6),
-          endY - arrowSize * Math.sin(angle + Math.PI / 6)
-        );
-        ctx.closePath();
-        ctx.fill();
-      }
-    });
-  }, [
-    dimensions,
-    vectors,
-    activities,
-    distribution,
-    showHeatmap,
-    showArrows,
-    pitchColor,
-    lineColor,
-  ]);
+    const goalHeight = pitchHeight * 0.248;
+    const goalY = (pitchHeight - goalHeight) / 2;
+    ctx.fillRect(0, goalY, 4, goalHeight);
+    ctx.fillRect(pitchWidth - 4, goalY, 4, goalHeight);
+  }, [dimensions, pitchColor, lineColor]);
 
   return (
     <div
       ref={containerRef}
-      className={`bg-green-800 p-2 sm:p-4 rounded-lg inline-block w-full ${className}`}
+      className={`relative bg-green-800 p-2 sm:p-4 rounded-lg w-full ${className}`}
       style={{ maxWidth: "100%" }}
     >
       <canvas
@@ -287,6 +182,19 @@ const FootballPitch = ({
           display: "block",
         }}
       />
+      {/* Overlay container for child components */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          padding: "calc(0.5rem + 2px) calc(1rem + 2px)",
+          margin: "-2px",
+        }}
+      >
+        {children &&
+          React.Children.map(children, (child) =>
+            React.cloneElement(child, { dimensions })
+          )}
+      </div>
     </div>
   );
 };

@@ -166,7 +166,7 @@ const DataTable = ({
   const TableLoadingState = () => (
     <div className="w-full py-16">
       <LoadingSpinner
-        size="lg"
+        size="md"
         color="primary"
         text="Loading data..."
         centered={true}
@@ -212,7 +212,7 @@ const DataTable = ({
       <div className="w-14 h-14 bg-muted/30 rounded-full flex items-center justify-center mb-4">
         <Search className="w-6 h-6 text-muted-foreground" />
       </div>
-      <h4 className="text-lg font-semibold text-foreground mb-2">
+      <h4 className="text-md font-semibold text-foreground mb-2">
         No results found
       </h4>
       <p className="text-muted-foreground mb-4 text-sm">
@@ -235,7 +235,7 @@ const DataTable = ({
   return (
     <div className="w-full space-y-6">
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="flex flex-col w-full sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground">{title}</h2>
           {!isLoading && displayTotal > 0 && (
@@ -247,26 +247,6 @@ const DataTable = ({
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
           {/* Items per page selector */}
-          <div className="flex items-center space-x-2 order-2 sm:order-1">
-            <span className="text-sm text-muted-foreground whitespace-nowrap">
-              Show
-            </span>
-            <Select
-              value={itemsPerPage.toString()}
-              onValueChange={handleItemsPerPageChange}
-            >
-              <SelectTrigger className="w-20 h-9">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="5">5</SelectItem>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="20">20</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
           {/* Add Button */}
           {onAdd && (
             <Button
@@ -281,7 +261,7 @@ const DataTable = ({
       </div>
 
       {/* Search Section */}
-      {searchable && (
+      {/* {searchable && (
         <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <Input
@@ -296,9 +276,9 @@ const DataTable = ({
             className="pl-10 h-11 bg-background border-border/60 focus:border-primary/50"
           />
         </div>
-      )}
+      )} */}
 
-      <div className="relative w-full overflow-hidden rounded-lg border border-border/60 bg-background">
+      <div className="relative w-full rounded-lg bg-background">
         {isLoading ? (
           <TableLoadingState />
         ) : displayTotal === 0 ? (
@@ -310,43 +290,61 @@ const DataTable = ({
         ) : (
           <>
             {/* Desktop Table */}
-            <div className="hidden md:block overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-muted/40 border-b border-border/60">
+            <div className="hidden md:block overflow-x-auto w-full">
+              <table className="w-full text-sm border-separate border-spacing-y-2">
+                <thead className="bg-muted border-b border-border/60">
                   <tr>
                     {columns.map((column, index) => (
                       <th
                         key={index}
-                        className="h-12 px-6 text-left align-middle font-semibold text-foreground/80 whitespace-nowrap text-xs uppercase tracking-wide"
+                        className={index === 0 ? "h-15 pl-3 text-left align-middle font-semibold text-foreground whitespace-nowrap text-sm uppercase tracking-wide rounded-tl-lg" : "h-15 px-6 text-left align-middle font-semibold text-foreground whitespace-nowrap text-sm uppercase tracking-wide"}
                       >
                         {column.header}
                       </th>
                     ))}
                     {actions && (
-                      <th className="h-12 px-6 text-left align-middle font-semibold text-foreground/80 whitespace-nowrap text-xs uppercase tracking-wide w-20">
-                        Actions
+                      <th className="h-15 px-3 text-left align-middle font-semibold text-foreground whitespace-nowrap text-sm uppercase tracking-wide w-20 rounded-tr-lg ">
+                          <div className="flex items-center space-x-2 order-2 sm:order-1">
+                            <span className="text-sm whitespace-nowrap">
+                              Items per page  
+                            </span>
+                            <Select
+                              value={itemsPerPage.toString()}
+                              onValueChange={handleItemsPerPageChange}
+                            >
+                              <SelectTrigger className="w-20 h-9 border-white focus:border-primary text-sm">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="5">5</SelectItem>
+                                <SelectItem value="10">10</SelectItem>
+                                <SelectItem value="20">20</SelectItem>
+                                <SelectItem value="50">50</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
                       </th>
                     )}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border/40">
+                <tbody className="divide-y divide-border/40 bg-muted/50 border-b border-border/60">
                   {displayData.map((row, rowIndex) => (
                     <tr
                       key={rowIndex}
-                      className="group transition-all duration-200 hover:bg-muted/20 even:bg-muted/5"
+                      className="group transition-all duration-200 hover:bg-muted/90 even:bg-muted/5 text-sx"
                     >
                       {columns.map((column, colIndex) => (
-                        <td key={colIndex} className="p-6 align-middle">
+                        <td key={colIndex} className={colIndex === 0 ? "p-6 align-middle text-sx rounded-tl-lg whitespace-nowrap rounded-bl-lg" : "p-6 align-middle whitespace-nowrap text-sx"}>
                           {column.cell ? (
                             column.cell({ row })
                           ) : column.accessor ? (
                             column.badge ? (
                               <Badge
                                 variant={getBadgeVariant(row[column.accessor])}
-                                className="whitespace-nowrap text-xs font-medium"
+                                className="whitespace-nowrap text-sx font-medium"
                               >
                                 {row[column.accessor]}
-                              </Badge>
+                              </Badge>  
                             ) : (
                               <span className="text-foreground whitespace-nowrap">
                                 {row[column.accessor]}
@@ -356,8 +354,8 @@ const DataTable = ({
                         </td>
                       ))}
                       {actions && (
-                        <td className="p-6 align-middle">
-                          <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity duration-200">
+                        <td className="p-6 align-middle rounded-tr-lg whitespace-nowrap rounded-br-lg">
+                          <div className="flex items-center whitespace-nowrap gap-1 opacity-80 group-hover:opacity-100 transition-opacity duration-200">
                             {actions({ row })}
                           </div>
                         </td>
@@ -463,32 +461,32 @@ const DataTable = ({
       </div>
 
       {/* Pagination - Only show if there's data and not loading */}
-      {!isLoading && displayTotal > 0 && totalPages > 1 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-border/40">
+      {!isLoading && displayTotal > 0 && (
+        <div className="flex flex-col sm:flex-row items-center justify-end gap-15 p-3 border-border/60 bg-muted/50 rounded-lg">
           {/* Results info */}
-          <div className="text-sm text-muted-foreground">
-            Showing{" "}
+          <div className="text-md text-muted-foreground">
+            {" "}
             <span className="font-medium text-foreground">
               {(currentPage - 1) * itemsPerPage + 1}
             </span>{" "}
-            to{" "}
+            -{" "}
             <span className="font-medium text-foreground">
               {Math.min(currentPage * itemsPerPage, displayTotal)}
             </span>{" "}
             of{" "}
             <span className="font-medium text-foreground">{displayTotal}</span>{" "}
-            entries
+            
           </div>
-
+          
           {/* Pagination controls */}
           <div className="flex items-center space-x-1">
             {/* First Page Button */}
             <Button
               variant="outline"
-              size="sm"
+              size="md"
               onClick={goToFirstPage}
               disabled={currentPage === 1}
-              className="h-8 w-8 p-0 border-border/60"
+              className="h-8 w-8 p-0 border-0 bg-transparent"
             >
               <ChevronsLeft className="w-3.5 h-3.5" />
               <span className="sr-only">First page</span>
@@ -497,10 +495,10 @@ const DataTable = ({
             {/* Previous Button */}
             <Button
               variant="outline"
-              size="sm"
+              size="md"
               onClick={() => goToPage(currentPage - 1)}
               disabled={currentPage === 1}
-              className="h-8 w-8 p-0 border-border/60"
+              className="h-8 w-8 p-0 border-0 bg-transparent"
             >
               <ChevronLeft className="w-3.5 h-3.5" />
               <span className="sr-only">Previous page</span>
@@ -510,14 +508,14 @@ const DataTable = ({
             {getPageNumbers().map((page, index) => (
               <Button
                 key={index}
-                variant={currentPage === page ? "default" : "outline"}
-                size="sm"
+                variant={currentPage === page ? "link" : "outline"}
+                size="md"
                 onClick={() => goToPage(page)}
                 disabled={page === "..."}
                 className={
                   page === "..."
-                    ? "h-8 w-8 p-0 border-border/60 cursor-default text-muted-foreground"
-                    : "h-8 w-8 p-0 min-w-8 border-border/60"
+                    ? "h-8 w-8 p-0 border-0 cursor-default text-muted-foreground bg-transparent"
+                    : "h-8 w-8 p-0 min-w-8 border-0 bg-transparent"
                 }
               >
                 {page}
@@ -527,10 +525,10 @@ const DataTable = ({
             {/* Next Button */}
             <Button
               variant="outline"
-              size="sm"
+              size="md"
               onClick={() => goToPage(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="h-8 w-8 p-0 border-border/60"
+              className="h-8 w-8 p-0 border-0 bg-transparent"
             >
               <ChevronRight className="w-3.5 h-3.5" />
               <span className="sr-only">Next page</span>
@@ -539,10 +537,10 @@ const DataTable = ({
             {/* Last Page Button */}
             <Button
               variant="outline"
-              size="sm"
+              size="md"
               onClick={goToLastPage}
               disabled={currentPage === totalPages}
-              className="h-8 w-8 p-0 border-border/60"
+              className="h-8 w-8 p-0 border-0 bg-transparent"
             >
               <ChevronsRight className="w-3.5 h-3.5" />
               <span className="sr-only">Last page</span>
