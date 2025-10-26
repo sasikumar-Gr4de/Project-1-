@@ -1,4 +1,3 @@
-// src/pages/Matches/MatchPrepareStep.jsx
 import { useState } from "react";
 import {
   Upload,
@@ -45,7 +44,7 @@ const MatchPrepareStep = ({ matchId, currentStep, onStepComplete }) => {
 
   const handleFileUpload = (results) => {
     const result = results[0];
-    window.alert("Video File Uload");
+    // window.alert("Video File Uload");
     console.log(result);
   };
 

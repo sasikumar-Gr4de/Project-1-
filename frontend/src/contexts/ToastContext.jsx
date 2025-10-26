@@ -117,7 +117,7 @@ export const ToastProvider = ({ children }) => {
       {children}
 
       {/* Global Toast Container */}
-      <div className="fixed top-4 right-4 left-4 sm:left-auto sm:right-4 z-[100] space-y-3 pointer-events-none">
+      <div className="fixed top-4 right-4 left-4 sm:left-auto sm:right-4 z-100 space-y-3 pointer-events-none">
         {toasts.map((toast) => (
           <div
             key={toast.id}
@@ -135,11 +135,11 @@ export const ToastProvider = ({ children }) => {
 
               {/* Content */}
               <div className="flex-1 min-w-0">
-                <div className="font-semibold text-sm leading-tight break-words">
+                <div className="font-semibold text-sm leading-tight wrap-break-word">
                   {toast.title}
                 </div>
                 {toast.description && (
-                  <div className="text-sm mt-1.5 leading-relaxed break-words text-gray-700">
+                  <div className="text-sm mt-1.5 leading-relaxed wrap-break-word text-gray-700">
                     {toast.description}
                   </div>
                 )}

@@ -27,6 +27,20 @@ export const useClubsStore = create(
             };
           }
         },
+        getClubById: async (id) => {
+          try {
+            const response = await api.get(`/clubs/${id}`);
+            const result = response.data;
+
+            return result;
+          } catch (error) {
+            const errorMsg = error.response?.data?.message || error.message;
+            return {
+              success: false,
+              error: errorMsg,
+            };
+          }
+        },
         getAllClubsForSelect: async () => {
           try {
             const response = await api.get("/clubs", {

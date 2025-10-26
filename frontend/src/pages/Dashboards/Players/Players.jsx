@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { capitalize } from "@/utils/helper.utils";
 import RatingDisplay from "@/components/common/RatingDisplay";
+import { useToast } from "@/contexts/ToastContext";
 
 const Players = () => {
   const [players, setPlayers] = useState([]);
@@ -32,8 +33,8 @@ const Players = () => {
   });
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
-  // Pagination state
   const [pagination, setPagination] = useState({
     page: 1,
     pageSize: 10,
@@ -45,6 +46,11 @@ const Players = () => {
     usePlayersStore();
   const { getAllClubsForSelect } = useClubsStore();
 
+  useEffect(() => {
+    fetchAllPlayers();
+    fetchClubs();
+  }, []);
+
   const fetchAllPlayers = async (
     page = pagination.page,
     pageSize = pagination.pageSize,
@@ -52,12 +58,9 @@ const Players = () => {
   ) => {
     setIsLoading(true);
     try {
-      const filters = {};
-      if (search) {
-        filters.search = search;
-      }
-
+      const filters = search ? { search } : {};
       const result = await getAllPlayers(page, pageSize, filters);
+
       if (result.success === true) {
         const { data, pagination: paginationData } = result.data;
         setPlayers(data || []);
@@ -70,6 +73,11 @@ const Players = () => {
       }
     } catch (error) {
       console.error("Error fetching players:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch players",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -86,11 +94,6 @@ const Players = () => {
     }
   };
 
-  useEffect(() => {
-    fetchAllPlayers();
-    fetchClubs();
-  }, []);
-
   const handlePageChange = (newPage) => {
     fetchAllPlayers(newPage, pagination.pageSize, searchTerm);
   };
@@ -103,12 +106,28 @@ const Players = () => {
     try {
       const result = await createPlayer(playerData);
       if (result.success) {
+        toast({
+          title: "Success",
+          description: "Player added successfully",
+          variant: "success",
+        });
         fetchAllPlayers(pagination.page, pagination.pageSize, searchTerm);
         setShowAddModal(false);
         setSelectedPlayer(null);
+      } else {
+        toast({
+          title: "Error",
+          description: result.error || "Failed to add player",
+          variant: "destructive",
+        });
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.error("Error adding player:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add player",
+        variant: "destructive",
+      });
     }
   };
 
@@ -117,31 +136,64 @@ const Players = () => {
       const { player_id } = updatedData;
       const result = await updatePlayer(player_id, updatedData);
       if (result.success) {
+        toast({
+          title: "Success",
+          description: "Player updated successfully",
+          variant: "success",
+        });
         fetchAllPlayers(pagination.page, pagination.pageSize, searchTerm);
         setSelectedPlayer(null);
         setShowAddModal(false);
+      } else {
+        toast({
+          title: "Error",
+          description: result.error || "Failed to update player",
+          variant: "destructive",
+        });
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.error("Error updating player:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update player",
+        variant: "destructive",
+      });
     }
   };
 
   const handleDeletePlayer = async () => {
-    const result = await deletePlayer(deleteModal.playerId);
-    const { success } = result;
-    if (success === true) {
-      fetchAllPlayers(pagination.page, pagination.pageSize, searchTerm);
-      setDeleteModal({ isOpen: false, playerId: "" });
+    try {
+      const result = await deletePlayer(deleteModal.playerId);
+      if (result.success === true) {
+        toast({
+          title: "Success",
+          description: "Player deleted successfully",
+          variant: "success",
+        });
+        fetchAllPlayers(pagination.page, pagination.pageSize, searchTerm);
+        setDeleteModal({ isOpen: false, playerId: "" });
+      } else {
+        toast({
+          title: "Error",
+          description: result.error || "Failed to delete player",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting player:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete player",
+        variant: "destructive",
+      });
     }
   };
 
-  const handleEditPlayer = async (player) => {
-    console.log(player);
+  const handleEditPlayer = (player) => {
     setSelectedPlayer(player);
     setShowAddModal(true);
   };
 
-  // Calculate age from date of birth
   const calculateAge = (dateOfBirth) => {
     if (!dateOfBirth) return "N/A";
     const today = new Date();
@@ -159,13 +211,21 @@ const Players = () => {
     return age;
   };
 
-  // Get club name by ID
   const getClubName = (clubId) => {
     const club = clubs.find((club) => club.club_id === clubId);
     return club ? club.club_name : "Unknown Club";
   };
 
-  // Beautiful gradient avatars for players
+  const getStatusVariant = (status) => {
+    const variants = {
+      active: "default",
+      injured: "destructive",
+      suspended: "outline",
+      inactive: "secondary",
+    };
+    return variants[status?.toLowerCase()] || "secondary";
+  };
+
   const PlayerAvatar = ({ player, className = "w-10 h-10" }) => {
     const gradientClass = `bg-gradient-to-br from-primary/80 to-primary/60`;
 
@@ -193,34 +253,15 @@ const Players = () => {
     );
   };
 
-  // Get status badge variant
-  const getStatusVariant = (status) => {
-    switch (status?.toLowerCase()) {
-      case "active":
-        return "default";
-      case "injured":
-        return "destructive";
-      case "suspended":
-        return "outline";
-      case "inactive":
-        return "secondary";
-      default:
-        return "secondary";
-    }
-  };
-
-  // Beautiful always-visible action buttons
   const ActionButton = ({
     icon: Icon,
     onClick,
-    variant = "ghost",
     color = "primary",
-    size = "sm",
     tooltip,
   }) => (
     <Button
-      variant={variant}
-      size={size}
+      variant="ghost"
+      size="sm"
       onClick={onClick}
       className={`
         h-8 w-8 p-0 transition-all duration-200 rounded-md
@@ -239,7 +280,6 @@ const Players = () => {
     </Button>
   );
 
-  // Enhanced table columns with compact design
   const playerColumns = [
     {
       header: "Player",
@@ -281,7 +321,7 @@ const Players = () => {
     {
       header: "Sense Score",
       accessor: "score",
-      cell: ({ row }) => <RatingDisplay rating={row.sense_score | 0} />,
+      cell: ({ row }) => <RatingDisplay rating={row.sense_score || 0} />,
     },
     {
       header: "Age",
@@ -347,7 +387,6 @@ const Players = () => {
     },
   ];
 
-  // Beautiful always-visible actions
   const playerActions = ({ row }) => (
     <div className="flex items-center space-x-2 transition-all duration-200">
       <ActionButton
@@ -375,19 +414,6 @@ const Players = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header Section */}
-      {/* <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            Players
-          </h1>
-          <p className="text-muted-foreground">
-            Manage football players and their profiles
-          </p>
-        </div>
-      </div> */}
-
-      {/* Players Table */}
       <DataTable
         data={players}
         columns={playerColumns}
@@ -398,7 +424,6 @@ const Players = () => {
         isLoading={isLoading}
         onAdd={() => setShowAddModal(true)}
         addButtonText="Add Player"
-        // Pagination props
         pagination={pagination}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
@@ -407,7 +432,6 @@ const Players = () => {
         tableHeight="500px"
       />
 
-      {/* Add/Edit Player Modal */}
       <AddPlayerModal
         isOpen={showAddModal}
         onClose={() => {
@@ -419,7 +443,6 @@ const Players = () => {
         clubs={clubs}
       />
 
-      {/* Delete Confirmation Modal */}
       <DeleteConfirmModal
         isOpen={deleteModal.isOpen}
         onClose={() => setDeleteModal({ isOpen: false, playerId: "" })}

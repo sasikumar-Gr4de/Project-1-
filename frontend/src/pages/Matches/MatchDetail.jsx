@@ -12,19 +12,36 @@ import MatchReviewStep from "@/pages/Matches/MatchReviewStep";
 import MatchCompleteStep from "@/pages/Matches/MatchCompleteStep";
 import MatchPrepareStep from "@/pages/Matches/MatchPrepareStep";
 
+import { useMatchesStore } from "@/store/matches.store";
+
 const MatchDetail = () => {
   const { id } = useParams();
+  const [matchData, setMatchData] = useState(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [activeTab, setActiveTab] = useState(0);
+  const { getMatchById } = useMatchesStore();
 
-  // Mock steps data
   const steps = [
-    // { id: "overview", label: "Overview", description: "Match Analysis" },
     { id: "prepare", label: "Prepare", description: "Data Setup" },
     { id: "analysis", label: "Analysis", description: "Performance Metrics" },
     { id: "review", label: "Review", description: "QA & Assessment" },
     { id: "complete", label: "Complete", description: "Final Report" },
   ];
+
+  useEffect(() => {
+    const fetchMatchData = async () => {
+      console.log("MatchDetail: fetching match", id);
+      try {
+        const { data } = await getMatchById(id);
+        console.log("MatchDetail: fetched", data);
+        setMatchData(data);
+      } catch (err) {
+        console.error("MatchDetail: fetch error", err);
+      }
+    };
+
+    fetchMatchData();
+  }, [id, getMatchById]);
 
   const handleStepClick = (stepIndex) => {
     if (stepIndex <= currentStep) {
@@ -47,7 +64,6 @@ const MatchDetail = () => {
     }
   };
 
-  // Mock tabs data - moved after function definitions
   const tabs = [
     {
       id: "overview",
@@ -81,6 +97,15 @@ const MatchDetail = () => {
       content: <MatchCompleteStep matchId={id} currentStep={currentStep} />,
     },
   ];
+
+  // Guard render until match data is loaded to avoid runtime errors during initial render
+  if (!matchData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
+        <div className="text-sm text-muted-foreground">Loading match...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -149,10 +174,15 @@ const MatchDetail = () => {
           </div>
         </div>
 
-        {/* Video Player Section */}
-        <div className="mb-6">
-          <VideoPlayer videoUrl={null} title="Match Highlights" />
-        </div>
+        {/* Video Player Section (only when URL exists) */}
+        {matchData?.video_url ? (
+          <div className="mb-6">
+            <VideoPlayer
+              videoUrl={matchData.video_url}
+              title="Match Highlights"
+            />
+          </div>
+        ) : null}
 
         {/* Tabs Section */}
         <div className="bg-card border border-border rounded-xl overflow-hidden">

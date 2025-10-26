@@ -65,6 +65,19 @@ export const useMatchesStore = create(
             };
           }
         },
+        getMatchById: async (id) => {
+          try {
+            const response = await api.get(`/matches/${id}`);
+            const result = response.data;
+            return result;
+          } catch (error) {
+            const errorMsg = error.response?.data?.message || error.message;
+            return {
+              success: false,
+              error: errorMsg,
+            };
+          }
+        },
       }),
       {
         name: "matches-storage",

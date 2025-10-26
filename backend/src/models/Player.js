@@ -17,6 +17,19 @@ export default class Player {
       jersey_number,
     } = playerData;
     try {
+      // check jersey_number is not duplicated in the same club
+      const { data: existingPlayers, error: fetchError } = await supabase
+        .from("players")
+        .select("*")
+        .eq("current_club", current_club)
+        .eq("jersey_number", jersey_number);
+      if (fetchError) throw fetchError;
+      if (existingPlayers.length > 0) {
+        throw new Error(
+          `Jersey number ${jersey_number} is already taken in the club.`
+        );
+      }
+
       const { data, error } = await supabase
         .from("players")
         .insert([
@@ -40,6 +53,20 @@ export default class Player {
       return data;
     } catch (err) {
       console.error("Error creating player:", err);
+      throw err;
+    }
+  }
+
+  static async findByClubId(clubId) {
+    try {
+      const { data, error } = await supabase
+        .from("players")
+        .select("*")
+        .eq("current_club", clubId);
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      console.error("Error fetching players by club ID:", err);
       throw err;
     }
   }

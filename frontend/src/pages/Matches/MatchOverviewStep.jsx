@@ -1,3 +1,5 @@
+import React, { useState, useEffect } from "react";
+
 import {
   Calendar,
   MapPin,
@@ -6,30 +8,68 @@ import {
   BarChart3,
   Users,
 } from "lucide-react";
-import {
-  mockMatchData,
-  mockClubsData,
-  mockPlayersData,
-  mockMatchMetrics,
-} from "@/mock/matchData";
+import { mockMatchMetrics } from "@/mock/matchData";
+import { useMatchesStore } from "@/store/matches.store";
+import { useClubsStore } from "@/store/clubs.store";
+import { usePlayersStore } from "@/store/players.store";
 
 const MatchOverviewStep = ({ matchId, currentStep }) => {
-  const match = mockMatchData;
-  const homeClub = mockClubsData[match.home_club_id];
-  const awayClub = mockClubsData[match.away_club_id];
-  const homePlayers = mockPlayersData[match.home_club_id] || [];
-  const awayPlayers = mockPlayersData[match.away_club_id] || [];
+  const [match, setMatch] = useState(null);
+  const [homeClub, setHomeClub] = useState(null);
+  const [awayClub, setAwayClub] = useState(null);
+  const [homePlayers, setHomePlayers] = useState([]);
+  const [awayPlayers, setAwayPlayers] = useState([]);
 
-  if (currentStep !== 0) {
+  const { getMatchById } = useMatchesStore();
+  const { getClubById } = useClubsStore();
+  const { getPlayersByClubId } = usePlayersStore();
+
+  useEffect(() => {
+    const fetchMatchData = async () => {
+      try {
+        const { data: matchData } = await getMatchById(matchId);
+        console.log("Match Data:", matchData);
+        setMatch(matchData);
+
+        if (matchData) {
+          const { data: homeClubData } = await getClubById(
+            matchData.home_club_id
+          );
+          setHomeClub(homeClubData);
+          console.log("Home Club Data:", homeClubData);
+
+          const { data: awayClubData } = await getClubById(
+            matchData.away_club_id
+          );
+          setAwayClub(awayClubData);
+          console.log("Away Club Data:", awayClubData);
+
+          const { data: homePlayersData } = await getPlayersByClubId(
+            matchData.home_club_id
+          );
+          setHomePlayers(homePlayersData || []);
+          console.log(homePlayersData);
+
+          const { data: awayPlayersData } = await getPlayersByClubId(
+            matchData.away_club_id
+          );
+          setAwayPlayers(awayPlayersData || []);
+        }
+      } catch (error) {
+        console.error("Error fetching match data:", error);
+      }
+    };
+
+    fetchMatchData();
+  }, [matchId, currentStep, getMatchById, getClubById, getPlayersByClubId]);
+
+  // Guard render until required data exists
+  if (!match || !homeClub || !awayClub) {
     return (
-      <div className="text-center py-12">
-        <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-muted-foreground mb-2">
-          Step Not Available
-        </h3>
-        <p className="text-muted-foreground">
-          Please complete the preparation steps to access match overview.
-        </p>
+      <div className="p-3">
+        <div className="text-sm text-muted-foreground">
+          Loading match data...
+        </div>
       </div>
     );
   }
@@ -106,7 +146,7 @@ const MatchOverviewStep = ({ matchId, currentStep }) => {
     const awayPercentage = total > 0 ? (stat.away / total) * 100 : 50;
 
     return (
-      <div className="bg-card   p-1">
+      <div className="bg-card p-1">
         {/* Metric Name */}
 
         {/* Values and Progress Bar */}
@@ -166,14 +206,16 @@ const MatchOverviewStep = ({ matchId, currentStep }) => {
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
             <span className="text-xs font-bold text-foreground">
-              {player.name
+              {player.full_name
                 .split(" ")
                 .map((n) => n[0])
                 .join("")}
             </span>
           </div>
           <div className="min-w-0">
-            <div className="text-sm font-semibold truncate">{player.name}</div>
+            <div className="text-sm font-semibold truncate">
+              {player.full_name}
+            </div>
             <div className="text-xs text-muted-foreground">
               {player.position} • #{player.jersey_number}
             </div>
@@ -185,7 +227,7 @@ const MatchOverviewStep = ({ matchId, currentStep }) => {
               isHome ? "text-primary" : "text-muted-foreground"
             }`}
           >
-            {player.metrics.talent_index_score}
+            {player.metrics?.talent_index_score}
           </div>
           <div className="text-xs text-muted-foreground">GR4DE</div>
         </div>
@@ -193,15 +235,17 @@ const MatchOverviewStep = ({ matchId, currentStep }) => {
 
       <div className="grid grid-cols-3 gap-1 text-center text-xs">
         <div>
-          <div className="font-semibold">{player.metrics.goals || 0}</div>
+          <div className="font-semibold">{player.metrics?.goals || 0}</div>
           <div className="text-muted-foreground">Goals</div>
         </div>
         <div>
-          <div className="font-semibold">{player.metrics.assists || 0}</div>
+          <div className="font-semibold">{player.metrics?.assists || 0}</div>
           <div className="text-muted-foreground">Assists</div>
         </div>
         <div>
-          <div className="font-semibold">{player.metrics.pass_accuracy}%</div>
+          <div className="font-semibold">
+            {player.metrics?.pass_accuracy || 0}%
+          </div>
           <div className="text-muted-foreground">Pass %</div>
         </div>
       </div>
@@ -214,10 +258,10 @@ const MatchOverviewStep = ({ matchId, currentStep }) => {
       <div className="bg-card border border-border rounded-xl p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="text-center flex-1">
-            <div className="text-xl font-bold">{homeClub.name}</div>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-xl font-bold">{homeClub.club_name}</div>
+            {/* <div className="text-sm text-muted-foreground">
               Home • {homeClub.formation}
-            </div>
+            </div> */}
           </div>
 
           <div className="text-center mx-6">
@@ -228,10 +272,10 @@ const MatchOverviewStep = ({ matchId, currentStep }) => {
           </div>
 
           <div className="text-center flex-1">
-            <div className="text-xl font-bold">{awayClub.name}</div>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-xl font-bold">{awayClub.club_name}</div>
+            {/* <div className="text-sm text-muted-foreground">
               Away • {awayClub.formation}
-            </div>
+            </div> */}
           </div>
         </div>
 

@@ -44,6 +44,15 @@ class PlayersService {
     }
   }
 
+  static async getPlayersByClubId(clubId) {
+    try {
+      const result = await Player.findByClubId(clubId);
+      return generateResponse(result, COMMON_GET_SUCCESS);
+    } catch (err) {
+      throw err;
+    }
+  }
+
   static async updatePlayer(id, updateData) {
     try {
       const data = await Player.update(id, updateData);

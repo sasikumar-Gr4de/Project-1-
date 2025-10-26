@@ -9,6 +9,8 @@ import { useClubsStore } from "@/store/clubs.store";
 import { Trophy, Edit, Trash2, Eye, CalendarDays, MapPin } from "lucide-react";
 import { capitalize } from "@/utils/helper.utils";
 import { formatDate } from "@/utils/formatter.util";
+import { useToast } from "@/contexts/ToastContext";
+import { Link } from "react-router-dom";
 
 const Matches = () => {
   const [matches, setMatches] = useState([]);
@@ -21,8 +23,8 @@ const Matches = () => {
   });
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
-  // Pagination state
   const [pagination, setPagination] = useState({
     page: 1,
     pageSize: 10,
@@ -34,6 +36,11 @@ const Matches = () => {
     useMatchesStore();
   const { getAllClubsForSelect } = useClubsStore();
 
+  useEffect(() => {
+    fetchAllMatches();
+    fetchClubs();
+  }, []);
+
   const fetchAllMatches = async (
     page = pagination.page,
     pageSize = pagination.pageSize,
@@ -41,12 +48,9 @@ const Matches = () => {
   ) => {
     setIsLoading(true);
     try {
-      const filters = {};
-      if (search) {
-        filters.search = search;
-      }
-
+      const filters = search ? { search } : {};
       const result = await getAllMatches(page, pageSize, filters);
+
       if (result.success === true) {
         const { data, pagination: paginationData } = result.data;
         setMatches(data || []);
@@ -59,6 +63,11 @@ const Matches = () => {
       }
     } catch (error) {
       console.error("Error fetching matches:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch matches",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -74,11 +83,6 @@ const Matches = () => {
       console.error("Error fetching clubs:", error);
     }
   };
-
-  useEffect(() => {
-    fetchAllMatches();
-    fetchClubs();
-  }, []);
 
   const handlePageChange = (newPage) => {
     fetchAllMatches(newPage, pagination.pageSize, searchTerm);
@@ -97,11 +101,27 @@ const Matches = () => {
     try {
       const result = await createMatch(matchData);
       if (result.success) {
+        toast({
+          title: "Success",
+          description: "Match added successfully",
+          variant: "success",
+        });
         fetchAllMatches(pagination.page, pagination.pageSize, searchTerm);
         setShowAddModal(false);
+      } else {
+        toast({
+          title: "Error",
+          description: result.error || "Failed to add match",
+          variant: "destructive",
+        });
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.error("Error adding match:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add match",
+        variant: "destructive",
+      });
     }
   };
 
@@ -110,86 +130,103 @@ const Matches = () => {
       const { match_id } = updatedData;
       const result = await updateMatch(match_id, updatedData);
       if (result.success) {
+        toast({
+          title: "Success",
+          description: "Match updated successfully",
+          variant: "success",
+        });
         fetchAllMatches(pagination.page, pagination.pageSize, searchTerm);
         setSelectedMatch(null);
         setShowAddModal(false);
+      } else {
+        toast({
+          title: "Error",
+          description: result.error || "Failed to update match",
+          variant: "destructive",
+        });
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.error("Error updating match:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update match",
+        variant: "destructive",
+      });
     }
   };
 
   const handleDeleteMatch = async () => {
-    const result = await deleteMatch(deleteModal.matchId);
-    const { success } = result;
-    if (success === true) {
-      fetchAllMatches(pagination.page, pagination.pageSize, searchTerm);
-      setDeleteModal({ isOpen: false, matchId: "" });
+    try {
+      const result = await deleteMatch(deleteModal.matchId);
+      if (result.success === true) {
+        toast({
+          title: "Success",
+          description: "Match deleted successfully",
+          variant: "success",
+        });
+        fetchAllMatches(pagination.page, pagination.pageSize, searchTerm);
+        setDeleteModal({ isOpen: false, matchId: "" });
+      } else {
+        toast({
+          title: "Error",
+          description: result.error || "Failed to delete match",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting match:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete match",
+        variant: "destructive",
+      });
     }
   };
 
-  const handleEditMatch = async (match) => {
+  const handleEditMatch = (match) => {
     setSelectedMatch(match);
     setShowAddModal(true);
   };
 
-  // Format match score
   const formatScore = (match) => {
-    if (match.match_status !== "completed") {
-      return "VS";
-    }
+    if (match.match_status !== "completed") return "VS";
     return `${match.score_home || 0} - ${match.score_away || 0}`;
   };
 
-  // Get status badge variant
   const getStatusVariant = (status) => {
-    switch (status) {
-      case "completed":
-        return "default";
-      case "ongoing":
-        return "destructive";
-      case "scheduled":
-        return "secondary";
-      case "postponed":
-        return "outline";
-      default:
-        return "secondary";
-    }
+    const variants = {
+      completed: "default",
+      ongoing: "destructive",
+      scheduled: "secondary",
+      postponed: "outline",
+    };
+    return variants[status] || "secondary";
   };
 
-  const getAnalysisVarient = (status) => {
-    switch (status) {
-      case "completed":
-        return "default";
-      case "approved":
-        return "default";
-      case "pending":
-        return "destructive";
-      case "rejected":
-        return "outline";
-      default:
-        return "secondary";
-    }
+  const getAnalysisVariant = (status) => {
+    const variants = {
+      completed: "default",
+      approved: "default",
+      pending: "destructive",
+      rejected: "outline",
+    };
+    return variants[status] || "secondary";
   };
 
-  // Get club name by ID
   const getClubName = (clubId) => {
     const club = clubs.find((club) => club.club_id === clubId);
     return club ? club.club_name : "Unknown Club";
   };
 
-  // Beautiful always-visible action buttons
   const ActionButton = ({
     icon: Icon,
     onClick,
-    variant = "ghost",
     color = "primary",
-    size = "sm",
     tooltip,
   }) => (
     <Button
-      variant={variant}
-      size={size}
+      variant="ghost"
+      size="sm"
       onClick={onClick}
       className={`
         h-8 w-8 p-0 transition-all duration-200 rounded-md
@@ -208,14 +245,12 @@ const Matches = () => {
     </Button>
   );
 
-  // Enhanced table columns with compact design
   const matchColumns = [
     {
       header: "Match",
       accessor: "home_club_id",
       cell: ({ row }) => (
         <div className="flex items-center justify-between space-x-4 min-w-0">
-          {/* Home Team - Right Aligned */}
           <div className="flex-1 text-right min-w-0">
             <p className="font-semibold text-foreground text-sm truncate">
               {getClubName(row.home_club_id)}
@@ -295,8 +330,8 @@ const Matches = () => {
       accessor: "qa_status",
       cell: ({ row }) => (
         <Badge
-          variant={getAnalysisVarient(row.qa_status)}
-          className="text-xs font-medium bg-secondary/10 text-secondary-foreground border-secondary/20"
+          variant={getAnalysisVariant(row.qa_status)}
+          className="text-xs font-medium bg-secondary/10 text-gray-300 border-secondary/20"
         >
           {capitalize(row.qa_status)}
         </Badge>
@@ -304,15 +339,16 @@ const Matches = () => {
     },
   ];
 
-  // Beautiful always-visible actions
   const matchActions = ({ row }) => (
     <div className="flex items-center space-x-2 transition-all duration-200">
-      <ActionButton
-        icon={Eye}
-        onClick={() => console.log("View match", row)}
-        color="secondary"
-        tooltip="View match"
-      />
+      <Link to={`/matches/${row.match_id}`}>
+        <ActionButton
+          icon={Eye}
+          onClick={() => console.log("View match", row)}
+          color="secondary"
+          tooltip="View match"
+        />
+      </Link>
       <ActionButton
         icon={Edit}
         onClick={() => handleEditMatch(row)}
@@ -330,19 +366,6 @@ const Matches = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header Section */}
-      {/* <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            Matches
-          </h1>
-          <p className="text-muted-foreground">
-            Manage football matches and schedules
-          </p>
-        </div>
-      </div> */}
-
-      {/* Matches Table */}
       <DataTable
         data={matches}
         columns={matchColumns}
@@ -353,7 +376,6 @@ const Matches = () => {
         isLoading={isLoading}
         onAdd={() => setShowAddModal(true)}
         addButtonText="Add Match"
-        // Pagination props
         pagination={pagination}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
@@ -362,7 +384,6 @@ const Matches = () => {
         tableHeight="500px"
       />
 
-      {/* Add/Edit Match Modal */}
       <AddMatchModal
         isOpen={showAddModal}
         onClose={() => {
@@ -374,7 +395,6 @@ const Matches = () => {
         clubs={clubs}
       />
 
-      {/* Delete Confirmation Modal */}
       <DeleteConfirmModal
         isOpen={deleteModal.isOpen}
         onClose={() => setDeleteModal({ isOpen: false, matchId: "" })}

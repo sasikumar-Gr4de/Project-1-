@@ -114,8 +114,6 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
         weight_kg: "",
         current_club: "",
       });
-
-      onClose();
     } catch (error) {
       console.error("Error saving player:", error);
       alert("Failed to save player. Please try again.");
@@ -126,7 +124,7 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
 
   const handleAvatarUpload = (result) => {
     if (result.success) {
-      window.alert(result.url);
+      // window.alert(result.url);
       setFormData((prev) => ({
         ...prev,
         avatar_url: result.url || "",

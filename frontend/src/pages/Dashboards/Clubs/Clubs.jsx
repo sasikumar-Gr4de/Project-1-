@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import DataTable from "@/components/common/DataTable";
 import AddClubModal from "@/components/modals/AddClubModal";
 import DeleteConfirmModal from "@/components/common/DeleteConfirmModal";
 import { Edit, Calendar, Users, Trophy, Shield, Trash2 } from "lucide-react";
 import { useClubsStore } from "@/store/clubs.store";
-import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/contexts/ToastContext";
 
 const Clubs = () => {
   const [clubs, setClubs] = useState([]);
@@ -13,8 +14,8 @@ const Clubs = () => {
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, clubId: "" });
   const [selectedClub, setSelectedClub] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
-  // Pagination state
   const [pagination, setPagination] = useState({
     page: 1,
     pageSize: 10,
@@ -23,6 +24,10 @@ const Clubs = () => {
   });
 
   const { getAllClubs, createClub, updateClub, deleteClub } = useClubsStore();
+
+  useEffect(() => {
+    fetchAllClubs();
+  }, []);
 
   const fetchAllClubs = async (
     page = pagination.page,
@@ -43,14 +48,15 @@ const Clubs = () => {
       }
     } catch (error) {
       console.error("Error fetching clubs:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch clubs",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchAllClubs();
-  }, []);
 
   const handlePageChange = (newPage) => {
     fetchAllClubs(newPage, pagination.pageSize);
@@ -64,13 +70,27 @@ const Clubs = () => {
     try {
       const result = await createClub(clubData);
       if (result.success) {
-        const newClub = result.data;
-        setClubs((prev) => [newClub, ...prev]);
+        toast({
+          title: "Success",
+          description: "Club added successfully",
+          variant: "success",
+        });
         fetchAllClubs(pagination.page, pagination.pageSize);
-        setSelectedClub(null);
+        setShowAddModal(false);
+      } else {
+        toast({
+          title: "Error",
+          description: result.error || "Failed to add club",
+          variant: "destructive",
+        });
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.error("Error adding club:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add club",
+        variant: "destructive",
+      });
     }
   };
 
@@ -79,43 +99,64 @@ const Clubs = () => {
       const { club_id } = updatedData;
       const result = await updateClub(club_id, updatedData);
       if (result.success) {
-        setClubs((prev) =>
-          prev.map((club) =>
-            club.club_id === club_id
-              ? {
-                  ...club,
-                  ...updatedData,
-                  updated_at: new Date().toISOString(),
-                }
-              : club
-          )
-        );
+        toast({
+          title: "Success",
+          description: "Club updated successfully",
+          variant: "success",
+        });
+        fetchAllClubs(pagination.page, pagination.pageSize);
         setSelectedClub(null);
         setShowAddModal(false);
+      } else {
+        toast({
+          title: "Error",
+          description: result.error || "Failed to update club",
+          variant: "destructive",
+        });
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.error("Error updating club:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update club",
+        variant: "destructive",
+      });
     }
   };
 
   const handleDeleteClub = async () => {
-    const result = await deleteClub(deleteModal.clubId);
-    const { success } = result;
-    if (success === true) {
-      setClubs((prev) =>
-        prev.filter((club) => club.club_id !== deleteModal.clubId)
-      );
-      setDeleteModal({ isOpen: false, clubId: "" });
-      fetchAllClubs(pagination.page, pagination.pageSize);
+    try {
+      const result = await deleteClub(deleteModal.clubId);
+      if (result.success === true) {
+        toast({
+          title: "Success",
+          description: "Club deleted successfully",
+          variant: "success",
+        });
+        fetchAllClubs(pagination.page, pagination.pageSize);
+        setDeleteModal({ isOpen: false, clubId: "" });
+      } else {
+        toast({
+          title: "Error",
+          description: result.error || "Failed to delete club",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting club:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete club",
+        variant: "destructive",
+      });
     }
   };
 
-  const handleEditClub = async (club) => {
+  const handleEditClub = (club) => {
     setSelectedClub(club);
     setShowAddModal(true);
   };
 
-  // Beautiful gradient avatars for clubs
   const ClubAvatar = ({ club, className = "w-8 h-8" }) => {
     const gradientClass = club?.mark_url
       ? `bg-gradient-to-br from-transparent to-transparent`
@@ -138,18 +179,15 @@ const Clubs = () => {
     );
   };
 
-  // Beautiful always-visible action buttons
   const ActionButton = ({
     icon: Icon,
     onClick,
-    variant = "ghost",
     color = "primary",
-    size = "sm",
     tooltip,
   }) => (
     <Button
-      variant={variant}
-      size={size}
+      variant="ghost"
+      size="sm"
       onClick={onClick}
       className={`
         h-8 w-8 p-0 transition-all duration-200 rounded-md
@@ -158,7 +196,7 @@ const Clubs = () => {
             ? "bg-primary/5 text-primary border border-primary/20 hover:bg-primary/10 hover:border-primary/30"
             : color === "secondary"
             ? "bg-secondary/5 text-secondary border border-secondary/20 hover:bg-secondary/10 hover:border-secondary/30"
-            : "bg-destructive/5 text-destructive border border-destructive/20 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
+            : "bg-destructive/5 text-destructive border border-destructive/20 hover:bg-destructive/10 hover:border-destructive/30"
         }
         shadow-sm hover:shadow-md
       `}
@@ -168,7 +206,6 @@ const Clubs = () => {
     </Button>
   );
 
-  // Enhanced table columns with compact design
   const clubColumns = [
     {
       header: "Club",
@@ -211,7 +248,7 @@ const Clubs = () => {
             variant="primary"
             className="text-xs font-medium bg-secondary/50 text-secondary-foreground border border-secondary/20"
           >
-            {row.players.length || 0}
+            {row.players?.length || 0}
           </Badge>
         </div>
       ),
@@ -226,7 +263,7 @@ const Clubs = () => {
             variant="outline"
             className="text-xs font-medium bg-secondary/50 text-secondary-foreground border border-secondary/20"
           >
-            {row.matches_home.length + row.matches_away.length || 0}
+            {(row.matches_home?.length || 0) + (row.matches_away?.length || 0)}
           </Badge>
         </div>
       ),
@@ -245,7 +282,6 @@ const Clubs = () => {
     },
   ];
 
-  // Beautiful always-visible actions
   const clubActions = ({ row }) => (
     <div className="flex items-center space-x-2 transition-all duration-200">
       <ActionButton
@@ -271,19 +307,6 @@ const Clubs = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header Section */}
-      {/* <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            Clubs
-          </h1>
-          <p className="text-muted-foreground">
-            Manage football clubs and their information
-          </p>
-        </div>
-      </div> */}
-
-      {/* Clubs Table */}
       <DataTable
         data={clubs}
         columns={clubColumns}
@@ -294,7 +317,6 @@ const Clubs = () => {
         addButtonText="Add Club"
         searchable={true}
         searchPlaceholder="Search clubs..."
-        // Pagination props
         pagination={pagination}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
@@ -302,7 +324,6 @@ const Clubs = () => {
         emptyStateDescription="Get started by adding your first football club to the system."
       />
 
-      {/* Add/Edit Club Modal */}
       <AddClubModal
         isOpen={showAddModal}
         onClose={() => {
@@ -313,7 +334,6 @@ const Clubs = () => {
         club={selectedClub}
       />
 
-      {/* Delete Confirmation Modal */}
       <DeleteConfirmModal
         isOpen={deleteModal.isOpen}
         onClose={() => setDeleteModal({ isOpen: false, clubId: "" })}

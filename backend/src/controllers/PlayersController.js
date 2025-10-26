@@ -69,6 +69,16 @@ class PlayersController {
       return sendServerErrorResponse(req, res, err);
     }
   }
+
+  async getPlayersByClubId(req, res) {
+    try {
+      const { clubId } = req.params;
+      const result = await PlayersService.getPlayersByClubId(clubId);
+      return res.status(200).json(result);
+    } catch (err) {
+      return sendServerErrorResponse(req, res, err);
+    }
+  }
 }
 
 export default new PlayersController();

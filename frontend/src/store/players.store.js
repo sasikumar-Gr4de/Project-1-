@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
 import { zustandEncryptedStorage } from "@/utils/storage.utils.js";
 import api from "@/services/base.api.js";
+import { useToast } from "@/contexts/ToastContext";
 
 export const usePlayersStore = create(
   devtools(
@@ -14,6 +15,25 @@ export const usePlayersStore = create(
                 page,
                 pageSize,
                 ...filters,
+              },
+            });
+            const result = response.data;
+
+            return result;
+          } catch (error) {
+            const errorMsg = error.response?.data?.message || error.message;
+            return {
+              success: false,
+              error: errorMsg,
+            };
+          }
+        },
+        getPlayersByClubId: async (clubId) => {
+          try {
+            const response = await api.get(`/players/club/${clubId}`, {
+              params: {
+                page: 0,
+                pageSize: 0,
               },
             });
             const result = response.data;

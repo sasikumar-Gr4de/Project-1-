@@ -10,5 +10,6 @@ router.get("/:id", protect, PlayersController.getPlayer);
 router.put("/:id", protect, PlayersController.updatePlayer);
 router.delete("/:id", protect, PlayersController.deletePlayer);
 router.get("/:id/club", protect, PlayersController.getPlayerClub);
+router.get("/club/:clubId", protect, PlayersController.getPlayersByClubId);
 
 export default router;
