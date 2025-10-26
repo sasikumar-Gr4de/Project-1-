@@ -10,6 +10,7 @@ export default class Player {
       position,
       height_cm,
       weight_kg,
+      preferred_foot,
       current_club,
       nationality,
       avatar_url,
@@ -25,6 +26,7 @@ export default class Player {
             position,
             height_cm,
             weight_kg,
+            preferred_foot,
             current_club,
             nationality,
             avatar_url,
@@ -125,6 +127,21 @@ export default class Player {
       return data;
     } catch (err) {
       console.error("Error fetching player's club:", err);
+      throw err;
+    }
+  }
+
+  static async deleteByClubId(clubId) {
+    try {
+      const { data, error } = await supabase
+        .from("players")
+        .delete()
+        .eq("current_club", clubId)
+        .select();
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      console.error("Error deleting players by club ID:", err);
       throw err;
     }
   }

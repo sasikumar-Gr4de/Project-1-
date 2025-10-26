@@ -1,6 +1,5 @@
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -18,7 +17,6 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  MoreHorizontal,
 } from "lucide-react";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 
@@ -237,12 +235,12 @@ const DataTable = ({
       {/* Header Section */}
       <div className="flex flex-col w-full sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground">{title}</h2>
+          {/* <h2 className="text-2xl font-bold text-foreground">{title}</h2>
           {!isLoading && displayTotal > 0 && (
             <p className="text-sm text-muted-foreground">
               {displayTotal} {displayTotal === 1 ? "record" : "records"} found
             </p>
-          )}
+          )} */}
         </div>
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
@@ -297,32 +295,36 @@ const DataTable = ({
                     {columns.map((column, index) => (
                       <th
                         key={index}
-                        className={index === 0 ? "h-15 pl-3 text-left align-middle font-semibold text-foreground whitespace-nowrap text-sm uppercase tracking-wide rounded-tl-lg" : "h-15 px-6 text-left align-middle font-semibold text-foreground whitespace-nowrap text-sm uppercase tracking-wide"}
+                        className={
+                          index === 0
+                            ? "h-15 pl-3 text-left align-middle font-semibold text-foreground whitespace-nowrap text-sm uppercase tracking-wide rounded-tl-lg"
+                            : "h-15 px-6 text-left align-middle font-semibold text-foreground whitespace-nowrap text-sm uppercase tracking-wide"
+                        }
                       >
                         {column.header}
                       </th>
                     ))}
                     {actions && (
                       <th className="h-15 px-3 text-left align-middle font-semibold text-foreground whitespace-nowrap text-sm uppercase tracking-wide w-20 rounded-tr-lg ">
-                          <div className="flex items-center space-x-2 order-2 sm:order-1">
-                            <span className="text-sm whitespace-nowrap">
-                              Items per page  
-                            </span>
-                            <Select
-                              value={itemsPerPage.toString()}
-                              onValueChange={handleItemsPerPageChange}
-                            >
-                              <SelectTrigger className="w-20 h-9 border-white focus:border-primary text-sm">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="5">5</SelectItem>
-                                <SelectItem value="10">10</SelectItem>
-                                <SelectItem value="20">20</SelectItem>
-                                <SelectItem value="50">50</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
+                        <div className="flex items-center space-x-2 order-2 sm:order-1">
+                          <span className="text-sm whitespace-nowrap">
+                            Items per page
+                          </span>
+                          <Select
+                            value={itemsPerPage.toString()}
+                            onValueChange={handleItemsPerPageChange}
+                          >
+                            <SelectTrigger className="w-20 h-9 border-white focus:border-primary text-sm">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="5">5</SelectItem>
+                              <SelectItem value="10">10</SelectItem>
+                              <SelectItem value="20">20</SelectItem>
+                              <SelectItem value="50">50</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </th>
                     )}
                   </tr>
@@ -334,7 +336,14 @@ const DataTable = ({
                       className="group transition-all duration-200 hover:bg-muted/90 even:bg-muted/5 text-sx"
                     >
                       {columns.map((column, colIndex) => (
-                        <td key={colIndex} className={colIndex === 0 ? "p-6 align-middle text-sx rounded-tl-lg whitespace-nowrap rounded-bl-lg" : "p-6 align-middle whitespace-nowrap text-sx"}>
+                        <td
+                          key={colIndex}
+                          className={
+                            colIndex === 0
+                              ? "p-6 align-middle text-sx rounded-tl-lg whitespace-nowrap rounded-bl-lg"
+                              : "p-6 align-middle whitespace-nowrap text-sx"
+                          }
+                        >
                           {column.cell ? (
                             column.cell({ row })
                           ) : column.accessor ? (
@@ -344,7 +353,7 @@ const DataTable = ({
                                 className="whitespace-nowrap text-sx font-medium"
                               >
                                 {row[column.accessor]}
-                              </Badge>  
+                              </Badge>
                             ) : (
                               <span className="text-foreground whitespace-nowrap">
                                 {row[column.accessor]}
@@ -475,9 +484,8 @@ const DataTable = ({
             </span>{" "}
             of{" "}
             <span className="font-medium text-foreground">{displayTotal}</span>{" "}
-            
           </div>
-          
+
           {/* Pagination controls */}
           <div className="flex items-center space-x-1">
             {/* First Page Button */}

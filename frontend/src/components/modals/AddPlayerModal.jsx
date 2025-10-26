@@ -11,7 +11,11 @@ import {
 } from "@/components/ui/select";
 
 // Get all football positions
-import { FOOTBALL_POSITIONS, PLAYER_STATUSES } from "@/utils/constants";
+import {
+  FOOTBALL_POSITIONS,
+  PLAYER_STATUSES,
+  PLAYER_FOOT_LIST,
+} from "@/utils/constants";
 
 import AvatarUpload from "@/components/common/AvatarUpload";
 import { X } from "lucide-react";
@@ -24,6 +28,7 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
     position: "",
     height_cm: "",
     weight_kg: "",
+    preferred_foot: "",
     current_club: "",
     nationality: "",
     status: "Active",
@@ -319,6 +324,31 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
                       {PLAYER_STATUSES.map((status) => (
                         <SelectItem key={status} value={status}>
                           {status}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Preferred Foot</label>
+                  <Select
+                    value={formData.preferred_foot}
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        preferred_foot: value,
+                      }))
+                    }
+                    disabled={isSending}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select preferred_foot" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PLAYER_FOOT_LIST.map((preferred_foot) => (
+                        <SelectItem key={preferred_foot} value={preferred_foot}>
+                          {preferred_foot}
                         </SelectItem>
                       ))}
                     </SelectContent>

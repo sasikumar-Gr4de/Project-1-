@@ -339,7 +339,7 @@ const Matches = () => {
   return (
     <div className="space-y-6">
       {/* Header Section */}
-      <div className="flex items-center justify-between">
+      {/* <div className="flex items-center justify-between">
         <div className="space-y-1">
           <h1 className="text-3xl font-bold tracking-tight text-foreground">
             Matches
@@ -348,7 +348,7 @@ const Matches = () => {
             Manage football matches and schedules
           </p>
         </div>
-      </div>
+      </div> */}
 
       {/* Matches Table */}
       <DataTable

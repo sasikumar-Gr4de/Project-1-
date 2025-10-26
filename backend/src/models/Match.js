@@ -188,6 +188,21 @@ export default class Match {
     }
   }
 
+  static async deleteByClubId(clubId) {
+    try {
+      const { data, error } = await supabase
+        .from("matches")
+        .delete()
+        .or(`home_club_id.eq.${clubId},away_club_id.eq.${clubId}`)
+        .select();
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      console.error("Error deleting matches by club ID:", err);
+      throw err;
+    }
+  }
+
   static async delete(id) {
     try {
       const { data, error } = await supabase

@@ -40,7 +40,7 @@ const Players = () => {
 
   const { getAllPlayers, createPlayer, updatePlayer, deletePlayer } =
     usePlayersStore();
-  const { getAllClubs } = useClubsStore();
+  const { getAllClubsForSelect } = useClubsStore();
 
   const fetchAllPlayers = async (
     page = pagination.page,
@@ -74,7 +74,7 @@ const Players = () => {
 
   const fetchClubs = async () => {
     try {
-      const result = await getAllClubs();
+      const result = await getAllClubsForSelect();
       if (result.success === true) {
         setClubs(result.data?.data || []);
       }
@@ -96,10 +96,10 @@ const Players = () => {
     fetchAllPlayers(1, newPageSize, searchTerm);
   };
 
-  const handleSearch = (value) => {
-    setSearchTerm(value);
-    fetchAllPlayers(1, pagination.pageSize, value);
-  };
+  // const handleSearch = (value) => {
+  //   setSearchTerm(value);
+  //   fetchAllPlayers(1, pagination.pageSize, value);
+  // };
 
   const handleAddPlayer = async (playerData) => {
     try {
@@ -365,7 +365,7 @@ const Players = () => {
   return (
     <div className="space-y-6">
       {/* Header Section */}
-      <div className="flex items-center justify-between">
+      {/* <div className="flex items-center justify-between">
         <div className="space-y-1">
           <h1 className="text-3xl font-bold tracking-tight text-foreground">
             Players
@@ -374,7 +374,7 @@ const Players = () => {
             Manage football players and their profiles
           </p>
         </div>
-      </div>
+      </div> */}
 
       {/* Players Table */}
       <DataTable

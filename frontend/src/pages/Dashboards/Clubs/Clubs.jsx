@@ -3,16 +3,7 @@ import { Button } from "@/components/ui/button";
 import DataTable from "@/components/common/DataTable";
 import AddClubModal from "@/components/modals/AddClubModal";
 import DeleteConfirmModal from "@/components/common/DeleteConfirmModal";
-import {
-  Edit,
-  MapPin,
-  Calendar,
-  Users,
-  Trophy,
-  Shield,
-  Trash2,
-  MoreHorizontal,
-} from "lucide-react";
+import { Edit, Calendar, Users, Trophy, Shield, Trash2 } from "lucide-react";
 import { useClubsStore } from "@/store/clubs.store";
 import { Badge } from "@/components/ui/badge";
 
@@ -125,13 +116,13 @@ const Clubs = () => {
 
   // Beautiful gradient avatars for clubs
   const ClubAvatar = ({ club, className = "w-8 h-8" }) => {
-    const gradientClass = club?.club_id
-      ? `bg-gradient-to-br from-primary/80 to-primary/60`
-      : `bg-gradient-to-br from-green-500/80 to-green-600/60`;
+    const gradientClass = club?.mark_url
+      ? `bg-gradient-to-br from-transparent to-transparent`
+      : `bg-gradient-to-br from-primary/80 to-primary/60`;
 
     return (
       <div
-        className={`${className} rounded-full ${gradientClass} flex items-center justify-center text-primary-foreground shadow-sm border border-primary/20`}
+        className={`${className} rounded-full ${gradientClass} flex items-center justify-center text-primary-foreground shadow-sm`}
       >
         {club?.mark_url ? (
           <img
@@ -166,7 +157,7 @@ const Clubs = () => {
             ? "bg-primary/5 text-primary border border-primary/20 hover:bg-primary/10 hover:border-primary/30"
             : color === "secondary"
             ? "bg-secondary/5 text-secondary border border-secondary/20 hover:bg-secondary/10 hover:border-secondary/30"
-            : "bg-destructive/5 text-destructive border border-destructive/20 hover:bg-destructive/10 hover:border-destructive/30"
+            : "bg-destructive/5 text-destructive border border-destructive/20 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
         }
         shadow-sm hover:shadow-md
       `}
@@ -216,10 +207,10 @@ const Clubs = () => {
         <div className="flex items-center space-x-2">
           <Users className="w-3.5 h-3.5 text-muted-foreground/70" />
           <Badge
-            variant="secondary"
-            className="text-xs font-medium bg-secondary/10 text-secondary-foreground border border-secondary/20"
+            variant="primary"
+            className="text-xs font-medium bg-secondary/50 text-secondary-foreground border border-secondary/20"
           >
-            {row.player_count || 0}
+            {row.players.length || 0}
           </Badge>
         </div>
       ),
@@ -232,9 +223,9 @@ const Clubs = () => {
           <Trophy className="w-3.5 h-3.5 text-muted-foreground/70" />
           <Badge
             variant="outline"
-            className="text-xs font-medium bg-background border-border/40"
+            className="text-xs font-medium bg-secondary/50 text-secondary-foreground border border-secondary/20"
           >
-            {row.match_count || 0}
+            {row.matches_home.length + row.matches_away.length || 0}
           </Badge>
         </div>
       ),
@@ -280,7 +271,7 @@ const Clubs = () => {
   return (
     <div className="space-y-6">
       {/* Header Section */}
-      <div className="flex items-center justify-between">
+      {/* <div className="flex items-center justify-between">
         <div className="space-y-1">
           <h1 className="text-3xl font-bold tracking-tight text-foreground">
             Clubs
@@ -289,7 +280,7 @@ const Clubs = () => {
             Manage football clubs and their information
           </p>
         </div>
-      </div>
+      </div> */}
 
       {/* Clubs Table */}
       <DataTable
