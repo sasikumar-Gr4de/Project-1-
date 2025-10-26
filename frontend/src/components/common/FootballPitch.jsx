@@ -8,6 +8,7 @@ const FootballPitch = ({
   lineColor = "#ffffff",
   children,
   onDimensionsChange,
+  compact = false, // New prop for compact mode
 }) => {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
@@ -19,10 +20,18 @@ const FootballPitch = ({
       if (containerRef.current) {
         const containerWidth = containerRef.current.offsetWidth;
         const aspectRatio = 467 / 290;
-        const calculatedHeight = containerWidth / aspectRatio;
+
+        // For compact mode, use available height, otherwise maintain aspect ratio
+        let calculatedHeight;
+        if (compact) {
+          calculatedHeight = containerRef.current.offsetHeight;
+        } else {
+          calculatedHeight = containerWidth / aspectRatio;
+        }
+
         const newDimensions = {
           width: containerWidth,
-          height: calculatedHeight,
+          height: Math.max(calculatedHeight, 150), // Minimum height
         };
         setDimensions(newDimensions);
         onDimensionsChange?.(newDimensions);
@@ -33,7 +42,7 @@ const FootballPitch = ({
     window.addEventListener("resize", updateDimensions);
 
     return () => window.removeEventListener("resize", updateDimensions);
-  }, [onDimensionsChange]);
+  }, [onDimensionsChange, compact]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -170,15 +179,18 @@ const FootballPitch = ({
   return (
     <div
       ref={containerRef}
-      className={`relative w-full ${className}`} // Removed: bg-green-800 p-2 sm:p-4 rounded-lg
-      style={{ maxWidth: "100%" }}
+      className={`relative w-full ${className}`}
+      style={{
+        maxWidth: "100%",
+        height: compact ? "100%" : "auto",
+      }}
     >
       <canvas
         ref={canvasRef}
-        className="border-2 border-white rounded w-full"
+        className="w-full"
         style={{
           maxWidth: "100%",
-          height: "auto",
+          height: "100%",
           display: "block",
         }}
       />
@@ -186,8 +198,9 @@ const FootballPitch = ({
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          padding: "0", // Changed from "calc(0.5rem + 2px) calc(1rem + 2px)"
-          margin: "0", // Changed from "-2px"
+          padding: "0",
+          margin: "0",
+          overflow: "visible",
         }}
       >
         {children &&
