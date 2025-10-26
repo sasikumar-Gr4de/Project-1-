@@ -1,32 +1,41 @@
 import { useState } from "react";
 import {
-  Upload,
   Settings,
   CheckCircle,
   Clock,
   Video,
   Users,
-  MapPin,
-  Calendar,
+  Edit,
+  Save,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import VideoUpload from "@/components/common/VideoUpload";
+import MatchInfoForm from "@/components/matches/MatchInfoForm";
+import PlayerTimeSelection from "@/components/matches/PlayerTimeSelection";
 
-const MatchPrepareStep = ({ matchId, currentStep, onStepComplete }) => {
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [isProcessing, setIsProcessing] = useState(false);
+const MatchPrepareStep = ({
+  matchData,
+  homeClub,
+  awayClub,
+  homePlayers,
+  awayPlayers,
+  currentStep,
+  onStepComplete,
+  onDataUpdate,
+}) => {
+  const [isEditing, setIsEditing] = useState(false);
   const [preparationSteps, setPreparationSteps] = useState([
     {
       id: "video",
       label: "Video Upload",
-      status: "pending",
+      status: matchData?.video_url ? "completed" : "pending",
       description: "Upload match footage",
     },
     {
       id: "lineups",
       label: "Lineup Configuration",
       status: "pending",
-      description: "Set starting formations",
+      description: "Set starting formations and playing time",
     },
     {
       id: "metadata",
@@ -42,15 +51,46 @@ const MatchPrepareStep = ({ matchId, currentStep, onStepComplete }) => {
     },
   ]);
 
-  const handleFileUpload = (results) => {
+  const handleVideoUpload = (results) => {
     const result = results[0];
-    // window.alert("Video File Uload");
-    console.log(result);
+    console.log("Video uploaded:", result);
+
+    // Update preparation steps
+    setPreparationSteps((prev) =>
+      prev.map((step) =>
+        step.id === "video" ? { ...step, status: "completed" } : step
+      )
+    );
+
+    // Update match data with video URL
+    if (onDataUpdate && result.url) {
+      onDataUpdate((prev) => ({ ...prev, video_url: result.url }));
+    }
+  };
+
+  const handleMatchInfoUpdate = (updatedInfo) => {
+    if (onDataUpdate) {
+      onDataUpdate((prev) => ({ ...prev, ...updatedInfo }));
+    }
+    setIsEditing(false);
+  };
+
+  const handlePlayerTimeUpdate = (playerTimes) => {
+    console.log("Player times updated:", playerTimes);
+    // Update preparation steps
+    setPreparationSteps((prev) =>
+      prev.map((step) =>
+        step.id === "lineups" ? { ...step, status: "completed" } : step
+      )
+    );
   };
 
   const handleStartAnalysis = () => {
     if (onStepComplete) {
-      onStepComplete();
+      onStepComplete({
+        updatedMatch: matchData,
+        message: "Preparation completed successfully",
+      });
     }
   };
 
@@ -58,11 +98,19 @@ const MatchPrepareStep = ({ matchId, currentStep, onStepComplete }) => {
     (step) => step.status === "completed"
   );
 
+  if (!matchData || !homeClub || !awayClub) {
+    return (
+      <div className="p-6 text-center">
+        <div className="text-muted-foreground">Loading preparation data...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8 p-3">
       {/* Preparation Header */}
-      <div className="bg-card p-2">
-        <div className="flex items-center justify-between mb-2">
+      <div className="bg-card p-6 rounded-xl">
+        <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-2xl font-bold mb-2">Match Preparation</h2>
             <p className="text-muted-foreground">
@@ -79,7 +127,7 @@ const MatchPrepareStep = ({ matchId, currentStep, onStepComplete }) => {
         </div>
 
         {/* Progress Bar */}
-        <div className="w-full bg-muted rounded-full h-2 mb-6">
+        <div className="w-full bg-muted rounded-full h-2 mb-2">
           <div
             className="bg-primary h-2 rounded-full transition-all duration-500"
             style={{
@@ -94,20 +142,47 @@ const MatchPrepareStep = ({ matchId, currentStep, onStepComplete }) => {
         </div>
       </div>
 
-      {/* Preparation Steps */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Video Upload Section */}
         <div className="bg-card border border-border rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <Video className="h-6 w-6 text-primary" />
-            <h3 className="text-lg font-semibold">Video Upload</h3>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <Video className="h-6 w-6 text-primary" />
+              <h3 className="text-lg font-semibold">Video Upload</h3>
+            </div>
+            {matchData.video_url && (
+              <div className="px-3 py-1 bg-primary/20 text-primary rounded-full text-xs font-medium">
+                Uploaded
+              </div>
+            )}
           </div>
 
           <div className="space-y-4">
-            <VideoUpload
-              maxSize={2 * 1024 * 1024 * 1024}
-              onUpload={handleFileUpload}
-            />
+            {!matchData.video_url ? (
+              <VideoUpload
+                maxSize={2 * 1024 * 1024 * 1024}
+                onUpload={handleVideoUpload}
+                accept="video/mp4,video/mov,video/avi"
+              />
+            ) : (
+              <div className="text-center p-6 border-2 border-dashed border-primary/20 rounded-lg bg-primary/5">
+                <CheckCircle className="h-12 w-12 text-primary mx-auto mb-3" />
+                <p className="font-medium text-primary mb-1">Video Uploaded</p>
+                <p className="text-sm text-muted-foreground">
+                  Match video is ready for analysis
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-3"
+                  onClick={() => {
+                    /* Handle re-upload */
+                  }}
+                >
+                  Replace Video
+                </Button>
+              </div>
+            )}
 
             <div className="text-sm text-muted-foreground">
               <strong>Supported formats:</strong> MP4, MOV, AVI
@@ -119,49 +194,53 @@ const MatchPrepareStep = ({ matchId, currentStep, onStepComplete }) => {
           </div>
         </div>
 
-        {/* Configuration Section */}
+        {/* Match Information Section */}
         <div className="bg-card border border-border rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <Settings className="h-6 w-6 text-primary" />
-            <h3 className="text-lg font-semibold">Match Configuration</h3>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <Settings className="h-6 w-6 text-primary" />
+              <h3 className="text-lg font-semibold">Match Information</h3>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsEditing(!isEditing)}
+              className="gap-2"
+            >
+              {isEditing ? (
+                <Save className="h-4 w-4" />
+              ) : (
+                <Edit className="h-4 w-4" />
+              )}
+              {isEditing ? "Save" : "Edit"}
+            </Button>
           </div>
 
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 border border-border rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <Users className="h-4 w-4 text-primary" />
-                  <span className="font-medium">Formations</span>
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  Home: 4-3-3
-                  <br />
-                  Away: 4-2-3-1
-                </div>
-              </div>
-
-              <div className="p-4 border border-border rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <MapPin className="h-4 w-4 text-primary" />
-                  <span className="font-medium">Venue</span>
-                </div>
-                <div className="text-sm text-muted-foreground">Camp Nou</div>
-              </div>
-            </div>
-
-            <div className="p-4 border border-border rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <Calendar className="h-4 w-4 text-primary" />
-                <span className="font-medium">Match Details</span>
-              </div>
-              <div className="text-sm text-muted-foreground space-y-1">
-                <div>Date: March 15, 2024</div>
-                <div>Competition: La Liga Juvenil U19</div>
-                <div>Duration: 92 minutes</div>
-              </div>
-            </div>
-          </div>
+          <MatchInfoForm
+            matchData={matchData}
+            homeClub={homeClub}
+            awayClub={awayClub}
+            isEditing={isEditing}
+            onSave={handleMatchInfoUpdate}
+          />
         </div>
+      </div>
+
+      {/* Player Time Selection */}
+      <div className="bg-card border border-border rounded-xl p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <Users className="h-6 w-6 text-primary" />
+          <h3 className="text-lg font-semibold">
+            Player Lineup & Playing Time
+          </h3>
+        </div>
+
+        <PlayerTimeSelection
+          homePlayers={homePlayers}
+          awayPlayers={awayPlayers}
+          matchDuration={matchData.duration_minutes}
+          onUpdate={handlePlayerTimeUpdate}
+        />
       </div>
 
       {/* Preparation Steps Status */}
@@ -223,7 +302,7 @@ const MatchPrepareStep = ({ matchId, currentStep, onStepComplete }) => {
       <div className="flex justify-between items-center pt-6 border-t border-border">
         <div className="text-sm text-muted-foreground">
           {allStepsCompleted
-            ? "Ready to start analysis"
+            ? "Ready to start video analysis"
             : "Complete all preparation steps to continue"}
         </div>
 
@@ -234,7 +313,7 @@ const MatchPrepareStep = ({ matchId, currentStep, onStepComplete }) => {
           size="lg"
         >
           <CheckCircle className="h-4 w-4" />
-          Start Match Analysis
+          Start Video Analysis
         </Button>
       </div>
     </div>
