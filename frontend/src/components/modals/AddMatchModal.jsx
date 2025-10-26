@@ -167,9 +167,11 @@ const AddMatchModal = ({ isOpen, onClose, onSave, match, clubs }) => {
                 </label>
                 <Select
                   value={formData.home_club_id}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, home_club_id: value }))
-                  }
+                  onValueChange={(value) => {
+                    if (value && value !== "") {
+                      setFormData((prev) => ({ ...prev, home_club_id: value }));
+                    }
+                  }}
                   disabled={isSending}
                 >
                   <SelectTrigger>
@@ -258,9 +260,11 @@ const AddMatchModal = ({ isOpen, onClose, onSave, match, clubs }) => {
                 <label className="text-sm font-medium">Match Status</label>
                 <Select
                   value={formData.match_status}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, match_status: value }))
-                  }
+                  onValueChange={(value) => {
+                    if (value && value !== "") {
+                      setFormData((prev) => ({ ...prev, match_status: value }));
+                    }
+                  }}
                   disabled={isSending}
                 >
                   <SelectTrigger>
@@ -334,9 +338,11 @@ const AddMatchModal = ({ isOpen, onClose, onSave, match, clubs }) => {
                 <label className="text-sm font-medium">QA Status</label>
                 <Select
                   value={formData.qa_status}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, qa_status: value }))
-                  }
+                  onValueChange={(value) => {
+                    if (value && value !== "") {
+                      setFormData((prev) => ({ ...prev, qa_status: value }));
+                    }
+                  }}
                   disabled={isSending}
                 >
                   <SelectTrigger>

@@ -6,15 +6,7 @@ import AddMatchModal from "@/components/modals/AddMatchModal";
 import DeleteConfirmModal from "@/components/common/DeleteConfirmModal";
 import { useMatchesStore } from "@/store/matches.store";
 import { useClubsStore } from "@/store/clubs.store";
-import {
-  Trophy,
-  Edit,
-  Trash2,
-  Eye,
-  CalendarDays,
-  Building,
-  MapPin,
-} from "lucide-react";
+import { Trophy, Edit, Trash2, Eye, CalendarDays, MapPin } from "lucide-react";
 import { capitalize } from "@/utils/helper.utils";
 import { formatDate } from "@/utils/formatter.util";
 
@@ -40,7 +32,7 @@ const Matches = () => {
 
   const { getAllMatches, createMatch, updateMatch, deleteMatch } =
     useMatchesStore();
-  const { getAllClubs } = useClubsStore();
+  const { getAllClubsForSelect } = useClubsStore();
 
   const fetchAllMatches = async (
     page = pagination.page,
@@ -74,7 +66,7 @@ const Matches = () => {
 
   const fetchClubs = async () => {
     try {
-      const result = await getAllClubs();
+      const result = await getAllClubsForSelect();
       if (result.success === true) {
         setClubs(result.data?.data || []);
       }
