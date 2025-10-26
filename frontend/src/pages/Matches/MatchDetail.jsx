@@ -63,8 +63,8 @@ const MatchDetail = () => {
 
         setHomeClub(homeClubData?.data || null);
         setAwayClub(awayClubData?.data || null);
-        setHomePlayers(homePlayersData?.data?.players || []);
-        setAwayPlayers(awayPlayersData?.data?.players || []);
+        setHomePlayers(homePlayersData?.data || []);
+        setAwayPlayers(awayPlayersData?.data || []);
       } catch (error) {
         console.error("Error fetching match data:", error);
       } finally {

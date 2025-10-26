@@ -1,12 +1,18 @@
+// src/pages/Matches/MatchPrepareStep.jsx
 import { useState } from "react";
 import {
+  Upload,
   Settings,
   CheckCircle,
   Clock,
   Video,
   Users,
+  MapPin,
+  Calendar,
   Edit,
   Save,
+  Play,
+  Square,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import VideoUpload from "@/components/common/VideoUpload";
@@ -24,6 +30,7 @@ const MatchPrepareStep = ({
   onDataUpdate,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [matchInfoCompleted, setMatchInfoCompleted] = useState(false);
   const [preparationSteps, setPreparationSteps] = useState([
     {
       id: "video",
@@ -35,19 +42,14 @@ const MatchPrepareStep = ({
       id: "lineups",
       label: "Lineup Configuration",
       status: "pending",
-      description: "Set starting formations and playing time",
+      description: "Set player playing time intervals",
     },
     {
       id: "metadata",
-      label: "Match Metadata",
-      status: "pending",
-      description: "Verify match details",
-    },
-    {
-      id: "processing",
-      label: "Data Processing",
-      status: "pending",
-      description: "Analyze video data",
+      label: "Match Information",
+      status:
+        matchData?.venue && matchData?.competition ? "completed" : "pending",
+      description: "Verify and confirm match details",
     },
   ]);
 
@@ -73,16 +75,39 @@ const MatchPrepareStep = ({
       onDataUpdate((prev) => ({ ...prev, ...updatedInfo }));
     }
     setIsEditing(false);
+    setMatchInfoCompleted(true);
+
+    // Update preparation steps
+    setPreparationSteps((prev) =>
+      prev.map((step) =>
+        step.id === "metadata" ? { ...step, status: "completed" } : step
+      )
+    );
   };
 
   const handlePlayerTimeUpdate = (playerTimes) => {
     console.log("Player times updated:", playerTimes);
+
     // Update preparation steps
+    const allPlayersHaveTimes = [...homePlayers, ...awayPlayers].every(
+      (player) => playerTimes[player.player_id]?.start !== undefined
+    );
+
     setPreparationSteps((prev) =>
       prev.map((step) =>
-        step.id === "lineups" ? { ...step, status: "completed" } : step
+        step.id === "lineups" && allPlayersHaveTimes
+          ? { ...step, status: "completed" }
+          : step
       )
     );
+
+    // Update match data with player times
+    if (onDataUpdate) {
+      onDataUpdate((prev) => ({
+        ...prev,
+        player_playing_times: playerTimes,
+      }));
+    }
   };
 
   const handleStartAnalysis = () => {
@@ -114,7 +139,8 @@ const MatchPrepareStep = ({
           <div>
             <h2 className="text-2xl font-bold mb-2">Match Preparation</h2>
             <p className="text-muted-foreground">
-              Prepare all necessary data before starting the analysis
+              Upload video, set player playing times, and confirm match
+              information
             </p>
           </div>
           <div className="text-right">
@@ -176,7 +202,17 @@ const MatchPrepareStep = ({
                   size="sm"
                   className="mt-3"
                   onClick={() => {
-                    /* Handle re-upload */
+                    // Reset video URL to allow re-upload
+                    if (onDataUpdate) {
+                      onDataUpdate((prev) => ({ ...prev, video_url: null }));
+                    }
+                    setPreparationSteps((prev) =>
+                      prev.map((step) =>
+                        step.id === "video"
+                          ? { ...step, status: "pending" }
+                          : step
+                      )
+                    );
                   }}
                 >
                   Replace Video
@@ -201,19 +237,26 @@ const MatchPrepareStep = ({
               <Settings className="h-6 w-6 text-primary" />
               <h3 className="text-lg font-semibold">Match Information</h3>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsEditing(!isEditing)}
-              className="gap-2"
-            >
-              {isEditing ? (
-                <Save className="h-4 w-4" />
-              ) : (
-                <Edit className="h-4 w-4" />
+            <div className="flex items-center gap-2">
+              {matchInfoCompleted && (
+                <div className="px-3 py-1 bg-primary/20 text-primary rounded-full text-xs font-medium">
+                  Confirmed
+                </div>
               )}
-              {isEditing ? "Save" : "Edit"}
-            </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsEditing(!isEditing)}
+                className="gap-2"
+              >
+                {isEditing ? (
+                  <Save className="h-4 w-4" />
+                ) : (
+                  <Edit className="h-4 w-4" />
+                )}
+                {isEditing ? "Save" : "Edit"}
+              </Button>
+            </div>
           </div>
 
           <MatchInfoForm
@@ -228,17 +271,23 @@ const MatchPrepareStep = ({
 
       {/* Player Time Selection */}
       <div className="bg-card border border-border rounded-xl p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <Users className="h-6 w-6 text-primary" />
-          <h3 className="text-lg font-semibold">
-            Player Lineup & Playing Time
-          </h3>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <Users className="h-6 w-6 text-primary" />
+            <h3 className="text-lg font-semibold">
+              Player Lineup & Playing Time
+            </h3>
+          </div>
+          <div className="text-sm text-muted-foreground">
+            Set exact playing time intervals for each player
+          </div>
         </div>
 
         <PlayerTimeSelection
           homePlayers={homePlayers}
           awayPlayers={awayPlayers}
-          matchDuration={matchData.duration_minutes}
+          matchDuration={matchData.duration_minutes || 90}
+          existingTimes={matchData.player_playing_times || {}}
           onUpdate={handlePlayerTimeUpdate}
         />
       </div>
@@ -302,7 +351,7 @@ const MatchPrepareStep = ({
       <div className="flex justify-between items-center pt-6 border-t border-border">
         <div className="text-sm text-muted-foreground">
           {allStepsCompleted
-            ? "Ready to start video analysis"
+            ? "All preparation steps completed. Ready for video analysis."
             : "Complete all preparation steps to continue"}
         </div>
 
