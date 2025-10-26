@@ -192,14 +192,14 @@ const DistributionMap = ({
 
   // Full mode rendering
   return (
-    <Card className={className}>
+    <Card className={className + "border-0"}>
       <CardHeader className="pb-3">
         <CardTitle className="text-lg sm:text-xl">
           {category} Distribution
         </CardTitle>
-        <p className="text-xs sm:text-sm text-muted-foreground">
+        {/* <p className="text-xs sm:text-sm text-muted-foreground">
           {sections} pitch sections • {totalCount} events
-        </p>
+        </p> */}
       </CardHeader>
       <CardContent className="space-y-3 sm:space-y-4">
         {/* Subcategory Selection - Only show on larger screens */}

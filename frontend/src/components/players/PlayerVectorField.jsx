@@ -8,7 +8,7 @@ const PlayerVectorField = ({
   eventsData = {},
   category = "Passing",
   className = "",
-  compactMode = false, // New prop for compact mode
+  compactMode = false,
 }) => {
   const [selectedSubcategories, setSelectedSubcategories] = useState({});
   const [pitchDimensions, setPitchDimensions] = useState(null);
@@ -39,7 +39,6 @@ const PlayerVectorField = ({
   useEffect(() => {
     const checkResponsive = () => {
       const width = window.innerWidth;
-      // In compact mode, never show details
       setShowDetails(!compactMode && width >= 768);
     };
 
@@ -104,6 +103,7 @@ const PlayerVectorField = ({
               actionType,
               subcategory: subcat,
               type: "point",
+              isSamePosition: isSamePosition, // Mark if it's a same-position event
             });
           }
         });
@@ -134,6 +134,30 @@ const PlayerVectorField = ({
 
   const uniqueActionTypes = getUniqueActionTypes();
 
+  // Create a unified color map for consistent marker IDs
+  const getColorId = (color) => {
+    return color.replace(/[^a-zA-Z0-9]/g, "");
+  };
+
+  // Get circle properties based on whether it's a same-position event
+  const getCircleProperties = (point, isCompact = false) => {
+    if (point.isSamePosition) {
+      // Larger circles for same-position events
+      return {
+        radius: isCompact ? 5 : 7,
+        strokeWidth: isCompact ? 1 : 1.5,
+        className: "pulse-animation", // Optional: add animation for emphasis
+      };
+    } else {
+      // Regular circles for normal points
+      return {
+        radius: isCompact ? 2.5 : 3,
+        strokeWidth: isCompact ? 0.5 : 1,
+        className: "",
+      };
+    }
+  };
+
   // If in compact mode, render only the pitch visualization
   if (compactMode) {
     return (
@@ -146,56 +170,58 @@ const PlayerVectorField = ({
               height={pitchDimensions.height}
               style={{ padding: "0" }}
             >
-              {/* Render vectors with simplified arrows for compact mode */}
-              {vectors.map((vector, index) => (
-                <g key={`vector-${index}`}>
-                  <line
-                    x1={vector.startX}
-                    y1={vector.startY}
-                    x2={vector.endX}
-                    y2={vector.endY}
-                    stroke={vector.color}
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  />
-                  {/* Simplified arrowhead for compact mode */}
-                  <defs>
+              <defs>
+                {/* Define one marker per unique color */}
+                {Array.from(new Set(vectors.map((v) => v.color))).map(
+                  (color) => (
                     <marker
-                      id={`arrow-compact-${index}`}
+                      key={`compact-marker-${getColorId(color)}`}
+                      id={`arrow-compact-${getColorId(color)}`}
                       markerWidth="6"
                       markerHeight="6"
-                      refX="5"
+                      refX="5.5"
                       refY="3"
                       orient="auto"
                       markerUnits="strokeWidth"
+                      viewBox="0 0 6 6"
                     >
-                      <path d="M0,0 L0,6 L5,3 z" fill={vector.color} />
+                      <path d="M0,0 L0,6 L6,3 Z" fill={color} stroke="none" />
                     </marker>
-                  </defs>
-                  <line
-                    x1={vector.startX}
-                    y1={vector.startY}
-                    x2={vector.endX}
-                    y2={vector.endY}
-                    stroke={vector.color}
-                    strokeWidth="1.5"
-                    markerEnd={`url(#arrow-compact-${index})`}
-                  />
-                </g>
+                  )
+                )}
+              </defs>
+
+              {/* Render vectors */}
+              {vectors.map((vector, index) => (
+                <line
+                  key={`vector-${index}`}
+                  x1={vector.startX}
+                  y1={vector.startY}
+                  x2={vector.endX}
+                  y2={vector.endY}
+                  stroke={vector.color}
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  markerEnd={`url(#arrow-compact-${getColorId(vector.color)})`}
+                />
               ))}
 
               {/* Render points */}
-              {points.map((point, index) => (
-                <circle
-                  key={`point-${index}`}
-                  cx={point.x}
-                  cy={point.y}
-                  r="2.5"
-                  fill={point.color}
-                  stroke="#ffffff"
-                  strokeWidth="0.5"
-                />
-              ))}
+              {points.map((point, index) => {
+                const circleProps = getCircleProperties(point, true);
+                return (
+                  <circle
+                    key={`point-${index}`}
+                    cx={point.x}
+                    cy={point.y}
+                    r={circleProps.radius}
+                    fill={point.color}
+                    stroke="#ffffff"
+                    strokeWidth={circleProps.strokeWidth}
+                    className={circleProps.className}
+                  />
+                );
+              })}
             </svg>
           )}
         </FootballPitch>
@@ -205,12 +231,12 @@ const PlayerVectorField = ({
 
   // Full mode rendering
   return (
-    <Card className={className}>
+    <Card className={className + "border-0"}>
       <CardHeader className="pb-3">
         <CardTitle className="text-lg sm:text-xl">{category} Vectors</CardTitle>
-        <p className="text-xs sm:text-sm text-muted-foreground">
+        {/* <p className="text-xs sm:text-sm text-muted-foreground">
           {vectors.length} vectors • {points.length} points
-        </p>
+        </p> */}
       </CardHeader>
       <CardContent className="space-y-3 sm:space-y-4">
         {/* Subcategory Selection - Only on larger screens */}
@@ -253,55 +279,58 @@ const PlayerVectorField = ({
                 height={pitchDimensions.height}
                 style={{ padding: "0" }}
               >
-                {/* Render vectors */}
-                {vectors.map((vector, index) => (
-                  <g key={`vector-${index}`}>
-                    <line
-                      x1={vector.startX}
-                      y1={vector.startY}
-                      x2={vector.endX}
-                      y2={vector.endY}
-                      stroke={vector.color}
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                    <defs>
+                <defs>
+                  {/* Define one marker per unique color */}
+                  {Array.from(new Set(vectors.map((v) => v.color))).map(
+                    (color) => (
                       <marker
-                        id={`arrow-${index}`}
+                        key={`marker-${getColorId(color)}`}
+                        id={`arrow-${getColorId(color)}`}
                         markerWidth="8"
                         markerHeight="8"
-                        refX="7"
-                        refY="3"
+                        refX="7.5"
+                        refY="4"
                         orient="auto"
                         markerUnits="strokeWidth"
+                        viewBox="0 0 8 8"
                       >
-                        <path d="M0,0 L0,6 L7,3 z" fill={vector.color} />
+                        <path d="M0,0 L0,8 L8,4 Z" fill={color} stroke="none" />
                       </marker>
-                    </defs>
-                    <line
-                      x1={vector.startX}
-                      y1={vector.startY}
-                      x2={vector.endX}
-                      y2={vector.endY}
-                      stroke={vector.color}
-                      strokeWidth="2"
-                      markerEnd={`url(#arrow-${index})`}
-                    />
-                  </g>
+                    )
+                  )}
+                </defs>
+
+                {/* Render vectors */}
+                {vectors.map((vector, index) => (
+                  <line
+                    key={`vector-${index}`}
+                    x1={vector.startX}
+                    y1={vector.startY}
+                    x2={vector.endX}
+                    y2={vector.endY}
+                    stroke={vector.color}
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    markerEnd={`url(#arrow-${getColorId(vector.color)})`}
+                  />
                 ))}
 
                 {/* Render points */}
-                {points.map((point, index) => (
-                  <circle
-                    key={`point-${index}`}
-                    cx={point.x}
-                    cy={point.y}
-                    r="3"
-                    fill={point.color}
-                    stroke="#ffffff"
-                    strokeWidth="1"
-                  />
-                ))}
+                {points.map((point, index) => {
+                  const circleProps = getCircleProperties(point, false);
+                  return (
+                    <circle
+                      key={`point-${index}`}
+                      cx={point.x}
+                      cy={point.y}
+                      r={circleProps.radius}
+                      fill={point.color}
+                      stroke="#ffffff"
+                      strokeWidth={circleProps.strokeWidth}
+                      className={circleProps.className}
+                    />
+                  );
+                })}
               </svg>
             )}
           </FootballPitch>

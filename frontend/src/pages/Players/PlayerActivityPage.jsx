@@ -17,10 +17,10 @@ const PlayerProfile = ({ player_events }) => {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-3">
       {/* Category Selection */}
-      <div className="bg-card border rounded-lg p-4">
-        <h3 className="text-lg font-semibold mb-3">Select Category</h3>
+      <div className="bg-card  rounded-lg p-4 m-0">
+        {/* <h3 className="text-lg font-semibold mb-3">Select Category</h3> */}
         <div className="flex flex-wrap gap-2">
           {categories.map((category) => (
             <button

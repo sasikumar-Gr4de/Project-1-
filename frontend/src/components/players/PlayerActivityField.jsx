@@ -208,22 +208,22 @@ const PlayerActivityField = ({
 
   // Full mode rendering
   return (
-    <Card className={className}>
-      <CardHeader className="pb-3">
+    <Card className={className + "border-0"}>
+      <CardHeader className="pb-1">
         <CardTitle className="text-lg sm:text-xl">
           {category} Activity
         </CardTitle>
-        <p className="text-xs sm:text-sm text-muted-foreground">
+        {/* <p className="text-xs sm:text-sm text-muted-foreground">
           {GRID_COLS}×{GRID_ROWS} grid • {totalCount} activities
-        </p>
+        </p> */}
       </CardHeader>
       <CardContent className="space-y-3 sm:space-y-4">
         {/* Subcategory Selection - Only on larger screens */}
         {showDetails && subcategories.length > 0 && (
           <div className="bg-muted p-3 rounded-lg">
-            <Label className="text-xs sm:text-sm font-medium mb-2 block">
+            {/* <Label className="text-xs sm:text-sm font-medium mb-2 block">
               Subcategories:
-            </Label>
+            </Label> */}
             <div className="flex flex-wrap gap-2 sm:gap-3">
               {subcategories.map((subcat) => (
                 <div

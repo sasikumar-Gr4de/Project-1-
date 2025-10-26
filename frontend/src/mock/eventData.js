@@ -192,49 +192,49 @@ export const player_events = {
   "Ball Carry": {
     "Ball Carry": {
       "Ball Carry Short": [
+        // {
+        //   position_x: 45.07,
+        //   position_y: 42.71,
+        //   position_x_end: 45.07,
+        //   position_y_end: 28.46,
+        // },
+        // {
+        //   position_x: 45.07,
+        //   position_y: 57.29,
+        //   position_x_end: 45.07,
+        //   position_y_end: 68.0,
+        // },
+        // {
+        //   position_x: 35.22,
+        //   position_y: 68.0,
+        //   position_x_end: 35.22,
+        //   position_y_end: 68.0,
+        // },
+        // {
+        //   position_x: 45.07,
+        //   position_y: 57.29,
+        //   position_x_end: 35.22,
+        //   position_y_end: 42.71,
+        // },
         {
-          position_x: 45.07,
-          position_y: 42.71,
-          position_x_end: 45.07,
-          position_y_end: 28.46,
+          // position_x: 84.5,
+          // position_y: 28.46,
+          // position_x_end: 74.63,
+          // position_y_end: 28.46,
         },
-        {
-          position_x: 45.07,
-          position_y: 57.29,
-          position_x_end: 45.07,
-          position_y_end: 68.0,
-        },
-        {
-          position_x: 35.22,
-          position_y: 68.0,
-          position_x_end: 35.22,
-          position_y_end: 68.0,
-        },
-        {
-          position_x: 45.07,
-          position_y: 57.29,
-          position_x_end: 35.22,
-          position_y_end: 42.71,
-        },
-        {
-          position_x: 84.5,
-          position_y: 28.46,
-          position_x_end: 74.63,
-          position_y_end: 28.46,
-        },
-        {
-          position_x: 25.37,
-          position_y: 68.0,
-          position_x_end: 15.5,
-          position_y_end: 68.0,
-        },
+        // {
+        //   position_x: 25.37,
+        //   position_y: 68.0,
+        //   position_x_end: 15.5,
+        //   position_y_end: 68.0,
+        // },
       ],
       "Ball Carry Medium": [
         {
-          position_x: 25.37,
-          position_y: 15.95,
-          position_x_end: 25.37,
-          position_y_end: 42.71,
+          // position_x: 25.37,
+          // position_y: 15.95,
+          // position_x_end: 25.37,
+          // position_y_end: 42.71,
         },
       ],
       "Ball Carry Long": [

@@ -7,7 +7,7 @@ import PlayerActivityField from "@/components/players/PlayerActivityField";
 
 const PlayerProfilePage = ({ player, player_events }) => {
   const [expandedCategories, setExpandedCategories] = useState({
-    Passing: false,
+    Passing: true,
     Shooting: false,
     Defending: false,
     Physical: false,
@@ -139,7 +139,7 @@ const PlayerProfilePage = ({ player, player_events }) => {
   const visualizationLayout = getVisualizationLayout();
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-6 p-3">
       {/* Header Controls */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-muted/50 rounded-lg">
         <div className="space-y-1 sm:space-y-2">
@@ -208,7 +208,7 @@ const PlayerProfilePage = ({ player, player_events }) => {
                   </div>
 
                   {/* Mobile badges */}
-                  {isMobile && (
+                  {/* {isMobile && (
                     <div className="flex gap-1 shrink-0">
                       <span className="px-1.5 py-0.5 text-xs bg-primary/10 text-primary rounded-full">
                         {getSubcategoryCount(category)}
@@ -219,10 +219,10 @@ const PlayerProfilePage = ({ player, player_events }) => {
                         </span>
                       )}
                     </div>
-                  )}
+                  )} */}
 
                   {/* Desktop badges */}
-                  {!isMobile && (
+                  {/* {!isMobile && (
                     <>
                       <span className="px-2 py-1 text-xs bg-primary/10 text-primary rounded-full whitespace-nowrap">
                         {getSubcategoryCount(category)} subcategories
@@ -233,16 +233,16 @@ const PlayerProfilePage = ({ player, player_events }) => {
                         </span>
                       )}
                     </>
-                  )}
+                  )} */}
                 </div>
 
-                {!isMobile && (
+                {/* {!isMobile && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground whitespace-nowrap">
                     <span>
                       {expandedCategories[category] ? "Collapse" : "Expand"}
                     </span>
                   </div>
-                )}
+                )} */}
               </div>
 
               {/* Category Content */}
