@@ -124,4 +124,4 @@ export const FOOTBALL_POSITIONS = [
 
 export const PLAYER_FOOT_LIST = ["Left", "Right", "Both"];
 
-export const PLAYER_STATUSES = ["Active", "Injured", "Suspended", "Inactive"];
+export const PLAYER_STATUSES = ["active", "injured", "suspended", "inactive"];

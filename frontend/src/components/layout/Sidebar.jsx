@@ -1,5 +1,4 @@
 import React from "react";
-import { Button } from "../ui/button";
 import {
   Home,
   Trophy,
@@ -60,16 +59,15 @@ const Sidebar = ({ isOpen, onClose }) => {
   ];
 
   const handleLinkClick = () => {
-    // Close sidebar on mobile when link is clicked
-    if (window.innerWidth < 768) {
+    if (window.innerWidth < 1024) {
       onClose();
     }
   };
 
   return (
     <div className="flex flex-col h-full bg-card">
-      {/* Navigation - Removed the mobile header with Menu/X */}
-      <nav className="flex-1 overflow-y-auto p-4 space-y-6 mt-4 md:mt-0">
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto p-4 space-y-6">
         {menuGroups.map((group) => (
           <div key={group.name} className="space-y-2">
             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-2">
@@ -84,7 +82,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                       to={item.href}
                       onClick={handleLinkClick}
                       className={`
-                        flex items-center justify-between w-full px-3 py-3 rounded-lg text-sm font-medium transition-all duration-200
+                        flex items-center w-full px-3 py-3 rounded-lg text-sm font-medium transition-all duration-200
                         ${
                           isActive
                             ? "bg-primary text-primary-foreground shadow-sm"
@@ -92,23 +90,15 @@ const Sidebar = ({ isOpen, onClose }) => {
                         }
                       `}
                     >
-                      <div className="flex items-center space-x-3 min-w-0">
-                        <div
-                          className={`p-1.5 rounded-sm shrink-0 ${
+                      <div className="flex items-center space-x-3">
+                        <item.icon
+                          className={`w-4 h-4 ${
                             isActive
-                              ? "bg-primary-foreground/20"
-                              : "bg-primary/10"
+                              ? "text-primary-foreground"
+                              : "text-primary"
                           }`}
-                        >
-                          <item.icon
-                            className={`w-4 h-4 ${
-                              isActive
-                                ? "text-primary-foreground"
-                                : "text-primary"
-                            }`}
-                          />
-                        </div>
-                        <span className="truncate">{item.name}</span>
+                        />
+                        <span>{item.name}</span>
                       </div>
                     </Link>
                   </li>
@@ -120,15 +110,15 @@ const Sidebar = ({ isOpen, onClose }) => {
       </nav>
 
       {/* Sidebar Footer */}
-      <div className="p-4 border-t border-border shrink-0">
+      <div className="p-4 border-t border-border">
         <div className="bg-accent/50 rounded-lg p-3">
           <div className="flex items-center space-x-2 mb-1">
-            <Circle className="w-2 h-2 fill-green-500 text-green-500 animate-pulse shrink-0" />
-            <span className="text-xs font-medium text-foreground truncate">
+            <Circle className="w-2 h-2 fill-green-500 text-green-500" />
+            <span className="text-xs font-medium text-foreground">
               System Online
             </span>
           </div>
-          <p className="text-xs text-muted-foreground truncate">
+          <p className="text-xs text-muted-foreground">
             All services are running smoothly
           </p>
         </div>

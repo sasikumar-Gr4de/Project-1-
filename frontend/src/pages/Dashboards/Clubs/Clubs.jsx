@@ -67,6 +67,7 @@ const Clubs = () => {
         const newClub = result.data;
         setClubs((prev) => [newClub, ...prev]);
         fetchAllClubs(pagination.page, pagination.pageSize);
+        setSelectedClub(null);
       }
     } catch (err) {
       console.log(err);

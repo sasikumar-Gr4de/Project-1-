@@ -33,10 +33,18 @@ const AddClubModal = ({ isOpen, onClose, onSave, club }) => {
       ...club,
       ...formData,
       founded_year: parseInt(formData.founded_year),
-      // mark_url is already set from the AvatarUpload component
     };
 
     await onSave(clubData);
+
+    // Clear Form Data
+    setFormData({
+      club_name: "",
+      location: "",
+      founded_year: "",
+      mark_url: "",
+    });
+
     setIsSending(false);
     onClose();
   };

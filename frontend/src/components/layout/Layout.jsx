@@ -1,4 +1,3 @@
-// src/components/layout/Layout.jsx
 import React, { useState, useEffect } from "react";
 import Header from "@/components/layout/Header";
 import Sidebar from "@/components/layout/Sidebar";
@@ -6,7 +5,7 @@ import Footer from "@/components/layout/Footer";
 import Chatbot from "@/components/chat/Chatbot";
 import { Outlet } from "react-router-dom";
 
-const Layout = ({}) => {
+const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -30,65 +29,48 @@ const Layout = ({}) => {
     setSidebarOpen(false);
   };
 
-  // Close sidebar when clicking on overlay or navigating on mobile
-  useEffect(() => {
-    if (sidebarOpen && isMobile) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [sidebarOpen, isMobile]);
-
   return (
-    <div className="h-screen flex flex-col bg-background overflow-hidden">
-      {/* Header - Fixed */}
+    <div className="min-h-screen flex flex-col bg-background">
+      {/* Header */}
       <Header onMenuToggle={handleMenuToggle} />
 
       {/* Main Content Area */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 min-h-0">
         {/* Mobile Overlay */}
         {sidebarOpen && isMobile && (
           <div
-            className="fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-300"
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
             onClick={handleSidebarClose}
           />
         )}
 
         {/* Sidebar */}
-        <div
+        <aside
           className={`
-            fixed md:static inset-y-0 left-0 z-50
-            w-64 bg-card border-r border-border
-            transform transition-transform duration-300 ease-in-out
-            h-[calc(100vh-4rem)] mt-16 md:mt-0
-            ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} 
-            md:translate-x-0 md:z-auto
+            fixed inset-y-0 left-0 z-30 w-64 bg-card border-r border-border transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-auto
+            ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
           `}
         >
           <Sidebar isOpen={sidebarOpen} onClose={handleSidebarClose} />
-        </div>
+        </aside>
 
-        {/* Content Area with Footer at Bottom */}
-        <div className="flex-1 flex flex-col min-h-0 w-full">
-          {/* Scrollable Content Area - Takes all available space */}
-          <div className="flex-1 overflow-y-auto">
-            <div className="p-4 md:p-6 lg:p-8 min-h-full">
-              <Outlet />
+        {/* Main Content */}
+        <main className="flex-1 min-w-0 lg:ml-0">
+          <div className="h-full flex flex-col">
+            {/* Scrollable Content Area */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="p-4 sm:p-6 lg:p-8">
+                <Outlet />
+              </div>
             </div>
-          </div>
 
-          {/* Footer - Always at bottom */}
-          <div className="shrink-0 border-t border-border">
+            {/* Footer */}
             <Footer />
           </div>
-        </div>
+        </main>
       </div>
 
-      {/* Chatbot Integration */}
+      {/* Chatbot */}
       <Chatbot />
     </div>
   );

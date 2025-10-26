@@ -16,12 +16,15 @@ import {
   PLAYER_STATUSES,
   PLAYER_FOOT_LIST,
 } from "@/utils/constants";
+import { capitalize } from "@/utils/helper.utils";
 
 import AvatarUpload from "@/components/common/AvatarUpload";
+import { useToast } from "@/hooks/use-toast";
 import { X } from "lucide-react";
 
 const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
   const [isSending, setIsSending] = useState(false);
+  const { toast, toasts } = useToast();
   const [formData, setFormData] = useState({
     full_name: "",
     date_of_birth: "",
@@ -31,7 +34,7 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
     preferred_foot: "",
     current_club: "",
     nationality: "",
-    status: "Active",
+    status: "active",
     jersey_number: "",
     avatar_url: "",
   });
@@ -44,9 +47,10 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
         position: player.position || "",
         height_cm: player.height_cm || "",
         weight_kg: player.weight_kg || "",
+        preferred_foot: player.preferred_foot || "",
         current_club: player.current_club || "",
         nationality: player.nationality || "",
-        status: player.status || "Active",
+        status: player.status || "active",
         jersey_number: player.jersey_number || "",
         avatar_url: player.avatar_url || "",
       });
@@ -57,9 +61,10 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
         position: "",
         height_cm: "",
         weight_kg: "",
+        preferred_foot: "",
         current_club: "",
         nationality: "",
-        status: "Active",
+        status: "active",
         jersey_number: "",
         avatar_url: "",
       });
@@ -70,15 +75,17 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Validate required fields
+    setIsSending(true);
+    window.alert(JSON.stringify(formData));
     if (!formData.full_name.trim()) {
-      alert("Full name is required");
+      console.log("Full name is required");
+      // toast({
+      //   title: "Form Error",
+      //   description: "Full name is required",
+      //   variant: "destructive",
+      // });
       return;
     }
-
-    setIsSending(true);
-
     try {
       const submitData = {
         ...formData,
@@ -92,8 +99,19 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
       if (player) {
         submitData.player_id = player.player_id;
       }
-      console.log(submitData);
+
       await onSave(submitData);
+      // Clear form data after successful save
+      setFormData({
+        full_name: "",
+        date_of_birth: "",
+        position: "",
+        preferred_foot: "",
+        height_cm: "",
+        weight_kg: "",
+        current_club: "",
+      });
+
       onClose();
     } catch (error) {
       console.error("Error saving player:", error);
@@ -200,9 +218,11 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
                   <label className="text-sm font-medium">Position</label>
                   <Select
                     value={formData.position}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({ ...prev, position: value }))
-                    }
+                    onValueChange={(value) => {
+                      if (value && value !== "") {
+                        setFormData((prev) => ({ ...prev, position: value }));
+                      }
+                    }}
                     disabled={isSending}
                   >
                     <SelectTrigger>
@@ -225,9 +245,14 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
                   <label className="text-sm font-medium">Current Club</label>
                   <Select
                     value={formData.current_club}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({ ...prev, current_club: value }))
-                    }
+                    onValueChange={(value) => {
+                      if (value && value !== "") {
+                        setFormData((prev) => ({
+                          ...prev,
+                          current_club: value,
+                        }));
+                      }
+                    }}
                     disabled={isSending}
                   >
                     <SelectTrigger>
@@ -255,6 +280,7 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
                         height_cm: e.target.value,
                       }))
                     }
+                    min={0}
                     placeholder="Enter height"
                     disabled={isSending}
                   />
@@ -272,6 +298,7 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
                         weight_kg: e.target.value,
                       }))
                     }
+                    min={0}
                     placeholder="Enter weight"
                     disabled={isSending}
                   />
@@ -312,9 +339,11 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
                   <label className="text-sm font-medium">Status</label>
                   <Select
                     value={formData.status}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({ ...prev, status: value }))
-                    }
+                    onValueChange={(value) => {
+                      if (value && value !== "") {
+                        setFormData((prev) => ({ ...prev, status: value }));
+                      }
+                    }}
                     disabled={isSending}
                   >
                     <SelectTrigger>
@@ -323,7 +352,7 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
                     <SelectContent>
                       {PLAYER_STATUSES.map((status) => (
                         <SelectItem key={status} value={status}>
-                          {status}
+                          {capitalize(status)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -334,12 +363,14 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
                   <label className="text-sm font-medium">Preferred Foot</label>
                   <Select
                     value={formData.preferred_foot}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        preferred_foot: value,
-                      }))
-                    }
+                    onValueChange={(value) => {
+                      if (value && value !== "") {
+                        setFormData((prev) => ({
+                          ...prev,
+                          preferred_foot: value,
+                        }));
+                      }
+                    }}
                     disabled={isSending}
                   >
                     <SelectTrigger>
@@ -378,7 +409,7 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
             >
               {isSending ? (
                 <div className="flex items-center space-x-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-secondary-foreground border-t-transparent rounded-full animate-spin" />
                   <span>{player ? "Updating..." : "Creating..."}</span>
                 </div>
               ) : player ? (

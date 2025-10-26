@@ -17,6 +17,7 @@ import {
   Eye,
   User,
 } from "lucide-react";
+import { capitalize } from "@/utils/helper.utils";
 
 const Players = () => {
   const [players, setPlayers] = useState([]);
@@ -107,6 +108,7 @@ const Players = () => {
       if (result.success) {
         fetchAllPlayers(pagination.page, pagination.pageSize, searchTerm);
         setShowAddModal(false);
+        setSelectedPlayer(null);
       }
     } catch (err) {
       console.log(err);
@@ -137,6 +139,7 @@ const Players = () => {
   };
 
   const handleEditPlayer = async (player) => {
+    console.log(player);
     setSelectedPlayer(player);
     setShowAddModal(true);
   };
@@ -254,7 +257,7 @@ const Players = () => {
             <div className="flex items-center space-x-2 mt-1">
               <Badge
                 variant="secondary"
-                className="text-xs font-medium bg-secondary/10 text-secondary-foreground border border-secondary/20"
+                className="text-xs font-medium bg-secondary/10 text-foreground border border-secondary/20"
               >
                 {row.position}
               </Badge>
@@ -330,7 +333,7 @@ const Players = () => {
           variant={getStatusVariant(row.status)}
           className="text-xs font-medium bg-primary/10 text-primary border border-primary/20"
         >
-          {row.status}
+          {capitalize(row.status)}
         </Badge>
       ),
     },

@@ -47,6 +47,7 @@ export default class Player {
   static async update(id, updateData) {
     try {
       // status field validation
+      console.log(updateData);
       if (
         updateData.status &&
         !Object.values(PLAYER_STATUSES).includes(updateData.status)

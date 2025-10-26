@@ -22,9 +22,16 @@ export default class Club {
 
   static async update(id, updateData) {
     try {
+      const { club_name, location, founded_year, mark_url } = updateData;
+      console.log(updateData);
       const { data, error } = await supabase
         .from("clubs")
-        .update(updateData)
+        .update({
+          club_name,
+          location,
+          founded_year,
+          mark_url,
+        })
         .eq("club_id", id)
         .select()
         .single();
