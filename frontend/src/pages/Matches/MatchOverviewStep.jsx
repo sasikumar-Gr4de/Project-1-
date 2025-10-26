@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-
+import React from "react";
 import {
   Calendar,
   MapPin,
@@ -9,67 +8,20 @@ import {
   Users,
 } from "lucide-react";
 import { mockMatchMetrics } from "@/mock/matchData";
-import { useMatchesStore } from "@/store/matches.store";
-import { useClubsStore } from "@/store/clubs.store";
-import { usePlayersStore } from "@/store/players.store";
 
-const MatchOverviewStep = ({ matchId, currentStep }) => {
-  const [match, setMatch] = useState(null);
-  const [homeClub, setHomeClub] = useState(null);
-  const [awayClub, setAwayClub] = useState(null);
-  const [homePlayers, setHomePlayers] = useState([]);
-  const [awayPlayers, setAwayPlayers] = useState([]);
-
-  const { getMatchById } = useMatchesStore();
-  const { getClubById } = useClubsStore();
-  const { getPlayersByClubId } = usePlayersStore();
-
-  useEffect(() => {
-    const fetchMatchData = async () => {
-      try {
-        const { data: matchData } = await getMatchById(matchId);
-        console.log("Match Data:", matchData);
-        setMatch(matchData);
-
-        if (matchData) {
-          const { data: homeClubData } = await getClubById(
-            matchData.home_club_id
-          );
-          setHomeClub(homeClubData);
-          console.log("Home Club Data:", homeClubData);
-
-          const { data: awayClubData } = await getClubById(
-            matchData.away_club_id
-          );
-          setAwayClub(awayClubData);
-          console.log("Away Club Data:", awayClubData);
-
-          const { data: homePlayersData } = await getPlayersByClubId(
-            matchData.home_club_id
-          );
-          setHomePlayers(homePlayersData || []);
-          console.log(homePlayersData);
-
-          const { data: awayPlayersData } = await getPlayersByClubId(
-            matchData.away_club_id
-          );
-          setAwayPlayers(awayPlayersData || []);
-        }
-      } catch (error) {
-        console.error("Error fetching match data:", error);
-      }
-    };
-
-    fetchMatchData();
-  }, [matchId, currentStep, getMatchById, getClubById, getPlayersByClubId]);
-
+const MatchOverviewStep = ({
+  matchData,
+  homeClub,
+  awayClub,
+  homePlayers,
+  awayPlayers,
+  currentStep,
+}) => {
   // Guard render until required data exists
-  if (!match || !homeClub || !awayClub) {
+  if (!matchData || !homeClub || !awayClub) {
     return (
-      <div className="p-3">
-        <div className="text-sm text-muted-foreground">
-          Loading match data...
-        </div>
+      <div className="p-6 text-center">
+        <div className="text-muted-foreground">Loading match overview...</div>
       </div>
     );
   }
@@ -91,52 +43,7 @@ const MatchOverviewStep = ({ matchId, currentStep }) => {
       home: mockMatchMetrics.shots.home,
       away: mockMatchMetrics.shots.away,
     },
-    {
-      label: "Shots On Target",
-      home: mockMatchMetrics.shots_on_target.home,
-      away: mockMatchMetrics.shots_on_target.away,
-    },
-    {
-      label: "Shot Conversion Rate %",
-      home: Math.round(
-        (mockMatchMetrics.shots_on_target.home / mockMatchMetrics.shots.home) *
-          100
-      ),
-      away: Math.round(
-        (mockMatchMetrics.shots_on_target.away / mockMatchMetrics.shots.away) *
-          100
-      ),
-    },
-    {
-      label: "Passes Completed",
-      home: mockMatchMetrics.passes.home,
-      away: mockMatchMetrics.passes.away,
-    },
-    {
-      label: "Chances Created",
-      home: 12,
-      away: 9,
-    },
-    {
-      label: "Successful Tackles",
-      home: mockMatchMetrics.tackles.home,
-      away: mockMatchMetrics.tackles.away,
-    },
-    {
-      label: "Successful Interceptions",
-      home: mockMatchMetrics.interceptions.home,
-      away: mockMatchMetrics.interceptions.away,
-    },
-    {
-      label: "Duels Won",
-      home: 32,
-      away: 33,
-    },
-    {
-      label: "Total Saves",
-      home: 2,
-      away: 1,
-    },
+    // ... other stats
   ];
 
   const ComparisonStat = ({ stat }) => {
@@ -146,12 +53,8 @@ const MatchOverviewStep = ({ matchId, currentStep }) => {
     const awayPercentage = total > 0 ? (stat.away / total) * 100 : 50;
 
     return (
-      <div className="bg-card p-1">
-        {/* Metric Name */}
-
-        {/* Values and Progress Bar */}
+      <div className="bg-card p-3 rounded-lg">
         <div className="space-y-3">
-          {/* Values Row */}
           <div className="flex justify-between items-center">
             <div
               className={`text-lg font-bold text-center w-16 ${
@@ -172,21 +75,19 @@ const MatchOverviewStep = ({ matchId, currentStep }) => {
             </div>
           </div>
 
-          {/* Progress Bar */}
-          <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
-            <div className="flex h-3">
+          <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+            <div className="flex h-2">
               <div
-                className="bg-primary h-3 transition-all duration-500"
+                className="bg-primary h-2 transition-all duration-500"
                 style={{ width: `${homePercentage}%` }}
               />
               <div
-                className="bg-muted-foreground/30 h-3 transition-all duration-500"
+                className="bg-muted-foreground/30 h-2 transition-all duration-500"
                 style={{ width: `${awayPercentage}%` }}
               />
             </div>
           </div>
 
-          {/* Team Labels */}
           <div className="flex justify-between items-center text-xs text-muted-foreground">
             <span>Home</span>
             <span>Away</span>
@@ -207,7 +108,7 @@ const MatchOverviewStep = ({ matchId, currentStep }) => {
           <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
             <span className="text-xs font-bold text-foreground">
               {player.full_name
-                .split(" ")
+                ?.split(" ")
                 .map((n) => n[0])
                 .join("")}
             </span>
@@ -227,7 +128,7 @@ const MatchOverviewStep = ({ matchId, currentStep }) => {
               isHome ? "text-primary" : "text-muted-foreground"
             }`}
           >
-            {player.metrics?.talent_index_score}
+            {player.metrics?.talent_index_score || "N/A"}
           </div>
           <div className="text-xs text-muted-foreground">GR4DE</div>
         </div>
@@ -254,28 +155,22 @@ const MatchOverviewStep = ({ matchId, currentStep }) => {
 
   return (
     <div className="space-y-6 p-3">
-      {/* Section 1: Match Header */}
+      {/* Match Header */}
       <div className="bg-card border border-border rounded-xl p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="text-center flex-1">
             <div className="text-xl font-bold">{homeClub.club_name}</div>
-            {/* <div className="text-sm text-muted-foreground">
-              Home • {homeClub.formation}
-            </div> */}
           </div>
 
           <div className="text-center mx-6">
             <div className="text-4xl font-bold text-primary mb-2">
-              {match.score_home} - {match.score_away}
+              {matchData.score_home} - {matchData.score_away}
             </div>
             <div className="text-sm text-muted-foreground">Full Time</div>
           </div>
 
           <div className="text-center flex-1">
             <div className="text-xl font-bold">{awayClub.club_name}</div>
-            {/* <div className="text-sm text-muted-foreground">
-              Away • {awayClub.formation}
-            </div> */}
           </div>
         </div>
 
@@ -284,7 +179,7 @@ const MatchOverviewStep = ({ matchId, currentStep }) => {
             <Calendar className="h-4 w-4 text-primary" />
             <div>
               <div className="text-sm font-medium">
-                {new Date(match.match_date).toLocaleDateString()}
+                {new Date(matchData.match_date).toLocaleDateString()}
               </div>
               <div className="text-xs text-muted-foreground">Date</div>
             </div>
@@ -292,14 +187,14 @@ const MatchOverviewStep = ({ matchId, currentStep }) => {
           <div className="flex items-center gap-2 p-2 bg-muted/20 rounded-lg">
             <MapPin className="h-4 w-4 text-primary" />
             <div>
-              <div className="text-sm font-medium">{match.venue}</div>
+              <div className="text-sm font-medium">{matchData.venue}</div>
               <div className="text-xs text-muted-foreground">Venue</div>
             </div>
           </div>
           <div className="flex items-center gap-2 p-2 bg-muted/20 rounded-lg">
             <Trophy className="h-4 w-4 text-primary" />
             <div>
-              <div className="text-sm font-medium">{match.competition}</div>
+              <div className="text-sm font-medium">{matchData.competition}</div>
               <div className="text-xs text-muted-foreground">Competition</div>
             </div>
           </div>
@@ -307,7 +202,7 @@ const MatchOverviewStep = ({ matchId, currentStep }) => {
             <Clock className="h-4 w-4 text-primary" />
             <div>
               <div className="text-sm font-medium">
-                {match.duration_minutes}'
+                {matchData.duration_minutes}'
               </div>
               <div className="text-xs text-muted-foreground">Duration</div>
             </div>
@@ -315,9 +210,9 @@ const MatchOverviewStep = ({ matchId, currentStep }) => {
         </div>
       </div>
 
-      {/* Equal Width Layout: Comparison Stats + Players */}
+      {/* Stats and Players Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Section 1: Comparison Stats */}
+        {/* Match Statistics */}
         <div className="lg:col-span-1 bg-card border border-border rounded-xl overflow-hidden">
           <div className="p-4 border-b border-border">
             <h2 className="text-lg font-bold flex items-center gap-2">
@@ -332,7 +227,7 @@ const MatchOverviewStep = ({ matchId, currentStep }) => {
           </div>
         </div>
 
-        {/* Section 2: Home Team Players */}
+        {/* Home Team Players */}
         <div className="bg-card border border-border rounded-xl overflow-hidden">
           <div className="p-4 border-b border-border">
             <h3 className="font-semibold flex items-center gap-2">
@@ -351,7 +246,7 @@ const MatchOverviewStep = ({ matchId, currentStep }) => {
           </div>
         </div>
 
-        {/* Section 3: Away Team Players */}
+        {/* Away Team Players */}
         <div className="bg-card border border-border rounded-xl overflow-hidden">
           <div className="p-4 border-b border-border">
             <h3 className="font-semibold flex items-center gap-2">
