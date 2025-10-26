@@ -1,4 +1,3 @@
-// src/pages/Matches/MatchDetail.jsx
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ArrowLeft, Video, Download, Share2 } from "lucide-react";
@@ -11,37 +10,72 @@ import MatchAnalysisStep from "@/pages/Matches/MatchAnalysisStep";
 import MatchReviewStep from "@/pages/Matches/MatchReviewStep";
 import MatchCompleteStep from "@/pages/Matches/MatchCompleteStep";
 import MatchPrepareStep from "@/pages/Matches/MatchPrepareStep";
-
 import { useMatchesStore } from "@/store/matches.store";
+import { useClubsStore } from "@/store/clubs.store";
+import { usePlayersStore } from "@/store/players.store";
 
 const MatchDetail = () => {
   const { id } = useParams();
   const [matchData, setMatchData] = useState(null);
+  const [homeClub, setHomeClub] = useState(null);
+  const [awayClub, setAwayClub] = useState(null);
+  const [homePlayers, setHomePlayers] = useState([]);
+  const [awayPlayers, setAwayPlayers] = useState([]);
   const [currentStep, setCurrentStep] = useState(0);
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState(1); // Default to Preparation tab
+  const [loading, setLoading] = useState(true);
+
   const { getMatchById } = useMatchesStore();
+  const { getClubById } = useClubsStore();
+  const { getPlayersByClubId } = usePlayersStore();
 
   const steps = [
+    { id: "overview", label: "Overview", description: "Match Summary" },
     { id: "prepare", label: "Prepare", description: "Data Setup" },
-    { id: "analysis", label: "Analysis", description: "Performance Metrics" },
+    { id: "analysis", label: "Analysis", description: "Video Annotation" },
     { id: "review", label: "Review", description: "QA & Assessment" },
     { id: "complete", label: "Complete", description: "Final Report" },
   ];
 
   useEffect(() => {
-    const fetchMatchData = async () => {
-      console.log("MatchDetail: fetching match", id);
+    const fetchAllData = async () => {
       try {
-        const { data } = await getMatchById(id);
-        console.log("MatchDetail: fetched", data);
-        setMatchData(data);
-      } catch (err) {
-        console.error("MatchDetail: fetch error", err);
+        setLoading(true);
+        console.log("Fetching match data for ID:", id);
+
+        const { data: matchData } = await getMatchById(id);
+        console.log("Match data:", matchData);
+
+        if (!matchData) {
+          throw new Error("Match not found");
+        }
+
+        setMatchData(matchData);
+
+        // Fetch all related data in parallel
+        const [homeClubData, awayClubData, homePlayersData, awayPlayersData] =
+          await Promise.all([
+            getClubById(matchData.home_club_id),
+            getClubById(matchData.away_club_id),
+            getPlayersByClubId(matchData.home_club_id),
+            getPlayersByClubId(matchData.away_club_id),
+          ]);
+
+        setHomeClub(homeClubData?.data || null);
+        setAwayClub(awayClubData?.data || null);
+        setHomePlayers(homePlayersData?.data?.players || []);
+        setAwayPlayers(awayPlayersData?.data?.players || []);
+      } catch (error) {
+        console.error("Error fetching match data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchMatchData();
-  }, [id, getMatchById]);
+    if (id) {
+      fetchAllData();
+    }
+  }, [id, getMatchById, getClubById, getPlayersByClubId]);
 
   const handleStepClick = (stepIndex) => {
     if (stepIndex <= currentStep) {
@@ -64,45 +98,102 @@ const MatchDetail = () => {
     }
   };
 
+  const handleStepComplete = (stepData = {}) => {
+    // Update match data if needed from child components
+    if (stepData.updatedMatch) {
+      setMatchData((prev) => ({ ...prev, ...stepData.updatedMatch }));
+    }
+    handleNextStep();
+  };
+
+  // Enhanced tabs with proper data passing
   const tabs = [
     {
       id: "overview",
       label: "Match Overview",
-      content: <MatchOverviewStep matchId={id} currentStep={currentStep} />,
+      content: (
+        <MatchOverviewStep
+          matchData={matchData}
+          homeClub={homeClub}
+          awayClub={awayClub}
+          homePlayers={homePlayers}
+          awayPlayers={awayPlayers}
+          currentStep={currentStep}
+        />
+      ),
     },
     {
       id: "prepare",
       label: "Preparation",
       content: (
         <MatchPrepareStep
-          matchId={id}
+          matchData={matchData}
+          homeClub={homeClub}
+          awayClub={awayClub}
+          homePlayers={homePlayers}
+          awayPlayers={awayPlayers}
           currentStep={currentStep}
-          onStepComplete={handleNextStep}
+          onStepComplete={handleStepComplete}
+          onDataUpdate={setMatchData}
         />
       ),
     },
     {
       id: "analysis",
-      label: "Performance Analysis",
-      content: <MatchAnalysisStep matchId={id} currentStep={currentStep} />,
+      label: "Video Analysis",
+      content: (
+        <MatchAnalysisStep
+          matchData={matchData}
+          currentStep={currentStep}
+          onStepComplete={handleStepComplete}
+        />
+      ),
     },
     {
       id: "review",
-      label: "Review & QA",
-      content: <MatchReviewStep matchId={id} currentStep={currentStep} />,
+      label: "Quality Review",
+      content: (
+        <MatchReviewStep
+          matchData={matchData}
+          currentStep={currentStep}
+          onStepComplete={handleStepComplete}
+        />
+      ),
     },
     {
       id: "complete",
       label: "Completion",
-      content: <MatchCompleteStep matchId={id} currentStep={currentStep} />,
+      content: (
+        <MatchCompleteStep
+          matchData={matchData}
+          currentStep={currentStep}
+          onStepComplete={handleStepComplete}
+        />
+      ),
     },
   ];
 
-  // Guard render until match data is loaded to avoid runtime errors during initial render
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="text-lg text-muted-foreground">
+            Loading match data...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!matchData) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
-        <div className="text-sm text-muted-foreground">Loading match...</div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="text-lg text-destructive">Match not found</div>
+          <Button onClick={() => window.history.back()} className="mt-4">
+            Go Back
+          </Button>
+        </div>
       </div>
     );
   }
@@ -122,15 +213,19 @@ const MatchDetail = () => {
             </Button>
             <div>
               <h1 className="text-2xl lg:text-3xl font-bold">Match Analysis</h1>
-              {/* <p className="text-muted-foreground">ID: {id}</p> */}
+              <p className="text-muted-foreground">
+                {homeClub?.club_name} vs {awayClub?.club_name}
+              </p>
             </div>
           </div>
 
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="gap-2">
-              <Video className="h-4 w-4" />
-              Watch Video
-            </Button>
+            {matchData?.video_url && (
+              <Button variant="outline" size="sm" className="gap-2">
+                <Video className="h-4 w-4" />
+                Watch Video
+              </Button>
+            )}
             <Button variant="outline" size="sm" className="gap-2">
               <Download className="h-4 w-4" />
               Export
@@ -162,7 +257,8 @@ const MatchDetail = () => {
             </Button>
 
             <div className="text-sm text-muted-foreground">
-              Step {currentStep + 1} of {steps.length}
+              Step {currentStep + 1} of {steps.length} •{" "}
+              {steps[currentStep]?.label}
             </div>
 
             <Button
@@ -174,15 +270,15 @@ const MatchDetail = () => {
           </div>
         </div>
 
-        {/* Video Player Section (only when URL exists) */}
-        {matchData?.video_url ? (
+        {/* Video Player Section */}
+        {matchData?.video_url && (
           <div className="mb-6">
             <VideoPlayer
               videoUrl={matchData.video_url}
-              title="Match Highlights"
+              title={`${homeClub?.club_name} vs ${awayClub?.club_name}`}
             />
           </div>
-        ) : null}
+        )}
 
         {/* Tabs Section */}
         <div className="bg-card border border-border rounded-xl overflow-hidden">
