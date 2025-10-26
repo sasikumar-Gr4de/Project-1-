@@ -20,9 +20,12 @@ import { capitalize } from "@/utils/helper.utils";
 
 import AvatarUpload from "@/components/common/AvatarUpload";
 import { X } from "lucide-react";
+import { useToast } from "@/contexts/ToastContext";
+import { validatePlayerInput } from "@/utils/validations";
 
 const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
   const [isSending, setIsSending] = useState(false);
+  const { toast } = useToast();
 
   const [formData, setFormData] = useState({
     full_name: "",
@@ -75,16 +78,7 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSending(true);
-    window.alert(JSON.stringify(formData));
-    if (!formData.full_name.trim()) {
-      console.log("Full name is required");
-      // toast({
-      //   title: "Form Error",
-      //   description: "Full name is required",
-      //   variant: "destructive",
-      // });
-      return;
-    }
+
     try {
       const submitData = {
         ...formData,
@@ -97,6 +91,16 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
 
       if (player) {
         submitData.player_id = player.player_id;
+      }
+
+      const { isValid, message } = validatePlayerInput(submitData);
+      if (isValid === false) {
+        toast({
+          title: "Error",
+          description: message,
+          variant: "destructive",
+        });
+        return;
       }
 
       await onSave(submitData);
@@ -199,7 +203,9 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Date of Birth</label>
+                  <label className="text-sm font-medium">
+                    Date of Birth <span className="text-destructive">*</span>
+                  </label>
                   <Input
                     type="date"
                     value={formData.date_of_birth}
@@ -214,7 +220,9 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Position</label>
+                  <label className="text-sm font-medium">
+                    Position <span className="text-destructive">*</span>
+                  </label>
                   <Select
                     value={formData.position}
                     onValueChange={(value) => {
@@ -241,7 +249,9 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Current Club</label>
+                  <label className="text-sm font-medium">
+                    Current Club <span className="text-destructive">*</span>
+                  </label>
                   <Select
                     value={formData.current_club}
                     onValueChange={(value) => {
@@ -319,7 +329,9 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Jersey Number</label>
+                  <label className="text-sm font-medium">
+                    Jersey Number <span className="text-destructive">*</span>
+                  </label>
                   <Input
                     type="number"
                     value={formData.jersey_number}
@@ -359,7 +371,9 @@ const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Preferred Foot</label>
+                  <label className="text-sm font-medium">
+                    Preferred Foot <span className="text-destructive">*</span>
+                  </label>
                   <Select
                     value={formData.preferred_foot}
                     onValueChange={(value) => {

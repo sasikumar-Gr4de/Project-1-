@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import AvatarUpload from "@/components/common/AvatarUpload";
 import { X } from "lucide-react";
+import AvatarUpload from "@/components/common/AvatarUpload";
+import { useToast } from "@/contexts/ToastContext";
+import { validateClubInput } from "@/utils/validations";
 
 const AddClubModal = ({ isOpen, onClose, onSave, club }) => {
   const [isSending, setIsSending] = useState(false);
@@ -13,6 +15,7 @@ const AddClubModal = ({ isOpen, onClose, onSave, club }) => {
     founded_year: "",
     mark_url: "",
   });
+  const { toast } = useToast();
 
   useEffect(() => {
     setFormData({
@@ -34,6 +37,17 @@ const AddClubModal = ({ isOpen, onClose, onSave, club }) => {
       ...formData,
       founded_year: parseInt(formData.founded_year),
     };
+    console.log(clubData);
+    const { isValid, message } = validateClubInput(clubData);
+    if (isValid === false) {
+      toast({
+        title: "Error",
+        description: message,
+        variant: "destructive",
+      });
+      setIsSending(false);
+      return;
+    }
 
     await onSave(clubData);
 

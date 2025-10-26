@@ -12,6 +12,8 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import VideoUpload from "@/components/common/VideoUpload";
 import { X } from "lucide-react";
+import { validateMatchInput } from "@/utils/validations";
+import { useToast } from "@/contexts/ToastContext";
 
 const AddMatchModal = ({ isOpen, onClose, onSave, match, clubs }) => {
   const [isSending, setIsSending] = useState(false);
@@ -32,6 +34,7 @@ const AddMatchModal = ({ isOpen, onClose, onSave, match, clubs }) => {
   const [uploadedVideo, setUploadedVideo] = useState(null);
   const [isUploadingVideo, setIsUploadingVideo] = useState(false);
   const [videoUploadProgress, setVideoUploadProgress] = useState(0);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (match) {
@@ -78,11 +81,6 @@ const AddMatchModal = ({ isOpen, onClose, onSave, match, clubs }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (formData.home_club_id === formData.away_club_id) {
-      alert("Home and away clubs cannot be the same");
-      return;
-    }
-
     setIsSending(true);
 
     try {
@@ -97,6 +95,17 @@ const AddMatchModal = ({ isOpen, onClose, onSave, match, clubs }) => {
 
       if (match) {
         submitData.match_id = match.match_id;
+      }
+
+      const { isValid, message } = validateMatchInput(submitData);
+      if (isValid === false) {
+        toast({
+          title: "Error",
+          description: message,
+          variant: "destructive",
+        });
+        setIsSending(false);
+        return;
       }
 
       await onSave(submitData);
@@ -230,7 +239,9 @@ const AddMatchModal = ({ isOpen, onClose, onSave, match, clubs }) => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Venue</label>
+                <label className="text-sm font-medium">
+                  Venue <span className="text-destructive">*</span>
+                </label>
                 <Input
                   value={formData.venue}
                   onChange={(e) =>
