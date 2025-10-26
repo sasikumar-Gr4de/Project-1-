@@ -19,12 +19,11 @@ import {
 import { capitalize } from "@/utils/helper.utils";
 
 import AvatarUpload from "@/components/common/AvatarUpload";
-import { useToast } from "@/hooks/use-toast";
 import { X } from "lucide-react";
 
 const AddPlayerModal = ({ isOpen, onClose, onSave, player, clubs }) => {
   const [isSending, setIsSending] = useState(false);
-  const { toast, toasts } = useToast();
+
   const [formData, setFormData] = useState({
     full_name: "",
     date_of_birth: "",

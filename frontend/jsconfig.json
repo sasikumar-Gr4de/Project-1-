@@ -2,12 +2,12 @@
   "compilerOptions": {
     "baseUrl": "src",
     "paths": {
-      "@components/*": ["components/*"],
-      "@assets/*": ["assets/*"],
-      "@pages/*": ["pages/*"],
-      "@utils/*": ["utils/*"],
-      "@services/*": ["services/*"],
-      "@store/*": ["store/*"]
+      "@components/*": ["./src/components/*"],
+      "@assets/*": ["./assets/*"],
+      "@pages/*": ["./src/pages/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@services/*": ["./src/services/*"],
+      "@store/*": ["./src/store/*"]
     },
     "jsx": "react-jsx",
     "allowSyntheticDefaultImports": true,
@@ -16,6 +16,6 @@
     "noEmit": true,
     "typeRoots": ["./node_modules/@types"]
   },
-  "include": ["src"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

@@ -22,59 +22,62 @@ import Unauthorized from "@/pages/Error/Unauthorized";
 import NotFound from "@/pages/Error/NotFoundPage";
 import MatchDetail from "@/pages/Matches/MatchDetail";
 import PlayerDetail from "@/pages/Players/PlayerDetail";
+import { ToastProvider } from "@/contexts/ToastContext";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/server/upload-image" element={<ServerFileUpload />} />
-        <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/verify-email" element={<VerifyEmail />} />
+    <ToastProvider>
+      <Router>
+        <Routes>
+          <Route path="/server/upload-image" element={<ServerFileUpload />} />
+          <Route path="/" element={<Landing />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
 
-        {/* Dashboard Routes */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Layout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<Home />} />
-          <Route path="clubs" element={<Clubs />} />
-          <Route path="players" element={<Players />} />
-          <Route path="matches" element={<Matches />} />
-        </Route>
+          {/* Dashboard Routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Home />} />
+            <Route path="clubs" element={<Clubs />} />
+            <Route path="players" element={<Players />} />
+            <Route path="matches" element={<Matches />} />
+          </Route>
 
-        <Route
-          path="/matches/:id"
-          element={
-            <ProtectedRoute>
-              <Layout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<MatchDetail />} />
-        </Route>
+          <Route
+            path="/matches/:id"
+            element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<MatchDetail />} />
+          </Route>
 
-        <Route
-          path="/players/:id"
-          element={
-            <ProtectedRoute>
-              <Layout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<PlayerDetail />} />
-        </Route>
+          <Route
+            path="/players/:id"
+            element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<PlayerDetail />} />
+          </Route>
 
-        {/* Error pages */}
-        <Route path="/unauthorized" element={<Unauthorized />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </Router>
+          {/* Error pages */}
+          <Route path="/unauthorized" element={<Unauthorized />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Router>
+    </ToastProvider>
   );
 }
 

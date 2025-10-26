@@ -16,8 +16,10 @@ import {
   Trash2,
   Eye,
   User,
+  Footprints,
 } from "lucide-react";
 import { capitalize } from "@/utils/helper.utils";
+import RatingDisplay from "@/components/common/RatingDisplay";
 
 const Players = () => {
   const [players, setPlayers] = useState([]);
@@ -96,11 +98,6 @@ const Players = () => {
   const handlePageSizeChange = (newPageSize) => {
     fetchAllPlayers(1, newPageSize, searchTerm);
   };
-
-  // const handleSearch = (value) => {
-  //   setSearchTerm(value);
-  //   fetchAllPlayers(1, pagination.pageSize, value);
-  // };
 
   const handleAddPlayer = async (playerData) => {
     try {
@@ -282,6 +279,11 @@ const Players = () => {
       ),
     },
     {
+      header: "Sense Score",
+      accessor: "score",
+      cell: ({ row }) => <RatingDisplay rating={row.sense_score | 0} />,
+    },
+    {
       header: "Age",
       accessor: "date_of_birth",
       cell: ({ row }) => (
@@ -320,6 +322,12 @@ const Players = () => {
             <Scale className="w-3 h-3 text-muted-foreground/70" />
             <span className="text-xs text-foreground/90">
               {row.weight_kg} kg
+            </span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Footprints className="w-3 h-3 text-muted-foreground/70" />
+            <span className="text-xs text-foreground/90">
+              {row.preferred_foot}
             </span>
           </div>
         </div>

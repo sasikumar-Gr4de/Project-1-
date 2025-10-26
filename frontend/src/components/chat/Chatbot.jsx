@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/contexts/ToastContext";
 import ChatbotButton from "@/components/chat/ChatbotButton";
 import ChatbotWindow from "@/components/chat/ChatbotWindow";
 
@@ -8,24 +8,7 @@ const Chatbot = () => {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
-  const { toast, toasts } = useToast();
-
-  // Load chat history from localStorage
-  // useEffect(() => {
-  //   const savedChat = localStorage.getItem("chatbot-history");
-  //   if (savedChat) {
-  //     try {
-  //       setMessages(JSON.parse(savedChat));
-  //     } catch (error) {
-  //       console.error("Error loading chat history:", error);
-  //       toast({
-  //         title: "Error",
-  //         description: "Failed to load chat history",
-  //         variant: "destructive",
-  //       });
-  //     }
-  //   }
-  // }, [toast]);
+  const { toast } = useToast();
 
   // Save messages to localStorage
   useEffect(() => {
@@ -121,25 +104,6 @@ const Chatbot = () => {
         onSendMessage={handleSendMessage}
         isLoading={isLoading}
       />
-
-      {/* Toast container - Responsive positioning */}
-      <div className="fixed top-4 right-4 left-4 sm:left-auto sm:right-4 z-60 space-y-2">
-        {toasts.map((toast) => (
-          <div
-            key={toast.id}
-            className={`p-4 rounded-lg shadow-lg border max-w-sm mx-auto sm:mx-0 animate-in slide-in-from-right-full duration-300 ${
-              toast.variant === "destructive"
-                ? "bg-destructive text-destructive-foreground border-destructive/50"
-                : "bg-background text-foreground border-border"
-            }`}
-          >
-            <div className="font-semibold">{toast.title}</div>
-            {toast.description && (
-              <div className="text-sm mt-1">{toast.description}</div>
-            )}
-          </div>
-        ))}
-      </div>
     </>
   );
 };
