@@ -34,9 +34,15 @@ const Sidebar = ({ isOpen, onClose }) => {
           name: "Matches",
           icon: Trophy,
           href: "/dashboard/matches",
+          key: "matches",
         },
-        { name: "Clubs", icon: Users, href: "/dashboard/clubs" },
-        { name: "Players", icon: User, href: "/dashboard/players" },
+        { name: "Clubs", icon: Users, href: "/dashboard/clubs", key: "clubs" },
+        {
+          name: "Players",
+          icon: User,
+          href: "/dashboard/players",
+          key: "players",
+        },
       ],
     },
     {

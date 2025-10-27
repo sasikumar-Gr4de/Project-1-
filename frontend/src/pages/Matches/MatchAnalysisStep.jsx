@@ -1,5 +1,4 @@
-// src/pages/Matches/MatchAnalysisStep.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   BarChart3,
   Target,
@@ -8,18 +7,36 @@ import {
   Users,
   Award,
   Activity,
+  Upload,
+  Cpu,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+  Send,
+  MessageSquare,
 } from "lucide-react";
-import { mockPlayersData, mockMatchData } from "@/mock/matchData";
-import {
-  mockMetricsData,
-  metricsCategories,
-  getCategoryLabel,
-  getMetricLabel,
-} from "@/mock/analysisMetrics";
+import { Button } from "@/components/ui/button";
+import DataTable from "@/components/common/DataTable";
+import { mockAnnotations } from "@/mock/annotationData";
+import { useAuthStore } from "@/store/auth.store";
 
-const MatchAnalysisStep = ({ matchId, currentStep }) => {
+const MatchAnalysisStep = ({ matchId, currentStep, onStepComplete }) => {
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("core");
+  const [annotations, setAnnotations] = useState([]);
+  const [annotationType, setAnnotationType] = useState("manual");
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [modelEndpoint, setModelEndpoint] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { user } = useAuthStore();
+  const isAdmin = user?.role === "admin";
+  const isAnnotator = user?.role === "annotator";
+
+  useEffect(() => {
+    // Load annotations data
+    setAnnotations(mockAnnotations);
+  }, []);
 
   if (currentStep < 1) {
     return (
@@ -35,325 +52,519 @@ const MatchAnalysisStep = ({ matchId, currentStep }) => {
     );
   }
 
-  const homePlayers = mockPlayersData[mockMatchData.home_club_id] || [];
-  const awayPlayers = mockPlayersData[mockMatchData.away_club_id] || [];
-  const allPlayers = [...homePlayers, ...awayPlayers];
-
-  // Calculate team averages
-  const calculateTeamAverages = (players) => {
-    const metrics = [
-      "talent_index_score",
-      "technical_proficiency",
-      "tactical_intelligence",
-      "physical_attributes",
-    ];
-    return metrics.reduce((acc, metric) => {
-      const sum = players.reduce(
-        (total, player) => total + (player.metrics[metric] || 0),
-        0
-      );
-      acc[metric] = sum / players.length;
-      return acc;
-    }, {});
-  };
-
-  const homeAverages = calculateTeamAverages(homePlayers);
-  const awayAverages = calculateTeamAverages(awayPlayers);
-
-  const MetricProgress = ({ value, label, max = 100 }) => (
-    <div className="flex items-center justify-between p-3 border border-border rounded-lg">
-      <span className="text-sm flex-1">{label}</span>
-      <div className="flex items-center gap-3">
-        <div className="w-24 bg-muted rounded-full h-2">
-          <div
-            className="bg-primary h-2 rounded-full transition-all duration-500"
-            style={{ width: `${(value / max) * 100}%` }}
-          />
-        </div>
-        <span className="text-sm font-medium w-12 text-right">
-          {value}
-          {max === 100
-            ? ""
-            : typeof value === "number"
-            ? value.toFixed(1)
-            : value}
-        </span>
-      </div>
-    </div>
-  );
-
-  const PlayerComparison = ({ player1, player2, category }) => (
-    <div className="space-y-3">
-      {metricsCategories[category].map((metric) => (
-        <div key={metric} className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground w-32 truncate">
-            {getMetricLabel(metric)}
-          </span>
-          <div className="flex-1 flex items-center justify-center gap-4">
-            <div className="text-right w-20">
-              <div className="font-medium">{player1[metric] || 0}</div>
+  // Admin View - Annotation Progress Dashboard
+  if (isAdmin) {
+    const annotationColumns = [
+      {
+        header: "Annotator",
+        accessorKey: "annotator_name",
+        cell: ({ row }) => (
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+              <span className="text-xs font-bold text-primary">
+                {row.original.annotator_name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")}
+              </span>
             </div>
-            <div className="flex-1 bg-muted rounded-full h-2">
+            <span>{row.original.annotator_name}</span>
+          </div>
+        ),
+      },
+      {
+        header: "Type",
+        accessorKey: "annotation_type",
+        cell: ({ row }) => (
+          <span
+            className={`px-2 py-1 rounded-full text-xs font-medium ${
+              row.original.annotation_type === "ai_model"
+                ? "bg-blue-100 text-blue-800"
+                : "bg-green-100 text-green-800"
+            }`}
+          >
+            {row.original.annotation_type === "ai_model"
+              ? "AI Model"
+              : "Manual"}
+          </span>
+        ),
+      },
+      {
+        header: "Progress",
+        accessorKey: "progress",
+        cell: ({ row }) => (
+          <div className="flex items-center gap-3">
+            <div className="w-24 bg-muted rounded-full h-2">
               <div
-                className="bg-primary h-2 rounded-full"
-                style={{
-                  width: `${((player1[metric] || 0) / 100) * 50}%`,
-                  marginLeft: `${50 - ((player1[metric] || 0) / 100) * 50}%`,
-                }}
+                className={`h-2 rounded-full transition-all duration-500 ${
+                  row.original.progress === 100 ? "bg-green-500" : "bg-primary"
+                }`}
+                style={{ width: `${row.original.progress}%` }}
               />
             </div>
-            <div className="text-left w-20">
-              <div className="font-medium">{player2[metric] || 0}</div>
+            <span className="text-sm font-medium w-8">
+              {row.original.progress}%
+            </span>
+          </div>
+        ),
+      },
+      {
+        header: "Status",
+        accessorKey: "status",
+        cell: ({ row }) => (
+          <span
+            className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+              row.original.status === "completed"
+                ? "bg-green-100 text-green-800"
+                : row.original.status === "in_progress"
+                ? "bg-blue-100 text-blue-800"
+                : "bg-gray-100 text-gray-800"
+            }`}
+          >
+            {row.original.status === "completed" && (
+              <CheckCircle className="h-3 w-3" />
+            )}
+            {row.original.status === "in_progress" && (
+              <Clock className="h-3 w-3" />
+            )}
+            {row.original.status.replace("_", " ")}
+          </span>
+        ),
+      },
+      {
+        header: "Last Updated",
+        accessorKey: "updated_at",
+        cell: ({ row }) =>
+          new Date(row.original.updated_at).toLocaleDateString(),
+      },
+      {
+        header: "Actions",
+        cell: ({ row }) => (
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleSendMessage(row.original.annotator_id)}
+            >
+              <MessageSquare className="h-4 w-4" />
+            </Button>
+          </div>
+        ),
+      },
+    ];
+
+    const handleSendMessage = (annotatorId) => {
+      // Implement message sending functionality
+      console.log(`Send message to annotator: ${annotatorId}`);
+    };
+
+    const handleSubmitAnalysis = () => {
+      const completedAnnotations = annotations.filter(
+        (a) => a.status === "completed"
+      );
+      if (completedAnnotations.length > 0) {
+        setIsSubmitting(true);
+        // Simulate API call
+        setTimeout(() => {
+          onStepComplete({ analysisSubmitted: true });
+          setIsSubmitting(false);
+        }, 1000);
+      }
+    };
+
+    const completedCount = annotations.filter(
+      (a) => a.status === "completed"
+    ).length;
+    const totalCount = annotations.length;
+
+    return (
+      <div className="space-y-6 p-3">
+        {/* Analysis Progress Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-card border border-border rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Users className="h-4 w-4 text-primary" />
+              <span className="text-sm font-medium">Total Annotators</span>
+            </div>
+            <div className="text-2xl font-bold text-primary">{totalCount}</div>
+          </div>
+
+          <div className="bg-card border border-border rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle className="h-4 w-4 text-green-500" />
+              <span className="text-sm font-medium">Completed</span>
+            </div>
+            <div className="text-2xl font-bold text-green-500">
+              {completedCount}
+            </div>
+          </div>
+
+          <div className="bg-card border border-border rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Clock className="h-4 w-4 text-blue-500" />
+              <span className="text-sm font-medium">In Progress</span>
+            </div>
+            <div className="text-2xl font-bold text-blue-500">
+              {totalCount - completedCount}
+            </div>
+          </div>
+
+          <div className="bg-card border border-border rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingUp className="h-4 w-4 text-primary" />
+              <span className="text-sm font-medium">Completion Rate</span>
+            </div>
+            <div className="text-2xl font-bold text-primary">
+              {totalCount > 0
+                ? Math.round((completedCount / totalCount) * 100)
+                : 0}
+              %
             </div>
           </div>
         </div>
-      ))}
-    </div>
-  );
 
-  return (
-    <div className="space-y-6 p-3">
-      {/* Performance Overview Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-card border border-border rounded-lg p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Award className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium">Avg. Talent Index</span>
+        {/* Annotations Table */}
+        <div className="bg-card border border-border rounded-xl p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-semibold flex items-center gap-2">
+              <BarChart3 className="h-5 w-5 text-primary" />
+              Annotation Progress
+            </h3>
+            <Button
+              onClick={handleSubmitAnalysis}
+              disabled={completedCount === 0 || isSubmitting}
+              className="gap-2"
+            >
+              {isSubmitting ? (
+                <>Submitting...</>
+              ) : (
+                <>
+                  <Send className="h-4 w-4" />
+                  Submit Analysis ({completedCount}/{totalCount})
+                </>
+              )}
+            </Button>
           </div>
-          <div className="flex justify-between items-end">
-            <div className="text-2xl font-bold text-primary">
-              {homeAverages.talent_index_score.toFixed(1)}
-            </div>
-            <div className="text-sm text-muted-foreground">
-              vs {awayAverages.talent_index_score.toFixed(1)}
-            </div>
-          </div>
+
+          <DataTable
+            columns={annotationColumns}
+            data={annotations}
+            searchable={true}
+            searchPlaceholder="Search annotators..."
+          />
         </div>
 
-        <div className="bg-card border border-border rounded-lg p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <BarChart3 className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium">Technical Level</span>
-          </div>
-          <div className="flex justify-between items-end">
-            <div className="text-2xl font-bold text-primary">
-              {homeAverages.technical_proficiency.toFixed(1)}
-            </div>
-            <div className="text-sm text-muted-foreground">
-              vs {awayAverages.technical_proficiency.toFixed(1)}
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-card border border-border rounded-lg p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Brain className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium">Tactical IQ</span>
-          </div>
-          <div className="flex justify-between items-end">
-            <div className="text-2xl font-bold text-primary">
-              {homeAverages.tactical_intelligence.toFixed(1)}
-            </div>
-            <div className="text-sm text-muted-foreground">
-              vs {awayAverages.tactical_intelligence.toFixed(1)}
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-card border border-border rounded-lg p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Activity className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium">Physical Level</span>
-          </div>
-          <div className="flex justify-between items-end">
-            <div className="text-2xl font-bold text-primary">
-              {homeAverages.physical_attributes.toFixed(1)}
-            </div>
-            <div className="text-sm text-muted-foreground">
-              vs {awayAverages.physical_attributes.toFixed(1)}
-            </div>
-          </div>
+        {/* Instructions */}
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+          <h4 className="text-lg font-semibold text-blue-900 mb-2 flex items-center gap-2">
+            <AlertCircle className="h-5 w-5" />
+            Admin Instructions
+          </h4>
+          <ul className="text-blue-800 space-y-1 text-sm">
+            <li>• Monitor annotator progress in real-time</li>
+            <li>• Send messages to annotators for coordination</li>
+            <li>
+              • Submit analysis only when all required annotations are completed
+            </li>
+            <li>• At least one completed analysis is required to proceed</li>
+          </ul>
         </div>
       </div>
+    );
+  }
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-3">
-        {/* Players List */}
-        <div className="lg:col-span-1 space-y-4">
-          <h3 className="text-lg font-semibold flex items-center gap-2">
-            <Users className="h-5 w-5 text-primary" />
-            Player Performance
-          </h3>
-          <div className="space-y-3 max-h-96 overflow-y-auto">
-            {allPlayers.map((player) => (
-              <div
-                key={player.player_id}
-                onClick={() => setSelectedPlayer(player)}
-                className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                  selectedPlayer?.player_id === player.player_id
-                    ? "border-primary bg-primary/5"
-                    : "border-border hover:border-primary/50"
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-                      <span className="text-sm font-bold">
-                        {player.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </span>
-                    </div>
-                    <div>
-                      <div className="font-semibold">{player.name}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {player.position} • #{player.jersey_number}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xl font-bold text-primary">
-                      {mockMetricsData[player.player_id]?.talent_index_score ||
-                        0}
-                    </div>
-                    <div className="text-xs text-muted-foreground">GR4DE</div>
-                  </div>
-                </div>
-              </div>
-            ))}
+  // Annotator View - Annotation Interface
+  if (isAnnotator) {
+    const userAnnotation = annotations.find(
+      (a) => a.annotator_id === user.id
+    ) || {
+      progress: 0,
+      status: "not_started",
+      annotation_type: "manual",
+    };
+
+    const handleFileUpload = (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        // Simulate upload progress
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += 10;
+          setUploadProgress(progress);
+          if (progress >= 100) {
+            clearInterval(interval);
+            // Update annotation progress
+            const updatedAnnotations = annotations.map((ann) =>
+              ann.annotator_id === user.id
+                ? { ...ann, progress: 100, status: "completed" }
+                : ann
+            );
+            setAnnotations(updatedAnnotations);
+          }
+        }, 200);
+      }
+    };
+
+    const handleModelAnnotation = () => {
+      if (!modelEndpoint) {
+        alert("Please enter a model endpoint URL");
+        return;
+      }
+
+      setIsSubmitting(true);
+      // Simulate AI model processing
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 5;
+        setUploadProgress(progress);
+        if (progress >= 100) {
+          clearInterval(interval);
+          const updatedAnnotations = annotations.map((ann) =>
+            ann.annotator_id === user.id
+              ? {
+                  ...ann,
+                  progress: 100,
+                  status: "completed",
+                  annotation_type: "ai_model",
+                  model_endpoint: modelEndpoint,
+                }
+              : ann
+          );
+          setAnnotations(updatedAnnotations);
+          setIsSubmitting(false);
+        }
+      }, 300);
+    };
+
+    const handleManualProgressUpdate = (newProgress) => {
+      const updatedAnnotations = annotations.map((ann) =>
+        ann.annotator_id === user.id
+          ? {
+              ...ann,
+              progress: newProgress,
+              status: newProgress === 100 ? "completed" : "in_progress",
+            }
+          : ann
+      );
+      setAnnotations(updatedAnnotations);
+    };
+
+    const handleSubmitAnnotation = () => {
+      if (userAnnotation.progress === 100) {
+        onStepComplete({ annotationCompleted: true });
+      } else {
+        alert(
+          "Please complete your annotation (100% progress) before submitting."
+        );
+      }
+    };
+
+    return (
+      <div className="space-y-6">
+        {/* Current Progress */}
+        <div className="bg-card border border-border rounded-xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-semibold">Your Annotation Progress</h3>
+            <div className="text-2xl font-bold text-primary">
+              {userAnnotation.progress}%
+            </div>
+          </div>
+
+          <div className="w-full bg-muted rounded-full h-4 mb-2">
+            <div
+              className={`h-4 rounded-full transition-all duration-500 ${
+                userAnnotation.progress === 100 ? "bg-green-500" : "bg-primary"
+              }`}
+              style={{ width: `${userAnnotation.progress}%` }}
+            />
+          </div>
+
+          <div className="flex justify-between text-sm text-muted-foreground">
+            <span>Not Started</span>
+            <span>In Progress</span>
+            <span>Completed</span>
           </div>
         </div>
 
-        {/* Player Metrics */}
-        <div className="lg:col-span-2">
-          {selectedPlayer ? (
-            <div className="space-y-6">
-              <div className="bg-card border border-border rounded-xl p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-semibold">
-                    {selectedPlayer.name} - Detailed Analysis
-                  </h3>
-                  <div className="text-3xl font-bold text-primary">
-                    {mockMetricsData[selectedPlayer.player_id]
-                      ?.talent_index_score || 0}
-                  </div>
-                </div>
+        {/* Annotation Method Selection */}
+        <div className="bg-card border border-border rounded-xl p-6">
+          <h3 className="text-xl font-semibold mb-4">Annotation Method</h3>
 
-                {/* Category Selector */}
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {Object.keys(metricsCategories).map((category) => (
-                    <button
-                      key={category}
-                      onClick={() => setSelectedCategory(category)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                        selectedCategory === category
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted text-muted-foreground hover:bg-muted/80"
-                      }`}
-                    >
-                      {getCategoryLabel(category)}
-                    </button>
-                  ))}
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div
+              className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
+                annotationType === "manual"
+                  ? "border-primary bg-primary/5"
+                  : "border-border hover:border-primary/50"
+              }`}
+              onClick={() => setAnnotationType("manual")}
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <Upload className="h-5 w-5 text-primary" />
+                <span className="font-semibold">Manual Annotation</span>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Upload CSV file with your analysis data
+              </p>
+            </div>
 
-                {/* Metrics Grid */}
-                <div className="space-y-3">
-                  {metricsCategories[selectedCategory].map((metric) => {
-                    const value =
-                      mockMetricsData[selectedPlayer.player_id]?.[metric];
-                    return value !== undefined ? (
-                      <MetricProgress
-                        key={metric}
-                        value={
-                          typeof value === "number" ? value.toFixed(1) : value
-                        }
-                        label={getMetricLabel(metric)}
-                        max={
-                          metric.includes("distance") ||
-                          metric.includes("speed")
-                            ? metric === "max_speed"
-                              ? 40
-                              : metric === "total_distance_covered"
-                              ? 15000
-                              : metric.includes("distance")
-                              ? 2500
-                              : 100
-                            : 100
-                        }
+            <div
+              className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
+                annotationType === "ai_model"
+                  ? "border-primary bg-primary/5"
+                  : "border-border hover:border-primary/50"
+              }`}
+              onClick={() => setAnnotationType("ai_model")}
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <Cpu className="h-5 w-5 text-primary" />
+                <span className="font-semibold">AI Model Annotation</span>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Use AI model endpoint for automated analysis
+              </p>
+            </div>
+          </div>
+
+          {/* Manual Annotation Interface */}
+          {annotationType === "manual" && (
+            <div className="space-y-4">
+              <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+                <Upload className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground mb-4">
+                  Upload your CSV analysis file
+                </p>
+                <input
+                  type="file"
+                  accept=".csv"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  id="csv-upload"
+                />
+                <Button asChild>
+                  <label htmlFor="csv-upload" className="cursor-pointer">
+                    Choose CSV File
+                  </label>
+                </Button>
+
+                {uploadProgress > 0 && (
+                  <div className="mt-4">
+                    <div className="w-full bg-muted rounded-full h-2">
+                      <div
+                        className="h-2 rounded-full bg-primary transition-all duration-300"
+                        style={{ width: `${uploadProgress}%` }}
                       />
-                    ) : null;
-                  })}
-                </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Uploading... {uploadProgress}%
+                    </p>
+                  </div>
+                )}
               </div>
 
-              {/* Player Comparison */}
-              <div className="bg-card border border-border rounded-xl p-6">
-                <h4 className="text-lg font-semibold mb-4">
-                  Comparison with Team Average
-                </h4>
-                <PlayerComparison
-                  player1={mockMetricsData[selectedPlayer.player_id] || {}}
-                  player2={calculateTeamAverages(
-                    selectedPlayer.club_id === mockMatchData.home_club_id
-                      ? homePlayers
-                      : awayPlayers
-                  )}
-                  category={selectedCategory}
-                />
+              {/* Manual Progress Control */}
+              <div className="bg-muted rounded-lg p-4">
+                <label className="text-sm font-medium mb-2 block">
+                  Manual Progress Update
+                </label>
+                <div className="flex items-center gap-4">
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={userAnnotation.progress}
+                    onChange={(e) =>
+                      handleManualProgressUpdate(parseInt(e.target.value))
+                    }
+                    className="flex-1"
+                  />
+                  <span className="text-sm font-medium w-12">
+                    {userAnnotation.progress}%
+                  </span>
+                </div>
               </div>
             </div>
-          ) : (
-            <div className="bg-card border border-border rounded-xl p-12 text-center">
-              <BarChart3 className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-muted-foreground mb-2">
-                Select a Player
-              </h3>
-              <p className="text-muted-foreground">
-                Choose a player from the list to view detailed performance
-                metrics and analysis.
-              </p>
+          )}
+
+          {/* AI Model Annotation Interface */}
+          {annotationType === "ai_model" && (
+            <div className="space-y-4">
+              <div className="space-y-3">
+                <label className="text-sm font-medium">
+                  Model Endpoint URL
+                </label>
+                <input
+                  type="url"
+                  value={modelEndpoint}
+                  onChange={(e) => setModelEndpoint(e.target.value)}
+                  placeholder="https://api.example.com/ai-annotation/v1"
+                  className="w-full p-2 border border-border rounded-lg"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Output URL will be automatically generated by the server
+                </p>
+              </div>
+
+              <Button
+                onClick={handleModelAnnotation}
+                disabled={!modelEndpoint || isSubmitting}
+                className="w-full gap-2"
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Processing with AI Model... {uploadProgress}%
+                  </>
+                ) : (
+                  <>
+                    <Cpu className="h-4 w-4" />
+                    Start AI Model Annotation
+                  </>
+                )}
+              </Button>
+
+              {uploadProgress > 0 && (
+                <div className="space-y-2">
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div
+                      className="h-2 rounded-full bg-primary transition-all duration-300"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  </div>
+                  <p className="text-sm text-muted-foreground text-center">
+                    AI Model Processing... {uploadProgress}%
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </div>
-      </div>
 
-      {/* Team Comparison */}
-      <div className="bg-card border border-border rounded-xl p-6">
-        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <TrendingUp className="h-5 w-5 text-primary" />
-          Team Performance Comparison
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div>
-            <h4 className="font-semibold mb-3 text-primary">
-              FC Barcelona Juvenil A
-            </h4>
-            <div className="space-y-3">
-              {metricsCategories.core.map((metric) => (
-                <MetricProgress
-                  key={metric}
-                  value={homeAverages[metric]?.toFixed(1) || 0}
-                  label={getMetricLabel(metric)}
-                />
-              ))}
-            </div>
-          </div>
-          <div>
-            <h4 className="font-semibold mb-3 text-muted-foreground">
-              Real Madrid Juvenil A
-            </h4>
-            <div className="space-y-3">
-              {metricsCategories.core.map((metric) => (
-                <MetricProgress
-                  key={metric}
-                  value={awayAverages[metric]?.toFixed(1) || 0}
-                  label={getMetricLabel(metric)}
-                />
-              ))}
-            </div>
-          </div>
+        {/* Submit Button */}
+        <div className="flex justify-end">
+          <Button
+            onClick={handleSubmitAnnotation}
+            disabled={userAnnotation.progress < 100}
+            className="gap-2"
+          >
+            <CheckCircle className="h-4 w-4" />
+            Submit Annotation ({userAnnotation.progress}%)
+          </Button>
         </div>
       </div>
+    );
+  }
+
+  // Default view for other roles
+  return (
+    <div className="text-center py-12 p-3">
+      <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+      <h3 className="text-lg font-semibold text-muted-foreground mb-2">
+        Access Restricted
+      </h3>
+      <p className="text-muted-foreground">
+        You don't have permission to access the analysis interface.
+      </p>
     </div>
   );
 };

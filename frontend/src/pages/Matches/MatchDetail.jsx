@@ -22,7 +22,7 @@ const MatchDetail = () => {
   const [homePlayers, setHomePlayers] = useState([]);
   const [awayPlayers, setAwayPlayers] = useState([]);
   const [currentStep, setCurrentStep] = useState(0);
-  const [activeTab, setActiveTab] = useState(1); // Default to Preparation tab
+  const [activeTab, setActiveTab] = useState(0); // Default to Overview tab
   const [loading, setLoading] = useState(true);
 
   const { getMatchById } = useMatchesStore();
@@ -30,7 +30,6 @@ const MatchDetail = () => {
   const { getPlayersByClubId } = usePlayersStore();
 
   const steps = [
-    { id: "overview", label: "Overview", description: "Match Summary" },
     { id: "prepare", label: "Prepare", description: "Data Setup" },
     { id: "analysis", label: "Analysis", description: "Video Annotation" },
     { id: "review", label: "Review", description: "QA & Assessment" },
@@ -78,23 +77,36 @@ const MatchDetail = () => {
   }, [id, getMatchById, getClubById, getPlayersByClubId]);
 
   const handleStepClick = (stepIndex) => {
+    // Only allow navigating to completed steps or current step
+    // Users can't jump ahead to incomplete steps
     if (stepIndex <= currentStep) {
       setCurrentStep(stepIndex);
-      setActiveTab(stepIndex);
+      setActiveTab(stepIndex + 1); // +1 because Overview is tab 0
     }
   };
 
   const handleNextStep = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
-      setActiveTab(currentStep + 1);
+      setActiveTab(currentStep + 2); // +2 because Overview is tab 0 and we're moving to next step tab
     }
   };
 
-  const handlePrevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-      setActiveTab(currentStep - 1);
+  const handleTabChange = (tabIndex) => {
+    setActiveTab(tabIndex);
+
+    // If switching to Overview tab (index 0), don't change currentStep
+    if (tabIndex === 0) {
+      return;
+    }
+
+    // For step tabs, only allow switching to completed steps
+    const stepIndex = tabIndex - 1; // Convert tab index to step index
+    if (stepIndex <= currentStep) {
+      setCurrentStep(stepIndex);
+    } else {
+      // If trying to switch to an incomplete step, revert to current step's tab
+      setActiveTab(currentStep + 1);
     }
   };
 
@@ -248,44 +260,33 @@ const MatchDetail = () => {
 
           {/* Step Navigation */}
           <div className="flex justify-between items-center mt-6 pt-6 border-t border-border">
-            <Button
-              variant="outline"
-              onClick={handlePrevStep}
-              disabled={currentStep === 0}
-            >
-              Previous Step
-            </Button>
-
             <div className="text-sm text-muted-foreground">
               Step {currentStep + 1} of {steps.length} •{" "}
               {steps[currentStep]?.label}
             </div>
 
-            <Button
-              onClick={handleNextStep}
-              disabled={currentStep === steps.length - 1}
-            >
-              Next Step
-            </Button>
+            <div className="text-sm text-muted-foreground">
+              Complete each step to proceed to the next
+            </div>
           </div>
         </div>
 
         {/* Video Player Section */}
-        {matchData?.video_url && (
-          <div className="mb-6">
-            <VideoPlayer
-              videoUrl={matchData.video_url}
-              title={`${homeClub?.club_name} vs ${awayClub?.club_name}`}
-            />
-          </div>
-        )}
+        {/* {matchData?.video_url && ( */}
+        <div className="mb-6">
+          <VideoPlayer
+            videoUrl={matchData.video_url}
+            title={`${homeClub?.club_name} vs ${awayClub?.club_name}`}
+          />
+        </div>
+        {/* )} */}
 
         {/* Tabs Section */}
         <div className="bg-card border border-border rounded-xl overflow-hidden">
           <Tabs
             tabs={tabs}
             defaultTab={activeTab}
-            onTabChange={setActiveTab}
+            onTabChange={handleTabChange}
             variant="default"
             size="md"
             responsive={true}

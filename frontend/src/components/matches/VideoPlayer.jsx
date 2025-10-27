@@ -31,8 +31,12 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
-  const [playerType, setPlayerType] = useState("html5"); // "html5" or "youtube"
+  const [playerType, setPlayerType] = useState("html5");
   const [isSeeking, setIsSeeking] = useState(false);
+
+  // Refs for cleanup
+  const timeIntervalRef = useRef(null);
+  const youtubePlayerRef = useRef(null);
 
   // Check if URL is YouTube
   const isYouTubeUrl =
@@ -42,6 +46,13 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
   const getYouTubeVideoId = (url) => {
     if (!url) return null;
 
+    // Handle youtu.be short URLs
+    if (url.includes("youtu.be/")) {
+      const id = url.split("youtu.be/")[1]?.split("?")[0];
+      return id || null;
+    }
+
+    // Handle youtube.com URLs
     const regex =
       /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
     const match = url.match(regex);
@@ -58,18 +69,146 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
 
-  // For YouTube, we'll use a simple iframe with controls and just track time for our timeline
+  // Cleanup function
+  const cleanup = () => {
+    // Clear intervals
+    if (timeIntervalRef.current) {
+      clearInterval(timeIntervalRef.current);
+      timeIntervalRef.current = null;
+    }
+
+    // Destroy YouTube player
+    if (youtubePlayerRef.current) {
+      try {
+        youtubePlayerRef.current.destroy();
+      } catch (e) {
+        console.warn("Error destroying YouTube player:", e);
+      }
+      youtubePlayerRef.current = null;
+    }
+
+    // Reset states
+    setIsPlaying(false);
+    setCurrentTime(0);
+    setDuration(0);
+    setIsLoading(true);
+    setError(null);
+  };
+
+  // Determine player type and initialize
   useEffect(() => {
-    if (!isYouTubeUrl || !youtubeVideoId) {
-      setPlayerType("html5");
+    // Cleanup previous instance
+    cleanup();
+
+    if (!videoUrl) {
+      setError("No video URL provided");
+      setIsLoading(false);
       return;
     }
 
-    setPlayerType("youtube");
-    setIsLoading(false);
-    // For YouTube, we'll set a default duration (can be updated if needed)
-    setDuration(3600); // Default 1 hour
-  }, [videoUrl, isYouTubeUrl, youtubeVideoId]);
+    if (isYouTubeUrl && youtubeVideoId) {
+      // Use YouTube player for YouTube URLs
+      setPlayerType("youtube");
+      initializeYouTubePlayer();
+    } else {
+      // Use HTML5 player for other video URLs
+      setPlayerType("html5");
+      setIsLoading(false); // HTML5 will set loading to false when metadata loads
+    }
+
+    return () => {
+      cleanup();
+    };
+  }, [videoUrl, youtubeVideoId]);
+
+  // YouTube Player Initialization
+  const initializeYouTubePlayer = () => {
+    setIsLoading(true);
+
+    // Load YouTube IFrame API if not already loaded
+    if (!window.YT) {
+      const tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      const firstScriptTag = document.getElementsByTagName("script")[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    }
+
+    // Create YouTube player when API is ready
+    window.onYouTubeIframeAPIReady = () => {
+      if (!youtubeIframeRef.current || !youtubeVideoId) return;
+
+      try {
+        const player = new window.YT.Player(youtubeIframeRef.current, {
+          videoId: youtubeVideoId,
+          playerVars: {
+            playsinline: 1,
+            controls: 0, // Hide YouTube's native controls
+            modestbranding: 1,
+            rel: 0,
+            showinfo: 0,
+            iv_load_policy: 3,
+            enablejsapi: 1,
+          },
+          events: {
+            onReady: (event) => {
+              setIsLoading(false);
+              setDuration(event.target.getDuration());
+              setError(null);
+
+              // Start time update interval
+              timeIntervalRef.current = setInterval(() => {
+                if (player && player.getCurrentTime) {
+                  try {
+                    const time = player.getCurrentTime();
+                    setCurrentTime(time);
+                  } catch (e) {
+                    console.warn("Error getting current time:", e);
+                  }
+                }
+              }, 100);
+            },
+            onStateChange: (event) => {
+              switch (event.data) {
+                case window.YT.PlayerState.PLAYING:
+                  setIsPlaying(true);
+                  setIsLoading(false);
+                  break;
+                case window.YT.PlayerState.PAUSED:
+                  setIsPlaying(false);
+                  break;
+                case window.YT.PlayerState.ENDED:
+                  setIsPlaying(false);
+                  setCurrentTime(0);
+                  break;
+                case window.YT.PlayerState.BUFFERING:
+                  setIsLoading(true);
+                  break;
+                case window.YT.PlayerState.CUED:
+                  setIsLoading(false);
+                  break;
+              }
+            },
+            onError: (event) => {
+              console.error("YouTube player error:", event.data);
+              setError("Failed to load YouTube video. Please check the URL.");
+              setIsLoading(false);
+            },
+          },
+        });
+
+        youtubePlayerRef.current = player;
+      } catch (error) {
+        console.error("YouTube Player creation error:", error);
+        setError("Failed to initialize YouTube player");
+        setIsLoading(false);
+      }
+    };
+
+    // If API is already loaded, initialize immediately
+    if (window.YT && window.YT.Player) {
+      window.onYouTubeIframeAPIReady();
+    }
+  };
 
   // HTML5 Video event listeners
   useEffect(() => {
@@ -104,6 +243,14 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
       setError(null);
     };
 
+    const handleWaiting = () => {
+      setIsLoading(true);
+    };
+
+    const handleCanPlayThrough = () => {
+      setIsLoading(false);
+    };
+
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
     };
@@ -113,6 +260,8 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
     video.addEventListener("ended", handleEnded);
     video.addEventListener("error", handleError);
     video.addEventListener("canplay", handleCanPlay);
+    video.addEventListener("waiting", handleWaiting);
+    video.addEventListener("canplaythrough", handleCanPlayThrough);
     document.addEventListener("fullscreenchange", handleFullscreenChange);
 
     return () => {
@@ -121,29 +270,23 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
       video.removeEventListener("ended", handleEnded);
       video.removeEventListener("error", handleError);
       video.removeEventListener("canplay", handleCanPlay);
+      video.removeEventListener("waiting", handleWaiting);
+      video.removeEventListener("canplaythrough", handleCanPlayThrough);
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
     };
   }, [playerType, isSeeking]);
 
-  // For YouTube, we'll simulate time progression for the timeline
-  useEffect(() => {
-    if (playerType !== "youtube" || !isPlaying) return;
-
-    const interval = setInterval(() => {
-      setCurrentTime((prev) => {
-        const newTime = prev + 1;
-        return newTime > duration ? duration : newTime;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [playerType, isPlaying, duration]);
-
-  // Event handlers for HTML5 video
+  // Event handlers for both video types
   const togglePlay = () => {
     if (playerType === "youtube") {
-      // For YouTube, we just toggle our simulated play state
-      setIsPlaying(!isPlaying);
+      const player = youtubePlayerRef.current;
+      if (player) {
+        if (isPlaying) {
+          player.pauseVideo();
+        } else {
+          player.playVideo();
+        }
+      }
     } else if (videoRef.current) {
       if (isPlaying) {
         videoRef.current.pause();
@@ -153,7 +296,6 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
           console.error("Play error:", err);
         });
       }
-      setIsPlaying(!isPlaying);
     }
   };
 
@@ -163,13 +305,6 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
 
   const handleSeekEnd = () => {
     setIsSeeking(false);
-
-    // For YouTube, when seeking ends, we open at that timestamp
-    if (playerType === "youtube") {
-      const timestamp = Math.floor(currentTime);
-      const newUrl = `https://www.youtube.com/embed/${youtubeVideoId}?start=${timestamp}&autoplay=1`;
-      window.open(newUrl, "_blank", "noopener,noreferrer");
-    }
   };
 
   const handleSeek = (e) => {
@@ -178,8 +313,12 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
 
     if (playerType === "html5" && videoRef.current) {
       videoRef.current.currentTime = newTime;
+    } else if (playerType === "youtube") {
+      const player = youtubePlayerRef.current;
+      if (player) {
+        player.seekTo(newTime, true);
+      }
     }
-    // For YouTube, we just update the timeline visually
   };
 
   const handleVolumeChange = (e) => {
@@ -187,6 +326,11 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
 
     if (playerType === "html5" && videoRef.current) {
       videoRef.current.volume = newVolume;
+    } else if (playerType === "youtube") {
+      const player = youtubePlayerRef.current;
+      if (player) {
+        player.setVolume(newVolume * 100);
+      }
     }
     setVolume(newVolume);
     setIsMuted(newVolume === 0);
@@ -195,6 +339,15 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
   const toggleMute = () => {
     if (playerType === "html5" && videoRef.current) {
       videoRef.current.muted = !isMuted;
+    } else if (playerType === "youtube") {
+      const player = youtubePlayerRef.current;
+      if (player) {
+        if (isMuted) {
+          player.unMute();
+        } else {
+          player.mute();
+        }
+      }
     }
     setIsMuted(!isMuted);
   };
@@ -206,16 +359,19 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
       playerRef.current.requestFullscreen().catch((err) => {
         console.error("Fullscreen error:", err);
       });
-      setIsFullscreen(true);
     } else {
       document.exitFullscreen();
-      setIsFullscreen(false);
     }
   };
 
   const changePlaybackRate = (rate) => {
     if (playerType === "html5" && videoRef.current) {
       videoRef.current.playbackRate = rate;
+    } else if (playerType === "youtube") {
+      const player = youtubePlayerRef.current;
+      if (player) {
+        player.setPlaybackRate(rate);
+      }
     }
     setPlaybackRate(rate);
     setShowSettings(false);
@@ -224,24 +380,17 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
   const restartVideo = () => {
     if (playerType === "html5" && videoRef.current) {
       videoRef.current.currentTime = 0;
+    } else if (playerType === "youtube") {
+      const player = youtubePlayerRef.current;
+      if (player) {
+        player.seekTo(0, true);
+      }
     }
     setCurrentTime(0);
   };
 
   const openInNewTab = () => {
-    if (playerType === "youtube") {
-      window.open(videoUrl, "_blank", "noopener,noreferrer");
-    } else {
-      window.open(videoUrl, "_blank", "noopener,noreferrer");
-    }
-  };
-
-  const openYouTubeAtTimestamp = () => {
-    if (playerType === "youtube" && youtubeVideoId) {
-      const timestamp = Math.floor(currentTime);
-      const youtubeUrl = `https://www.youtube.com/embed/${youtubeVideoId}?start=${timestamp}&autoplay=1`;
-      window.open(youtubeUrl, "_blank", "noopener,noreferrer");
-    }
+    window.open(videoUrl, "_blank", "noopener,noreferrer");
   };
 
   // Auto-hide controls
@@ -286,7 +435,7 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
       onMouseMove={() => setShowControls(true)}
       onMouseLeave={() => !isPlaying && setShowControls(false)}
     >
-      {/* Video Element - HTML5 */}
+      {/* Video Element - HTML5 (only for non-YouTube URLs) */}
       {playerType === "html5" && (
         <video
           ref={videoRef}
@@ -300,34 +449,18 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
         </video>
       )}
 
-      {/* YouTube Preview */}
-      {playerType === "youtube" && youtubeVideoId && (
-        <div className="w-full aspect-video bg-gray-900 flex items-center justify-center relative">
-          <img
-            src={`https://img.youtube.com/vi/${youtubeVideoId}/maxresdefault.jpg`}
-            alt="YouTube video thumbnail"
-            className="w-full h-full object-cover opacity-60"
-          />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center text-white">
-              <div
-                className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4 hover:bg-red-700 cursor-pointer"
-                onClick={openInNewTab}
-              >
-                <Play className="h-8 w-8 ml-1 text-white" />
-              </div>
-              <p className="text-lg font-semibold">YouTube Video</p>
-              <p className="text-sm text-gray-300 mt-2">
-                Click play to watch on YouTube
-              </p>
-            </div>
-          </div>
-        </div>
+      {/* YouTube IFrame (only for YouTube URLs) */}
+      {playerType === "youtube" && (
+        <div
+          ref={youtubeIframeRef}
+          className="w-full aspect-video"
+          onClick={togglePlay}
+        />
       )}
 
       {/* Loading Spinner */}
-      {isLoading && playerType === "html5" && (
-        <div className="absolute inset-0 flex items-center justify-center bg-background/50">
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background/50 z-10">
           <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
           <span className="ml-3 text-white">Loading video...</span>
         </div>
@@ -337,13 +470,15 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
       <div
         className={`absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent transition-opacity duration-300 ${
           showControls ? "opacity-100" : "opacity-0"
-        }`}
+        } ${isLoading ? "pointer-events-none" : ""}`}
       >
         {/* Top Bar */}
         <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center">
-          <h3 className="text-white font-semibold truncate max-w-[70%]">
-            {title}
-          </h3>
+          {playerType !== "youtube" && (
+            <h3 className="text-white font-semibold truncate max-w-[70%]">
+              {title}
+            </h3>
+          )}
 
           <div className="flex items-center space-x-2">
             {/* Open in new tab */}
@@ -356,40 +491,36 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
               <ExternalLink className="h-4 w-4" />
             </Button>
 
-            {playerType === "html5" && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowSettings(!showSettings)}
-                className="text-white hover:bg-white/20"
-              >
-                <Settings className="h-4 w-4" />
-              </Button>
-            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowSettings(!showSettings)}
+              className="text-white hover:bg-white/20"
+            >
+              <Settings className="h-4 w-4" />
+            </Button>
           </div>
         </div>
 
-        {/* Center Play Button - Only for HTML5 */}
-        {playerType === "html5" && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <Button
-              variant="ghost"
-              size="lg"
-              onClick={togglePlay}
-              className="w-16 h-16 rounded-full bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm"
-            >
-              {isPlaying ? (
-                <Pause className="h-8 w-8" />
-              ) : (
-                <Play className="h-8 w-8 ml-1" />
-              )}
-            </Button>
-          </div>
-        )}
+        {/* Center Play Button */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Button
+            variant="ghost"
+            size="lg"
+            onClick={togglePlay}
+            className="w-16 h-16 rounded-full bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm"
+          >
+            {isPlaying ? (
+              <Pause className="h-8 w-8" />
+            ) : (
+              <Play className="h-8 w-8 ml-1" />
+            )}
+          </Button>
+        </div>
 
         {/* Bottom Controls */}
         <div className="absolute bottom-0 left-0 right-0 p-4 space-y-3">
-          {/* Progress Bar - Always show for time selection */}
+          {/* Progress Bar */}
           <div className="w-full">
             <div className="flex items-center justify-between text-white text-xs mb-1">
               <span>{formatTime(currentTime)}</span>
@@ -407,84 +538,61 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
               onTouchEnd={handleSeekEnd}
               className="w-full h-2 bg-white/30 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary hover:[&::-webkit-slider-thumb]:bg-primary/80"
             />
-            <div className="flex justify-between text-white text-xs mt-1">
-              <span>Start</span>
-              <span>End</span>
-            </div>
           </div>
 
           {/* Control Buttons */}
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              {/* Play/Pause - Only for HTML5 */}
-              {playerType === "html5" && (
+              {/* Play/Pause */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={togglePlay}
+                className="text-white hover:bg-white/20"
+              >
+                {isPlaying ? (
+                  <Pause className="h-4 w-4" />
+                ) : (
+                  <Play className="h-4 w-4" />
+                )}
+              </Button>
+
+              {/* Volume Control */}
+              <div className="flex items-center space-x-2">
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={togglePlay}
+                  onClick={toggleMute}
                   className="text-white hover:bg-white/20"
                 >
-                  {isPlaying ? (
-                    <Pause className="h-4 w-4" />
+                  {isMuted || volume === 0 ? (
+                    <VolumeX className="h-4 w-4" />
                   ) : (
-                    <Play className="h-4 w-4" />
+                    <Volume2 className="h-4 w-4" />
                   )}
                 </Button>
-              )}
-
-              {/* Volume Control - Only for HTML5 */}
-              {playerType === "html5" && (
-                <div className="flex items-center space-x-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={toggleMute}
-                    className="text-white hover:bg-white/20"
-                  >
-                    {isMuted || volume === 0 ? (
-                      <VolumeX className="h-4 w-4" />
-                    ) : (
-                      <Volume2 className="h-4 w-4" />
-                    )}
-                  </Button>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.1"
-                    value={volume}
-                    onChange={handleVolumeChange}
-                    className="w-20 h-1 bg-white/30 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary"
-                  />
-                </div>
-              )}
-
-              {/* Open at selected time - For YouTube */}
-              {playerType === "youtube" && (
-                <Button
-                  variant="default"
-                  size="sm"
-                  onClick={openYouTubeAtTimestamp}
-                  className="bg-primary hover:bg-primary/90"
-                >
-                  <Play className="h-4 w-4 mr-1" />
-                  Open at {formatTime(currentTime)}
-                </Button>
-              )}
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.1"
+                  value={volume}
+                  onChange={handleVolumeChange}
+                  className="w-20 h-1 bg-white/30 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary"
+                />
+              </div>
             </div>
 
             <div className="flex items-center space-x-2">
-              {/* Restart - Only for HTML5 */}
-              {playerType === "html5" && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={restartVideo}
-                  className="text-white hover:bg-white/20"
-                >
-                  <RotateCcw className="h-4 w-4" />
-                </Button>
-              )}
+              {/* Restart */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={restartVideo}
+                className="text-white hover:bg-white/20"
+              >
+                <RotateCcw className="h-4 w-4" />
+              </Button>
 
               {/* Download Button - Only for HTML5 videos */}
               {playerType === "html5" && (
@@ -492,20 +600,12 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
                   variant="ghost"
                   size="sm"
                   onClick={() => {
-                    if (
-                      videoUrl.startsWith("blob:") ||
-                      videoUrl.startsWith("/")
-                    ) {
-                      const link = document.createElement("a");
-                      link.href = videoUrl;
-                      link.download = title || "video";
-                      link.click();
-                    }
+                    const link = document.createElement("a");
+                    link.href = videoUrl;
+                    link.download = title || "video";
+                    link.click();
                   }}
                   className="text-white hover:bg-white/20"
-                  disabled={
-                    !videoUrl.startsWith("blob:") && !videoUrl.startsWith("/")
-                  }
                 >
                   <Download className="h-4 w-4" />
                 </Button>
@@ -528,8 +628,8 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
           </div>
         </div>
 
-        {/* Settings Menu - Only for HTML5 */}
-        {showSettings && playerType === "html5" && (
+        {/* Settings Menu */}
+        {showSettings && (
           <div className="absolute bottom-16 right-4 bg-card border border-border rounded-lg p-3 shadow-lg z-10">
             <div className="space-y-2">
               <h4 className="text-sm font-semibold text-foreground mb-2">
@@ -553,10 +653,10 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
         )}
       </div>
 
-      {/* YouTube Disclaimer */}
+      {/* YouTube Indicator */}
       {playerType === "youtube" && (
         <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-          YouTube - Use timeline to select start time
+          YouTube
         </div>
       )}
     </div>
