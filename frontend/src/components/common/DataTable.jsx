@@ -160,18 +160,147 @@ const DataTable = ({
     }
   };
 
-  // Loading State
-  const TableLoadingState = () => (
-    <div className="w-full py-16">
-      <LoadingSpinner
-        size="md"
-        color="primary"
-        text="Loading data..."
-        centered={true}
-        fullWidth={true}
-      />
-    </div>
-  );
+  // Skeleton Rows for Loading State
+  const TableSkeleton = () => {
+    const skeletonRows = Array.from({ length: itemsPerPage }, (_, i) => i);
+
+    return (
+      <>
+        {/* Desktop Skeleton */}
+        <div className="hidden md:block overflow-x-auto w-full">
+          <table className="w-full text-sm border-separate border-spacing-y-2">
+            <thead className="bg-muted border-b border-border/60">
+              <tr>
+                {columns.map((column, index) => (
+                  <th
+                    key={index}
+                    className={
+                      index === 0
+                        ? "h-15 pl-3 text-left align-middle font-semibold text-foreground whitespace-nowrap text-sm uppercase tracking-wide rounded-tl-lg"
+                        : "h-15 px-6 text-left align-middle font-semibold text-foreground whitespace-nowrap text-sm uppercase tracking-wide"
+                    }
+                  >
+                    {column.header}
+                  </th>
+                ))}
+                {actions && (
+                  <th className="h-15 px-3 text-left align-middle font-semibold text-foreground whitespace-nowrap text-sm uppercase tracking-wide w-20 rounded-tr-lg">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm whitespace-nowrap">
+                        Items per page
+                      </span>
+                      <Select disabled value={itemsPerPage.toString()}>
+                        <SelectTrigger className="w-20 h-9 border-white focus:border-primary text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </Select>
+                    </div>
+                  </th>
+                )}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/40 bg-muted/50 border-b border-border/60">
+              {skeletonRows.map((rowIndex) => (
+                <tr
+                  key={rowIndex}
+                  className="group transition-all duration-200 even:bg-muted/5 text-sx"
+                >
+                  {columns.map((column, colIndex) => (
+                    <td
+                      key={colIndex}
+                      className={
+                        colIndex === 0
+                          ? "p-6 align-middle text-sx rounded-tl-lg whitespace-nowrap rounded-bl-lg"
+                          : "p-6 align-middle whitespace-nowrap text-sx"
+                      }
+                    >
+                      <div className="flex items-center space-x-2">
+                        <div className="h-4 bg-muted-foreground/20 rounded animate-pulse flex-1 max-w-[120px]"></div>
+                        {colIndex === 0 && (
+                          <div className="w-6 h-6 bg-muted-foreground/20 rounded-full animate-pulse"></div>
+                        )}
+                      </div>
+                    </td>
+                  ))}
+                  {actions && (
+                    <td className="p-6 align-middle rounded-tr-lg whitespace-nowrap rounded-br-lg">
+                      <div className="flex items-center space-x-2 opacity-50">
+                        <div className="w-8 h-8 bg-muted-foreground/20 rounded-md animate-pulse"></div>
+                        <div className="w-8 h-8 bg-muted-foreground/20 rounded-md animate-pulse"></div>
+                        <div className="w-8 h-8 bg-muted-foreground/20 rounded-md animate-pulse"></div>
+                      </div>
+                    </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Mobile Skeleton */}
+        <div className="block md:hidden space-y-3 p-4">
+          {skeletonRows.slice(0, 3).map((rowIndex) => (
+            <div
+              key={rowIndex}
+              className="bg-card border border-border/40 rounded-lg p-4 space-y-3 shadow-sm"
+            >
+              {/* Main content skeleton */}
+              <div className="space-y-2">
+                {columns.slice(0, 2).map((column, colIndex) => (
+                  <div
+                    key={colIndex}
+                    className="flex justify-between items-center"
+                  >
+                    <div className="h-3 bg-muted-foreground/20 rounded animate-pulse w-20"></div>
+                    <div className="h-4 bg-muted-foreground/20 rounded animate-pulse w-24"></div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Additional fields skeleton */}
+              {columns.length > 2 && (
+                <div className="pt-2 border-t border-border/20 space-y-2">
+                  {columns.slice(2).map((column, colIndex) => (
+                    <div
+                      key={colIndex}
+                      className="flex justify-between items-center"
+                    >
+                      <div className="h-3 bg-muted-foreground/20 rounded animate-pulse w-16"></div>
+                      <div className="h-4 bg-muted-foreground/20 rounded animate-pulse w-20"></div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Actions skeleton */}
+              {actions && (
+                <div className="pt-3 border-t border-border/20">
+                  <div className="flex justify-end">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 bg-muted-foreground/20 rounded-md animate-pulse"></div>
+                      <div className="w-8 h-8 bg-muted-foreground/20 rounded-md animate-pulse"></div>
+                      <div className="w-8 h-8 bg-muted-foreground/20 rounded-md animate-pulse"></div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Loading Overlay */}
+        <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center rounded-lg">
+          <LoadingSpinner
+            type="pulse"
+            size="lg"
+            text="Loading ..."
+            centered={true}
+            color="primary"
+          />
+        </div>
+      </>
+    );
+  };
 
   // No Data State
   const NoDataState = () => (
@@ -235,21 +364,16 @@ const DataTable = ({
       {/* Header Section */}
       <div className="flex flex-col w-full sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="space-y-1">
-          {/* <h2 className="text-2xl font-bold text-foreground">{title}</h2>
-          {!isLoading && displayTotal > 0 && (
-            <p className="text-sm text-muted-foreground">
-              {displayTotal} {displayTotal === 1 ? "record" : "records"} found
-            </p>
-          )} */}
+          {/* Optional title - commented out but structure remains */}
         </div>
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
-          {/* Items per page selector */}
           {/* Add Button */}
           {onAdd && (
             <Button
               onClick={onAdd}
               className="bg-primary hover:bg-primary/90 order-1 sm:order-2 w-full sm:w-auto h-9"
+              disabled={isLoading}
             >
               <Plus className="w-4 h-4 mr-2" />
               {addButtonText}
@@ -258,27 +382,11 @@ const DataTable = ({
         </div>
       </div>
 
-      {/* Search Section */}
-      {/* {searchable && (
-        <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-          <Input
-            placeholder={searchPlaceholder}
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              if (!isExternalPagination) {
-                setInternalPage(1);
-              }
-            }}
-            className="pl-10 h-11 bg-background border-border/60 focus:border-primary/50"
-          />
-        </div>
-      )} */}
-
       <div className="relative w-full rounded-lg bg-background">
         {isLoading ? (
-          <TableLoadingState />
+          <div className="relative">
+            <TableSkeleton />
+          </div>
         ) : displayTotal === 0 ? (
           searchTerm && !isExternalPagination ? (
             <EmptySearchState />
