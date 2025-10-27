@@ -18,6 +18,7 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
   const videoRef = useRef(null);
   const playerRef = useRef(null);
   const youtubeIframeRef = useRef(null);
+  const mountedRef = useRef(true);
 
   // Player states
   const [isPlaying, setIsPlaying] = useState(false);
@@ -151,10 +152,13 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
 
       await loadYouTubeAPI();
 
-      console.log(youtubeIframeRef.current);
-      console.log(youtubeVideoId);
-      if (!youtubeIframeRef.current || !youtubeVideoId) {
-        throw new Error("YouTube iframe ref or video ID not available");
+      // Ensure the iframe container DOM node exists before creating the player.
+      await waitForRef(youtubeIframeRef, 5000);
+      if (!youtubeIframeRef.current) {
+        throw new Error("YouTube iframe ref not available after waiting");
+      }
+      if (!youtubeVideoId) {
+        throw new Error("YouTube video ID not available");
       }
 
       const player = new window.YT.Player(youtubeIframeRef.current, {
@@ -249,6 +253,20 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
     }
   };
 
+  // Wait for a ref to be attached (uses requestAnimationFrame for non-blocking check)
+  const waitForRef = (ref, timeout = 5000) =>
+    new Promise((resolve, reject) => {
+      const start = Date.now();
+      const check = () => {
+        if (ref.current) return resolve(ref.current);
+        if (Date.now() - start > timeout) {
+          return reject(new Error("ref not attached within timeout"));
+        }
+        requestAnimationFrame(check);
+      };
+      check();
+    });
+
   // Determine player type and initialize
   useEffect(() => {
     if (!videoUrl) {
@@ -261,13 +279,18 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
 
     if (isYouTubeUrl && youtubeVideoId) {
       setPlayerType("youtube");
-      initializeYouTubePlayer();
+      // initialize but guard against unmounted component
+      mountedRef.current = true;
+      initializeYouTubePlayer().catch((err) => {
+        if (mountedRef.current) console.error(err);
+      });
     } else {
       setPlayerType("html5");
       // HTML5 will set loading to false when metadata loads
     }
 
     return () => {
+      mountedRef.current = false;
       cleanup();
     };
   }, [videoUrl, youtubeVideoId]);
