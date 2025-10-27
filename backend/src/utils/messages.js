@@ -26,9 +26,6 @@ export const TOKEN_VERFICATION_FAILED =
   "Token verification failed. Please log in again.";
 
 export const LOGOUT_SUCCESS = "Logged out successfully";
-export const COMMON_GET_SUCCESS = "Featched data successfully";
-export const COMMON_UPDATE_SUCCESS = "Data is successfully updated";
-export const COMMON_SERVER_ERROR = "Internal server error";
 
 // change password
 export const CURRENT_PASSWORD_INCORRECT = "Current password is incorrect";
@@ -62,3 +59,34 @@ export const PLAYER_UPDATE_SUCCESS = "Player updated successfully";
 export const PLAYER_DELETE_SUCCESS = "Player deleted successfully";
 export const PLAYER_NOT_FOUND = "Player not found";
 export const PLAYER_CLUB_GET_SUCCESS = "Player club retrieved successfully";
+
+// Analysis Works Messages
+export const ANALYSIS_WORK_CREATE_SUCCESS =
+  "Analysis work created successfully";
+export const ANALYSIS_WORK_GET_SUCCESS = "Analysis work retrieved successfully";
+export const ANALYSIS_WORK_UPDATE_SUCCESS =
+  "Analysis work updated successfully";
+export const ANALYSIS_WORK_DELETE_SUCCESS =
+  "Analysis work deleted successfully";
+export const ANALYSIS_WORK_NOT_FOUND = "Analysis work not found";
+
+// Events Temp Messages
+export const EVENT_CREATE_SUCCESS = "Event created successfully";
+export const EVENT_GET_SUCCESS = "Event retrieved successfully";
+export const EVENT_UPDATE_SUCCESS = "Event updated successfully";
+export const EVENT_DELETE_SUCCESS = "Event deleted successfully";
+export const EVENT_NOT_FOUND = "Event not found";
+export const EVENTS_BULK_CREATE_SUCCESS = "Events created successfully";
+
+// Match Info Messages
+export const MATCH_INFO_CREATE_SUCCESS = "Match info created successfully";
+export const MATCH_INFO_GET_SUCCESS = "Match info retrieved successfully";
+export const MATCH_INFO_UPDATE_SUCCESS = "Match info updated successfully";
+export const MATCH_INFO_DELETE_SUCCESS = "Match info deleted successfully";
+export const MATCH_INFO_NOT_FOUND = "Match info not found";
+
+// Common Messages
+
+export const COMMON_GET_SUCCESS = "Featched data successfully";
+export const COMMON_UPDATE_SUCCESS = "Data is successfully updated";
+export const COMMON_SERVER_ERROR = "Internal server error";
