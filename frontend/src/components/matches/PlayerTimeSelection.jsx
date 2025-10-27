@@ -313,7 +313,7 @@ const PlayerTimeSelection = ({
           )}
         </div>
 
-        <Button
+        {/* <Button
           onClick={handleCompleteLineup}
           disabled={!isLineupComplete()}
           className="gap-2"
@@ -321,7 +321,7 @@ const PlayerTimeSelection = ({
         >
           <CheckCircle className="h-4 w-4" />
           Complete Lineup
-        </Button>
+        </Button> */}
       </div>
 
       {/* Summary Statistics */}

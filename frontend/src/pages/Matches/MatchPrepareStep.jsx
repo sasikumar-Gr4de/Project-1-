@@ -216,11 +216,11 @@ const MatchPrepareStep = ({
           },
         }));
 
-        toast({
-          title: "Success",
-          description: "Player added to lineup",
-          variant: "success",
-        });
+        // toast({
+        //   title: "Success",
+        //   description: "Player added to lineup",
+        //   variant: "success",
+        // });
         return true;
       } else {
         throw new Error(result.error || "Failed to add player");
@@ -258,11 +258,11 @@ const MatchPrepareStep = ({
           },
         }));
 
-        toast({
-          title: "Success",
-          description: "Player updated successfully",
-          variant: "success",
-        });
+        // toast({
+        //   title: "Success",
+        //   description: "Player updated successfully",
+        //   variant: "success",
+        // });
         return true;
       } else {
         throw new Error(result.error || "Failed to update player");
@@ -298,11 +298,11 @@ const MatchPrepareStep = ({
           return newLineup;
         });
 
-        toast({
-          title: "Success",
-          description: "Player removed from lineup",
-          variant: "success",
-        });
+        // toast({
+        //   title: "Success",
+        //   description: "Player removed from lineup",
+        //   variant: "success",
+        // });
         return true;
       } else {
         throw new Error(result.error || "Failed to remove player");
@@ -345,11 +345,11 @@ const MatchPrepareStep = ({
 
       if (result.success) {
         console.log("Lineup saved successfully to backend");
-        toast({
-          title: "Success",
-          description: "Player lineup saved successfully",
-          variant: "success",
-        });
+        // toast({
+        //   title: "Success",
+        //   description: "Player lineup saved successfully",
+        //   variant: "success",
+        // });
         return true;
       } else {
         throw new Error(result.error || "Failed to save player lineup");
