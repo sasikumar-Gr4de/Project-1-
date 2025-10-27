@@ -80,7 +80,7 @@ export default class Club {
           .order("created_at", {
             ascending: false,
           })
-          .select("club_id, club_name");
+          .select("club_id, club_name, mark_url");
         if (error) throw error;
         return { data };
       }

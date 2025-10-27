@@ -78,6 +78,7 @@ const Matches = () => {
       const result = await getAllClubsForSelect();
       if (result.success === true) {
         setClubs(result.data?.data || []);
+        console.log(result);
       }
     } catch (error) {
       console.error("Error fetching clubs:", error);
@@ -90,11 +91,6 @@ const Matches = () => {
 
   const handlePageSizeChange = (newPageSize) => {
     fetchAllMatches(1, newPageSize, searchTerm);
-  };
-
-  const handleSearch = (value) => {
-    setSearchTerm(value);
-    fetchAllMatches(1, pagination.pageSize, value);
   };
 
   const handleAddMatch = async (matchData) => {
@@ -218,6 +214,11 @@ const Matches = () => {
     return club ? club.club_name : "Unknown Club";
   };
 
+  const getMarkUrl = (clubId) => {
+    const club = clubs.find((club) => club.club_id === clubId);
+    return club ? club.mark_url : null;
+  };
+
   const ActionButton = ({
     icon: Icon,
     onClick,
@@ -245,39 +246,92 @@ const Matches = () => {
     </Button>
   );
 
+  const MatchTeamDisplay = ({ clubId, position = "home" }) => {
+    const clubName = getClubName(clubId);
+    const markUrl = getMarkUrl(clubId);
+
+    return (
+      <div
+        className={`flex flex-col items-center space-y-2 min-w-0 flex-1 ${
+          position === "home" ? "text-right" : "text-left"
+        }`}
+      >
+        {/* Club Name - Hidden on mobile, visible on tablet and up */}
+        <p className="hidden sm:block font-semibold text-foreground text-sm truncate max-w-full">
+          {clubName}
+        </p>
+
+        {/* Club Badge */}
+        <div className="flex items-center space-x-2 sm:space-x-0 sm:flex-col sm:space-y-1">
+          {position === "away" && (
+            <img
+              src={markUrl}
+              alt={clubName}
+              className="w-6 h-6 sm:w-8 sm:h-8 rounded-full object-cover shrink-0"
+            />
+          )}
+
+          {/* Club Name - Only visible on mobile */}
+          <p className="sm:hidden text-xs font-medium text-foreground truncate max-w-20">
+            {clubName}
+          </p>
+
+          {position === "home" && (
+            <img
+              src={markUrl}
+              alt={clubName}
+              className="w-6 h-6 sm:w-8 sm:h-8 rounded-full object-cover shrink-0"
+            />
+          )}
+        </div>
+
+        {/* Position Label */}
+        <p className="text-xs text-muted-foreground capitalize hidden xs:block">
+          {position}
+        </p>
+      </div>
+    );
+  };
+
   const matchColumns = [
     {
       header: "Match",
       accessor: "home_club_id",
       cell: ({ row }) => (
-        <div className="flex items-center justify-between space-x-4 min-w-0">
-          <div className="flex-1 text-right min-w-0">
-            <p className="font-semibold text-foreground text-sm truncate">
-              {getClubName(row.home_club_id)}
-            </p>
-            <p className="text-xs text-muted-foreground">Home</p>
-          </div>
+        <div className="flex items-center justify-between space-x-2 sm:space-x-4 min-w-0">
+          {/* Home Team */}
+          <MatchTeamDisplay clubId={row.home_club_id} position="home" />
 
-          <div className="flex flex-col items-center mx-2 shrink-0">
+          {/* Score & Status */}
+          <div className="flex flex-col items-center mx-1 sm:mx-2 shrink-0 min-w-[60px] sm:min-w-20">
             <div className="px-2 py-1 bg-muted/50 rounded-md border border-border/40">
-              <span className="font-bold text-sm text-foreground">
+              <span className="font-bold text-xs sm:text-sm text-foreground">
                 {formatScore(row)}
               </span>
             </div>
             <Badge
               variant={getStatusVariant(row.match_status)}
-              className="mt-1 text-xs font-medium bg-primary/10 text-primary border-primary/20"
+              className="mt-1 text-xs font-medium bg-primary/10 text-primary border-primary/20 hidden xs:inline-flex"
             >
               {capitalize(row.match_status)}
             </Badge>
+            {/* Mobile status badge */}
+            <Badge
+              variant={getStatusVariant(row.match_status)}
+              className="mt-1 text-[10px] font-medium bg-primary/10 text-primary border-primary/20 xs:hidden"
+            >
+              {row.match_status === "completed"
+                ? "Done"
+                : row.match_status === "ongoing"
+                ? "Live"
+                : row.match_status === "scheduled"
+                ? "Next"
+                : "Post"}
+            </Badge>
           </div>
 
-          <div className="flex-1 text-left min-w-0">
-            <p className="font-semibold text-foreground text-sm truncate">
-              {getClubName(row.away_club_id)}
-            </p>
-            <p className="text-xs text-muted-foreground">Away</p>
-          </div>
+          {/* Away Team */}
+          <MatchTeamDisplay clubId={row.away_club_id} position="away" />
         </div>
       ),
     },
@@ -286,9 +340,14 @@ const Matches = () => {
       accessor: "competition",
       cell: ({ row }) => (
         <div className="flex items-center space-x-2">
-          <Trophy className="w-3.5 h-3.5 text-muted-foreground/70" />
-          <span className="text-sm font-medium text-foreground/90 truncate">
+          <Trophy className="w-3.5 h-3.5 text-muted-foreground/70 shrink-0" />
+          <span className="text-sm font-medium text-foreground/90 truncate hidden sm:block">
             {row.competition}
+          </span>
+          <span className="text-xs font-medium text-foreground/90 truncate sm:hidden">
+            {row.competition.length > 15
+              ? row.competition.substring(0, 15) + "..."
+              : row.competition}
           </span>
         </div>
       ),
@@ -298,9 +357,14 @@ const Matches = () => {
       accessor: "venue",
       cell: ({ row }) => (
         <div className="flex items-center space-x-2">
-          <MapPin className="w-3.5 h-3.5 text-muted-foreground/70" />
-          <span className="text-sm text-foreground/90 truncate">
+          <MapPin className="w-3.5 h-3.5 text-muted-foreground/70 shrink-0" />
+          <span className="text-sm text-foreground/90 truncate hidden md:block">
             {row.venue}
+          </span>
+          <span className="text-xs text-foreground/90 truncate md:hidden">
+            {row.venue.length > 12
+              ? row.venue.substring(0, 12) + "..."
+              : row.venue}
           </span>
         </div>
       ),
@@ -310,12 +374,18 @@ const Matches = () => {
       accessor: "match_date",
       cell: ({ row }) => (
         <div className="flex items-center space-x-2">
-          <CalendarDays className="w-3.5 h-3.5 text-muted-foreground/70" />
+          <CalendarDays className="w-3.5 h-3.5 text-muted-foreground/70 shrink-0" />
           <div className="min-w-0">
-            <p className="text-sm font-medium text-foreground/90 whitespace-nowrap">
+            <p className="text-sm font-medium text-foreground/90 whitespace-nowrap hidden sm:block">
               {formatDate(new Date(row.match_date))}
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs font-medium text-foreground/90 whitespace-nowrap sm:hidden">
+              {new Date(row.match_date).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+              })}
+            </p>
+            <p className="text-xs text-muted-foreground whitespace-nowrap">
               {new Date(row.match_date).toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
@@ -331,7 +401,7 @@ const Matches = () => {
       cell: ({ row }) => (
         <Badge
           variant={getAnalysisVariant(row.qa_status)}
-          className="text-xs font-medium bg-secondary/10 text-gray-300 border-secondary/20"
+          className="text-xs font-medium bg-secondary/10 text-gray-300 border-secondary/20 hidden md:inline-flex"
         >
           {capitalize(row.qa_status)}
         </Badge>
@@ -340,7 +410,7 @@ const Matches = () => {
   ];
 
   const matchActions = ({ row }) => (
-    <div className="flex items-center space-x-2 transition-all duration-200">
+    <div className="flex items-center space-x-1 sm:space-x-2 transition-all duration-200">
       <Link to={`/matches/${row.match_id}`}>
         <ActionButton
           icon={Eye}
@@ -382,6 +452,7 @@ const Matches = () => {
         emptyStateTitle="No Matches Found"
         emptyStateDescription="Get started by adding your first football match to the system."
         tableHeight="500px"
+        responsive={true}
       />
 
       <AddMatchModal

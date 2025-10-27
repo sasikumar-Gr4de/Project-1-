@@ -39,38 +39,38 @@ const Layout = () => {
   useEffect(() => {
     if (sidebarOpen && isMobile) {
       document.body.style.overflow = "hidden";
-      document.documentElement.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = "unset";
-      document.documentElement.style.overflow = "unset";
+      document.body.style.overflow = "";
     }
 
     return () => {
-      document.body.style.overflow = "unset";
-      document.documentElement.style.overflow = "unset";
+      document.body.style.overflow = "";
     };
   }, [sidebarOpen, isMobile]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background relative">
-      {/* Header - Always on top */}
-      <Header onMenuToggle={handleMenuToggle} />
+    <div className="h-screen flex flex-col bg-background relative">
+      {/* Fixed Header */}
+      <div className="fixed top-0 left-0 right-0 z-50">
+        <Header onMenuToggle={handleMenuToggle} />
+      </div>
 
       {/* Main Content Area */}
-      <div className="flex flex-1 min-h-0 relative">
-        {/* Mobile Overlay - Fixed positioning to cover entire screen */}
+      <div className="flex flex-1 pt-14 min-h-0">
+        {" "}
+        {/* pt-14 to account for header height */}
+        {/* Mobile Overlay */}
         {sidebarOpen && isMobile && (
           <div
             className="fixed inset-0 bg-black/60 z-40 lg:hidden animate-in fade-in-0"
             onClick={handleSidebarClose}
             style={{
-              top: "56px", // Height of header on mobile
-              height: "calc(100vh - 56px)", // Remaining viewport height
+              top: "56px",
+              height: "calc(100vh - 56px)",
             }}
           />
         )}
-
-        {/* Sidebar - Fixed for mobile, static for desktop */}
+        {/* Fixed Sidebar */}
         <aside
           className={`
             fixed inset-y-0 left-0 z-30 w-64 bg-card border-r border-border 
@@ -80,25 +80,26 @@ const Layout = () => {
             shadow-xl lg:shadow-none
           `}
           style={{
-            top: "56px", // Below header on mobile
-            height: "calc(100vh - 56px)", // Remaining viewport height
+            top: "56px",
+            height: "calc(100vh - 56px)",
           }}
         >
           <Sidebar isOpen={sidebarOpen} onClose={handleSidebarClose} />
         </aside>
-
-        {/* Main Content */}
-        <main className="flex-1 min-w-0 lg:ml-0 transition-all duration-300 flex flex-col">
+        {/* Scrollable Main Content */}
+        <main className="flex-1 min-w-0 lg:ml-0 flex flex-col">
           <div className="flex-1 flex flex-col min-h-0">
-            {/* Scrollable Content Area */}
-            <div className="flex-1 overflow-y-auto scroll-smooth">
+            {/* Scrollable Content Area - Only this part scrolls */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar">
               <div className="p-3 sm:p-4 lg:p-6 min-h-full">
                 <Outlet />
               </div>
             </div>
 
-            {/* Footer */}
-            <Footer />
+            {/* Fixed Footer */}
+            <div className="shrink-0">
+              <Footer />
+            </div>
           </div>
         </main>
       </div>

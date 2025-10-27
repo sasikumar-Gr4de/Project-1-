@@ -215,7 +215,7 @@ const Players = () => {
 
     return (
       <div
-        className={`${className} rounded-full ${gradientClass} flex items-center justify-center text-primary-foreground shadow-sm border border-primary/20`}
+        className={`${className} rounded-full ${gradientClass} flex items-center justify-center text-primary-foreground shadow-sm border`}
       >
         {player?.avatar_url ? (
           <img
@@ -231,7 +231,7 @@ const Players = () => {
               .join("")}
           </span>
         ) : (
-          <User className="w-5 h-5" />
+          <User className="w-5 h-5 border-primary/20" />
         )}
       </div>
     );

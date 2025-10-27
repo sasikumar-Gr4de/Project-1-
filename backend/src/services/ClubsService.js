@@ -13,7 +13,6 @@ import {
 class ClubsService {
   static async createClub(clubData) {
     try {
-      console.log(clubData);
       const data = await Club.create(clubData);
       if (data) return generateResponse(data, CLUB_CREATE_SUCCESS);
       return generateResponse(null, "Creating Error");
