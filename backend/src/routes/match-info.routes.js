@@ -1,3 +1,4 @@
+// src/routes/match-info.routes.js
 import express from "express";
 import MatchInfoController from "../controllers/MatchInfoController.js";
 import { protect } from "../middleware/auth.middleware.js";
@@ -5,6 +6,7 @@ import { protect } from "../middleware/auth.middleware.js";
 const router = express.Router();
 
 router.post("/", protect, MatchInfoController.createMatchInfo);
+router.post("/bulk", protect, MatchInfoController.createBulkMatchInfo); // Add this line
 router.get("/", protect, MatchInfoController.getAllMatchInfo);
 router.get("/:id", protect, MatchInfoController.getMatchInfo);
 router.put("/:id", protect, MatchInfoController.updateMatchInfo);

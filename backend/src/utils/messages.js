@@ -84,6 +84,8 @@ export const MATCH_INFO_GET_SUCCESS = "Match info retrieved successfully";
 export const MATCH_INFO_UPDATE_SUCCESS = "Match info updated successfully";
 export const MATCH_INFO_DELETE_SUCCESS = "Match info deleted successfully";
 export const MATCH_INFO_NOT_FOUND = "Match info not found";
+export const MATCH_INFO_BULK_CREATE_SUCCESS =
+  "Match info created successfully for all players";
 
 // Common Messages
 

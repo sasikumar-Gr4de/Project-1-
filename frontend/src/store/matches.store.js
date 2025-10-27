@@ -78,6 +78,37 @@ export const useMatchesStore = create(
             };
           }
         },
+        updateMatch: async (id, updatedData) => {
+          try {
+            const response = await api.put(`/matches/${id}`, updatedData);
+            const result = response.data;
+            return result;
+          } catch (error) {
+            const errorMsg = error.response?.data?.message || error.message;
+            return {
+              success: false,
+              error: errorMsg,
+            };
+          }
+        },
+
+        // New method for match info operations
+        updateMatchInfo: async (matchId, matchInfoData) => {
+          try {
+            const response = await api.put(
+              `/matches/${matchId}/info`,
+              matchInfoData
+            );
+            const result = response.data;
+            return result;
+          } catch (error) {
+            const errorMsg = error.response?.data?.message || error.message;
+            return {
+              success: false,
+              error: errorMsg,
+            };
+          }
+        },
       }),
       {
         name: "matches-storage",

@@ -1,3 +1,4 @@
+// src/controllers/MatchInfoController.js
 import MatchInfoService from "../services/MatchInfoService.js";
 import { sendServerErrorResponse } from "../utils/helpers.js";
 
@@ -5,6 +6,28 @@ class MatchInfoController {
   async createMatchInfo(req, res) {
     try {
       const result = await MatchInfoService.createMatchInfo(req.body);
+      return res.status(201).json(result);
+    } catch (err) {
+      return sendServerErrorResponse(req, res, err);
+    }
+  }
+
+  // Add this new method for bulk creation
+  async createBulkMatchInfo(req, res) {
+    try {
+      const { match_id, players } = req.body;
+
+      if (!match_id || !players || !Array.isArray(players)) {
+        return res.status(400).json({
+          success: false,
+          message: "Match ID and players array are required",
+        });
+      }
+
+      const result = await MatchInfoService.createBulkMatchInfo(
+        match_id,
+        players
+      );
       return res.status(201).json(result);
     } catch (err) {
       return sendServerErrorResponse(req, res, err);

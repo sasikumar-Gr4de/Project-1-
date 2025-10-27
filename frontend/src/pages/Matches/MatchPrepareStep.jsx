@@ -1,5 +1,5 @@
 // src/pages/Matches/MatchPrepareStep.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Upload,
   Settings,
@@ -13,11 +13,16 @@ import {
   Save,
   Play,
   Square,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import VideoUpload from "@/components/common/VideoUpload";
 import MatchInfoForm from "@/components/matches/MatchInfoForm";
 import PlayerTimeSelection from "@/components/matches/PlayerTimeSelection";
+import { useMatchesStore } from "@/store/matches.store";
+import { useMatchInfoStore } from "@/store/match-info.store";
+import { useToast } from "@/contexts/ToastContext";
 
 const MatchPrepareStep = ({
   matchData,
@@ -31,6 +36,20 @@ const MatchPrepareStep = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [matchInfoCompleted, setMatchInfoCompleted] = useState(false);
+  const [savingMatchInfo, setSavingMatchInfo] = useState(false);
+  const [savingLineup, setSavingLineup] = useState(false);
+  const [loadingLineup, setLoadingLineup] = useState(true);
+  const [lineupData, setLineupData] = useState({});
+
+  const { updateMatch } = useMatchesStore();
+  const {
+    createBulkMatchInfo,
+    getMatchInfoByMatch,
+    createMatchInfo,
+    deleteMatchInfo,
+  } = useMatchInfoStore();
+  const { toast } = useToast();
+
   const [preparationSteps, setPreparationSteps] = useState([
     {
       id: "video",
@@ -53,6 +72,75 @@ const MatchPrepareStep = ({
     },
   ]);
 
+  // Load existing match info on component mount
+  useEffect(() => {
+    const loadExistingMatchInfo = async () => {
+      if (matchData?.match_id) {
+        try {
+          setLoadingLineup(true);
+          const result = await getMatchInfoByMatch(matchData.match_id);
+
+          if (result.success && result.data) {
+            // Convert existing match info to lineup data format
+            const loadedLineupData = {};
+            result.data.forEach((info) => {
+              loadedLineupData[info.player_id] = {
+                start_time: info.start_time
+                  ? Math.floor(new Date(info.start_time).getTime() / 1000)
+                  : 0,
+                end_time: info.end_time
+                  ? Math.floor(new Date(info.end_time).getTime() / 1000)
+                  : matchData.duration_minutes || 90,
+                position: info.position || "",
+                player_name: info.players?.full_name || "",
+                jersey_number: info.players?.jersey_number || "",
+                match_info_id: info.match_info_id,
+              };
+            });
+
+            setLineupData(loadedLineupData);
+
+            // Update local match data with loaded lineup
+            if (onDataUpdate) {
+              onDataUpdate((prev) => ({
+                ...prev,
+                player_playing_times: loadedLineupData,
+              }));
+            }
+
+            // If we have existing match info, mark lineup as completed
+            if (result.data.length > 0) {
+              setPreparationSteps((prev) =>
+                prev.map((step) =>
+                  step.id === "lineups"
+                    ? { ...step, status: "completed" }
+                    : step
+                )
+              );
+            }
+          }
+        } catch (error) {
+          console.error("Error loading existing match info:", error);
+          toast({
+            title: "Error",
+            description: "Failed to load player lineup data",
+            variant: "destructive",
+          });
+        } finally {
+          setLoadingLineup(false);
+        }
+      }
+    };
+
+    loadExistingMatchInfo();
+  }, [
+    matchData?.match_id,
+    getMatchInfoByMatch,
+    matchData.duration_minutes,
+    onDataUpdate,
+    toast,
+  ]);
+
   const handleVideoUpload = (results) => {
     const result = results[0];
     console.log("Video uploaded:", result);
@@ -70,23 +158,52 @@ const MatchPrepareStep = ({
     }
   };
 
-  const handleMatchInfoUpdate = (updatedInfo) => {
-    if (onDataUpdate) {
-      onDataUpdate((prev) => ({ ...prev, ...updatedInfo }));
-    }
-    setIsEditing(false);
-    setMatchInfoCompleted(true);
+  const handleMatchInfoUpdate = async (updatedInfo) => {
+    setSavingMatchInfo(true);
 
-    // Update preparation steps
-    setPreparationSteps((prev) =>
-      prev.map((step) =>
-        step.id === "metadata" ? { ...step, status: "completed" } : step
-      )
-    );
+    try {
+      // Update match data in backend
+      const result = await updateMatch(matchData.match_id, updatedInfo);
+
+      if (result.success) {
+        // Update local state
+        if (onDataUpdate) {
+          onDataUpdate((prev) => ({ ...prev, ...updatedInfo }));
+        }
+
+        setIsEditing(false);
+        setMatchInfoCompleted(true);
+
+        // Update preparation steps
+        setPreparationSteps((prev) =>
+          prev.map((step) =>
+            step.id === "metadata" ? { ...step, status: "completed" } : step
+          )
+        );
+        toast({
+          title: "Success",
+          description: "Match information updated successfully",
+          variant: "success",
+        });
+      } else {
+        throw new Error(result.error || "Failed to update match information");
+      }
+    } catch (error) {
+      console.error("Error updating match information:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update match information",
+        variant: "destructive",
+      });
+    } finally {
+      setSavingMatchInfo(false);
+    }
   };
 
+  // Handle lineup updates - ONLY update local state, don't save to backend
   const handlePlayerTimeUpdate = (playerTimes) => {
-    console.log("Player times updated:", playerTimes);
+    console.log("Player times updated locally:", playerTimes);
+    setLineupData(playerTimes);
 
     // Check if we have at least one player with valid times for each team
     const homeTeamHasPlayers = Object.keys(playerTimes).some((playerId) => {
@@ -110,7 +227,7 @@ const MatchPrepareStep = ({
       )
     );
 
-    // Update match data with player times
+    // Update match data with player times (local state only)
     if (onDataUpdate) {
       onDataUpdate((prev) => ({
         ...prev,
@@ -119,7 +236,68 @@ const MatchPrepareStep = ({
     }
   };
 
-  const handleStartAnalysis = () => {
+  // Save lineup to backend only when explicitly requested
+  const handleSaveLineupToBackend = async () => {
+    setSavingLineup(true);
+
+    try {
+      // Transform lineup data to match_info table format
+      const matchInfoData = Object.entries(lineupData).map(
+        ([playerId, data]) => ({
+          match_id: matchData.match_id,
+          club_id: homePlayers.find((p) => p.player_id === playerId)
+            ? matchData.home_club_id
+            : matchData.away_club_id,
+          player_id: playerId,
+          position: data.position || "",
+          start_time: data.start_time
+            ? new Date(data.start_time * 1000).toISOString()
+            : new Date(0).toISOString(),
+          end_time: data.end_time
+            ? new Date(data.end_time * 1000).toISOString()
+            : null,
+        })
+      );
+
+      // Save to backend using bulk create
+      const result = await createBulkMatchInfo(
+        matchData.match_id,
+        matchInfoData
+      );
+
+      if (result.success) {
+        console.log("Lineup saved successfully to backend");
+        toast({
+          title: "Success",
+          description: "Player lineup saved successfully",
+          variant: "success",
+        });
+        return true;
+      } else {
+        throw new Error(result.error || "Failed to save player lineup");
+      }
+    } catch (error) {
+      console.error("Error saving player lineup:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save player lineup",
+        variant: "destructive",
+      });
+      return false;
+    } finally {
+      setSavingLineup(false);
+    }
+  };
+
+  const handleStartAnalysis = async () => {
+    // Save lineup to backend before proceeding
+    if (Object.keys(lineupData).length > 0) {
+      const saved = await handleSaveLineupToBackend();
+      if (!saved) {
+        return; // Don't proceed if save failed
+      }
+    }
+
     if (onStepComplete) {
       onStepComplete({
         updatedMatch: matchData,
@@ -256,14 +434,17 @@ const MatchPrepareStep = ({
                 variant="outline"
                 size="sm"
                 onClick={() => setIsEditing(!isEditing)}
+                disabled={savingMatchInfo}
                 className="gap-2"
               >
-                {isEditing ? (
+                {savingMatchInfo ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : isEditing ? (
                   <Save className="h-4 w-4" />
                 ) : (
                   <Edit className="h-4 w-4" />
                 )}
-                {isEditing ? "Save" : "Edit"}
+                {savingMatchInfo ? "Saving..." : isEditing ? "Save" : "Edit"}
               </Button>
             </div>
           </div>
@@ -274,6 +455,7 @@ const MatchPrepareStep = ({
             awayClub={awayClub}
             isEditing={isEditing}
             onSave={handleMatchInfoUpdate}
+            saving={savingMatchInfo}
           />
         </div>
       </div>
@@ -287,26 +469,45 @@ const MatchPrepareStep = ({
               Player Lineup & Playing Time
             </h3>
           </div>
-          <div className="text-sm text-muted-foreground">
-            Set exact playing time intervals for each player
+          <div className="flex items-center gap-2">
+            <div className="text-sm text-muted-foreground">
+              Set exact playing time intervals for each player
+            </div>
+            {loadingLineup && (
+              <div className="flex items-center gap-1 text-xs text-primary">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                Loading lineup...
+              </div>
+            )}
           </div>
         </div>
 
-        <PlayerTimeSelection
-          homePlayers={homePlayers}
-          awayPlayers={awayPlayers}
-          matchDuration={matchData.duration_minutes || 90}
-          existingTimes={matchData.player_playing_times || {}}
-          onUpdate={handlePlayerTimeUpdate}
-          onComplete={() => {
-            // Mark lineup step as completed
-            setPreparationSteps((prev) =>
-              prev.map((step) =>
-                step.id === "lineups" ? { ...step, status: "completed" } : step
-              )
-            );
-          }}
-        />
+        {loadingLineup ? (
+          <div className="text-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+            <p className="text-muted-foreground">
+              Loading player lineup data...
+            </p>
+          </div>
+        ) : (
+          <PlayerTimeSelection
+            homePlayers={homePlayers}
+            awayPlayers={awayPlayers}
+            matchDuration={matchData.duration_minutes || 90}
+            existingTimes={lineupData}
+            onUpdate={handlePlayerTimeUpdate}
+            onComplete={() => {
+              // Mark lineup step as completed
+              setPreparationSteps((prev) =>
+                prev.map((step) =>
+                  step.id === "lineups"
+                    ? { ...step, status: "completed" }
+                    : step
+                )
+              );
+            }}
+          />
+        )}
       </div>
 
       {/* Preparation Steps Status */}
@@ -367,20 +568,70 @@ const MatchPrepareStep = ({
       {/* Action Buttons */}
       <div className="flex justify-between items-center pt-6 border-t border-border">
         <div className="text-sm text-muted-foreground">
-          {allStepsCompleted
-            ? "All preparation steps completed. Ready for video analysis."
-            : "Complete all preparation steps to continue"}
+          {allStepsCompleted ? (
+            <div className="flex items-center space-x-2 text-primary">
+              <CheckCircle className="h-4 w-4" />
+              <span>
+                All preparation steps completed. Ready for video analysis.
+              </span>
+            </div>
+          ) : (
+            <div>
+              <span>Complete all preparation steps to continue</span>
+              {preparationSteps.find((s) => s.id === "video")?.status !==
+                "completed" && (
+                <div className="text-destructive text-xs mt-1">
+                  • Upload match video
+                </div>
+              )}
+              {preparationSteps.find((s) => s.id === "metadata")?.status !==
+                "completed" && (
+                <div className="text-destructive text-xs mt-1">
+                  • Confirm match information
+                </div>
+              )}
+              {preparationSteps.find((s) => s.id === "lineups")?.status !==
+                "completed" && (
+                <div className="text-destructive text-xs mt-1">
+                  • Configure player lineups
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
-        <Button
-          onClick={handleStartAnalysis}
-          disabled={!allStepsCompleted}
-          className="gap-2"
-          size="lg"
-        >
-          <CheckCircle className="h-4 w-4" />
-          Start Video Analysis
-        </Button>
+        <div className="flex gap-3">
+          {/* Save Lineup Button - Only show if there are changes */}
+          {Object.keys(lineupData).length > 0 && (
+            <Button
+              onClick={handleSaveLineupToBackend}
+              disabled={savingLineup}
+              variant="outline"
+              className="gap-2"
+            >
+              {savingLineup ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
+              {savingLineup ? "Saving..." : "Save Lineup"}
+            </Button>
+          )}
+
+          <Button
+            onClick={handleStartAnalysis}
+            disabled={!allStepsCompleted || savingLineup}
+            className="gap-2"
+            size="lg"
+          >
+            {savingLineup ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <CheckCircle className="h-4 w-4" />
+            )}
+            {savingLineup ? "Saving..." : "Start Video Analysis"}
+          </Button>
+        </div>
       </div>
     </div>
   );

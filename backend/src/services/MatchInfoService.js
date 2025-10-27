@@ -1,3 +1,4 @@
+// src/services/MatchInfoService.js
 import MatchInfo from "../models/MatchInfo.js";
 import { generateResponse } from "../utils/helpers.js";
 import {
@@ -6,6 +7,7 @@ import {
   MATCH_INFO_UPDATE_SUCCESS,
   MATCH_INFO_DELETE_SUCCESS,
   MATCH_INFO_NOT_FOUND,
+  MATCH_INFO_BULK_CREATE_SUCCESS,
   COMMON_GET_SUCCESS,
 } from "../utils/messages.js";
 
@@ -14,6 +16,20 @@ class MatchInfoService {
     try {
       const data = await MatchInfo.create(matchInfoData);
       return generateResponse(data, MATCH_INFO_CREATE_SUCCESS);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  // Add this new method for bulk creation
+  static async createBulkMatchInfo(matchId, playersData) {
+    try {
+      // First, delete existing match info for this match to avoid duplicates
+      await MatchInfo.deleteByMatchId(matchId);
+
+      // Then create new records
+      const data = await MatchInfo.createBulk(playersData);
+      return generateResponse(data, MATCH_INFO_BULK_CREATE_SUCCESS);
     } catch (err) {
       throw err;
     }
