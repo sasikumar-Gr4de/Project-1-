@@ -88,14 +88,23 @@ const MatchPrepareStep = ({
   const handlePlayerTimeUpdate = (playerTimes) => {
     console.log("Player times updated:", playerTimes);
 
-    // Update preparation steps
-    const allPlayersHaveTimes = [...homePlayers, ...awayPlayers].every(
-      (player) => playerTimes[player.player_id]?.start !== undefined
-    );
+    // Check if we have at least one player with valid times for each team
+    const homeTeamHasPlayers = Object.keys(playerTimes).some((playerId) => {
+      const player = homePlayers.find((p) => p.player_id === playerId);
+      return player && playerTimes[playerId]?.start_time !== undefined;
+    });
 
+    const awayTeamHasPlayers = Object.keys(playerTimes).some((playerId) => {
+      const player = awayPlayers.find((p) => p.player_id === playerId);
+      return player && playerTimes[playerId]?.start_time !== undefined;
+    });
+
+    const lineupsCompleted = homeTeamHasPlayers && awayTeamHasPlayers;
+
+    // Update preparation steps
     setPreparationSteps((prev) =>
       prev.map((step) =>
-        step.id === "lineups" && allPlayersHaveTimes
+        step.id === "lineups" && lineupsCompleted
           ? { ...step, status: "completed" }
           : step
       )
@@ -289,6 +298,14 @@ const MatchPrepareStep = ({
           matchDuration={matchData.duration_minutes || 90}
           existingTimes={matchData.player_playing_times || {}}
           onUpdate={handlePlayerTimeUpdate}
+          onComplete={() => {
+            // Mark lineup step as completed
+            setPreparationSteps((prev) =>
+              prev.map((step) =>
+                step.id === "lineups" ? { ...step, status: "completed" } : step
+              )
+            );
+          }}
         />
       </div>
 

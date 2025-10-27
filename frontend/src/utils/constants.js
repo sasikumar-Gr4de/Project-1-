@@ -122,6 +122,64 @@ export const FOOTBALL_POSITIONS = [
   },
 ];
 
+export const POSITION_CATEGORIES = {
+  GOALKEEPER: FOOTBALL_POSITIONS.filter((pos) => pos.abbreviation === "GK"),
+  DEFENDERS: FOOTBALL_POSITIONS.filter((pos) =>
+    ["CB", "LB", "RB", "SW", "LWB", "RWB"].includes(pos.abbreviation)
+  ),
+  MIDFIELDERS: FOOTBALL_POSITIONS.filter((pos) =>
+    ["CM", "CDM", "CAM", "LM", "RM", "B2B", "DLP", "WP"].includes(
+      pos.abbreviation
+    )
+  ),
+  FORWARDS: FOOTBALL_POSITIONS.filter((pos) =>
+    ["ST", "CF", "SS", "LW", "RW", "F9", "TM", "IF"].includes(pos.abbreviation)
+  ),
+};
+
+// Helper function to get position by abbreviation
+export const getPositionByAbbreviation = (abbr) => {
+  return FOOTBALL_POSITIONS.find((pos) => pos.abbreviation === abbr);
+};
+
+// Helper function to get position display text
+export const getPositionDisplay = (abbr) => {
+  const position = getPositionByAbbreviation(abbr);
+  return position ? `${position.abbreviation} - ${position.position}` : abbr;
+};
+
+export const FORMATION_POSITIONS = {
+  "4-4-2": ["GK", "RB", "CB", "CB", "LB", "RM", "CM", "CM", "LM", "CF", "ST"],
+  "4-3-3": ["GK", "RB", "CB", "CB", "LB", "CDM", "CM", "CAM", "RW", "ST", "LW"],
+  "4-2-3-1": [
+    "GK",
+    "RB",
+    "CB",
+    "CB",
+    "LB",
+    "CDM",
+    "CDM",
+    "RM",
+    "CAM",
+    "LM",
+    "ST",
+  ],
+  "3-5-2": [
+    "GK",
+    "CB",
+    "CB",
+    "CB",
+    "RWB",
+    "CM",
+    "CDM",
+    "CM",
+    "LWB",
+    "CF",
+    "ST",
+  ],
+  "3-4-3": ["GK", "CB", "CB", "CB", "RM", "CM", "CM", "LM", "RW", "ST", "LW"],
+};
+
 export const PLAYER_FOOT_LIST = ["Left", "Right", "Both"];
 
 export const PLAYER_STATUSES = ["active", "injured", "suspended", "inactive"];

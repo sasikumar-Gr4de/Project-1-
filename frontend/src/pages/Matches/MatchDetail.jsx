@@ -22,7 +22,7 @@ const MatchDetail = () => {
   const [homePlayers, setHomePlayers] = useState([]);
   const [awayPlayers, setAwayPlayers] = useState([]);
   const [currentStep, setCurrentStep] = useState(0);
-  const [activeTab, setActiveTab] = useState(0); // Default to Overview tab
+  const [activeTab, setActiveTab] = useState(1); // Default to Preparation tab
   const [loading, setLoading] = useState(true);
 
   const { getMatchById } = useMatchesStore();
@@ -271,15 +271,12 @@ const MatchDetail = () => {
           </div>
         </div>
 
-        {/* Video Player Section */}
-        {/* {matchData?.video_url && ( */}
         <div className="mb-6">
           <VideoPlayer
             videoUrl={matchData.video_url}
             title={`${homeClub?.club_name} vs ${awayClub?.club_name}`}
           />
         </div>
-        {/* )} */}
 
         {/* Tabs Section */}
         <div className="bg-card border border-border rounded-xl overflow-hidden">
