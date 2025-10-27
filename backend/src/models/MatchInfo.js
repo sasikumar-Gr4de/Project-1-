@@ -1,4 +1,3 @@
-// src/models/MatchInfo.js
 import { supabase } from "../config/supabase.config.js";
 
 export default class MatchInfo {
@@ -21,7 +20,6 @@ export default class MatchInfo {
     }
   }
 
-  // Add this new method for bulk creation
   static async createBulk(matchInfoArray) {
     try {
       const { data, error } = await supabase
@@ -36,7 +34,6 @@ export default class MatchInfo {
     }
   }
 
-  // Add this method to delete all match info for a specific match
   static async deleteByMatchId(matchId) {
     try {
       const { data, error } = await supabase
@@ -143,7 +140,7 @@ export default class MatchInfo {
         `
         )
         .eq("match_id", matchId)
-        .order("position", { ascending: true });
+        .order("start_time", { ascending: true });
       if (error) throw error;
       return data;
     } catch (err) {

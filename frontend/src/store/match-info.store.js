@@ -1,3 +1,4 @@
+// src/store/match-info.store.js
 import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
 import { zustandEncryptedStorage } from "@/utils/storage.utils.js";
@@ -40,6 +41,39 @@ export const useMatchInfoStore = create(
           }
         },
 
+        // Update match info
+        updateMatchInfo: async (matchInfoId, updateData) => {
+          try {
+            const response = await api.put(
+              `/match-info/${matchInfoId}`,
+              updateData
+            );
+            const result = response.data;
+            return result;
+          } catch (error) {
+            const errorMsg = error.response?.data?.message || error.message;
+            return {
+              success: false,
+              error: errorMsg,
+            };
+          }
+        },
+
+        // Delete match info
+        deleteMatchInfo: async (matchInfoId) => {
+          try {
+            const response = await api.delete(`/match-info/${matchInfoId}`);
+            const result = response.data;
+            return result;
+          } catch (error) {
+            const errorMsg = error.response?.data?.message || error.message;
+            return {
+              success: false,
+              error: errorMsg,
+            };
+          }
+        },
+
         // Get match info by match ID
         getMatchInfoByMatch: async (matchId) => {
           try {
@@ -64,21 +98,6 @@ export const useMatchInfoStore = create(
                 end_time: endTime,
               }
             );
-            const result = response.data;
-            return result;
-          } catch (error) {
-            const errorMsg = error.response?.data?.message || error.message;
-            return {
-              success: false,
-              error: errorMsg,
-            };
-          }
-        },
-
-        // Delete match info
-        deleteMatchInfo: async (matchInfoId) => {
-          try {
-            const response = await api.delete(`/match-info/${matchInfoId}`);
             const result = response.data;
             return result;
           } catch (error) {

@@ -1,6 +1,14 @@
-// src/components/matches/PlayerTimeSelection.jsx
-import { useState, useEffect, useRef } from "react";
-import { Plus, Users, Clock, CheckCircle, Trash2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import {
+  Plus,
+  Users,
+  Clock,
+  CheckCircle,
+  Trash2,
+  Edit,
+  Save,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Tabs from "@/components/common/Tabs";
@@ -11,19 +19,17 @@ const PlayerTimeSelection = ({
   awayPlayers = [],
   matchDuration = 90,
   existingTimes = {},
-  onUpdate,
+  onAddPlayer,
+  onUpdatePlayer,
+  onDeletePlayer,
   onComplete,
 }) => {
   const [activeTab, setActiveTab] = useState(0);
   const [showPlayerModal, setShowPlayerModal] = useState(false);
   const [homeLineup, setHomeLineup] = useState([]);
   const [awayLineup, setAwayLineup] = useState([]);
+  const [editingPlayer, setEditingPlayer] = useState(null);
   const [isInitialized, setIsInitialized] = useState(false);
-
-  // Use refs to track previous values and prevent unnecessary updates
-  const prevHomeLineupRef = useRef([]);
-  const prevAwayLineupRef = useRef([]);
-  const updateTimeoutRef = useRef(null);
 
   // Initialize lineups from existing times data
   useEffect(() => {
@@ -44,6 +50,7 @@ const PlayerTimeSelection = ({
           start_time: data.start_time || 0,
           end_time: data.end_time || matchDuration,
           position: data.position || playerData.position || "",
+          match_info_id: data.match_info_id,
         };
 
         // Determine which team the player belongs to
@@ -57,58 +64,9 @@ const PlayerTimeSelection = ({
 
     setHomeLineup(homeLineupData);
     setAwayLineup(awayLineupData);
-    prevHomeLineupRef.current = homeLineupData;
-    prevAwayLineupRef.current = awayLineupData;
 
     setIsInitialized(true);
   }, [existingTimes, homePlayers, awayPlayers, matchDuration, isInitialized]);
-
-  // Update parent component only when lineups actually change
-  useEffect(() => {
-    if (!isInitialized) return;
-
-    const homeChanged =
-      JSON.stringify(homeLineup) !== JSON.stringify(prevHomeLineupRef.current);
-    const awayChanged =
-      JSON.stringify(awayLineup) !== JSON.stringify(prevAwayLineupRef.current);
-
-    if (homeChanged || awayChanged) {
-      // Clear any pending update
-      if (updateTimeoutRef.current) {
-        clearTimeout(updateTimeoutRef.current);
-      }
-
-      // Debounce the update to prevent rapid successive calls
-      updateTimeoutRef.current = setTimeout(() => {
-        const allPlayerTimes = {};
-
-        [...homeLineup, ...awayLineup].forEach((player) => {
-          allPlayerTimes[player.player_id] = {
-            start_time: player.start_time || 0,
-            end_time: player.end_time || matchDuration,
-            position: player.position || "",
-            player_name: player.full_name,
-            jersey_number: player.jersey_number,
-          };
-        });
-
-        if (onUpdate) {
-          onUpdate(allPlayerTimes);
-        }
-
-        // Update refs with current values
-        prevHomeLineupRef.current = [...homeLineup];
-        prevAwayLineupRef.current = [...awayLineup];
-      }, 300);
-    }
-
-    // Cleanup timeout on unmount
-    return () => {
-      if (updateTimeoutRef.current) {
-        clearTimeout(updateTimeoutRef.current);
-      }
-    };
-  }, [homeLineup, awayLineup, matchDuration, onUpdate, isInitialized]);
 
   const getCurrentTeamData = () => {
     return activeTab === 0
@@ -130,7 +88,7 @@ const PlayerTimeSelection = ({
     setShowPlayerModal(true);
   };
 
-  const handleAddPlayer = (player) => {
+  const handleAddPlayer = async (player) => {
     const { lineup, setLineup } = getCurrentTeamData();
 
     // Check if player is already in lineup
@@ -149,31 +107,94 @@ const PlayerTimeSelection = ({
       position: player.position || "",
     };
 
-    // Update lineup state
+    // Update lineup state immediately for better UX
     setLineup((prev) => {
       const newLineup = [...prev, newPlayer];
       return newLineup;
     });
+
+    // Save to backend
+    if (onAddPlayer) {
+      const success = await onAddPlayer(player.player_id, {
+        start_time: 0,
+        end_time: matchDuration,
+        position: player.position || "",
+      });
+
+      if (!success) {
+        // Rollback if save failed
+        setLineup((prev) =>
+          prev.filter((p) => p.player_id !== player.player_id)
+        );
+      }
+    }
   };
 
-  const handleRemovePlayer = (playerId) => {
+  const handleRemovePlayer = async (playerId) => {
     const { setLineup } = getCurrentTeamData();
 
+    // Store the player data for rollback
+    const playerToRemove = getCurrentTeamData().lineup.find(
+      (p) => p.player_id === playerId
+    );
+
+    // Update lineup state immediately for better UX
     setLineup((prev) => {
       const newLineup = prev.filter((p) => p.player_id !== playerId);
       return newLineup;
     });
+
+    // Delete from backend
+    if (onDeletePlayer) {
+      const success = await onDeletePlayer(playerId);
+
+      if (!success) {
+        // Rollback if delete failed
+        setLineup((prev) => [...prev, playerToRemove]);
+      }
+    }
   };
 
-  const handlePlayerUpdate = (playerId, updates) => {
+  const handleStartEdit = (player) => {
+    setEditingPlayer(player.player_id);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingPlayer(null);
+  };
+
+  const handleSaveEdit = async (playerId, updates) => {
     const { setLineup } = getCurrentTeamData();
 
+    // Store old data for rollback
+    const oldPlayerData = getCurrentTeamData().lineup.find(
+      (p) => p.player_id === playerId
+    );
+
+    // Update lineup state immediately for better UX
     setLineup((prev) => {
       const updatedLineup = prev.map((player) =>
         player.player_id === playerId ? { ...player, ...updates } : player
       );
       return updatedLineup;
     });
+
+    setEditingPlayer(null);
+
+    // Update in backend
+    if (onUpdatePlayer) {
+      const success = await onUpdatePlayer(playerId, updates);
+
+      if (!success) {
+        // Rollback if update failed
+        setLineup((prev) =>
+          prev.map((player) =>
+            player.player_id === playerId ? oldPlayerData : player
+          )
+        );
+        setEditingPlayer(playerId); // Stay in edit mode if failed
+      }
+    }
   };
 
   // Get available players for current team (players not in lineup)
@@ -214,7 +235,10 @@ const PlayerTimeSelection = ({
           availablePlayers={getAvailablePlayers()}
           onAddPlayer={handleAddPlayerClick}
           onRemovePlayer={handleRemovePlayer}
-          onUpdatePlayer={handlePlayerUpdate}
+          onStartEdit={handleStartEdit}
+          onSaveEdit={handleSaveEdit}
+          onCancelEdit={handleCancelEdit}
+          editingPlayer={editingPlayer}
           matchDuration={matchDuration}
           teamType="home"
         />
@@ -231,7 +255,10 @@ const PlayerTimeSelection = ({
           availablePlayers={getAvailablePlayers()}
           onAddPlayer={handleAddPlayerClick}
           onRemovePlayer={handleRemovePlayer}
-          onUpdatePlayer={handlePlayerUpdate}
+          onStartEdit={handleStartEdit}
+          onSaveEdit={handleSaveEdit}
+          onCancelEdit={handleCancelEdit}
+          editingPlayer={editingPlayer}
           matchDuration={matchDuration}
           teamType="away"
         />
@@ -324,13 +351,16 @@ const PlayerTimeSelection = ({
   );
 };
 
-// Team Lineup Component (keep the same as before)
+// Team Lineup Component
 const TeamLineup = ({
   lineup,
   availablePlayers,
   onAddPlayer,
   onRemovePlayer,
-  onUpdatePlayer,
+  onStartEdit,
+  onSaveEdit,
+  onCancelEdit,
+  editingPlayer,
   matchDuration,
   teamType,
 }) => {
@@ -404,7 +434,10 @@ const TeamLineup = ({
                 key={player.player_id}
                 player={player}
                 onRemove={onRemovePlayer}
-                onUpdate={onUpdatePlayer}
+                onStartEdit={onStartEdit}
+                onSaveEdit={onSaveEdit}
+                onCancelEdit={onCancelEdit}
+                isEditing={editingPlayer === player.player_id}
                 matchDuration={matchDuration}
               />
             ))}
@@ -421,21 +454,53 @@ const TeamLineup = ({
   );
 };
 
-// Individual Player Row Component (keep the same as before)
-const PlayerRow = ({ player, onRemove, onUpdate, matchDuration }) => {
+// Individual Player Row Component
+const PlayerRow = ({
+  player,
+  onRemove,
+  onStartEdit,
+  onSaveEdit,
+  onCancelEdit,
+  isEditing,
+  matchDuration,
+}) => {
+  const [editData, setEditData] = useState({
+    position: player.position || "",
+    start_time: player.start_time || 0,
+    end_time: player.end_time || matchDuration,
+  });
+
   const handleTimeChange = (field, value) => {
     const time = Math.max(0, Math.min(matchDuration, parseInt(value) || 0));
-    onUpdate(player.player_id, { [field]: time });
+    setEditData((prev) => ({ ...prev, [field]: time }));
   };
 
   const handlePositionChange = (e) => {
     const newPosition = e.target.value;
-    onUpdate(player.player_id, { position: newPosition });
+    setEditData((prev) => ({ ...prev, position: newPosition }));
+  };
+
+  const handleSave = () => {
+    onSaveEdit(player.player_id, editData);
+  };
+
+  const handleCancel = () => {
+    setEditData({
+      position: player.position || "",
+      start_time: player.start_time || 0,
+      end_time: player.end_time || matchDuration,
+    });
+    onCancelEdit();
   };
 
   const playingTime = Math.max(
     0,
     (player.end_time || matchDuration) - (player.start_time || 0)
+  );
+
+  const editPlayingTime = Math.max(
+    0,
+    (editData.end_time || matchDuration) - (editData.start_time || 0)
   );
 
   return (
@@ -464,50 +529,104 @@ const PlayerRow = ({ player, onRemove, onUpdate, matchDuration }) => {
 
       {/* Position Input */}
       <div className="col-span-2">
-        <input
-          type="text"
-          value={player.position || ""}
-          onChange={handlePositionChange}
-          placeholder="Position"
-          className="w-full px-3 py-2 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-        />
+        {isEditing ? (
+          <input
+            type="text"
+            value={editData.position}
+            onChange={handlePositionChange}
+            placeholder="Position"
+            className="w-full px-3 py-2 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          />
+        ) : (
+          <div className="text-sm text-foreground">
+            {player.position || "No position"}
+          </div>
+        )}
       </div>
 
       {/* Start Time */}
       <div className="col-span-2">
-        <input
-          type="number"
-          min="0"
-          max={matchDuration}
-          value={player.start_time || 0}
-          onChange={(e) => handleTimeChange("start_time", e.target.value)}
-          className="w-full px-3 py-2 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-center"
-        />
+        {isEditing ? (
+          <input
+            type="number"
+            min="0"
+            max={matchDuration}
+            value={editData.start_time}
+            onChange={(e) => handleTimeChange("start_time", e.target.value)}
+            className="w-full px-3 py-2 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-center"
+          />
+        ) : (
+          <div className="text-sm text-foreground text-center">
+            {player.start_time || 0}m
+          </div>
+        )}
       </div>
 
       {/* End Time */}
       <div className="col-span-2">
-        <input
-          type="number"
-          min="0"
-          max={matchDuration}
-          value={player.end_time || matchDuration}
-          onChange={(e) => handleTimeChange("end_time", e.target.value)}
-          className="w-full px-3 py-2 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-center"
-        />
+        {isEditing ? (
+          <input
+            type="number"
+            min="0"
+            max={matchDuration}
+            value={editData.end_time}
+            onChange={(e) => handleTimeChange("end_time", e.target.value)}
+            className="w-full px-3 py-2 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-center"
+          />
+        ) : (
+          <div className="text-sm text-foreground text-center">
+            {player.end_time || matchDuration}m
+          </div>
+        )}
       </div>
 
       {/* Actions & Duration */}
       <div className="col-span-2 flex items-center justify-center space-x-2">
-        <div className="text-xs text-muted-foreground mr-2">{playingTime}m</div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onRemove(player.player_id)}
-          className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10"
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
+        {isEditing ? (
+          <>
+            <div className="text-xs text-muted-foreground mr-2">
+              {editPlayingTime}m
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleSave}
+              className="h-8 w-8 p-0 text-primary hover:bg-primary/10"
+            >
+              <Save className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCancel}
+              className="h-8 w-8 p-0 text-muted-foreground hover:bg-muted"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </>
+        ) : (
+          <>
+            <div className="text-xs text-muted-foreground mr-2">
+              {playingTime}m
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onStartEdit(player)}
+              className="h-8 w-8 p-0 text-primary hover:bg-primary/10"
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onRemove(player.player_id)}
+              className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </>
+        )}
       </div>
     </div>
   );

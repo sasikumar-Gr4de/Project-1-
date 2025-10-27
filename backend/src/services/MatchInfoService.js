@@ -71,6 +71,18 @@ class MatchInfoService {
     }
   }
 
+  static async updateMatchInfo(id, updateData) {
+    try {
+      const data = await MatchInfo.update(id, updateData);
+      if (!data) {
+        return generateResponse(null, MATCH_INFO_NOT_FOUND);
+      }
+      return generateResponse(data, MATCH_INFO_UPDATE_SUCCESS);
+    } catch (err) {
+      throw err;
+    }
+  }
+
   static async deleteMatchInfo(id) {
     try {
       const data = await MatchInfo.delete(id);

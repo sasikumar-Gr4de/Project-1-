@@ -1,20 +1,13 @@
-// src/pages/Matches/MatchPrepareStep.jsx
 import { useState, useEffect } from "react";
 import {
-  Upload,
   Settings,
   CheckCircle,
   Clock,
   Video,
   Users,
-  MapPin,
-  Calendar,
+  Loader2,
   Edit,
   Save,
-  Play,
-  Square,
-  Loader2,
-  AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import VideoUpload from "@/components/common/VideoUpload";
@@ -46,6 +39,7 @@ const MatchPrepareStep = ({
     createBulkMatchInfo,
     getMatchInfoByMatch,
     createMatchInfo,
+    updateMatchInfo,
     deleteMatchInfo,
   } = useMatchInfoStore();
   const { toast } = useToast();
@@ -85,12 +79,8 @@ const MatchPrepareStep = ({
             const loadedLineupData = {};
             result.data.forEach((info) => {
               loadedLineupData[info.player_id] = {
-                start_time: info.start_time
-                  ? Math.floor(new Date(info.start_time).getTime() / 1000)
-                  : 0,
-                end_time: info.end_time
-                  ? Math.floor(new Date(info.end_time).getTime() / 1000)
-                  : matchData.duration_minutes || 90,
+                start_time: info.start_time || 0,
+                end_time: info.end_time || matchData.duration_minutes || 90,
                 position: info.position || "",
                 player_name: info.players?.full_name || "",
                 jersey_number: info.players?.jersey_number || "",
@@ -200,43 +190,135 @@ const MatchPrepareStep = ({
     }
   };
 
-  // Handle lineup updates - ONLY update local state, don't save to backend
-  const handlePlayerTimeUpdate = (playerTimes) => {
-    console.log("Player times updated locally:", playerTimes);
-    setLineupData(playerTimes);
+  // Handle adding a new player to lineup with real-time backend save
+  const handleAddPlayer = async (playerId, playerData) => {
+    try {
+      const matchInfoData = {
+        match_id: matchData.match_id,
+        club_id: homePlayers.find((p) => p.player_id === playerId)
+          ? matchData.home_club_id
+          : matchData.away_club_id,
+        player_id: playerId,
+        position: playerData.position || "",
+        start_time: playerData.start_time || 0,
+        end_time: playerData.end_time || matchData.duration_minutes || 90,
+      };
 
-    // Check if we have at least one player with valid times for each team
-    const homeTeamHasPlayers = Object.keys(playerTimes).some((playerId) => {
-      const player = homePlayers.find((p) => p.player_id === playerId);
-      return player && playerTimes[playerId]?.start_time !== undefined;
-    });
+      const result = await createMatchInfo(matchInfoData);
 
-    const awayTeamHasPlayers = Object.keys(playerTimes).some((playerId) => {
-      const player = awayPlayers.find((p) => p.player_id === playerId);
-      return player && playerTimes[playerId]?.start_time !== undefined;
-    });
+      if (result.success) {
+        // Update local state with the new player including match_info_id
+        setLineupData((prev) => ({
+          ...prev,
+          [playerId]: {
+            ...playerData,
+            match_info_id: result.data.match_info_id,
+          },
+        }));
 
-    const lineupsCompleted = homeTeamHasPlayers && awayTeamHasPlayers;
-
-    // Update preparation steps
-    setPreparationSteps((prev) =>
-      prev.map((step) =>
-        step.id === "lineups" && lineupsCompleted
-          ? { ...step, status: "completed" }
-          : step
-      )
-    );
-
-    // Update match data with player times (local state only)
-    if (onDataUpdate) {
-      onDataUpdate((prev) => ({
-        ...prev,
-        player_playing_times: playerTimes,
-      }));
+        toast({
+          title: "Success",
+          description: "Player added to lineup",
+          variant: "success",
+        });
+        return true;
+      } else {
+        throw new Error(result.error || "Failed to add player");
+      }
+    } catch (error) {
+      console.error("Error adding player:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add player",
+        variant: "destructive",
+      });
+      return false;
     }
   };
 
-  // Save lineup to backend only when explicitly requested
+  // Handle updating player data with real-time backend save
+  const handleUpdatePlayer = async (playerId, updates) => {
+    try {
+      // Find the match_info_id for this player
+      const playerMatchInfoId = lineupData[playerId]?.match_info_id;
+
+      if (!playerMatchInfoId) {
+        throw new Error("Player not found in lineup");
+      }
+
+      const result = await updateMatchInfo(playerMatchInfoId, updates);
+
+      if (result.success) {
+        // Update local state immediately - NO RELOADING
+        setLineupData((prev) => ({
+          ...prev,
+          [playerId]: {
+            ...prev[playerId],
+            ...updates,
+          },
+        }));
+
+        toast({
+          title: "Success",
+          description: "Player updated successfully",
+          variant: "success",
+        });
+        return true;
+      } else {
+        throw new Error(result.error || "Failed to update player");
+      }
+    } catch (error) {
+      console.error("Error updating player:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update player",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
+  // Handle deleting player with real-time backend save
+  const handleDeletePlayer = async (playerId) => {
+    try {
+      // Find the match_info_id for this player
+      const playerMatchInfoId = lineupData[playerId]?.match_info_id;
+
+      if (!playerMatchInfoId) {
+        throw new Error("Player not found in lineup");
+      }
+
+      const result = await deleteMatchInfo(playerMatchInfoId);
+
+      if (result.success) {
+        // Update local state immediately - NO RELOADING
+        setLineupData((prev) => {
+          const newLineup = { ...prev };
+          delete newLineup[playerId];
+          return newLineup;
+        });
+
+        toast({
+          title: "Success",
+          description: "Player removed from lineup",
+          variant: "success",
+        });
+        return true;
+      } else {
+        throw new Error(result.error || "Failed to remove player");
+      }
+    } catch (error) {
+      console.error("Error removing player:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to remove player",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
+  // Save entire lineup to backend (for bulk operations or final save)
   const handleSaveLineupToBackend = async () => {
     setSavingLineup(true);
 
@@ -250,12 +332,8 @@ const MatchPrepareStep = ({
             : matchData.away_club_id,
           player_id: playerId,
           position: data.position || "",
-          start_time: data.start_time
-            ? new Date(data.start_time * 1000).toISOString()
-            : new Date(0).toISOString(),
-          end_time: data.end_time
-            ? new Date(data.end_time * 1000).toISOString()
-            : null,
+          start_time: data.start_time || 0,
+          end_time: data.end_time || matchData.duration_minutes || 90,
         })
       );
 
@@ -290,7 +368,7 @@ const MatchPrepareStep = ({
   };
 
   const handleStartAnalysis = async () => {
-    // Save lineup to backend before proceeding
+    // Final save to ensure all data is persisted
     if (Object.keys(lineupData).length > 0) {
       const saved = await handleSaveLineupToBackend();
       if (!saved) {
@@ -495,7 +573,9 @@ const MatchPrepareStep = ({
             awayPlayers={awayPlayers}
             matchDuration={matchData.duration_minutes || 90}
             existingTimes={lineupData}
-            onUpdate={handlePlayerTimeUpdate}
+            onAddPlayer={handleAddPlayer}
+            onUpdatePlayer={handleUpdatePlayer}
+            onDeletePlayer={handleDeletePlayer}
             onComplete={() => {
               // Mark lineup step as completed
               setPreparationSteps((prev) =>
@@ -601,23 +681,6 @@ const MatchPrepareStep = ({
         </div>
 
         <div className="flex gap-3">
-          {/* Save Lineup Button - Only show if there are changes */}
-          {Object.keys(lineupData).length > 0 && (
-            <Button
-              onClick={handleSaveLineupToBackend}
-              disabled={savingLineup}
-              variant="outline"
-              className="gap-2"
-            >
-              {savingLineup ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Save className="h-4 w-4" />
-              )}
-              {savingLineup ? "Saving..." : "Save Lineup"}
-            </Button>
-          )}
-
           <Button
             onClick={handleStartAnalysis}
             disabled={!allStepsCompleted || savingLineup}

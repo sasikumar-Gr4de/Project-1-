@@ -9,11 +9,10 @@ CREATE TABLE match_info (
   club_id UUID NOT NULL,
   player_id UUID NOT NULL,
   position VARCHAR(50) NOT NULL,
-  start_time TIMESTAMP NOT NULL,
-  end_time TIMESTAMP,
+  start_time DECIMAL(10,2) NOT NULL CHECK (start_time >= 0), -- Start time in minutes (0-90+)
+  end_time DECIMAL(10,2) CHECK (end_time IS NULL OR end_time > start_time), -- End time in minutes, must be after start_time
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT chk_start_end_time CHECK (end_time IS NULL OR end_time > start_time), -- Ensure end_time is after start_time if set
   CONSTRAINT unique_match_player CHECK (UNIQUE (match_id, player_id)), -- Prevent duplicate player entries per match
   FOREIGN KEY (match_id) REFERENCES matches(match_id) ON DELETE CASCADE,
   FOREIGN KEY (club_id) REFERENCES clubs(club_id) ON DELETE RESTRICT,
