@@ -81,7 +81,9 @@ const Sidebar = ({ isOpen, onClose }) => {
             </h3>
             <ul className="space-y-1">
               {group.items.map((item) => {
-                const isActive = location.pathname === item.href;
+                const isActive =
+                  location.pathname === item.href ||
+                  location.pathname.includes(item.key);
                 return (
                   <li key={item.name}>
                     <Link
