@@ -255,7 +255,7 @@ const MatchAnalysisStep = ({ matchId, currentStep, onStepComplete }) => {
         </div>
 
         {/* Instructions */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+        {/* <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
           <h4 className="text-lg font-semibold text-blue-900 mb-2 flex items-center gap-2">
             <AlertCircle className="h-5 w-5" />
             Admin Instructions
@@ -268,7 +268,7 @@ const MatchAnalysisStep = ({ matchId, currentStep, onStepComplete }) => {
             </li>
             <li>• At least one completed analysis is required to proceed</li>
           </ul>
-        </div>
+        </div> */}
       </div>
     );
   }

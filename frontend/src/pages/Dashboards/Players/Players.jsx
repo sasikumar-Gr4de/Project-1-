@@ -21,6 +21,7 @@ import {
 import { capitalize } from "@/utils/helper.utils";
 import RatingDisplay from "@/components/common/RatingDisplay";
 import { useToast } from "@/contexts/ToastContext";
+import { calculateAge } from "@/utils/helper.utils";
 
 const Players = () => {
   const [players, setPlayers] = useState([]);
@@ -192,23 +193,6 @@ const Players = () => {
   const handleEditPlayer = (player) => {
     setSelectedPlayer(player);
     setShowAddModal(true);
-  };
-
-  const calculateAge = (dateOfBirth) => {
-    if (!dateOfBirth) return "N/A";
-    const today = new Date();
-    const birthDate = new Date(dateOfBirth);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-
-    if (
-      monthDiff < 0 ||
-      (monthDiff === 0 && today.getDate() < birthDate.getDate())
-    ) {
-      age--;
-    }
-
-    return age;
   };
 
   const getClubName = (clubId) => {

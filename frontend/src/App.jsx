@@ -23,6 +23,7 @@ import NotFound from "@/pages/Error/NotFoundPage";
 import MatchDetail from "@/pages/Matches/MatchDetail";
 import PlayerDetail from "@/pages/Players/PlayerDetail";
 import { ToastProvider } from "@/contexts/ToastContext";
+import ClubDetail from "@/pages/Clubs/ClubDetail";
 
 function App() {
   return (
@@ -70,6 +71,17 @@ function App() {
             }
           >
             <Route index element={<PlayerDetail />} />
+          </Route>
+
+          <Route
+            path="/clubs/:id"
+            element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<ClubDetail />} />
           </Route>
 
           {/* Error pages */}

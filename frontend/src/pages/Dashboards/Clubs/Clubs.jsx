@@ -7,6 +7,7 @@ import DeleteConfirmModal from "@/components/common/DeleteConfirmModal";
 import { Edit, Calendar, Users, Trophy, Shield, Trash2 } from "lucide-react";
 import { useClubsStore } from "@/store/clubs.store";
 import { useToast } from "@/contexts/ToastContext";
+import { Link } from "react-router-dom";
 
 const Clubs = () => {
   const [clubs, setClubs] = useState([]);
@@ -290,12 +291,14 @@ const Clubs = () => {
         color="primary"
         tooltip="Edit club"
       />
-      <ActionButton
-        icon={Users}
-        onClick={() => console.log("View players", row)}
-        color="secondary"
-        tooltip="View players"
-      />
+      <Link to={`/clubs/${row.club_id}`}>
+        <ActionButton
+          icon={Users}
+          onClick={() => console.log("View players", row)}
+          color="secondary"
+          tooltip="View players"
+        />
+      </Link>
       <ActionButton
         icon={Trash2}
         onClick={() => setDeleteModal({ isOpen: true, clubId: row.club_id })}
