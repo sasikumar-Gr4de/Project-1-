@@ -99,7 +99,8 @@ const LineupPlayerCard = ({
             <SelectValue placeholder="Select position" />
           </SelectTrigger>
           <SelectContent className="max-h-60">
-            <SelectItem value="">Select position</SelectItem>
+            {/* REMOVED the problematic Select.Item with empty value */}
+            {/* Instead, we'll use the placeholder in SelectTrigger */}
 
             {/* Goalkeepers */}
             <div className="px-2 py-1 text-xs font-semibold text-muted-foreground border-b border-border">
