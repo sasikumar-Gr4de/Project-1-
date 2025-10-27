@@ -151,6 +151,8 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
 
       await loadYouTubeAPI();
 
+      console.log(youtubeIframeRef.current);
+      console.log(youtubeVideoId);
       if (!youtubeIframeRef.current || !youtubeVideoId) {
         throw new Error("YouTube iframe ref or video ID not available");
       }
@@ -669,9 +671,11 @@ const VideoPlayer = ({ videoUrl, title = "Video Player" }) => {
       >
         {/* Top Bar */}
         <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center">
-          <h3 className="text-white font-semibold truncate max-w-[70%]">
-            {title}
-          </h3>
+          {playerType !== "youtube" && (
+            <h3 className="text-white font-semibold truncate max-w-[70%]">
+              {title}
+            </h3>
+          )}
 
           <div className="flex items-center space-x-2">
             {/* Open in new tab */}

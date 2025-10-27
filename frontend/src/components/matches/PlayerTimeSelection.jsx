@@ -24,23 +24,11 @@ const PlayerTimeSelection = ({
   const prevAwayLineupRef = useRef([]);
   const updateTimeoutRef = useRef(null);
 
-  console.log("🔍 DEBUG - Component render", {
-    homePlayersCount: homePlayers.length,
-    awayPlayersCount: awayPlayers.length,
-    homeLineupCount: homeLineup.length,
-    awayLineupCount: awayLineup.length,
-    isInitialized,
-  });
-
   // Initialize lineups from existing data - ONLY ONCE
   useEffect(() => {
     if (isInitialized) return;
 
-    console.log("🔄 INITIALIZING LINEUPS");
-
     if (existingTimes && Object.keys(existingTimes).length > 0) {
-      console.log("📥 Loading from existing times");
-
       const homeLineupData = [];
       const awayLineupData = [];
 
@@ -70,9 +58,6 @@ const PlayerTimeSelection = ({
         }
       });
 
-      console.log("🏠 Home lineup:", homeLineupData);
-      console.log("🛫 Away lineup:", awayLineupData);
-
       setHomeLineup(homeLineupData);
       setAwayLineup(awayLineupData);
       prevHomeLineupRef.current = homeLineupData;
@@ -92,8 +77,6 @@ const PlayerTimeSelection = ({
       JSON.stringify(awayLineup) !== JSON.stringify(prevAwayLineupRef.current);
 
     if (homeChanged || awayChanged) {
-      console.log("🔄 Lineups changed, updating parent");
-
       // Clear any pending update
       if (updateTimeoutRef.current) {
         clearTimeout(updateTimeoutRef.current);
@@ -112,13 +95,6 @@ const PlayerTimeSelection = ({
             jersey_number: player.jersey_number,
           };
         });
-
-        console.log(
-          "📤 Sending to parent:",
-          Object.keys(allPlayerTimes).length,
-          "players"
-        );
-
         if (onUpdate) {
           onUpdate(allPlayerTimes);
         }
@@ -162,8 +138,6 @@ const PlayerTimeSelection = ({
   };
 
   const handleAddPlayer = (player) => {
-    console.log("➕ ADDING PLAYER TO LINEUP:", player.full_name);
-
     const { lineup, setLineup } = getCurrentTeamData();
 
     // Check if player is already in lineup
@@ -171,7 +145,6 @@ const PlayerTimeSelection = ({
       (p) => p.player_id === player.player_id
     );
     if (isAlreadyInLineup) {
-      console.warn("⚠️ Player already in lineup:", player.full_name);
       return;
     }
 
@@ -183,29 +156,25 @@ const PlayerTimeSelection = ({
       position: player.position || "",
     };
 
-    console.log("🎯 New player data:", newPlayer);
-
     // Update lineup state
     setLineup((prev) => {
       const newLineup = [...prev, newPlayer];
-      console.log("📊 Lineup after addition:", newLineup.length, "players");
+
       return newLineup;
     });
   };
 
   const handleRemovePlayer = (playerId) => {
-    console.log("🗑️ REMOVING PLAYER:", playerId);
     const { setLineup } = getCurrentTeamData();
 
     setLineup((prev) => {
       const newLineup = prev.filter((p) => p.player_id !== playerId);
-      console.log("📊 Lineup after removal:", newLineup.length, "players");
+
       return newLineup;
     });
   };
 
   const handlePlayerUpdate = (playerId, updates) => {
-    console.log("✏️ UPDATING PLAYER:", playerId, updates);
     const { setLineup } = getCurrentTeamData();
 
     setLineup((prev) => {
@@ -223,7 +192,7 @@ const PlayerTimeSelection = ({
     const available = players.filter(
       (player) => !currentLineupIds.includes(player.player_id)
     );
-    console.log(`👥 Available players:`, available.length);
+
     return available;
   };
 
@@ -236,7 +205,6 @@ const PlayerTimeSelection = ({
   };
 
   const handleCompleteLineup = () => {
-    console.log("🏁 Completing lineup configuration");
     if (isInitialized && isLineupComplete() && onComplete) {
       onComplete();
     }

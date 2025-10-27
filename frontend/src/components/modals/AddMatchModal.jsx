@@ -202,9 +202,11 @@ const AddMatchModal = ({ isOpen, onClose, onSave, match, clubs }) => {
                 </label>
                 <Select
                   value={formData.away_club_id}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, away_club_id: value }))
-                  }
+                  onValueChange={(value) => {
+                    if (value && value !== "") {
+                      setFormData((prev) => ({ ...prev, away_club_id: value }));
+                    }
+                  }}
                   disabled={isSending}
                 >
                   <SelectTrigger>
