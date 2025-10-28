@@ -479,45 +479,6 @@ const EditUserModal = ({ isOpen, onClose, onSave, user }) => {
                 </div>
               </div>
             </div>
-
-            {/* Current Selection Summary */}
-            {/* <div className="space-y-4 p-4 bg-primary/5 rounded-lg border border-primary/10">
-              <h4 className="font-semibold text-primary flex items-center space-x-2">
-                <Shield className="w-4 h-4" />
-                <span>Update Summary</span>
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div className="space-y-1">
-                  <span className="text-muted-foreground">New Role:</span>
-                  <div className="font-medium">
-                    {formData.role ? capitalize(formData.role) : "Not selected"}
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <span className="text-muted-foreground">
-                    New Client Type:
-                  </span>
-                  <div className="font-medium">
-                    {formData.client_type
-                      ? capitalize(formData.client_type)
-                      : "Not selected"}
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <span className="text-muted-foreground">New Status:</span>
-                  <div className="font-medium flex items-center space-x-2">
-                    {getStatusIcon(formData.is_active)}
-                    <span>{formData.is_active ? "Active" : "Inactive"}</span>
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <span className="text-muted-foreground">Full Name:</span>
-                  <div className="font-medium truncate">
-                    {formData.full_name || "Not provided"}
-                  </div>
-                </div>
-              </div>
-            </div> */}
           </form>
         </CardContent>
 
