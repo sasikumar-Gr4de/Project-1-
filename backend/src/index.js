@@ -11,6 +11,7 @@ import awsRoutes from "./routes/aws.routes.js";
 import analysisWorksRoutes from "./routes/analysis-works.routes.js";
 import eventsTempRoutes from "./routes/events-temp.routes.js";
 import matchInfoRoutes from "./routes/match-info.routes.js";
+import usersRoutes from "./routes/users.routes.js";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -51,6 +52,7 @@ app.use("/api/aws", awsRoutes);
 app.use("/api/analysis-works", analysisWorksRoutes);
 app.use("/api/events-temp", eventsTempRoutes);
 app.use("/api/match-info", matchInfoRoutes);
+app.use("/api/users", usersRoutes);
 
 app.get("/api", (req, res) => {
   res.json({ success: true, message: "API is running" });

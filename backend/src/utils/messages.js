@@ -92,3 +92,10 @@ export const MATCH_INFO_BULK_CREATE_SUCCESS =
 export const COMMON_GET_SUCCESS = "Featched data successfully";
 export const COMMON_UPDATE_SUCCESS = "Data is successfully updated";
 export const COMMON_SERVER_ERROR = "Internal server error";
+
+export const USER_CREATE_SUCCESS = "User created successfully";
+export const USER_UPDATE_SUCCESS = "User updated successfully";
+export const USER_DELETE_SUCCESS = "User deleted successfully";
+export const USER_ACTIVATE_SUCCESS = "User activated successfully";
+export const USER_DEACTIVATE_SUCCESS = "User deactivated successfully";
+export const USERS_FETCH_SUCCESS = "Users fetched successfully";

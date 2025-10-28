@@ -2,7 +2,7 @@ import {
   CreateUserInputValidation,
   UpdateUserInputValidation,
 } from "../validation/user.validation.js";
-import UserService from "../services/UserService.js";
+import UserService from "../services/UsersService.js";
 import { sendServerErrorResponse } from "../utils/helpers.js";
 
 class UserController {

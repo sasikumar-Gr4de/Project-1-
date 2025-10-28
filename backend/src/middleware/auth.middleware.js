@@ -97,3 +97,27 @@ export const optionalAuth = async (req, res, next) => {
     next();
   }
 };
+
+// Add this to your existing auth.middleware.js
+export const adminOnly = (req, res, next) => {
+  try {
+    const userRole = req.user.role;
+
+    // Define admin roles
+    const adminRoles = ["admin", "data-reviewer"]; // Adjust as needed
+
+    if (!adminRoles.includes(userRole)) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Admin privileges required.",
+      });
+    }
+
+    next();
+  } catch (err) {
+    return res.status(401).json({
+      success: false,
+      message: "Invalid token or user role.",
+    });
+  }
+};
