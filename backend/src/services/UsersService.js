@@ -81,22 +81,9 @@ class UserService {
 
   static async getAllUsers(filters = {}, pagination = { page: 1, limit: 10 }) {
     try {
-      const { data, total, page, limit } = await User.findAll(
-        filters,
-        pagination
-      );
+      const result = await User.findAll(filters, pagination);
 
-      const response = {
-        users: data,
-        pagination: {
-          page,
-          limit,
-          total,
-          pages: Math.ceil(total / limit),
-        },
-      };
-
-      return generateResponse(response, USERS_FETCH_SUCCESS);
+      return generateResponse(result, USERS_FETCH_SUCCESS);
     } catch (err) {
       throw err;
     }

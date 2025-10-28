@@ -71,12 +71,15 @@ export default class User {
     }
   }
 
-  static async findAll(filters = {}, pagination = { page: 1, pageSize: 10 }) {
-    const { page, limit } = pagination;
-    const offset = (page - 1) * limit;
+  static async findAll(filters = {}, pagination) {
+    const { page, pageSize } = pagination;
+
+    const offset = (page - 1) * pageSize;
+
     try {
       let query = supabase.from("users").select("*", { count: "exact" });
 
+      // console.log(filters);
       // Apply filters
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
@@ -84,11 +87,23 @@ export default class User {
         }
       });
 
-      const { data, error, count } = await query
-        .range(offset, offset + limit - 1)
+      const {
+        data: users,
+        error,
+        count,
+      } = await query
+        .range(offset, offset + pageSize - 1)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return { data, total: count || 0, page, limit };
+      return {
+        users,
+        pagination: {
+          total: count || 0,
+          page,
+          pageSize,
+          totalPages: Math.ceil((count || 0) / pageSize) || 0,
+        },
+      };
     } catch (err) {
       throw err;
     }

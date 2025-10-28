@@ -24,6 +24,7 @@ import MatchDetail from "@/pages/Matches/MatchDetail";
 import PlayerDetail from "@/pages/Players/PlayerDetail";
 import { ToastProvider } from "@/contexts/ToastContext";
 import ClubDetail from "@/pages/Clubs/ClubDetail";
+import Users from "@/pages/Dashboards/Users/Users";
 
 function App() {
   return (
@@ -82,6 +83,17 @@ function App() {
             }
           >
             <Route index element={<ClubDetail />} />
+          </Route>
+
+          <Route
+            path="/users"
+            element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Users />} />
           </Route>
 
           {/* Error pages */}

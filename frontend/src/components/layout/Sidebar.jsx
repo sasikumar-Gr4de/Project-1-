@@ -13,6 +13,7 @@ import {
   PieChart,
   TrendingUp,
   Circle,
+  Shield,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -59,7 +60,13 @@ const Sidebar = ({ isOpen, onClose }) => {
       items: [
         { name: "Reports", icon: FileText, href: "/reports" },
         { name: "Statistics", icon: PieChart, href: "/statistics" },
-        { name: "Performance", icon: TrendingUp, href: "/performance" },
+        // Add this new item
+        {
+          name: "Users Management",
+          icon: Shield, // You might want to import this icon
+          href: "/users",
+          key: "users",
+        },
       ],
     },
   ];

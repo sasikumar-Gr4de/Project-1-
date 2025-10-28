@@ -5,7 +5,7 @@ import { protect, adminOnly } from "../middleware/auth.middleware.js";
 const router = express.Router();
 
 // Protected routes - Admin only
-router.post("/", protect, adminOnly, UserController.createUser);
+// router.post("/", protect, adminOnly, UserController.createUser);
 router.get("/", protect, adminOnly, UserController.getAllUsers);
 router.get("/role/:role", protect, adminOnly, UserController.getUsersByRole);
 router.get("/:id", protect, adminOnly, UserController.getUserById);

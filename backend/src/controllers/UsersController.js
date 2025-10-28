@@ -8,33 +8,26 @@ import { sendServerErrorResponse } from "../utils/helpers.js";
 class UserController {
   constructor() {}
 
-  async createUser(req, res) {
-    try {
-      const userData = req.body;
-      const validation_result = CreateUserInputValidation(userData);
-      if (validation_result["success"] === false)
-        return res.status(400).json(validation_result);
-
-      const result = await UserService.createUser(userData);
-      if (result["success"] === false) return res.status(400).json(result);
-      return res.status(201).json(result);
-    } catch (err) {
-      return sendServerErrorResponse(req, res, err);
-    }
-  }
-
   async getAllUsers(req, res) {
     try {
-      const { page = 1, limit = 10, role, client_type, is_active } = req.query;
+      const {
+        page = 1,
+        pageSize = 10,
+        role,
+        client_type,
+        is_active,
+      } = req.query;
 
       const filters = {};
       if (role) filters.role = role;
       if (client_type) filters.client_type = client_type;
-      if (is_active !== undefined) filters.is_active = is_active === "true";
+      if (is_active !== undefined)
+        filters.is_active = is_active === "true" || is_active === "";
 
-      const pagination = { page: parseInt(page), limit: parseInt(limit) };
+      const pagination = { page: parseInt(page), pageSize: parseInt(pageSize) };
 
       const result = await UserService.getAllUsers(filters, pagination);
+
       if (result["success"] === false) return res.status(400).json(result);
       return res.status(200).json(result);
     } catch (err) {

@@ -8,7 +8,7 @@ import { useMatchesStore } from "@/store/matches.store";
 import { useClubsStore } from "@/store/clubs.store";
 import { Trophy, Edit, Trash2, Eye, CalendarDays, MapPin } from "lucide-react";
 import { capitalize } from "@/utils/helper.utils";
-import { formatDate } from "@/utils/formatter.util";
+import { formatDate } from "@/utils/formatter.utils";
 import { useToast } from "@/contexts/ToastContext";
 import { Link } from "react-router-dom";
 
