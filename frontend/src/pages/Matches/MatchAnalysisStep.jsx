@@ -253,22 +253,6 @@ const MatchAnalysisStep = ({ matchId, currentStep, onStepComplete }) => {
             searchPlaceholder="Search annotators..."
           />
         </div>
-
-        {/* Instructions */}
-        {/* <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-          <h4 className="text-lg font-semibold text-blue-900 mb-2 flex items-center gap-2">
-            <AlertCircle className="h-5 w-5" />
-            Admin Instructions
-          </h4>
-          <ul className="text-blue-800 space-y-1 text-sm">
-            <li>• Monitor annotator progress in real-time</li>
-            <li>• Send messages to annotators for coordination</li>
-            <li>
-              • Submit analysis only when all required annotations are completed
-            </li>
-            <li>• At least one completed analysis is required to proceed</li>
-          </ul>
-        </div> */}
       </div>
     );
   }

@@ -70,6 +70,22 @@ export default class Match {
     }
   }
 
+  static async updateQaStatus(id, qa_status) {
+    try {
+      const { data, error } = await supabase
+        .from("matches")
+        .update({ qa_status })
+        .eq("match_id", id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      console.error("Error updating match QA status:", err);
+      throw err;
+    }
+  }
+
   static async findAll(filters = {}, pagination) {
     const { page, pageSize } = pagination;
     const offset = (page - 1) * pageSize;

@@ -17,7 +17,7 @@ CREATE TABLE matches (
   video_url VARCHAR(255), -- URL to match video footage
   tagged_by UUID, -- User who tagged the match data, nullable
   qa_status VARCHAR(20) CHECK (qa_status IN ('pending', 'approved', 'rejected', 'in_progress')), -- e.g., 'pending', 'approved', 'rejected'
-  qa_step VARCHAR(20),
+  --- qa_step DECIMAL(10,2) NOT NULL CHECK (qa_step >= 0),
   notes TEXT, -- Additional comments or observations
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

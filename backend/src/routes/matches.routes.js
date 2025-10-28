@@ -11,5 +11,6 @@ router.put("/:id", protect, MatchesController.updateMatch);
 router.delete("/:id", protect, MatchesController.deleteMatch);
 router.get("/club/:clubId", protect, MatchesController.getClubMatches);
 router.get("/player/:playerId", protect, MatchesController.getPlayerMatches);
+// router.patch("/:id/qa-status", protect, MatchesController.updateMatchQaStatus);
 
 export default router;

@@ -1,3 +1,4 @@
+// In MatchDetail.jsx - Update the component
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ArrowLeft, Video, Download, Share2 } from "lucide-react";
@@ -13,6 +14,7 @@ import MatchPrepareStep from "@/pages/Matches/MatchPrepareStep";
 import { useMatchesStore } from "@/store/matches.store";
 import { useClubsStore } from "@/store/clubs.store";
 import { usePlayersStore } from "@/store/players.store";
+import { useAuthStore } from "@/store/auth.store";
 
 const MatchDetail = () => {
   const { id } = useParams();
@@ -22,18 +24,42 @@ const MatchDetail = () => {
   const [homePlayers, setHomePlayers] = useState([]);
   const [awayPlayers, setAwayPlayers] = useState([]);
   const [currentStep, setCurrentStep] = useState(0);
-  const [activeTab, setActiveTab] = useState(1); // Default to Preparation tab
+  const [activeTab, setActiveTab] = useState(1);
   const [loading, setLoading] = useState(true);
 
-  const { getMatchById } = useMatchesStore();
+  const { getMatchById, updateMatch } = useMatchesStore();
   const { getClubById } = useClubsStore();
   const { getPlayersByClubId } = usePlayersStore();
+  const { user } = useAuthStore();
 
+  const isAdmin = user?.role === "admin";
+
+  // Define steps with their corresponding qa_status values
   const steps = [
-    { id: "prepare", label: "Prepare", description: "Data Setup" },
-    { id: "analysis", label: "Analysis", description: "Video Annotation" },
-    { id: "review", label: "Review", description: "QA & Assessment" },
-    { id: "complete", label: "Complete", description: "Final Report" },
+    {
+      id: "prepare",
+      label: "Prepare",
+      description: "Data Setup",
+      qa_status: 0,
+    },
+    {
+      id: "analysis",
+      label: "Analysis",
+      description: "Video Annotation",
+      qa_status: 1,
+    },
+    {
+      id: "review",
+      label: "Review",
+      description: "QA & Assessment",
+      qa_status: 2,
+    },
+    {
+      id: "complete",
+      label: "Complete",
+      description: "Final Report",
+      qa_status: 3,
+    },
   ];
 
   useEffect(() => {
@@ -50,6 +76,11 @@ const MatchDetail = () => {
         }
 
         setMatchData(matchData);
+
+        // Set current step based on qa_status
+        const qaStatus = matchData.qa_status || 0;
+        setCurrentStep(qaStatus);
+        setActiveTab(qaStatus + 1); // +1 because Overview is tab 0
 
         // Fetch all related data in parallel
         const [homeClubData, awayClubData, homePlayersData, awayPlayersData] =
@@ -76,19 +107,41 @@ const MatchDetail = () => {
     }
   }, [id, getMatchById, getClubById, getPlayersByClubId]);
 
-  const handleStepClick = (stepIndex) => {
-    // Only allow navigating to completed steps or current step
-    // Users can't jump ahead to incomplete steps
-    if (stepIndex <= currentStep) {
-      setCurrentStep(stepIndex);
-      setActiveTab(stepIndex + 1); // +1 because Overview is tab 0
+  // Update QA status in backend
+  const updateQaStatus = async (newQaStatus) => {
+    try {
+      const result = await updateMatch(id, { qa_status: newQaStatus });
+      if (result.success) {
+        setMatchData((prev) => ({ ...prev, qa_status: newQaStatus }));
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Error updating QA status:", error);
+      return false;
     }
   };
 
-  const handleNextStep = () => {
+  const handleStepClick = (stepIndex) => {
+    // Only allow navigating to completed steps or current step
+    if (stepIndex <= currentStep) {
+      setCurrentStep(stepIndex);
+      setActiveTab(stepIndex + 1);
+    }
+  };
+
+  const handleNextStep = async () => {
     if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-      setActiveTab(currentStep + 2); // +2 because Overview is tab 0 and we're moving to next step tab
+      const nextStep = currentStep + 1;
+      const nextQaStatus = steps[nextStep].qa_status;
+
+      // Update QA status in backend
+      const success = await updateQaStatus(nextQaStatus);
+
+      if (success) {
+        setCurrentStep(nextStep);
+        setActiveTab(nextStep + 1);
+      }
     }
   };
 
@@ -101,21 +154,28 @@ const MatchDetail = () => {
     }
 
     // For step tabs, only allow switching to completed steps
-    const stepIndex = tabIndex - 1; // Convert tab index to step index
-    if (stepIndex <= currentStep) {
-      setCurrentStep(stepIndex);
-    } else {
-      // If trying to switch to an incomplete step, revert to current step's tab
-      setActiveTab(currentStep + 1);
-    }
+    // const stepIndex = tabIndex - 1;
+    // if (stepIndex <= currentStep) {
+    //   setCurrentStep(stepIndex);
+    // } else {
+    //   // If trying to switch to an incomplete step, revert to current step's tab
+    //   setActiveTab(currentStep + 1);
+    // }
   };
 
-  const handleStepComplete = (stepData = {}) => {
+  const handleStepComplete = async (stepData = {}) => {
     // Update match data if needed from child components
     if (stepData.updatedMatch) {
       setMatchData((prev) => ({ ...prev, ...stepData.updatedMatch }));
     }
-    handleNextStep();
+
+    // For non-admin users, they complete their work but don't progress the step
+    if (!isAdmin) {
+      return;
+    }
+
+    // Only admin can progress to next step
+    await handleNextStep();
   };
 
   // Enhanced tabs with proper data passing
@@ -147,6 +207,7 @@ const MatchDetail = () => {
           currentStep={currentStep}
           onStepComplete={handleStepComplete}
           onDataUpdate={setMatchData}
+          isAdmin={isAdmin}
         />
       ),
     },
@@ -158,6 +219,7 @@ const MatchDetail = () => {
           matchData={matchData}
           currentStep={currentStep}
           onStepComplete={handleStepComplete}
+          isAdmin={isAdmin}
         />
       ),
     },
@@ -169,6 +231,7 @@ const MatchDetail = () => {
           matchData={matchData}
           currentStep={currentStep}
           onStepComplete={handleStepComplete}
+          isAdmin={isAdmin}
         />
       ),
     },
@@ -180,6 +243,7 @@ const MatchDetail = () => {
           matchData={matchData}
           currentStep={currentStep}
           onStepComplete={handleStepComplete}
+          isAdmin={isAdmin}
         />
       ),
     },
@@ -227,6 +291,9 @@ const MatchDetail = () => {
               <h1 className="text-2xl lg:text-3xl font-bold">Match Analysis</h1>
               <p className="text-muted-foreground">
                 {homeClub?.club_name} vs {awayClub?.club_name}
+                <span className="ml-2 px-2 py-1 bg-primary/20 text-primary rounded-full text-xs">
+                  Step {currentStep + 1}/4
+                </span>
               </p>
             </div>
           </div>
@@ -263,20 +330,25 @@ const MatchDetail = () => {
             <div className="text-sm text-muted-foreground">
               Step {currentStep + 1} of {steps.length} •{" "}
               {steps[currentStep]?.label}
+              {isAdmin && " • You can progress steps"}
             </div>
 
-            <div className="text-sm text-muted-foreground">
-              Complete each step to proceed to the next
-            </div>
+            {isAdmin && currentStep < steps.length - 1 && (
+              <Button onClick={handleNextStep} size="sm">
+                Next Step: {steps[currentStep + 1]?.label}
+              </Button>
+            )}
           </div>
         </div>
 
-        <div className="mb-6">
-          <VideoPlayer
-            videoUrl={matchData.video_url}
-            title={`${homeClub?.club_name} vs ${awayClub?.club_name}`}
-          />
-        </div>
+        {matchData.video_url && (
+          <div className="mb-6">
+            <VideoPlayer
+              videoUrl={matchData.video_url}
+              title={`${homeClub?.club_name} vs ${awayClub?.club_name}`}
+            />
+          </div>
+        )}
 
         {/* Tabs Section */}
         <div className="bg-card border border-border rounded-xl overflow-hidden">

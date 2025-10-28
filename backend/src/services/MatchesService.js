@@ -55,6 +55,15 @@ class MatchesService {
     }
   }
 
+  static async updateMatchQaStatus(id, qa_status) {
+    try {
+      const data = await Match.updateQaStatus(id, qa_status);
+      return generateResponse(data, "QA status updated successfully");
+    } catch (err) {
+      throw err;
+    }
+  }
+
   static async deleteMatch(id) {
     try {
       const data = await Match.delete(id);

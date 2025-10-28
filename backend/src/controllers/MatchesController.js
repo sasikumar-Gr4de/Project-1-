@@ -46,6 +46,22 @@ class MatchesController {
     }
   }
 
+  static async updateMatchQaStatus(req, res) {
+    try {
+      const { id } = req.params;
+      const { qa_status } = req.body;
+
+      const result = await MatchesService.updateMatchQaStatus(id, qa_status);
+      res.status(200).json(result);
+    } catch (error) {
+      console.error("Error updating match QA status:", error);
+      res.status(400).json({
+        success: false,
+        error: error.message,
+      });
+    }
+  }
+
   async deleteMatch(req, res) {
     try {
       const { id } = req.params;

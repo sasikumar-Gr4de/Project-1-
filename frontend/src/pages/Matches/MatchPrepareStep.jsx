@@ -683,8 +683,9 @@ const MatchPrepareStep = ({
         <div className="flex gap-3">
           <Button
             onClick={handleStartAnalysis}
-            disabled={!allStepsCompleted || savingLineup}
+            disabled={!allStepsCompleted || savingLineup || currentStep > 0}
             className="gap-2"
+            // disabled={currentStep > 0}
             size="lg"
           >
             {savingLineup ? (
@@ -692,7 +693,11 @@ const MatchPrepareStep = ({
             ) : (
               <CheckCircle className="h-4 w-4" />
             )}
-            {savingLineup ? "Saving..." : "Start Video Analysis"}
+            {savingLineup
+              ? "Saving..."
+              : currentStep === 0
+              ? "Start Video Analysis"
+              : "Already submitted"}
           </Button>
         </div>
       </div>
