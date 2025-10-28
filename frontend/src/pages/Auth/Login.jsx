@@ -1,15 +1,8 @@
 import { useState } from "react";
-import { Eye, EyeOff, User, Lock } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import logo from "@/assets/images/logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/auth.store";
@@ -31,7 +24,7 @@ const Login = () => {
       setIsLoading(true);
 
       const email = formData.email;
-      const password = formData.email;
+      const password = formData.password; // Fixed: was using email for password
       const res = await loginUser(email, password);
       const { success, data } = res;
       setIsLoading(false);
@@ -53,151 +46,153 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col lg:flex-row">
-      {/* Form Section - Always visible */}
-      <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8 w-full">
-        <div className="w-full max-w-[360px] sm:max-w-[400px] mx-auto">
+    <div className="min-h-screen bg-[#0F0F0E] flex">
+      {/* Form Section - Left Side */}
+      <div className="flex-1 flex items-center justify-center p-8 relative">
+        <div className="w-full max-w-[500px]">
           {/* Logo */}
-          <div className="flex justify-center mb-6 sm:mb-8">
+          <div className="flex justify-start mb-16">
             <img
               src={logo}
               alt="GR4DE Logo"
-              className="h-12 sm:h-14 lg:h-16 w-auto object-contain"
+              className="h-[100px] w-[100px] object-contain"
             />
           </div>
 
-          <Card className="border-border bg-card/80 backdrop-blur-sm shadow-lg">
-            <CardHeader className="space-y-2 pb-4 px-4 sm:px-6">
-              <CardTitle className="text-xl sm:text-2xl text-center font-semibold">
-                Welcome Back
-              </CardTitle>
-              <CardDescription className="text-center text-xs sm:text-sm">
-                Enter your credentials to access your account
-              </CardDescription>
-            </CardHeader>
+          {/* Title */}
+          <div className="mb-2">
+            <h1 className="text-[22px] font-bold test-primary font-inter-tight">
+              Log in
+            </h1>
+          </div>
 
-            <CardContent className="px-4 sm:px-6 pb-6">
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Email Field */}
-                <div className="space-y-2">
-                  <Label htmlFor="login-email" className="text-sm font-medium">
-                    Email Address
-                  </Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="login-email"
-                      name="email"
-                      type="email"
-                      placeholder="Enter your email"
-                      className="pl-10 h-11 bg-input/50 border-border focus:ring-2 focus:ring-primary/20"
-                      value={formData.email}
-                      onChange={handleChange}
-                      autoComplete="username"
-                      required
-                    />
-                  </div>
-                </div>
+          {/* Subtitle */}
+          <div className="mb-12">
+            <p className="text-[18px] text-white font-inter-tight font-normal">
+              Welcome Back! Please enter your details
+            </p>
+          </div>
 
-                {/* Password Field */}
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="login-password"
-                    className="text-sm font-medium"
-                  >
-                    Password
-                  </Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="login-password"
-                      name="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
-                      className="pl-10 pr-10 h-11 bg-input/50 border-border focus:ring-2 focus:ring-primary/20"
-                      value={formData.password}
-                      onChange={handleChange}
-                      autoComplete="current-password"
-                      required
-                    />
-                    <button
-                      type="button"
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Remember Me & Forgot Password */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2"></div>
-                  <Link to="/forget-password">
-                    <Button
-                      type="button"
-                      variant="link"
-                      className="px-0 text-primary hover:text-primary/80 text-sm h-auto font-medium"
-                    >
-                      Forgot password?
-                    </Button>
-                  </Link>
-                </div>
-
-                {/* Submit Button */}
-                <Button
-                  type="submit"
-                  className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-medium text-sm transition-all duration-200"
-                >
-                  {isLoading ? (
-                    <div className="flex items-center space-x-2">
-                      <div className="w-4 h-4 border-2 border-secondary-foreground border-t-transparent rounded-full animate-spin" />
-                      <span>Sign In...</span>
-                    </div>
-                  ) : (
-                    "Sign In"
-                  )}
-                </Button>
-              </form>
-
-              {/* Sign Up Link */}
-              <div className="mt-6 pt-4 border-t border-border">
-                <p className="text-center text-sm text-muted-foreground">
-                  Don't have an account?{" "}
-                  <Link to="/register">
-                    <Button
-                      variant="link"
-                      className="px-1 text-primary hover:text-primary/80 text-sm h-auto font-medium"
-                    >
-                      Sign up
-                    </Button>
-                  </Link>
-                </p>
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Email Field */}
+            <div className="space-y-4">
+              <Label
+                htmlFor="login-email"
+                className="text-[16px] font-medium text-white font-inter-tight"
+              >
+                Email
+              </Label>
+              <div className="relative">
+                <Input
+                  id="login-email"
+                  name="email"
+                  type="email"
+                  placeholder="Enter your email address"
+                  className="w-full h-[46px] bg-[#343434] border-none rounded-[5px] pl-4 text-white font-inter-tight font-normal placeholder:text-[#E1E5DD] placeholder:opacity-70 focus:ring-0"
+                  value={formData.email}
+                  onChange={handleChange}
+                  autoComplete="username"
+                  required
+                />
               </div>
-            </CardContent>
-          </Card>
+            </div>
+
+            {/* Password Field */}
+            <div className="space-y-4">
+              <Label
+                htmlFor="login-password"
+                className="text-[16px] font-medium text-white font-inter-tight"
+              >
+                Password
+              </Label>
+              <div className="relative">
+                <Input
+                  id="login-password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="********"
+                  className="w-full h-[46px] bg-[#343434] border-none rounded-[5px] pl-4 pr-10 text-white font-inter-tight font-normal placeholder:text-[#E1E5DD] placeholder:opacity-70 focus:ring-0"
+                  value={formData.password}
+                  onChange={handleChange}
+                  autoComplete="current-password"
+                  required
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#E1E5DD] hover:text-white transition-colors"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Forgot Password */}
+            <div className="flex justify-end">
+              <Link to="/forget-password">
+                <Button
+                  type="button"
+                  variant="link"
+                  className="px-0 text-[#FF3838] hover:text-[#FF3838]/80 text-[16px] h-auto font-normal font-inter-tight"
+                >
+                  Forgot Password?
+                </Button>
+              </Link>
+            </div>
+
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              className="w-full h-[46px] bg-primary hover:bg-primary/90 text-[#0F0F0E] font-inter-tight font-semibold text-[20px] rounded-[10px] transition-all duration-200"
+            >
+              {isLoading ? (
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 border-2 border-[#0F0F0E] border-t-transparent rounded-full animate-spin" />
+                  <span>Log in...</span>
+                </div>
+              ) : (
+                "Log in"
+              )}
+            </Button>
+          </form>
+
+          {/* Sign Up Link */}
+          <div className="mt-12 pt-8 border-t border-primary">
+            <p className="text-center text-[18px] text-white font-inter-tight font-normal">
+              Don't have an account?{" "}
+              <Link to="/register">
+                <Button
+                  variant="link"
+                  className="px-1 test-primary hover:test-primary/80 text-[18px] h-auto font-medium font-inter-tight underline"
+                >
+                  Sign up
+                </Button>
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Visual Section - Hidden on mobile */}
-      <div className="flex-1 bg-linear-to-br from-primary/15 to-secondary/15 hidden lg:flex items-center justify-center p-8 xl:p-12 relative overflow-hidden">
+      {/* Visual Section - Right Side */}
+      <div className="flex-1 bg-[#343434] hidden lg:flex items-center justify-center p-8 relative overflow-hidden">
         {/* Background Effects */}
         <div className="absolute inset-0">
           <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-secondary/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-[#9ae619]/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
         </div>
 
         {/* Content */}
         <div className="relative z-10 text-center space-y-8 max-w-2xl">
           <div className="space-y-4">
-            <h2 className="text-3xl xl:text-4xl font-bold text-foreground leading-tight">
+            <h2 className="text-3xl xl:text-4xl font-bold text-white leading-tight">
               The Game Reads You Back
             </h2>
-            <p className="text-lg xl:text-xl text-muted-foreground leading-relaxed">
+            <p className="text-lg xl:text-xl text-gray-300 leading-relaxed">
               GR4DE is a performance analytics platform that scores youth
               footballers based on match data, GPS tracking, and elite
               benchmarks
@@ -209,7 +204,7 @@ const Login = () => {
             <div className="text-center space-y-2">
               <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mx-auto">
                 <svg
-                  className="w-6 h-6 text-primary"
+                  className="w-6 h-6 test-primary"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -222,10 +217,8 @@ const Login = () => {
                   />
                 </svg>
               </div>
-              <h3 className="font-semibold text-foreground">
-                Performance Metrics
-              </h3>
-              <p className="text-sm text-muted-foreground">
+              <h3 className="font-semibold text-white">Performance Metrics</h3>
+              <p className="text-sm text-gray-300">
                 Track key performance indicators
               </p>
             </div>
@@ -233,7 +226,7 @@ const Login = () => {
             <div className="text-center space-y-2">
               <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mx-auto">
                 <svg
-                  className="w-6 h-6 text-primary"
+                  className="w-6 h-6 test-primary"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -246,10 +239,8 @@ const Login = () => {
                   />
                 </svg>
               </div>
-              <h3 className="font-semibold text-foreground">
-                Progress Tracking
-              </h3>
-              <p className="text-sm text-muted-foreground">
+              <h3 className="font-semibold text-white">Progress Tracking</h3>
+              <p className="text-sm text-gray-300">
                 Monitor development over time
               </p>
             </div>
@@ -257,7 +248,7 @@ const Login = () => {
             <div className="text-center space-y-2">
               <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mx-auto">
                 <svg
-                  className="w-6 h-6 text-primary"
+                  className="w-6 h-6 test-primary"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -270,10 +261,8 @@ const Login = () => {
                   />
                 </svg>
               </div>
-              <h3 className="font-semibold text-foreground">
-                Team Collaboration
-              </h3>
-              <p className="text-sm text-muted-foreground">
+              <h3 className="font-semibold text-white">Team Collaboration</h3>
+              <p className="text-sm text-gray-300">
                 Connect with coaches and players
               </p>
             </div>
@@ -281,7 +270,7 @@ const Login = () => {
             <div className="text-center space-y-2">
               <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mx-auto">
                 <svg
-                  className="w-6 h-6 text-primary"
+                  className="w-6 h-6 test-primary"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -294,8 +283,8 @@ const Login = () => {
                   />
                 </svg>
               </div>
-              <h3 className="font-semibold text-foreground">Data Security</h3>
-              <p className="text-sm text-muted-foreground">
+              <h3 className="font-semibold text-white">Data Security</h3>
+              <p className="text-sm text-gray-300">
                 Enterprise-grade protection
               </p>
             </div>
