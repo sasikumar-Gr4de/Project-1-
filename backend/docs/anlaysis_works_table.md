@@ -1,34 +1,31 @@
 ```sql
--- Enable the uuid-ossp extension (run separately if permitted)
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
--- Create the analysis_works table to track analysis tasks for matches
+-- Improved analysis_works table with tagged_by and separate ratings system
 CREATE TABLE analysis_works (
-  analysis_work_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), -- Unique identifier for each analysis task
-  match_id UUID NOT NULL, -- Foreign key referencing the match being analyzed
-  tagged_by UUID, -- Foreign key referencing the user who tagged/analyzed the match, nullable if unassigned
-  progress DECIMAL(5,2) CHECK (progress >= 0 AND progress <= 100), -- Progress percentage of the analysis (0-100)
-  rating DECIMAL(5,2) CHECK (rating >= 0 AND rating <= 100), -- Rating out of 100 for the analysis quality, nullable if not yet rated
-  status VARCHAR(20) NOT NULL CHECK (status IN ('rejected', 'review', 'completed', 'approved')), -- Current status of the analysis
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Timestamp when the record was created
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Timestamp of the last update, managed by trigger
-  notes TEXT, -- Additional comments or observations about the analysis
-  FOREIGN KEY (match_id) REFERENCES matches(match_id) ON DELETE CASCADE, -- Cascade delete if match is removed
-  FOREIGN KEY (tagged_by) REFERENCES users(id) ON DELETE SET NULL -- Set to NULL if the user is deleted
+  analysis_work_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  match_id UUID NOT NULL,
+  tagged_by UUID, -- User who performed the analysis/tagging
+  progress DECIMAL(5,2) CHECK (progress >= 0 AND progress <= 100),
+  status VARCHAR(20) NOT NULL CHECK (status IN ('rejected', 'review', 'completed', 'approved')),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  notes TEXT,
+  FOREIGN KEY (match_id) REFERENCES matches(match_id) ON DELETE CASCADE,
+  FOREIGN KEY (tagged_by) REFERENCES users(id) ON DELETE SET NULL
 );
 
--- Create a trigger function to update updated_at
-CREATE OR REPLACE FUNCTION update_analysis_works_updated_at()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = CURRENT_TIMESTAMP; -- Automatically update the timestamp on each update
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+-- Separate table for multiple ratings by different users
+CREATE TABLE analysis_ratings (
+  rating_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  analysis_work_id UUID NOT NULL,
+  rated_by UUID NOT NULL, -- User who provided the rating
+  rating DECIMAL(5,2) NOT NULL CHECK (rating >= 0 AND rating <= 100),
+  rating_notes TEXT, -- Optional comments for the specific rating
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (analysis_work_id) REFERENCES analysis_works(analysis_work_id) ON DELETE CASCADE,
+  FOREIGN KEY (rated_by) REFERENCES users(id) ON DELETE CASCADE,
+  UNIQUE(analysis_work_id, rated_by) -- Prevent duplicate ratings from same user
+);
 
--- Create a trigger to call the function on update
-CREATE TRIGGER update_analysis_works_updated_at
-BEFORE UPDATE ON analysis_works
-FOR EACH ROW
-EXECUTE FUNCTION update_analysis_works_updated_at();
+
 ```
