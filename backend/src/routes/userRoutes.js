@@ -1,5 +1,10 @@
 import express from "express";
-import { userController } from "../controllers";
+import {
+  getDashboard,
+  getReports,
+  getReport,
+  updateProfile,
+} from "../controllers/userController.js";
 import { authenticateToken } from "../middleware/auth.js";
 import { validate } from "../middleware/validation.js";
 import { updateProfileSchema } from "../middleware/validation.js";
@@ -9,14 +14,10 @@ const router = express.Router();
 router.use(authenticateToken);
 
 // Protected routes
-router.get("/dashboard", userController.getDashboard);
-router.get("/reports", userController.getReports);
-router.get("/reports/:reportId", userController.getReport);
+router.get("/dashboard", getDashboard);
+router.get("/reports", getReports);
+router.get("/reports/:reportId", getReport);
 
-router.patch(
-  "/profile",
-  validate(updateProfileSchema),
-  userController.updateProfile
-);
+router.patch("/profile", validate(updateProfileSchema), updateProfile);
 
 export default router;
