@@ -9,11 +9,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Tabs from "@/components/common/Tabs"; // Import custom Tabs component
 import { Mail, Phone, Lock, ArrowRight } from "lucide-react";
 
 const Login = () => {
-  const [activeTab, setActiveTab] = useState("email");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
@@ -55,6 +54,141 @@ const Login = () => {
     setOtp("");
   };
 
+  const handleTabChange = (index, tab) => {
+    // Reset form when switching between email and phone tabs
+    if (step === "verify") {
+      resetForm();
+    }
+  };
+
+  // Define tabs for the custom Tabs component
+  const loginTabs = [
+    {
+      id: "email",
+      label: "Email",
+      icon: Mail,
+      content: (
+        <div className="mt-4">
+          {step === "input" ? (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="h-11"
+                />
+              </div>
+              <Button
+                onClick={handleSendOtp}
+                disabled={!email || isLoading}
+                className="w-full h-11"
+              >
+                {isLoading ? "Sending..." : "Send Verification Code"}
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Input
+                  type="text"
+                  placeholder="Enter verification code"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  className="h-11 text-center text-lg font-mono"
+                  maxLength={6}
+                />
+                <p className="text-sm text-muted-foreground text-center">
+                  We sent a 6-digit code to {email}
+                </p>
+              </div>
+              <div className="flex space-x-2">
+                <Button
+                  variant="outline"
+                  onClick={resetForm}
+                  className="flex-1 h-11"
+                >
+                  Back
+                </Button>
+                <Button
+                  onClick={handleVerifyOtp}
+                  disabled={!otp || otp.length !== 6 || isLoading}
+                  className="flex-1 h-11"
+                >
+                  {isLoading ? "Verifying..." : "Verify"}
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      ),
+    },
+    {
+      id: "phone",
+      label: "WhatsApp",
+      icon: Phone,
+      content: (
+        <div className="mt-4">
+          {step === "input" ? (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Input
+                  type="tel"
+                  placeholder="Enter your phone number"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="h-11"
+                />
+              </div>
+              <Button
+                onClick={handleSendOtp}
+                disabled={!phone || isLoading}
+                className="w-full h-11"
+              >
+                {isLoading ? "Sending..." : "Send WhatsApp Code"}
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Input
+                  type="text"
+                  placeholder="Enter verification code"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  className="h-11 text-center text-lg font-mono"
+                  maxLength={6}
+                />
+                <p className="text-sm text-muted-foreground text-center">
+                  We sent a 6-digit code via WhatsApp
+                </p>
+              </div>
+              <div className="flex space-x-2">
+                <Button
+                  variant="outline"
+                  onClick={resetForm}
+                  className="flex-1 h-11"
+                >
+                  Back
+                </Button>
+                <Button
+                  onClick={handleVerifyOtp}
+                  disabled={!otp || otp.length !== 6 || isLoading}
+                  className="flex-1 h-11"
+                >
+                  {isLoading ? "Verifying..." : "Verify"}
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      ),
+    },
+  ];
+
   return (
     <Card className="w-full">
       <CardHeader className="text-center">
@@ -64,124 +198,16 @@ const Login = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="email">Email</TabsTrigger>
-            <TabsTrigger value="phone">WhatsApp</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="email">
-            {step === "input" ? (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Input
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="h-11"
-                  />
-                </div>
-                <Button
-                  onClick={handleSendOtp}
-                  disabled={!email || isLoading}
-                  className="w-full h-11"
-                >
-                  {isLoading ? "Sending..." : "Send Verification Code"}
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Input
-                    type="text"
-                    placeholder="Enter verification code"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    className="h-11 text-center text-lg font-mono"
-                    maxLength={6}
-                  />
-                  <p className="text-sm text-muted-foreground text-center">
-                    We sent a 6-digit code to {email}
-                  </p>
-                </div>
-                <div className="flex space-x-2">
-                  <Button
-                    variant="outline"
-                    onClick={resetForm}
-                    className="flex-1 h-11"
-                  >
-                    Back
-                  </Button>
-                  <Button
-                    onClick={handleVerifyOtp}
-                    disabled={!otp || otp.length !== 6 || isLoading}
-                    className="flex-1 h-11"
-                  >
-                    {isLoading ? "Verifying..." : "Verify"}
-                  </Button>
-                </div>
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="phone">
-            {step === "input" ? (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Input
-                    type="tel"
-                    placeholder="Enter your phone number"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="h-11"
-                  />
-                </div>
-                <Button
-                  onClick={handleSendOtp}
-                  disabled={!phone || isLoading}
-                  className="w-full h-11"
-                >
-                  {isLoading ? "Sending..." : "Send WhatsApp Code"}
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Input
-                    type="text"
-                    placeholder="Enter verification code"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    className="h-11 text-center text-lg font-mono"
-                    maxLength={6}
-                  />
-                  <p className="text-sm text-muted-foreground text-center">
-                    We sent a 6-digit code via WhatsApp
-                  </p>
-                </div>
-                <div className="flex space-x-2">
-                  <Button
-                    variant="outline"
-                    onClick={resetForm}
-                    className="flex-1 h-11"
-                  >
-                    Back
-                  </Button>
-                  <Button
-                    onClick={handleVerifyOtp}
-                    disabled={!otp || otp.length !== 6 || isLoading}
-                    className="flex-1 h-11"
-                  >
-                    {isLoading ? "Verifying..." : "Verify"}
-                  </Button>
-                </div>
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
+        <Tabs
+          tabs={loginTabs}
+          defaultTab={0}
+          onTabChange={handleTabChange}
+          variant="underline" // or "default", "pills"
+          size="md"
+          fullWidth={true}
+          responsive={true}
+          className="w-full"
+        />
       </CardContent>
     </Card>
   );

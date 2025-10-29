@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import VideoUpload from "@/components/common/VideoUpload";
 import FileUpload from "@/components/common/FileUpload";
 import {
-  Upload,
+  // Upload,
   Video,
   FileText,
   Calendar,
@@ -284,7 +284,7 @@ const Upload = () => {
                   </>
                 ) : (
                   <>
-                    <Upload className="w-4 h-4 mr-2" />
+                    {/* <Upload className="w-4 h-4 mr-2" /> */}
                     Submit for Analysis
                   </>
                 )}

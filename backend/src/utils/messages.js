@@ -1,4 +1,4 @@
-const HTTP_STATUS = {
+export const HTTP_STATUS = {
   SUCCESS: 200,
   CREATED: 201,
   BAD_REQUEST: 400,
@@ -9,7 +9,7 @@ const HTTP_STATUS = {
   SERVER_ERROR: 500,
 };
 
-const AUTH_MESSAGES = {
+export const AUTH_MESSAGES = {
   // Success messages
   OTP_SENT: "OTP sent successfully",
   OTP_VERIFIED: "OTP verified successfully",
@@ -32,7 +32,7 @@ const AUTH_MESSAGES = {
   RATE_LIMIT_EXCEEDED: "Too many attempts, please try again later",
 };
 
-const USER_MESSAGES = {
+export const USER_MESSAGES = {
   // Success messages
   PROFILE_FETCHED: "Profile fetched successfully",
   PROFILE_UPDATED: "Profile updated successfully",
@@ -46,7 +46,7 @@ const USER_MESSAGES = {
   INVALID_PHONE: "Invalid phone number format",
 };
 
-const VALIDATION_MESSAGES = {
+export const VALIDATION_MESSAGES = {
   REQUIRED_FIELD: "This field is required",
   INVALID_EMAIL: "Please provide a valid email",
   INVALID_PHONE: "Please provide a valid phone number",
@@ -55,13 +55,13 @@ const VALIDATION_MESSAGES = {
   INVALID_INPUT: "Invalid input provided",
 };
 
-const SERVER_MESSAGES = {
+export const SERVER_MESSAGES = {
   INTERNAL_ERROR: "Internal server error",
   SERVICE_UNAVAILABLE: "Service temporarily unavailable",
   DATABASE_ERROR: "Database operation failed",
 };
 
-const createResponse = (
+export const createResponse = (
   success,
   message,
   data = null,
@@ -73,6 +73,29 @@ const createResponse = (
     data,
     statusCode,
   };
+};
+
+export const REPORT_MESSAGES = {
+  // Success messages
+  REPORT_FETCHED: "Report fetched successfully",
+  REPORTS_FETCHED: "Reports fetched successfully",
+
+  REPORT_GENERATED: "Report generated successfully",
+  REPORT_DELETED: "Report deleted successfully",
+  REPORT_GENERATION_FAILED: "Report generation failed",
+
+  // Error messages
+  REPORT_NOT_FOUND: "Report not found",
+};
+
+export const SUBSCRIPTION_MESSAGES = {
+  // Success messages
+  SUBSCRIPTION_ACTIVE: "Subscription is active",
+  SUBSCRIPTION_INACTIVE: "Subscription is inactive",
+
+  // Error messages
+  SUBSCRIPTION_NOT_FOUND: "Subscription not found",
+  PAYMENT_FAILED: "Payment processing failed",
 };
 
 // Pre-built response objects

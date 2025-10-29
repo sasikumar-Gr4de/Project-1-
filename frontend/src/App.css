@@ -12,7 +12,19 @@ html, body {
   overflow: hidden;
 }
 
-/* Main scrollable container styles */
+/* Landing Page specific styles */
+.landing-page {
+  overflow-y: auto !important;
+  height: 100vh;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+.landing-page::-webkit-scrollbar {
+  display: none; /* WebKit */
+}
+
+/* Main scrollable container styles for other pages */
 .custom-scrollbar {
   overflow-y: auto;
   scrollbar-width: thin;

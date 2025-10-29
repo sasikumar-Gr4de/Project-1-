@@ -1,6 +1,6 @@
 import { supabase } from "../config/supabase.config.js";
 
-export const getuserDashboard = async (userId) => {
+export const getUserDashboard = async (userId) => {
   // Get user profile
   const { data: user, error: userError } = await supabase
     .from("users")
@@ -86,6 +86,19 @@ export const getReportDetails = async (reportId) => {
     )
     .eq("id", reportId)
     .eq("player_id", userId)
+    .single();
+
+  if (error) throw error;
+
+  return data;
+};
+
+export const updateUserProfile = async (userId, updates) => {
+  const { data, error } = await supabase
+    .from("users")
+    .update(updates)
+    .eq("id", userId)
+    .select()
     .single();
 
   if (error) throw error;

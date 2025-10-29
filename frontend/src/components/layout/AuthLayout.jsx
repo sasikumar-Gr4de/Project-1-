@@ -5,7 +5,7 @@ const AuthLayout = ({ children }) => {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="border-b border-border">
-        <div className="container mx-auto px-6 py-4">
+        <div className="container mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
@@ -20,13 +20,13 @@ const AuthLayout = ({ children }) => {
       </header>
 
       {/* Main content */}
-      <main className="flex-1 flex items-center justify-center p-6">
+      <main className="flex-1 flex items-center justify-center p-4 sm:p-6">
         <div className="w-full max-w-md">{children}</div>
       </main>
 
       {/* Footer */}
       <footer className="border-t border-border py-6">
-        <div className="container mx-auto px-6 text-center">
+        <div className="container mx-auto px-4 sm:px-6 text-center">
           <p className="text-sm text-muted-foreground">
             © 2024 GR4DE Platform. All rights reserved.
           </p>

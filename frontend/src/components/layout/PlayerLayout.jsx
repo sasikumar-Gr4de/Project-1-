@@ -9,7 +9,6 @@ import {
   BarChart3,
   User,
   Menu,
-  X,
   LogOut,
   ChevronLeft,
   ChevronRight,
@@ -19,8 +18,7 @@ import { cn } from "@/lib/utils";
 
 const PlayerLayout = ({ children }) => {
   const { user, logout } = useAuthStore();
-  const { sidebarOpen, toggleSidebar, mobileMenuOpen, toggleMobileMenu } =
-    useAppStore();
+  const { mobileMenuOpen, toggleMobileMenu } = useAppStore();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const navigation = NAV_ITEMS.PLAYER;
@@ -68,8 +66,8 @@ const PlayerLayout = ({ children }) => {
           <div className="flex items-center justify-between p-4 border-b border-border">
             <div
               className={cn(
-                "flex items-center space-x-3",
-                isCollapsed && "justify-center"
+                "flex items-center",
+                isCollapsed ? "justify-center w-full" : "space-x-3"
               )}
             >
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
@@ -110,9 +108,9 @@ const PlayerLayout = ({ children }) => {
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                  "flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                   "text-muted-foreground hover:text-foreground hover:bg-accent",
-                  isCollapsed && "justify-center"
+                  isCollapsed ? "justify-center" : "space-x-3"
                 )}
               >
                 {getIcon(item.icon)}
@@ -125,8 +123,8 @@ const PlayerLayout = ({ children }) => {
           <div className="p-4 border-t border-border">
             <div
               className={cn(
-                "flex items-center space-x-3",
-                isCollapsed && "justify-center"
+                "flex items-center",
+                isCollapsed ? "justify-center" : "space-x-3"
               )}
             >
               <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
@@ -163,11 +161,11 @@ const PlayerLayout = ({ children }) => {
       {/* Main content */}
       <div
         className={cn(
-          "lg:ml-64 transition-all duration-200",
-          isCollapsed && "lg:ml-20"
+          "min-h-screen transition-all duration-200",
+          isCollapsed ? "lg:ml-20" : "lg:ml-64"
         )}
       >
-        <main className="p-6">{children}</main>
+        <main className="p-4 lg:p-6">{children}</main>
       </div>
 
       {/* Mobile menu overlay */}

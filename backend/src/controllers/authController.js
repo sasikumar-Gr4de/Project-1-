@@ -1,6 +1,6 @@
 import sgMail from "../config/sendgrid.config.js";
 import twilioClient from "../config/twilio.config.js";
-import { generateAndStoreOtp, verifyOtp } from "../services/otpService.js";
+import { generateAndStoreOTP, verifyOTP } from "../services/otpService.js";
 import { createUser, getUserProfile } from "../services/authService.js";
 import { RESPONSES, AUTH_MESSAGES } from "../utils/messages.js";
 
@@ -12,7 +12,7 @@ export const sendOtp = async (req, res) => {
     const { email, phone } = req.body;
 
     // Generate and store OTP
-    const { otp, expiresAt } = await generateAndStoreOtp(email, phone);
+    const { otp, expiresAt } = await generateAndStoreOTP(email, phone);
 
     // Send OTP via appropriate channel
     if (email) {
@@ -26,7 +26,7 @@ export const sendOtp = async (req, res) => {
             <h2 style="color: #2563eb;">GR4DE Platform</h2>
             <p>Your verification code is:</p>
             <h1 style="font-size: 32px; color: #2563eb; letter-spacing: 8px;">${otp}</h1>
-            <p>This code will expire in 10 minutes.</p>
+            <p>This code will expire in 5 minutes.</p>
             <p>If you didn't request this code, please ignore this email.</p>
           </div>
         `,
@@ -61,7 +61,7 @@ export const verifyOtpAndLogin = async (req, res) => {
     const { email, phone, otp, ...userData } = req.body;
 
     // Verify OTP
-    const { isValid, error: otpError } = await verifyOtp(email, phone, otp);
+    const { isValid, error: otpError } = await verifyOTP(email, phone, otp);
 
     if (!isValid) {
       return res.status(400).json(RESPONSES.BAD_REQUEST(otpError));

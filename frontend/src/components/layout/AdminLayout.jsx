@@ -9,7 +9,6 @@ import {
   FileText,
   Settings,
   Menu,
-  X,
   LogOut,
   ChevronLeft,
   ChevronRight,
@@ -68,7 +67,7 @@ const AdminLayout = ({ children }) => {
             <div
               className={cn(
                 "flex items-center space-x-3",
-                isCollapsed && "justify-center"
+                isCollapsed && "justify-center w-full"
               )}
             >
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
@@ -77,11 +76,11 @@ const AdminLayout = ({ children }) => {
                 </span>
               </div>
               {!isCollapsed && (
-                <div>
+                <div className="flex-1">
                   <span className="text-xl font-bold text-foreground">
                     GR4DE
                   </span>
-                  <span className="text-xs text-muted-foreground ml-2">
+                  <span className="text-xs text-muted-foreground ml-2 block">
                     Admin
                   </span>
                 </div>
@@ -116,9 +115,9 @@ const AdminLayout = ({ children }) => {
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                  "flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                   "text-muted-foreground hover:text-foreground hover:bg-accent",
-                  isCollapsed && "justify-center"
+                  isCollapsed ? "justify-center" : "space-x-3"
                 )}
               >
                 {getIcon(item.icon)}
@@ -131,8 +130,8 @@ const AdminLayout = ({ children }) => {
           <div className="p-4 border-t border-border">
             <div
               className={cn(
-                "flex items-center space-x-3",
-                isCollapsed && "justify-center"
+                "flex items-center",
+                isCollapsed ? "justify-center" : "space-x-3"
               )}
             >
               <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
@@ -169,11 +168,11 @@ const AdminLayout = ({ children }) => {
       {/* Main content */}
       <div
         className={cn(
-          "lg:ml-64 transition-all duration-200",
-          isCollapsed && "lg:ml-20"
+          "min-h-screen transition-all duration-200",
+          isCollapsed ? "lg:ml-20" : "lg:ml-64"
         )}
       >
-        <main className="p-6">{children}</main>
+        <main className="p-4 lg:p-6">{children}</main>
       </div>
 
       {/* Mobile menu overlay */}
