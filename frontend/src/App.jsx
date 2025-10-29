@@ -61,12 +61,14 @@ function App() {
                   to={user?.role === "admin" ? "/admin" : "/dashboard"}
                 />
               ) : (
-                <Layout>
-                  <Login />
-                </Layout>
+                // <Layout>
+                <Login />
+                // </Layout>
               )
             }
           />
+
+          <Route path="/onboarding" element={<Onboarding />} />
 
           {/* Protected Routes - Use Layout */}
           {isAuthenticated ? (
