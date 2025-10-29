@@ -54,51 +54,17 @@ const Landing = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* <div
-        className="fixed inset-0 bg-cover bg-center bg-no-repeat bg-fixed z-0"
-        style={{
-          backgroundImage:
-            'linear-gradient(rgba(26, 29, 33, 0.7), rgba(26, 29, 33, 0.8)), url("https://images.unsplash.com/photo-1575361204480-aadea25e6e68?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80")',
-        }}
-      /> */}
-
       {/* Navigation */}
       <nav className="sticky top-0 z-50 bg-card/80 backdrop-blur-md border-b border-border">
-        <div className="container mx-auto px-4 py-4">
+        <div className="mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-                {/* <Football className="h-5 w-5 text-primary-foreground" /> */}
-              </div>
+              {/* <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center"> */}
+              {/* <Football className="h-5 w-5 text-primary-foreground" /> */}
+              {/* </div> */}
               <span className="text-xl font-bold">GR4DE</span>
             </div>
 
-            <div className="hidden md:flex space-x-8">
-              {/* <a
-                href="#features"
-                className="text-foreground hover:text-primary transition-colors"
-              >
-                Features
-              </a>
-              <a
-                href="#about"
-                className="text-foreground hover:text-primary transition-colors"
-              >
-                About
-              </a>
-              <a
-                href="#how-it-works"
-                className="text-foreground hover:text-primary transition-colors"
-              >
-                How It Works
-              </a>
-              <a
-                href="#contact"
-                className="text-foreground hover:text-primary transition-colors"
-              >
-                Contact
-              </a> */}
-            </div>
             <Link to="/login">
               <Button className=" px-6 py-2 rounded-md font-medium">
                 Get Started
@@ -110,7 +76,7 @@ const Landing = () => {
 
       {/* Hero Section */}
       <section className="py-20 px-4 ">
-        <div className="container mx-auto max-w-6xl">
+        <div className="mx-auto max-w-6xl">
           <div
             className={`flex flex-col lg:flex-row items-center justify-between transition-all duration-700 ${
               isVisible
@@ -132,8 +98,8 @@ const Landing = () => {
                 combining data science, motion tracking, and elite benchmarks to
                 standardize talent measurement.
               </p>
-              <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                {/* <button className="btn-primary px-8 py-4 rounded-lg font-medium text-lg flex items-center justify-center">
+              {/* <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4"> */}
+              {/* <button className="btn-primary px-8 py-4 rounded-lg font-medium text-lg flex items-center justify-center">
                   Start Free Trial
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </button>
@@ -141,7 +107,7 @@ const Landing = () => {
                   <Play className="mr-2 h-5 w-5" />
                   Watch Demo
                 </button> */}
-              </div>
+              {/* </div> */}
             </div>
 
             <div className="lg:w-1/2 flex justify-center">
@@ -224,7 +190,7 @@ const Landing = () => {
 
       {/* About Section */}
       <section id="about" className="py-16 px-4 bg-card/30">
-        <div className="container mx-auto max-w-6xl">
+        <div className="mx-auto max-w-6xl">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl font-bold mb-6">About GR4DE</h2>
@@ -298,7 +264,7 @@ const Landing = () => {
 
       {/* Features Section */}
       <section id="features" className="py-16 px-4">
-        <div className="container mx-auto max-w-6xl">
+        <div className="mx-auto max-w-6xl">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold mb-4">How GR4DE Works</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -352,7 +318,7 @@ const Landing = () => {
 
       {/* Gallery Section - Always Visible Text with Enhanced Hover */}
       <section className="py-16 px-4 bg-card/30">
-        <div className="container mx-auto max-w-6xl">
+        <div className="mx-auto max-w-6xl">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">GR4DE In Action</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -394,7 +360,7 @@ const Landing = () => {
 
       {/* CTA Section */}
       <section className="py-20 px-4 bg-card/30">
-        <div className="container mx-auto max-w-4xl text-center">
+        <div className="mx-auto max-w-4xl text-center">
           <h2 className="text-3xl font-bold mb-6">
             Ready to Transform Football Talent Assessment?
           </h2>
@@ -407,7 +373,7 @@ const Landing = () => {
 
       {/* Footer */}
       <footer className="py-12 px-4 border-t border-border">
-        <div className="container mx-auto max-w-6xl">
+        <div className="mx-auto max-w-6xl">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-3 mb-6 md:mb-0">
               <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">

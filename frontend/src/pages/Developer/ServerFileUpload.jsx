@@ -3,7 +3,9 @@ import FileUpload from "@/components/common/FileUpload";
 
 const ServerFileUpload = () => {
   const onUploadHandler = (results) => {
-    console.log(results);
+    const result = results[0];
+    const { url } = result;
+    window.alert(`Uploded Url : ${url}`);
   };
   return (
     <div className="min-h-screen bg-background text-foreground">
