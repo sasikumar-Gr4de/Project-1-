@@ -188,3 +188,48 @@ ALTER TABLE auth_otp ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "No direct access to OTP table" ON auth_otp FOR ALL USING (false);
 
 ```
+
+# GR4DE Platform Database Schema
+
+## Tables Overview
+
+### users
+
+Extends Supabase auth.users with additional profile information.
+
+### player_data
+
+Stores uploaded files and match data for processing.
+
+### processing_queue
+
+Tracks the status of file processing jobs.
+
+### reports
+
+Stores generated player reports with scores and PDF URLs.
+
+### benchmarks
+
+Reference data for position and age group comparisons.
+
+### subscriptions
+
+Manages user subscription plans and billing.
+
+### alerts
+
+Tracks email and WhatsApp notifications.
+
+### auth_otp
+
+Handles OTP-based authentication.
+
+## RLS Policies
+
+All tables have Row Level Security enabled with appropriate policies:
+
+- Users can only access their own data
+- Admins have full access
+- Processing queue is admin-only
+- Benchmarks are read-only for authenticated users
