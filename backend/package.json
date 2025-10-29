@@ -14,13 +14,16 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.914.0",
     "@aws-sdk/s3-request-presigner": "^3.916.0",
+    "@sendgrid/mail": "^8.1.6",
     "@supabase/realtime-js": "^2.76.1",
     "@supabase/supabase-js": "^2.76.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "joi": "^18.0.1",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "stripe": "^19.1.0",
+    "twilio": "^5.10.4"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
