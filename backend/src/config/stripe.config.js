@@ -3,11 +3,8 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-// const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-//   apiVersion: "2022-11-15",
-// });
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2022-11-15",
+});
 
-// export default stripe;
-
-const stripe_temp = "temp_stripe_instance";
-export default stripe_temp;
+export default stripe;
