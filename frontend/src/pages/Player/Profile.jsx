@@ -57,6 +57,7 @@ const Profile = () => {
         position: user.position || "",
         academy: user.academy || "",
         country: user.country || "",
+        avatar_url: user.avatar_url || "",
       });
     }
   }, [user]);
@@ -117,15 +118,16 @@ const Profile = () => {
       position: user.position || "",
       academy: user.academy || "",
       country: user.country || "",
+      avatar_url: user.avatar_url || "",
     });
     setIsEditing(false);
   };
 
   const handleAvatarUpdate = (result) => {
     if (result.success) {
-      // Avatar updated successfully - refresh user data
-      console.log("Avatar updated:", result.url);
-      // You might want to refresh the user data here
+      setFormData({
+        avatar_url: result.url,
+      });
     }
   };
 
@@ -145,10 +147,10 @@ const Profile = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Profile</h1>
+          {/* <h1 className="text-3xl font-bold">Profile</h1>
           <p className="text-muted-foreground">
             Manage your personal information and preferences
-          </p>
+          </p> */}
         </div>
         {!isEditing ? (
           <Button onClick={() => setIsEditing(true)}>
@@ -179,6 +181,7 @@ const Profile = () => {
             <CardContent>
               <AvatarUpload
                 onUpload={handleAvatarUpdate}
+                disabled={!isEditing}
                 existingUrl={user.avatar_url}
                 folder="avatars"
                 size="xl"

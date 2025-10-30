@@ -6,7 +6,7 @@ export const getOrCreateUser = async (email, phone, userData = {}) => {
     // Check if user already exists by querying the users table
     const existingUser = await getUserByEmailOrPhone(email, phone);
     if (existingUser) {
-      throw new Error("User already registered");
+      return { user: existingUser, isNewUser: false };
     }
     // Create user profile in users table directly
     const { data: profile, error: profileError } = await supabase

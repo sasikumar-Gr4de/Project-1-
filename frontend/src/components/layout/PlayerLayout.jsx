@@ -285,9 +285,13 @@ const PlayerLayout = ({ children }) => {
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                 >
                   <div className="w-10 h-10 bg-[#262626] rounded-full border border-black/10 flex items-center justify-center">
-                    <span className="text-white text-xs font-medium">
-                      {user?.player_name?.charAt(0)?.toUpperCase() || "U"}
-                    </span>
+                    {!user.avatar_url ? (
+                      <span className="text-white text-xs font-medium">
+                        {user?.player_name?.charAt(0)?.toUpperCase() || "U"}
+                      </span>
+                    ) : (
+                      <img src={user.avatar_url} className="rounded-2xl" />
+                    )}
                   </div>
                   <ChevronDown
                     className={cn(

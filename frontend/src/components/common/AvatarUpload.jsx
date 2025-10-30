@@ -10,6 +10,7 @@ const AvatarUpload = ({
   folder = "avatars",
   maxSize = 2 * 1024 * 1024, // 2MB default for avatars
   disabled = false,
+
   size = "lg", // sm, md, lg, xl
 }) => {
   const [isUploading, setIsUploading] = useState(false);
