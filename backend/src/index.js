@@ -42,7 +42,7 @@ app.use(
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
-app.use("/api/user", userRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/upload", uploadRoutes);

@@ -1,21 +1,36 @@
-// PlayerLayout.jsx - Updated with Figma Header Design
+// PlayerLayout.jsx - Improved with sticky layout and scrollable content
 import React, { useState, useEffect } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { useAppStore } from "@/store/appStore";
 import {
   Menu,
-  X,
   LogOut,
   Bell,
   ChevronDown,
   Settings,
   User,
-  Search,
+  LayoutDashboard,
+  Upload,
+  FileText,
+  BarChart3,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { NAV_ITEMS } from "@/utils/constants";
+
+// Icon mapping function
+const getIconComponent = (iconName) => {
+  const iconMap = {
+    LayoutDashboard: LayoutDashboard,
+    Upload: Upload,
+    FileText: FileText,
+    BarChart3: BarChart3,
+    User: User,
+  };
+
+  return iconMap[iconName] || BarChart3;
+};
 
 const PlayerLayout = ({ children }) => {
   const { user, logout } = useAuthStore();
@@ -23,9 +38,13 @@ const PlayerLayout = ({ children }) => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
-  // Navigation items based on Figma design
-  const navigation = NAV_ITEMS.PLAYER;
+  // Enhanced navigation with dynamic icons
+  const navigation = NAV_ITEMS.PLAYER.map((item) => ({
+    ...item,
+    iconComponent: getIconComponent(item.icon),
+  }));
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -60,6 +79,12 @@ const PlayerLayout = ({ children }) => {
     }
   };
 
+  const handleNavigation = (href, event) => {
+    event.preventDefault();
+    navigate(href);
+    closeMobileMenu();
+  };
+
   const isActiveRoute = (href) => {
     return (
       location.pathname === href || location.pathname.startsWith(href + "/")
@@ -73,7 +98,7 @@ const PlayerLayout = ({ children }) => {
       title: "Performance Report Ready",
       message: "Your latest match analysis is now available",
       time: "5 min ago",
-      read: false,
+      read: true,
     },
     {
       id: 2,
@@ -87,7 +112,7 @@ const PlayerLayout = ({ children }) => {
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-background flex layout-container">
       {/* Mobile menu button */}
       <div className="lg:hidden fixed top-4 left-4 z-50">
         <Button
@@ -100,65 +125,74 @@ const PlayerLayout = ({ children }) => {
         </Button>
       </div>
 
-      {/* Sidebar - Fixed with Figma Design */}
+      {/* Sidebar - Sticky and Responsive */}
       <div
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-[260px] bg-[#0F0F0E] transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0",
+          "fixed inset-y-0 left-0 z-40 w-[260px] bg-[#0F0F0E] transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 sticky-sidebar",
           mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <div className="flex flex-col h-full">
-          {/* Logo Section */}
-          <div className="flex items-center p-6 border-b border-border/20">
+          {/* Logo Section - Responsive */}
+          <div className="flex items-center p-4 lg:p-6 shrink-0">
             <img
               src="favicon-flat.png"
               alt="GR4DE Logo"
-              className="w-52 h-[50px]"
+              className="w-40 lg:w-52 h-auto max-h-12 lg:max-h-[50px] object-contain"
             />
           </div>
 
-          {/* Navigation - Exact Figma Layout */}
-          <nav className="flex-1 overflow-y-auto py-6">
+          {/* Navigation - Scrollable if needed */}
+          <nav className="flex-1 overflow-y-auto py-4 lg:py-6 scrollable-sidebar">
             <div className="space-y-1">
-              {navigation.map((item, index) => {
+              {navigation.map((item) => {
                 const isActive = isActiveRoute(item.href);
-                const topPosition = 163 + index * 65; // Exact Figma spacing
+                const IconComponent = item.iconComponent;
 
                 return (
-                  <a
+                  <button
                     key={item.name}
-                    href={item.href}
-                    onClick={closeMobileMenu}
+                    onClick={(e) => handleNavigation(item.href, e)}
                     className={cn(
-                      "flex items-center relative px-10 py-4 transition-all duration-200 group",
+                      "flex items-center relative w-full px-4 lg:px-10 py-3 lg:py-4 transition-all duration-200 group text-left rounded-lg",
                       "hover:bg-white/5",
-                      isActive && "bg-primary/10 text-primary"
+                      isActive &&
+                        "bg-linear-to-b from-[#994444] to-primary text-primary"
                     )}
                     style={{
-                      minHeight: "65px",
-                      paddingLeft: "76px", // Exact Figma left position for text
+                      minHeight: "60px",
+                      paddingLeft: "56px",
                     }}
                   >
-                    {/* Icon Circle - Exact Figma positioning */}
-                    <div className="absolute left-10 w-6 h-6 bg-[#D9D9D9] rounded-full" />
+                    {/* Icon Container */}
+                    <div
+                      className={cn(
+                        "absolute left-4 lg:left-10 w-5 h-5 lg:w-6 lg:h-6 flex items-center justify-center transition-colors",
+                        isActive
+                          ? "text-[#D9D9D9]"
+                          : "text-[#D9D9D9] group-hover:text-white/80"
+                      )}
+                    >
+                      <IconComponent className="w-4 h-4 lg:w-5 lg:h-5" />
+                    </div>
 
                     {/* Navigation Text */}
                     <span
                       className={cn(
-                        "text-lg font-normal font-['Inter_Tight'] transition-colors",
+                        "text-base lg:text-lg font-normal font-['Inter_Tight'] transition-colors ml-3",
                         isActive
-                          ? "text-primary"
+                          ? "text-[#D9D9D9]"
                           : "text-white group-hover:text-white/80"
                       )}
                     >
                       {item.name}
                     </span>
 
-                    {/* Active Indicator - Gradient line like Figma */}
-                    {isActive && (
+                    {/* Active Indicator */}
+                    {/* {isActive && (
                       <div className="absolute right-0 top-0 w-0.5 h-full bg-linear-to-b from-[#994444] to-primary opacity-50" />
-                    )}
-                  </a>
+                    )} */}
+                  </button>
                 );
               })}
             </div>
@@ -166,10 +200,10 @@ const PlayerLayout = ({ children }) => {
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <div className="flex-1 min-h-screen flex flex-col lg:ml-0">
-        {/* Header - Fixed with Figma Design */}
-        <header className="relative top-0 z-30 bg-[#0F0F0E] h-[92px] shrink-0">
+      {/* Main Content Area - Flex column for sticky header */}
+      <div className="flex-1 flex flex-col min-h-0 content-wrapper">
+        {/* Header - Sticky */}
+        <header className="sticky top-0 z-30 bg-[#0F0F0E] h-16 lg:h-[92px] shrink-0 border-b border-border/20 sticky-header">
           {/* Gradient Line at Bottom */}
           <div
             className="absolute bottom-0 left-0 w-full h-px"
@@ -179,20 +213,17 @@ const PlayerLayout = ({ children }) => {
             }}
           />
 
-          <div className="flex items-center justify-between h-full px-8">
+          <div className="flex items-center justify-between h-full px-4 lg:px-8">
             {/* Left Section - Page Title */}
             <div className="flex-1">
-              <h1
-                className="text-white text-[20px] font-semibold font-['Inter_Tight'] leading-5"
-                style={{ width: "162px" }}
-              >
+              <h1 className="text-white text-lg lg:text-[20px] font-semibold font-['Inter_Tight'] leading-5 truncate max-w-[162px]">
                 {navigation.find((item) => isActiveRoute(item.href))?.name ||
                   "Overview"}
               </h1>
             </div>
 
             {/* Right Section - Icons & User Menu */}
-            <div className="flex-1 flex justify-end items-center space-x-4">
+            <div className="flex-1 flex justify-end items-center space-x-2 lg:space-x-4">
               {/* Notifications Button - Updated Style */}
               <div className="relative notifications-menu">
                 <Button
@@ -268,16 +299,16 @@ const PlayerLayout = ({ children }) => {
 
                 {userMenuOpen && (
                   <div className="absolute right-0 top-full mt-2 w-56 bg-[#262626] border border-black/10 rounded-lg shadow-lg z-50">
-                    {/* <div className="p-4 border-b border-black/10">
+                    <div className="p-4 border-b border-black/10">
                       <p className="text-sm font-medium text-white truncate font-['Inter_Tight']">
                         {user?.player_name || "User"}
                       </p>
                       <p className="text-xs text-[#B0AFAF] mt-1 truncate font-['Inter_Tight']">
                         {user?.email}
                       </p>
-                    </div> */}
-                    <div className="p-2">
-                      <a
+                    </div>
+                    {/* <div className="p-2"> */}
+                    {/* <a
                         href="/profile"
                         className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-[#B0AFAF] hover:text-white hover:bg-[#333333] rounded-md transition-colors font-['Inter_Tight']"
                       >
@@ -290,8 +321,8 @@ const PlayerLayout = ({ children }) => {
                       >
                         <Settings className="w-4 h-4" />
                         <span>Settings</span>
-                      </a>
-                    </div>
+                      </a> */}
+                    {/* </div> */}
                     <div className="p-2 border-t border-black/10">
                       <button
                         onClick={handleLogout}
@@ -308,8 +339,8 @@ const PlayerLayout = ({ children }) => {
           </div>
         </header>
 
-        {/* Scrollable Content Area */}
-        <main className="flex-1 overflow-auto bg-background">
+        {/* Scrollable Content Area - Only this part scrolls */}
+        <main className="flex-1 overflow-auto bg-background scrollable-content">
           <div className="p-4 sm:p-6 lg:p-8 min-h-full">{children}</div>
         </main>
       </div>

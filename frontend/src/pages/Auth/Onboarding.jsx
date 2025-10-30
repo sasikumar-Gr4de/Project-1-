@@ -1,5 +1,7 @@
+// pages/Auth/Onboarding.jsx - Enhanced version
 import React, { useState } from "react";
 import { useAuthStore } from "@/store/authStore";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -28,18 +30,29 @@ const Onboarding = () => {
     country: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const { updateProfile } = useAuthStore();
+  const { updateProfile, user } = useAuthStore();
+  const navigate = useNavigate();
+
+  // If user already completed onboarding, redirect to dashboard
+  React.useEffect(() => {
+    if (user?.player_name) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     setIsLoading(true);
 
     try {
       await updateProfile(formData);
-      // Profile will be updated and user redirected automatically
+      // Navigation will be handled by the auth store update and ProtectedRoute
     } catch (error) {
       console.error("Failed to update profile:", error);
+      setError(error.message || "Failed to save profile. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -49,12 +62,29 @@ const Onboarding = () => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  // Calculate minimum and maximum dates for date input (ages 8-40)
+  const today = new Date();
+  const minDate = new Date(
+    today.getFullYear() - 40,
+    today.getMonth(),
+    today.getDate()
+  )
+    .toISOString()
+    .split("T")[0];
+  const maxDate = new Date(
+    today.getFullYear() - 8,
+    today.getMonth(),
+    today.getDate()
+  )
+    .toISOString()
+    .split("T")[0];
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-2xl bg-transparent border-none shadow-none">
         <CardHeader className="text-center space-y-4 px-4 sm:px-6">
           <div className="flex justify-center mb-4">
-            <img src="favicon.png" alt="GR4DE Logo" className="w-20 h-20" />
+            <img src="/favicon.png" alt="GR4DE Logo" className="w-20 h-20" />
           </div>
           <CardTitle className="text-2xl font-bold font-['Inter_Tight'] text-primary">
             Complete Your Profile
@@ -64,12 +94,20 @@ const Onboarding = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {error && (
+            <div className="mb-4 p-3 bg-red-500/20 border border-red-500 rounded-md">
+              <p className="text-red-400 text-sm font-['Inter_Tight']">
+                {error}
+              </p>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Player Name */}
               <div className="space-y-2">
                 <label className="text-white text-base font-medium font-['Inter_Tight']">
-                  Full Name
+                  Full Name *
                 </label>
                 <div className="relative">
                   <User className="absolute left-3 top-4 h-4 w-4 text-[#E1E5DD]" />
@@ -81,6 +119,8 @@ const Onboarding = () => {
                     }
                     className="pl-10 h-12 text-base bg-[#343434] border-[#343434] text-[#E1E5DD] placeholder:text-[#E1E5DD] placeholder:opacity-70 rounded-[5px] font-['Inter_Tight']"
                     required
+                    minLength={2}
+                    maxLength={100}
                   />
                 </div>
               </div>
@@ -88,7 +128,7 @@ const Onboarding = () => {
               {/* Date of Birth */}
               <div className="space-y-2">
                 <label className="text-white text-base font-medium font-['Inter_Tight']">
-                  Date of Birth
+                  Date of Birth *
                 </label>
                 <div className="relative">
                   <Calendar className="absolute left-3 top-4 h-4 w-4 text-[#E1E5DD]" />
@@ -98,20 +138,26 @@ const Onboarding = () => {
                     onChange={(e) =>
                       handleChange("date_of_birth", e.target.value)
                     }
+                    min={minDate}
+                    max={maxDate}
                     className="pl-10 h-12 text-base bg-[#343434] border-[#343434] text-[#E1E5DD] placeholder:text-[#E1E5DD] placeholder:opacity-70 rounded-[5px] font-['Inter_Tight']"
                     required
                   />
                 </div>
+                <p className="text-xs text-[#E1E5DD] opacity-70">
+                  Must be between 8 and 40 years old
+                </p>
               </div>
 
               {/* Position */}
               <div className="space-y-2">
                 <label className="text-white text-base font-medium font-['Inter_Tight']">
-                  Position
+                  Position *
                 </label>
                 <Select
                   value={formData.position}
                   onValueChange={(value) => handleChange("position", value)}
+                  required
                 >
                   <SelectTrigger className="h-12 text-base bg-[#343434] border-[#343434] text-[#E1E5DD] rounded-[5px] font-['Inter_Tight']">
                     <SelectValue placeholder="Select your position" />
@@ -189,15 +235,24 @@ const Onboarding = () => {
               </div>
             </div>
 
-            <Button
-              type="submit"
-              disabled={
-                isLoading || !formData.player_name || !formData.date_of_birth
-              }
-              className="w-full h-12 text-base font-['Inter_Tight'] bg-primary text-[#0F0F0E] hover:bg-primary/90 font-semibold rounded-[10px]"
-            >
-              {isLoading ? "Saving..." : "Complete Profile"}
-            </Button>
+            <div className="space-y-4">
+              <Button
+                type="submit"
+                disabled={
+                  isLoading ||
+                  !formData.player_name ||
+                  !formData.date_of_birth ||
+                  !formData.position
+                }
+                className="w-full h-12 text-base font-['Inter_Tight'] bg-primary text-[#0F0F0E] hover:bg-primary/90 font-semibold rounded-[10px]"
+              >
+                {isLoading ? "Saving..." : "Complete Profile"}
+              </Button>
+
+              <p className="text-xs text-[#E1E5DD] opacity-70 text-center">
+                Fields marked with * are required
+              </p>
+            </div>
           </form>
         </CardContent>
       </Card>

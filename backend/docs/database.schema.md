@@ -5,7 +5,7 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- Users table (extends Supabase auth.users)
 CREATE TABLE users (
-id UUID REFERENCES auth.users(id) PRIMARY KEY,
+id UUID REFERENCES gen_random_uuid() PRIMARY KEY,
 role TEXT NOT NULL DEFAULT 'player' CHECK (role IN ('player', 'coach', 'admin')),
 player_name TEXT,
 date_of_birth DATE,

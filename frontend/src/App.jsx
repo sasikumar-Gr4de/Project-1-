@@ -1,3 +1,4 @@
+// App.jsx - Fixed routing configuration
 import {
   BrowserRouter as Router,
   Route,
@@ -8,10 +9,8 @@ import { useEffect } from "react";
 import "@/App.css";
 
 import { useAuthStore } from "@/store/authStore";
-import { ROUTES, isPublicRoute } from "@/utils/routes.config";
 import Layout from "@/components/layout/Layout";
 import ProtectedRoute from "@/components/common/ProtectedRoute";
-import RoleProtectedRoute from "@/components/common/RoleProtectedRoute";
 
 // Auth Pages
 import Login from "@/pages/Auth/Login";
@@ -25,14 +24,8 @@ import ReportDetail from "@/pages/Player/ReportDetail";
 import Benchmarks from "@/pages/Player/Benchmarks";
 import Profile from "@/pages/Player/Profile";
 
-// Admin Pages
-import AdminDashboard from "@/pages/Admin/Dashboard";
-
 // Other Pages
 import Landing from "@/pages/Landing";
-import Unauthorized from "@/pages/Error/Unauthorized";
-import NotFoundPage from "@/pages/Error/NotFoundPage";
-import ServerFileUpload from "@/pages/Developer/ServerFileUpload";
 import { ToastProvider } from "@/contexts/ToastContext";
 
 function App() {
@@ -58,157 +51,103 @@ function App() {
     );
   }
 
-  // Determine default route based on authentication and user role
-  const getDefaultRoute = () => {
-    if (!isAuthenticated) return ROUTES.LANDING;
-    if (user?.requires_onboarding || !user?.player_name)
-      return ROUTES.ONBOARDING;
-    return user?.role === "admin" ? ROUTES.ADMIN_DASHBOARD : ROUTES.DASHBOARD;
-  };
-
   return (
     <ToastProvider>
       <Router>
         <Routes>
           {/* Public Routes */}
-          <Route path={ROUTES.LANDING} element={<Landing />} />
+          <Route path="/" element={<Landing />} />
           <Route
-            path={ROUTES.LOGIN}
+            path="/login"
             element={
-              isAuthenticated ? (
-                <Navigate to={getDefaultRoute()} replace />
-              ) : (
-                <Login />
-              )
+              isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />
             }
           />
-          <Route path={ROUTES.UNAUTHORIZED} element={<Unauthorized />} />
-          <Route path={ROUTES.SERVER_UPLOAD} element={<ServerFileUpload />} />
 
-          {/* Protected Routes with Layout */}
+          {/* Onboarding Route - Special handling */}
           <Route
-            path={ROUTES.ONBOARDING}
+            path="/onboarding"
             element={
-              <ProtectedRoute requireOnboarding={true}>
+              <ProtectedRoute>
+                <Onboarding />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Protected Routes that require completed onboarding */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
                 <Layout>
-                  <Onboarding />
+                  <Dashboard />
                 </Layout>
               </ProtectedRoute>
             }
           />
 
-          {/* Player Routes */}
           <Route
-            path={ROUTES.DASHBOARD}
+            path="/upload"
             element={
               <ProtectedRoute>
-                <RoleProtectedRoute allowedRoles={["player", "admin"]}>
-                  <Layout>
-                    <Dashboard />
-                  </Layout>
-                </RoleProtectedRoute>
+                <Layout>
+                  <Upload />
+                </Layout>
               </ProtectedRoute>
             }
           />
 
           <Route
-            path={ROUTES.UPLOAD}
+            path="/reports"
             element={
               <ProtectedRoute>
-                <RoleProtectedRoute allowedRoles={["player"]}>
-                  <Layout>
-                    <Upload />
-                  </Layout>
-                </RoleProtectedRoute>
+                <Layout>
+                  <Reports />
+                </Layout>
               </ProtectedRoute>
             }
           />
 
           <Route
-            path={ROUTES.REPORTS}
+            path="/reports/:reportId"
             element={
               <ProtectedRoute>
-                <RoleProtectedRoute allowedRoles={["player"]}>
-                  <Layout>
-                    <Reports />
-                  </Layout>
-                </RoleProtectedRoute>
+                <Layout>
+                  <ReportDetail />
+                </Layout>
               </ProtectedRoute>
             }
           />
 
           <Route
-            path={ROUTES.REPORT_DETAIL}
+            path="/benchmarks"
             element={
               <ProtectedRoute>
-                <RoleProtectedRoute allowedRoles={["player"]}>
-                  <Layout>
-                    <ReportDetail />
-                  </Layout>
-                </RoleProtectedRoute>
+                <Layout>
+                  <Benchmarks />
+                </Layout>
               </ProtectedRoute>
             }
           />
 
           <Route
-            path={ROUTES.BENCHMARKS}
+            path="/profile"
             element={
               <ProtectedRoute>
-                <RoleProtectedRoute allowedRoles={["player"]}>
-                  <Layout>
-                    <Benchmarks />
-                  </Layout>
-                </RoleProtectedRoute>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path={ROUTES.PROFILE}
-            element={
-              <ProtectedRoute>
-                <RoleProtectedRoute allowedRoles={["player", "admin"]}>
-                  <Layout>
-                    <Profile />
-                  </Layout>
-                </RoleProtectedRoute>
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Admin Routes */}
-          <Route
-            path={ROUTES.ADMIN}
-            element={
-              <ProtectedRoute>
-                <RoleProtectedRoute allowedRoles={["admin"]}>
-                  <Layout>
-                    <AdminDashboard />
-                  </Layout>
-                </RoleProtectedRoute>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path={ROUTES.ADMIN_DASHBOARD}
-            element={
-              <ProtectedRoute>
-                <RoleProtectedRoute allowedRoles={["admin"]}>
-                  <Layout>
-                    <AdminDashboard />
-                  </Layout>
-                </RoleProtectedRoute>
+                <Layout>
+                  <Profile />
+                </Layout>
               </ProtectedRoute>
             }
           />
 
           {/* Fallback Routes */}
           <Route
-            path="/"
-            element={<Navigate to={getDefaultRoute()} replace />}
+            path="*"
+            element={
+              <Navigate to={isAuthenticated ? "/dashboard" : "/"} replace />
+            }
           />
-          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Router>
     </ToastProvider>

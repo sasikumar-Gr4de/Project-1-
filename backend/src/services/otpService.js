@@ -57,7 +57,7 @@ export const verifyOTP = async (email = null, phone = null, otp) => {
     .eq(email ? "email" : "phone", email || phone)
     .eq("otp", otp)
     .eq("used", false)
-    .gt("expires_at", new Date())
+    .gt("expires_at", new Date().toUTCString())
     .order("created_at", { ascending: false })
     .limit(1)
     .single();
@@ -106,6 +106,7 @@ const generateSecureOtp = () => {
 };
 
 const cleanupExistingOtps = async (email, phone) => {
+  console.log("Cleaning up existing OTPs for", email || phone);
   const { error } = await supabase
     .from("auth_otp")
     .delete()

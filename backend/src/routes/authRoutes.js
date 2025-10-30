@@ -12,28 +12,18 @@ import {
   sendOtpSchema,
   verifyOtpSchema,
   refreshTokenSchema,
+  updateProfileSchema,
 } from "../middleware/validation.js";
 import { authenticateToken, optionalAuth } from "../middleware/auth.js";
-import { otpRateLimit, authRateLimit } from "../middleware/rateLimit.js";
 
 const router = express.Router();
 
 // Public routes
-router.post("/send-otp", otpRateLimit, validate(sendOtpSchema), sendOtp);
+router.post("/send-otp", validate(sendOtpSchema), sendOtp);
 
-router.post(
-  "/verify-otp",
-  authRateLimit,
-  validate(verifyOtpSchema),
-  verifyOtpAndLogin
-);
+router.post("/verify-otp", validate(verifyOtpSchema), verifyOtpAndLogin);
 
-router.post(
-  "/refresh-token",
-  authRateLimit,
-  validate(refreshTokenSchema),
-  refreshToken
-);
+router.post("/refresh-token", validate(refreshTokenSchema), refreshToken);
 
 // Protected routes
 router.get("/me", authenticateToken, getCurrentUser);
@@ -45,10 +35,6 @@ router.patch(
   updateCurrentUser
 );
 
-router.post(
-  "/logout",
-  optionalAuth, // Allow logout even with invalid tokens
-  logout
-);
+router.post("/logout", logout);
 
 export default router;

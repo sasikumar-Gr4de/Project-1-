@@ -83,7 +83,7 @@ const Dashboard = () => {
             Here's your latest performance overview
           </p>
         </div>
-        <Button asChild className="bg-primary text-black hover:bg-[#A8E55C]">
+        <Button asChild className="bg-[#A8E55C] text-black hover:bg-[#94D44A]">
           <a href="/upload">
             <Upload className="w-4 h-4 mr-2" />
             Upload New Data
@@ -99,7 +99,7 @@ const Dashboard = () => {
             <CardTitle className="text-sm font-medium text-white">
               GR4DE Score
             </CardTitle>
-            <Award className="h-4 w-4 text-primary" />
+            <Award className="h-4 w-4 text-[#A8E55C]" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-white">
@@ -123,7 +123,7 @@ const Dashboard = () => {
             <CardTitle className="text-sm font-medium text-white">
               Total Reports
             </CardTitle>
-            <FileText className="h-4 w-4 text-primary" />
+            <FileText className="h-4 w-4 text-[#A8E55C]" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-white">
@@ -143,10 +143,10 @@ const Dashboard = () => {
             <CardTitle className="text-sm font-medium text-white">
               Progress Trend
             </CardTitle>
-            <TrendingUp className="h-4 w-4 text-primary" />
+            <TrendingUp className="h-4 w-4 text-[#A8E55C]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">
+            <div className="text-2xl font-bold text-[#A8E55C]">
               {progressData?.length > 1 ? "+" : ""}
               {progressData?.length > 1
                 ? (
@@ -170,7 +170,7 @@ const Dashboard = () => {
             <CardTitle className="text-sm font-medium text-white">
               Benchmark Rank
             </CardTitle>
-            <Target className="h-4 w-4 text-primary" />
+            <Target className="h-4 w-4 text-[#A8E55C]" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-white">
@@ -202,7 +202,7 @@ const Dashboard = () => {
                 {recentReports.map((report) => (
                   <div
                     key={report.id}
-                    className="flex items-center justify-between p-3 border border-[#404040] rounded-lg bg-[#1A1A1A] hover:bg-[#2A2A2A] transition-colors"
+                    className="flex items-center justify-between p-3 border rounded-lg bg-[#1A1A1A] border-[#404040]"
                   >
                     <div className="flex items-center space-x-3">
                       <div
@@ -227,7 +227,7 @@ const Dashboard = () => {
                       </p>
                       <Badge
                         variant="outline"
-                        className="text-xs bg-[#404040] text-white border-[#404040]"
+                        className="text-xs bg-[#333333] text-white border-[#404040]"
                       >
                         Overall
                       </Badge>
@@ -241,7 +241,7 @@ const Dashboard = () => {
                 <p className="text-[#B0AFAF]">No reports yet</p>
                 <Button
                   asChild
-                  className="mt-4 bg-primary text-black hover:bg-[#A8E55C]"
+                  className="mt-4 bg-[#A8E55C] text-black hover:bg-[#94D44A]"
                 >
                   <a href="/upload">Upload Your First Data</a>
                 </Button>
@@ -297,10 +297,10 @@ const Dashboard = () => {
 
       {/* Quick Actions */}
       <div className="grid gap-4 md:grid-cols-3">
-        <Card className="bg-[#1A1A1A] border-primary/20 hover:border-primary/40 transition-colors">
+        <Card className="bg-[#A8E55C]/10 border-[#A8E55C]/20">
           <CardContent className="p-6">
             <div className="flex items-center space-x-3">
-              <Upload className="w-8 h-8 text-primary" />
+              <Upload className="w-8 h-8 text-[#A8E55C]" />
               <div>
                 <h3 className="font-semibold text-white">Upload Match Data</h3>
                 <p className="text-sm text-[#B0AFAF]">
@@ -311,10 +311,10 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="bg-[#1A1A1A] border-primary/20 hover:border-primary/40 transition-colors">
+        <Card className="bg-[#A8E55C]/10 border-[#A8E55C]/20">
           <CardContent className="p-6">
             <div className="flex items-center space-x-3">
-              <BarChart3 className="w-8 h-8 text-primary" />
+              <BarChart3 className="w-8 h-8 text-[#A8E55C]" />
               <div>
                 <h3 className="font-semibold text-white">View Benchmarks</h3>
                 <p className="text-sm text-[#B0AFAF]">
@@ -325,10 +325,10 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="bg-[#1A1A1A] border-primary/20 hover:border-primary/40 transition-colors">
+        <Card className="bg-[#A8E55C]/10 border-[#A8E55C]/20">
           <CardContent className="p-6">
             <div className="flex items-center space-x-3">
-              <FileText className="w-8 h-8 text-primary" />
+              <FileText className="w-8 h-8 text-[#A8E55C]" />
               <div>
                 <h3 className="font-semibold text-white">All Reports</h3>
                 <p className="text-sm text-[#B0AFAF]">

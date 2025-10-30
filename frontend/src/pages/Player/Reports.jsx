@@ -16,6 +16,7 @@ import {
   getBadgeVariant,
   getScoreColor,
 } from "@/utils/helper.utils";
+import { Link } from "react-router-dom";
 
 const Reports = () => {
   const { reports, pagination, isLoading, fetchReports, fetchReport } =
@@ -145,10 +146,10 @@ const Reports = () => {
           </p>
         </div>
         <Button asChild>
-          <a href="/upload">
+          <Link to="/upload">
             <Download className="w-4 h-4 mr-2" />
             New Analysis
-          </a>
+          </Link>
         </Button>
       </div>
 
@@ -204,7 +205,7 @@ const Reports = () => {
             data={reports}
             columns={columns}
             actions={actions}
-            isLoading={isLoading}
+            isLoading={isLoading} // Pass loading state
             pagination={{
               page: pagination.page,
               pageSize: pagination.pageSize,

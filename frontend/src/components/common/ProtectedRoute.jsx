@@ -1,3 +1,4 @@
+// components/common/ProtectedRoute.jsx - Fixed version
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { Navigate, useLocation } from "react-router-dom";
@@ -30,13 +31,21 @@ const ProtectedRoute = ({ children, requireOnboarding = false }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Redirect to onboarding if user needs to complete profile
-  if (requireOnboarding && user && !user.player_name) {
+  // Check if user needs onboarding
+  const needsOnboarding = user && !user.player_name;
+
+  // If route requires onboarding but user doesn't need it, redirect to dashboard
+  if (requireOnboarding && !needsOnboarding) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  // If user needs onboarding but is not on onboarding page, redirect to onboarding
+  if (needsOnboarding && location.pathname !== "/onboarding") {
     return <Navigate to="/onboarding" replace />;
   }
 
-  // Redirect away from onboarding if already completed
-  if (location.pathname === "/onboarding" && user?.player_name) {
+  // If user doesn't need onboarding but is on onboarding page, redirect to dashboard
+  if (!needsOnboarding && location.pathname === "/onboarding") {
     return <Navigate to="/dashboard" replace />;
   }
 

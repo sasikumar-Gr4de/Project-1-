@@ -1,35 +1,41 @@
 import { supabase } from "../config/supabase.config.js";
+import { generateUUID } from "./tokenService.js";
 
-export const createUser = async (email, phone, userData = {}) => {
-  const session = await supabase.client.auth.getSession();
-
+export const getOrCreateUser = async (email, phone, userData = {}) => {
   try {
-    // Check if user already exists
-    const existingUser = await findUserByEmailOrPhone(email, phone);
+    // Check if user already exists by querying the users table
+    const existingUser = await getUserByEmailOrPhone(email, phone);
     if (existingUser) {
       throw new Error("User already registered");
     }
+    // Create user profile in users table directly
+    const { data: profile, error: profileError } = await supabase
+      .from("users")
+      .insert([
+        {
+          email: email,
+          phone: phone || null,
+          role: "player",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          ...userData,
+        },
+      ])
+      .select()
+      .single();
 
-    // Create auth user
-    const authUser = await createAuthUser(email, userData);
-
-    // Create user profile
-    const userProfile = await createUserProfile(authUser, phone, userData);
-
-    return {
-      id: authUser.id,
-      email: authUser.email,
-      ...userProfile,
-    };
-  } catch (error) {
-    console.error("Create user error:", error);
-
-    // Cleanup on failure
-    if (error.message.includes("profile") && authUser) {
-      await supabase.auth.admin.deleteUser(authUser.id);
+    if (profileError) {
+      console.error("Profile creation error:", profileError);
+      throw new Error(`Profile creation failed: ${profileError.message}`);
     }
 
-    throw new Error(`User creation failed: ${error.message}`);
+    return {
+      user: profile, // Return the profile as user object
+      isNewUser: true,
+    };
+  } catch (err) {
+    console.error("Create user error:", err);
+    throw new Error(`User creation failed: ${err.message}`);
   }
 };
 
@@ -104,66 +110,25 @@ export const completeOnboarding = async (userId, onboardingData) => {
   return await updateUserProfile(userId, onboardingData);
 };
 
-// Helper functions
-const findUserByEmailOrPhone = async (email, phone) => {
+const getUserByEmailOrPhone = async (email, phone) => {
+  let query = supabase.from("users").select("*");
+
   if (email) {
-    const { data, error } = await supabase.auth.admin.getUserByEmail(email);
-    if (!error && data) return data.user;
+    query = query.or(`email.eq.${email}`);
   }
 
-  // Implement phone-based lookup if needed
   if (phone) {
-    const { data, error } = await supabase
-      .from("users")
-      .select("*")
-      .eq("phone", phone)
-      .single();
-
-    if (!error && data) return data;
+    query = query.or(email ? `phone.eq.${phone}` : `phone.eq.${phone}`);
   }
 
-  return null;
-};
+  const { data, error } = await query.maybeSingle();
 
-const createAuthUser = async (email, userData) => {
-  const { data, error } = await supabase.auth.admin.createUser({
-    email,
-    email_confirm: true,
-    user_metadata: {
-      ...userData,
-    },
-  });
-
-  if (error) {
-    throw new Error(`Auth user creation failed: ${error.message}`);
+  if (error && error.code !== "PGRST116") {
+    // PGRST116 = no rows
+    console.error("Error finding user:", error);
+    return null;
   }
-
-  return data.user;
-};
-
-const createUserProfile = async (authUser, phone, userData) => {
-  const { error } = await supabase.from("users").insert([
-    {
-      id: authUser.id,
-      email: authUser.email,
-      phone: phone || null,
-      role: "player", // Default role
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      ...userData,
-    },
-  ]);
-
-  if (error) {
-    throw new Error(`Profile creation failed: ${error.message}`);
-  }
-
-  // Return the created profile
-  const { data } = await supabase
-    .from("users")
-    .select("*")
-    .eq("id", authUser.id)
-    .single();
+  console.log("User found by email/phone:", data);
 
   return data;
 };

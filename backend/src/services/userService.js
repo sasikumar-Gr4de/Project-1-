@@ -25,7 +25,7 @@ export const getUserDashboard = async (userId) => {
   sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
   const { data: progressData, error: progressError } = await supabase
-    .from("progress")
+    .from("player_data")
     .select("*")
     .eq("player_id", userId)
     .gte("created_at", sixMonthsAgo.toISOString())
@@ -39,7 +39,7 @@ export const getUserDashboard = async (userId) => {
     .select("*")
     .eq("position", user.position)
     .eq("is_active", true)
-    .single();
+    .maybeSingle();
 
   if (benchmarkError) throw benchmarkError;
 

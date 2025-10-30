@@ -9,7 +9,7 @@ const authAPI = {
   verifyOtp: (data) => api.post("/auth/verify-otp", data),
   getCurrentUser: () => api.get("/auth/me"),
   logout: () => api.post("/auth/logout"),
-  updateProfile: (data) => api.patch("/users/profile", data),
+  updateProfile: (data) => api.patch("/auth/profile", data),
 };
 
 export const useAuthStore = create(
@@ -77,8 +77,7 @@ export const useAuthStore = create(
             });
 
             if (response.data.success) {
-              const { user, session, requires_onboarding } = response.data.data;
-              const token = session?.access_token;
+              const { user, token, requires_onboarding } = response.data.data;
 
               if (token) {
                 localStorage.setItem("auth-token", token);

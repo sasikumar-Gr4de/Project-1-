@@ -27,6 +27,7 @@ export const updateProfile = async (req, res) => {
 export const getDashboard = async (req, res) => {
   try {
     const dashboardData = await getUserDashboard(req.user.id);
+
     res.json(
       RESPONSES.SUCCESS("Dashboard data fetched successfully", dashboardData)
     );

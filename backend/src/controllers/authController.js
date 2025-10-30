@@ -1,16 +1,14 @@
 import sgMail from "../config/sendgrid.config.js";
 import { generateAndStoreOTP, verifyOTP } from "../services/otpService.js";
 import {
-  createUser,
+  getOrCreateUser,
   getUserProfile,
   updateUserProfile,
 } from "../services/authService.js";
 import { RESPONSES, AUTH_MESSAGES } from "../utils/messages.js";
 import { supabase } from "../config/supabase.config.js";
+import { generateCustomToken } from "../services/tokenService.js";
 
-/**
- * Send OTP to email or WhatsApp with proper validation
- */
 export const sendOtp = async (req, res) => {
   try {
     const { email, phone } = req.body;
@@ -29,7 +27,7 @@ export const sendOtp = async (req, res) => {
     }
 
     // Generate and store OTP
-    const { otp, expiresAt } = await generateAndStoreOTP(email, phone);
+    const { otp } = await generateAndStoreOTP(email, phone);
 
     // Send OTP via appropriate channel
     try {
@@ -57,14 +55,10 @@ export const sendOtp = async (req, res) => {
   }
 };
 
-/**
- * Verify OTP and authenticate user with robust error handling
- */
 export const verifyOtpAndLogin = async (req, res) => {
   try {
     const { email, phone, otp, ...userData } = req.body;
 
-    // Validate input
     if (!otp) {
       return res.status(400).json(RESPONSES.BAD_REQUEST("OTP is required"));
     }
@@ -82,44 +76,53 @@ export const verifyOtpAndLogin = async (req, res) => {
       return res.status(400).json(RESPONSES.BAD_REQUEST(otpError));
     }
 
-    let user;
-    let isNewUser = false;
+    // Get or create user
+    const { user, isNewUser } = await getOrCreateUser(email, phone, userData);
 
-    try {
-      // Check if user exists
-      const existingUser = await findExistingUser(email, phone);
-
-      if (existingUser) {
-        user = existingUser;
-      } else {
-        // Create new user
-        user = await createUser(email, phone, userData);
-        isNewUser = true;
-      }
-
-      // Get complete user profile
-      const profile = await getUserProfile(user.id);
-
-      // Generate authentication session
-      const session = await createUserSession(user.id);
-
-      res.json(
-        RESPONSES.SUCCESS(AUTH_MESSAGES.LOGIN_SUCCESS, {
-          user: profile,
-          session: {
-            access_token: session.access_token,
-            refresh_token: session.refresh_token,
-            expires_in: session.expires_in,
-            token_type: "bearer",
-          },
-          requires_onboarding: !profile.player_name,
-          is_new_user: isNewUser,
-        })
-      );
-    } catch (userError) {
-      console.error("User processing error:", userError);
-      throw userError;
+    if (!user) {
+      return res
+        .status(400)
+        .json(RESPONSES.BAD_REQUEST(AUTH_MESSAGES.USER_NOT_FOUND));
     }
+
+    // Get complete user profile
+    let profile;
+    try {
+      profile = await getUserProfile(user.id);
+    } catch (error) {
+      // If profile doesn't exist yet, create it
+      if (error.message.includes("not found")) {
+        await supabase.from("users").insert([
+          {
+            id: user.id,
+            email: user.email,
+            phone: phone || null,
+            role: "player",
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            ...userData,
+          },
+        ]);
+
+        profile = await getUserProfile(user.id);
+      } else {
+        throw error;
+      }
+    }
+
+    // Generate custom JWT token instead of Supabase session
+    const token = generateCustomToken(profile);
+
+    res.json(
+      RESPONSES.SUCCESS(AUTH_MESSAGES.LOGIN_SUCCESS, {
+        user: profile,
+        token: token,
+        token_type: "Bearer",
+        expires_in: "7d",
+        requires_onboarding: !profile.player_name,
+        is_new_user: isNewUser,
+      })
+    );
   } catch (error) {
     console.error("Verify OTP error:", error);
 
@@ -213,30 +216,44 @@ export const refreshToken = async (req, res) => {
         .json(RESPONSES.BAD_REQUEST("Refresh token is required"));
     }
 
-    const { data, error } = await supabase.auth.refreshSession({
-      refresh_token,
-    });
+    // Verify refresh token
+    const decoded = verifyRefreshToken(refresh_token);
 
-    if (error) {
+    // Get user profile
+    const profile = await getUserProfile(decoded.userId);
+
+    // Generate new access token
+    const newAccessToken = generateCustomToken(profile);
+
+    res.json(
+      RESPONSES.SUCCESS("Token refreshed", {
+        access_token: newAccessToken,
+        token_type: "Bearer",
+        expires_in: "7d",
+        user: profile,
+      })
+    );
+  } catch (error) {
+    console.error("Refresh token error:", error);
+
+    if (
+      error.message.includes("Invalid refresh token") ||
+      error.name === "JsonWebTokenError"
+    ) {
       return res
         .status(401)
         .json(RESPONSES.UNAUTHORIZED("Invalid refresh token"));
     }
 
-    res.json(
-      RESPONSES.SUCCESS("Token refreshed", {
-        access_token: data.session.access_token,
-        refresh_token: data.session.refresh_token,
-        expires_in: data.session.expires_in,
-        token_type: "bearer",
-      })
-    );
-  } catch (error) {
-    console.error("Refresh token error:", error);
+    if (error.name === "TokenExpiredError") {
+      return res
+        .status(401)
+        .json(RESPONSES.UNAUTHORIZED("Refresh token expired"));
+    }
+
     res.status(500).json(RESPONSES.SERVER_ERROR(AUTH_MESSAGES.INTERNAL_ERROR));
   }
 };
-
 // Helper functions
 const sendEmailOtp = async (email, otp) => {
   const msg = {
@@ -255,7 +272,7 @@ const sendEmailOtp = async (email, otp) => {
     `,
   };
 
-  await sgMail.send(msg);
+  // await sgMail.send(msg);
   console.log("OTP sent via email to:", email);
 };
 
@@ -267,24 +284,4 @@ const sendWhatsAppOtp = async (phone, otp) => {
   //   from: process.env.TWILIO_WHATSAPP_FROM,
   //   to: `whatsapp:${phone}`,
   // });
-};
-
-const findExistingUser = async (email, phone) => {
-  if (email) {
-    const { data, error } = await supabase.auth.admin.getUserByEmail(email);
-    if (!error && data) return data.user;
-  }
-
-  // Add phone lookup logic if needed
-  return null;
-};
-
-const createUserSession = async (userId) => {
-  const { data, error } = await supabase.auth.admin.createSession({
-    userId: userId,
-    // Additional session configuration
-  });
-
-  if (error) throw error;
-  return data.session;
 };

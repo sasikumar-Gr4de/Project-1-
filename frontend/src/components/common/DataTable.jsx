@@ -29,7 +29,7 @@ const DataTable = ({
   title,
   onAdd,
   addButtonText = "Add New",
-  isLoading = true,
+  isLoading = false, // Changed default to false
   emptyStateTitle = "No Data Available",
   emptyStateDescription = "There are no records to display. Get started by adding your first entry.",
   // Pagination props
@@ -160,12 +160,14 @@ const DataTable = ({
     }
   };
 
-  // Skeleton Rows for Loading State
+  // Skeleton Rows for Loading State - FIXED LAYOUT
   const TableSkeleton = () => {
     const skeletonRows = Array.from({ length: itemsPerPage }, (_, i) => i);
 
     return (
-      <>
+      <div className="relative min-h-[400px]">
+        {" "}
+        {/* Fixed height container */}
         {/* Desktop Skeleton */}
         <div className="hidden md:block overflow-x-auto w-full">
           <table className="w-full text-sm border-separate border-spacing-y-2">
@@ -236,7 +238,6 @@ const DataTable = ({
             </tbody>
           </table>
         </div>
-
         {/* Mobile Skeleton */}
         <div className="block md:hidden space-y-3 p-4">
           {skeletonRows.slice(0, 3).map((rowIndex) => (
@@ -287,24 +288,25 @@ const DataTable = ({
             </div>
           ))}
         </div>
-
-        {/* Loading Overlay */}
-        <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center rounded-lg">
-          <LoadingSpinner
-            type="pulse"
-            size="lg"
-            text="Loading ..."
-            centered={true}
-            color="primary"
-          />
+        {/* Loading Overlay - Fixed positioning */}
+        <div className="absolute inset-0 bg-background/50 backdrop-blur-sm flex items-center justify-center rounded-lg border border-border/30">
+          <div className="text-center">
+            <LoadingSpinner
+              type="pulse"
+              size="lg"
+              text="Loading reports..."
+              centered={true}
+              color="primary"
+            />
+          </div>
         </div>
-      </>
+      </div>
     );
   };
 
   // No Data State
   const NoDataState = () => (
-    <div className="flex flex-col items-center justify-center py-16 px-4 text-center bg-muted/20 rounded-lg border border-border/50">
+    <div className="flex flex-col items-center justify-center py-16 px-4 text-center bg-muted/20 rounded-lg border border-border/50 min-h-[200px]">
       <div className="relative mb-6">
         <div className="w-20 h-20 bg-linear-to-br from-primary/10 to-primary/5 rounded-full flex items-center justify-center mb-2 border border-primary/20">
           <Inbox className="w-8 h-8 text-primary/60" />
@@ -335,7 +337,7 @@ const DataTable = ({
 
   // Empty search results state
   const EmptySearchState = () => (
-    <div className="flex flex-col items-center justify-center py-12 px-4 text-center bg-muted/20 rounded-lg border border-border/50">
+    <div className="flex flex-col items-center justify-center py-12 px-4 text-center bg-muted/20 rounded-lg border border-border/50 min-h-[200px]">
       <div className="w-14 h-14 bg-muted/30 rounded-full flex items-center justify-center mb-4">
         <Search className="w-6 h-6 text-muted-foreground" />
       </div>
@@ -384,9 +386,7 @@ const DataTable = ({
 
       <div className="relative w-full rounded-lg bg-background">
         {isLoading ? (
-          <div className="relative">
-            <TableSkeleton />
-          </div>
+          <TableSkeleton />
         ) : displayTotal === 0 ? (
           searchTerm && !isExternalPagination ? (
             <EmptySearchState />
