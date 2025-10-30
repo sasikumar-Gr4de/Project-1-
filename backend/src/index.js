@@ -7,6 +7,7 @@ import adminRoutes from "./routes/adminRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
 import subscriptionRoutes from "./routes/subscriptionRoutes.js";
+import uploadRoutes from "./routes/uploadRoutes.js";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -44,6 +45,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
+app.use("/api/upload", uploadRoutes);
 
 app.get("/api", (req, res) => {
   res.json({ success: true, message: "API is running" });

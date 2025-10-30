@@ -111,9 +111,9 @@ const PlayerLayout = ({ children }) => {
           {/* Logo Section */}
           <div className="flex items-center p-6 border-b border-border/20">
             <img
-              src="https://placehold.co/208x55"
+              src="favicon-flat.png"
               alt="GR4DE Logo"
-              className="w-52 h-[55px]"
+              className="w-52 h-[50px]"
             />
           </div>
 

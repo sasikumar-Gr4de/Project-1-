@@ -1,9 +1,17 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { Navigate } from "react-router-dom"; // Add this import
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
+import { useEffect } from "react";
 import "@/App.css";
 
 import { useAuthStore } from "@/store/authStore";
+import { ROUTES, isPublicRoute } from "@/utils/routes.config";
 import Layout from "@/components/layout/Layout";
+import ProtectedRoute from "@/components/common/ProtectedRoute";
+import RoleProtectedRoute from "@/components/common/RoleProtectedRoute";
 
 // Auth Pages
 import Login from "@/pages/Auth/Login";
@@ -20,6 +28,7 @@ import Profile from "@/pages/Player/Profile";
 // Admin Pages
 import AdminDashboard from "@/pages/Admin/Dashboard";
 
+// Other Pages
 import Landing from "@/pages/Landing";
 import Unauthorized from "@/pages/Error/Unauthorized";
 import NotFoundPage from "@/pages/Error/NotFoundPage";
@@ -27,9 +36,16 @@ import ServerFileUpload from "@/pages/Developer/ServerFileUpload";
 import { ToastProvider } from "@/contexts/ToastContext";
 
 function App() {
-  const { isAuthenticated, user, isLoading } = useAuthStore();
+  const { isAuthenticated, user, isInitialized, initializeAuth } =
+    useAuthStore();
 
-  if (isLoading) {
+  // Initialize authentication on app start
+  useEffect(() => {
+    initializeAuth();
+  }, [initializeAuth]);
+
+  // Show loading while initializing
+  if (!isInitialized) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -42,228 +58,156 @@ function App() {
     );
   }
 
-  // Redirect logic for onboarding
-  const requiresOnboarding = isAuthenticated && user && !user.player_name;
+  // Determine default route based on authentication and user role
+  const getDefaultRoute = () => {
+    if (!isAuthenticated) return ROUTES.LANDING;
+    if (user?.requires_onboarding || !user?.player_name)
+      return ROUTES.ONBOARDING;
+    return user?.role === "admin" ? ROUTES.ADMIN_DASHBOARD : ROUTES.DASHBOARD;
+  };
 
   return (
     <ToastProvider>
       <Router>
         <Routes>
-          {/* Public Routes - No Layout */}
-          <Route path="/" element={<Landing />} />
-
-          {/* Auth Routes - Use AuthLayout */}
+          {/* Public Routes */}
+          <Route path={ROUTES.LANDING} element={<Landing />} />
           <Route
-            path="/login"
+            path={ROUTES.LOGIN}
             element={
               isAuthenticated ? (
-                <Navigate
-                  to={user?.role === "admin" ? "/admin" : "/dashboard"}
-                />
+                <Navigate to={getDefaultRoute()} replace />
               ) : (
                 <Login />
               )
             }
           />
+          <Route path={ROUTES.UNAUTHORIZED} element={<Unauthorized />} />
+          <Route path={ROUTES.SERVER_UPLOAD} element={<ServerFileUpload />} />
 
-          <Route path="/onboarding" element={<Onboarding />} />
+          {/* Protected Routes with Layout */}
+          <Route
+            path={ROUTES.ONBOARDING}
+            element={
+              <ProtectedRoute requireOnboarding={true}>
+                <Layout>
+                  <Onboarding />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
 
+          {/* Player Routes */}
           <Route
-            path="/dashboard"
+            path={ROUTES.DASHBOARD}
             element={
-              <Layout>
-                <Dashboard />
-              </Layout>
-            }
-          />
-          <Route
-            path="/upload"
-            element={
-              <Layout>
-                <Upload />
-              </Layout>
-            }
-          />
-          <Route
-            path="/reports"
-            element={
-              <Layout>
-                <Reports />
-              </Layout>
-            }
-          />
-          <Route
-            path="/reports/:reportId"
-            element={
-              <Layout>
-                <ReportDetail />
-              </Layout>
-            }
-          />
-          <Route
-            path="/benchmarks"
-            element={
-              <Layout>
-                <Benchmarks />
-              </Layout>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <Layout>
-                <Profile />
-              </Layout>
+              <ProtectedRoute>
+                <RoleProtectedRoute allowedRoles={["player", "admin"]}>
+                  <Layout>
+                    <Dashboard />
+                  </Layout>
+                </RoleProtectedRoute>
+              </ProtectedRoute>
             }
           />
 
           <Route
-            path="/admin"
+            path={ROUTES.UPLOAD}
             element={
-              <Layout>
-                <AdminDashboard />
-              </Layout>
-            }
-          />
-          <Route
-            path="/admin/dashboard"
-            element={
-              <Layout>
-                <AdminDashboard />
-              </Layout>
+              <ProtectedRoute>
+                <RoleProtectedRoute allowedRoles={["player"]}>
+                  <Layout>
+                    <Upload />
+                  </Layout>
+                </RoleProtectedRoute>
+              </ProtectedRoute>
             }
           />
 
           <Route
-            path="/admin"
+            path={ROUTES.REPORTS}
             element={
-              <Layout>
-                <AdminDashboard />
-              </Layout>
+              <ProtectedRoute>
+                <RoleProtectedRoute allowedRoles={["player"]}>
+                  <Layout>
+                    <Reports />
+                  </Layout>
+                </RoleProtectedRoute>
+              </ProtectedRoute>
             }
           />
+
           <Route
-            path="/admin/dashboard"
+            path={ROUTES.REPORT_DETAIL}
             element={
-              <Layout>
-                <AdminDashboard />
-              </Layout>
+              <ProtectedRoute>
+                <RoleProtectedRoute allowedRoles={["player"]}>
+                  <Layout>
+                    <ReportDetail />
+                  </Layout>
+                </RoleProtectedRoute>
+              </ProtectedRoute>
             }
           />
 
-          {/* Protected Routes - Use Layout */}
-          {isAuthenticated ? (
-            <>
-              {/* Onboarding */}
-              {requiresOnboarding ? (
-                <Route
-                  path="*"
-                  element={
-                    <Layout>
-                      <Onboarding />
-                    </Layout>
-                  }
-                />
-              ) : (
-                <>
-                  {/* Player Routes */}
-                  {user?.role !== "admin" && (
-                    <>
-                      <Route
-                        path="/dashboard"
-                        element={
-                          <Layout>
-                            <Dashboard />
-                          </Layout>
-                        }
-                      />
-                      <Route
-                        path="/upload"
-                        element={
-                          <Layout>
-                            <Upload />
-                          </Layout>
-                        }
-                      />
-                      <Route
-                        path="/reports"
-                        element={
-                          <Layout>
-                            <Reports />
-                          </Layout>
-                        }
-                      />
-                      <Route
-                        path="/reports/:reportId"
-                        element={
-                          <Layout>
-                            <ReportDetail />
-                          </Layout>
-                        }
-                      />
-                      <Route
-                        path="/benchmarks"
-                        element={
-                          <Layout>
-                            <Benchmarks />
-                          </Layout>
-                        }
-                      />
-                      <Route
-                        path="/profile"
-                        element={
-                          <Layout>
-                            <Profile />
-                          </Layout>
-                        }
-                      />
-                    </>
-                  )}
+          <Route
+            path={ROUTES.BENCHMARKS}
+            element={
+              <ProtectedRoute>
+                <RoleProtectedRoute allowedRoles={["player"]}>
+                  <Layout>
+                    <Benchmarks />
+                  </Layout>
+                </RoleProtectedRoute>
+              </ProtectedRoute>
+            }
+          />
 
-                  {/* Admin Routes */}
-                  {user?.role === "admin" && (
-                    <>
-                      <Route
-                        path="/admin"
-                        element={
-                          <Layout>
-                            <AdminDashboard />
-                          </Layout>
-                        }
-                      />
-                      <Route
-                        path="/admin/dashboard"
-                        element={
-                          <Layout>
-                            <AdminDashboard />
-                          </Layout>
-                        }
-                      />
-                    </>
-                  )}
+          <Route
+            path={ROUTES.PROFILE}
+            element={
+              <ProtectedRoute>
+                <RoleProtectedRoute allowedRoles={["player", "admin"]}>
+                  <Layout>
+                    <Profile />
+                  </Layout>
+                </RoleProtectedRoute>
+              </ProtectedRoute>
+            }
+          />
 
-                  {/* Fallback for authenticated users */}
-                  <Route
-                    path="*"
-                    element={
-                      <Navigate
-                        to={user?.role === "admin" ? "/admin" : "/dashboard"}
-                      />
-                    }
-                  />
-                </>
-              )}
-            </>
-          ) : (
-            /* Redirect unauthenticated users trying to access protected routes */
-            <Route path="*" element={<Navigate to="/" />} />
-          )}
+          {/* Admin Routes */}
+          <Route
+            path={ROUTES.ADMIN}
+            element={
+              <ProtectedRoute>
+                <RoleProtectedRoute allowedRoles={["admin"]}>
+                  <Layout>
+                    <AdminDashboard />
+                  </Layout>
+                </RoleProtectedRoute>
+              </ProtectedRoute>
+            }
+          />
 
-          {/* Developer Route */}
-          <Route path="/server/upload-image" element={<ServerFileUpload />} />
+          <Route
+            path={ROUTES.ADMIN_DASHBOARD}
+            element={
+              <ProtectedRoute>
+                <RoleProtectedRoute allowedRoles={["admin"]}>
+                  <Layout>
+                    <AdminDashboard />
+                  </Layout>
+                </RoleProtectedRoute>
+              </ProtectedRoute>
+            }
+          />
 
-          {/* Error Routes */}
-          <Route path="/unauthorized" element={<Unauthorized />} />
+          {/* Fallback Routes */}
+          <Route
+            path="/"
+            element={<Navigate to={getDefaultRoute()} replace />}
+          />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Router>

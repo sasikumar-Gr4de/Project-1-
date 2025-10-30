@@ -414,18 +414,6 @@ const Login = () => {
                     enableSearch={true}
                     disableSearchIcon={true}
                     searchPlaceholder="Search countries..."
-                    preferredCountries={[
-                      "us",
-                      "gb",
-                      "in",
-                      "ca",
-                      "au",
-                      "de",
-                      "fr",
-                      "br",
-                      "ng",
-                      "za",
-                    ]}
                     containerClass="react-tel-input"
                     inputClass="form-control"
                     autoFormat={true}

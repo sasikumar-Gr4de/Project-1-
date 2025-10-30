@@ -3,21 +3,52 @@ import {
   sendOtp,
   verifyOtpAndLogin,
   getCurrentUser,
+  updateCurrentUser,
   logout,
+  refreshToken,
 } from "../controllers/authController.js";
 import { validate } from "../middleware/validation.js";
-import { sendOtpSchema, verifyOtpSchema } from "../middleware/validation.js";
-import { authenticateToken } from "../middleware/auth.js";
-import { otpRateLimit } from "../middleware/rateLimit.js";
+import {
+  sendOtpSchema,
+  verifyOtpSchema,
+  refreshTokenSchema,
+} from "../middleware/validation.js";
+import { authenticateToken, optionalAuth } from "../middleware/auth.js";
+import { otpRateLimit, authRateLimit } from "../middleware/rateLimit.js";
 
 const router = express.Router();
 
 // Public routes
 router.post("/send-otp", otpRateLimit, validate(sendOtpSchema), sendOtp);
-router.post("/verify-otp", validate(verifyOtpSchema), verifyOtpAndLogin);
+
+router.post(
+  "/verify-otp",
+  authRateLimit,
+  validate(verifyOtpSchema),
+  verifyOtpAndLogin
+);
+
+router.post(
+  "/refresh-token",
+  authRateLimit,
+  validate(refreshTokenSchema),
+  refreshToken
+);
 
 // Protected routes
 router.get("/me", authenticateToken, getCurrentUser);
-router.post("/logout", authenticateToken, logout);
+
+router.patch(
+  "/profile",
+  authenticateToken,
+  validate(updateProfileSchema),
+  updateCurrentUser
+);
+
+router.post(
+  "/logout",
+  optionalAuth, // Allow logout even with invalid tokens
+  logout
+);
 
 export default router;

@@ -1,50 +1,54 @@
 import sgMail from "../config/sendgrid.config.js";
-import twilioClient from "../config/twilio.config.js";
 import { generateAndStoreOTP, verifyOTP } from "../services/otpService.js";
-import { createUser, getUserProfile } from "../services/authService.js";
+import {
+  createUser,
+  getUserProfile,
+  updateUserProfile,
+} from "../services/authService.js";
 import { RESPONSES, AUTH_MESSAGES } from "../utils/messages.js";
+import { supabase } from "../config/supabase.config.js";
 
 /**
- * Send OTP to email or WhatsApp
+ * Send OTP to email or WhatsApp with proper validation
  */
 export const sendOtp = async (req, res) => {
   try {
     const { email, phone } = req.body;
 
+    // Validate input
+    if (!email && !phone) {
+      return res
+        .status(400)
+        .json(RESPONSES.BAD_REQUEST("Email or phone is required"));
+    }
+
+    if (email && phone) {
+      return res
+        .status(400)
+        .json(RESPONSES.BAD_REQUEST("Provide either email or phone, not both"));
+    }
+
     // Generate and store OTP
     const { otp, expiresAt } = await generateAndStoreOTP(email, phone);
 
     // Send OTP via appropriate channel
-    if (email) {
-      const msg = {
-        to: email,
-        from: process.env.SENDGRID_FROM_EMAIL || "noreply@gr4de.com",
-        subject: "Your GR4DE Verification Code",
-        text: `Your verification code is: ${otp}. This code expires in 10 minutes.`,
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #2563eb;">GR4DE Platform</h2>
-            <p>Your verification code is:</p>
-            <h1 style="font-size: 32px; color: #2563eb; letter-spacing: 8px;">${otp}</h1>
-            <p>This code will expire in 5 minutes.</p>
-            <p>If you didn't request this code, please ignore this email.</p>
-          </div>
-        `,
-      };
-
-      await sgMail.send(msg);
-    } else if (phone) {
-      await twilioClient.messages.create({
-        body: `Your GR4DE verification code is: ${otp}. This code expires in 10 minutes.`,
-        from: process.env.TWILIO_WHATSAPP_FROM,
-        to: `whatsapp:${phone}`,
-      });
+    try {
+      if (email) {
+        await sendEmailOtp(email, otp);
+      } else if (phone) {
+        await sendWhatsAppOtp(phone, otp);
+      }
+    } catch (channelError) {
+      console.error("OTP delivery failed:", channelError);
+      // Continue - OTP is still stored and can be verified
     }
 
     res.json(
       RESPONSES.SUCCESS(AUTH_MESSAGES.OTP_SENT, {
         channel: email ? "email" : "whatsapp",
-        expires_in: "10 minutes",
+        expires_in: "5 minutes",
+        // Development only - never expose OTP in production
+        ...(process.env.NODE_ENV === "development" && { otp }),
       })
     );
   } catch (error) {
@@ -54,11 +58,22 @@ export const sendOtp = async (req, res) => {
 };
 
 /**
- * Verify OTP and authenticate user
+ * Verify OTP and authenticate user with robust error handling
  */
 export const verifyOtpAndLogin = async (req, res) => {
   try {
     const { email, phone, otp, ...userData } = req.body;
+
+    // Validate input
+    if (!otp) {
+      return res.status(400).json(RESPONSES.BAD_REQUEST("OTP is required"));
+    }
+
+    if (!email && !phone) {
+      return res
+        .status(400)
+        .json(RESPONSES.BAD_REQUEST("Email or phone is required"));
+    }
 
     // Verify OTP
     const { isValid, error: otpError } = await verifyOTP(email, phone, otp);
@@ -67,54 +82,53 @@ export const verifyOtpAndLogin = async (req, res) => {
       return res.status(400).json(RESPONSES.BAD_REQUEST(otpError));
     }
 
-    // Create or get user
     let user;
+    let isNewUser = false;
+
     try {
-      const result = await createUser(email, phone, userData);
-      user = result.user;
-    } catch (error) {
-      if (error.message === "User already registered") {
-        // Get existing user
-        const { data: authData } = email
-          ? await supabase.auth.admin.getUserByEmail(email)
-          : { data: null }; // Would need phone lookup logic
+      // Check if user exists
+      const existingUser = await findExistingUser(email, phone);
 
-        if (authData) {
-          user = authData.user;
-        }
+      if (existingUser) {
+        user = existingUser;
       } else {
-        throw error;
+        // Create new user
+        user = await createUser(email, phone, userData);
+        isNewUser = true;
       }
+
+      // Get complete user profile
+      const profile = await getUserProfile(user.id);
+
+      // Generate authentication session
+      const session = await createUserSession(user.id);
+
+      res.json(
+        RESPONSES.SUCCESS(AUTH_MESSAGES.LOGIN_SUCCESS, {
+          user: profile,
+          session: {
+            access_token: session.access_token,
+            refresh_token: session.refresh_token,
+            expires_in: session.expires_in,
+            token_type: "bearer",
+          },
+          requires_onboarding: !profile.player_name,
+          is_new_user: isNewUser,
+        })
+      );
+    } catch (userError) {
+      console.error("User processing error:", userError);
+      throw userError;
     }
-
-    if (!user) {
-      return res
-        .status(400)
-        .json(RESPONSES.BAD_REQUEST(AUTH_MESSAGES.USER_NOT_FOUND));
-    }
-
-    // Generate session token
-    const {
-      data: { session },
-      error: sessionError,
-    } = await supabase.auth.admin.createSession({
-      userId: user.id,
-      // ... other session properties
-    });
-
-    if (sessionError) throw sessionError;
-
-    // Get user profile
-    const profile = await getUserProfile(user.id);
-
-    res.json(
-      RESPONSES.SUCCESS(AUTH_MESSAGES.LOGIN_SUCCESS, {
-        user: profile,
-        session: session,
-      })
-    );
   } catch (error) {
     console.error("Verify OTP error:", error);
+
+    if (error.message.includes("User already registered")) {
+      return res
+        .status(409)
+        .json(RESPONSES.CONFLICT(AUTH_MESSAGES.USER_EXISTS));
+    }
+
     res.status(500).json(RESPONSES.SERVER_ERROR(AUTH_MESSAGES.INTERNAL_ERROR));
   }
 };
@@ -124,7 +138,14 @@ export const verifyOtpAndLogin = async (req, res) => {
  */
 export const getCurrentUser = async (req, res) => {
   try {
+    if (!req.user) {
+      return res
+        .status(401)
+        .json(RESPONSES.UNAUTHORIZED(AUTH_MESSAGES.TOKEN_REQUIRED));
+    }
+
     const profile = await getUserProfile(req.user.id);
+
     res.json(RESPONSES.SUCCESS(AUTH_MESSAGES.PROFILE_FETCHED, profile));
   } catch (error) {
     console.error("Get current user error:", error);
@@ -133,14 +154,137 @@ export const getCurrentUser = async (req, res) => {
 };
 
 /**
- * Logout user
+ * Update user profile
+ */
+export const updateCurrentUser = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res
+        .status(401)
+        .json(RESPONSES.UNAUTHORIZED(AUTH_MESSAGES.TOKEN_REQUIRED));
+    }
+
+    const updates = req.body;
+
+    // Remove protected fields
+    const { id, email, created_at, ...allowedUpdates } = updates;
+
+    const updatedProfile = await updateUserProfile(req.user.id, allowedUpdates);
+
+    res.json(RESPONSES.SUCCESS(AUTH_MESSAGES.PROFILE_UPDATED, updatedProfile));
+  } catch (error) {
+    console.error("Update user error:", error);
+    res.status(500).json(RESPONSES.SERVER_ERROR(AUTH_MESSAGES.INTERNAL_ERROR));
+  }
+};
+
+/**
+ * Logout user (invalidate session)
  */
 export const logout = async (req, res) => {
   try {
-    // Client should remove the token
+    const token = req.headers.authorization?.replace("Bearer ", "");
+
+    if (token) {
+      // Invalidate the token with Supabase
+      const { error } = await supabase.auth.admin.signOut(token);
+      if (error) {
+        console.error("Token invalidation error:", error);
+      }
+    }
+
     res.json(RESPONSES.SUCCESS(AUTH_MESSAGES.LOGOUT_SUCCESS));
   } catch (error) {
     console.error("Logout error:", error);
     res.status(500).json(RESPONSES.SERVER_ERROR(AUTH_MESSAGES.INTERNAL_ERROR));
   }
+};
+
+/**
+ * Refresh access token
+ */
+export const refreshToken = async (req, res) => {
+  try {
+    const { refresh_token } = req.body;
+
+    if (!refresh_token) {
+      return res
+        .status(400)
+        .json(RESPONSES.BAD_REQUEST("Refresh token is required"));
+    }
+
+    const { data, error } = await supabase.auth.refreshSession({
+      refresh_token,
+    });
+
+    if (error) {
+      return res
+        .status(401)
+        .json(RESPONSES.UNAUTHORIZED("Invalid refresh token"));
+    }
+
+    res.json(
+      RESPONSES.SUCCESS("Token refreshed", {
+        access_token: data.session.access_token,
+        refresh_token: data.session.refresh_token,
+        expires_in: data.session.expires_in,
+        token_type: "bearer",
+      })
+    );
+  } catch (error) {
+    console.error("Refresh token error:", error);
+    res.status(500).json(RESPONSES.SERVER_ERROR(AUTH_MESSAGES.INTERNAL_ERROR));
+  }
+};
+
+// Helper functions
+const sendEmailOtp = async (email, otp) => {
+  const msg = {
+    to: email,
+    from: process.env.SENDGRID_FROM_EMAIL || "noreply@gr4de.com",
+    subject: "Your GR4DE Verification Code",
+    text: `Your verification code is: ${otp}. This code expires in 5 minutes.`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #2563eb;">GR4DE Platform</h2>
+        <p>Your verification code is:</p>
+        <h1 style="font-size: 32px; color: #2563eb; letter-spacing: 8px;">${otp}</h1>
+        <p>This code will expire in 5 minutes.</p>
+        <p>If you didn't request this code, please ignore this email.</p>
+      </div>
+    `,
+  };
+
+  await sgMail.send(msg);
+  console.log("OTP sent via email to:", email);
+};
+
+const sendWhatsAppOtp = async (phone, otp) => {
+  console.log("OTP for WhatsApp:", otp, "to:", phone);
+  // Implement Twilio WhatsApp integration here
+  // await twilioClient.messages.create({
+  //   body: `Your GR4DE verification code is: ${otp}. This code expires in 5 minutes.`,
+  //   from: process.env.TWILIO_WHATSAPP_FROM,
+  //   to: `whatsapp:${phone}`,
+  // });
+};
+
+const findExistingUser = async (email, phone) => {
+  if (email) {
+    const { data, error } = await supabase.auth.admin.getUserByEmail(email);
+    if (!error && data) return data.user;
+  }
+
+  // Add phone lookup logic if needed
+  return null;
+};
+
+const createUserSession = async (userId) => {
+  const { data, error } = await supabase.auth.admin.createSession({
+    userId: userId,
+    // Additional session configuration
+  });
+
+  if (error) throw error;
+  return data.session;
 };

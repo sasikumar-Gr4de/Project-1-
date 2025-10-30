@@ -1,9 +1,9 @@
-// authStore.js - Fixed to work with current base.api.js
+// store/authStore.js - Professional version
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import api from "@/services/base.api"; // Import the axios instance
+import { devtools, persist } from "zustand/middleware";
+import api from "@/services/base.api";
 
-// Create API methods using the axios instance
+// API methods
 const authAPI = {
   sendOtp: (data) => api.post("/auth/send-otp", data),
   verifyOtp: (data) => api.post("/auth/verify-otp", data),
@@ -13,111 +13,150 @@ const authAPI = {
 };
 
 export const useAuthStore = create(
-  persist(
-    (set, get) => ({
-      user: null,
-      token: null,
-      isAuthenticated: false,
-      isLoading: false,
+  devtools(
+    persist(
+      (set, get) => ({
+        // State
+        user: null,
+        token: null,
+        isAuthenticated: false,
+        isLoading: false,
+        isInitialized: false,
 
-      // Actions
-      setUser: (user) => set({ user, isAuthenticated: !!user }),
-      setToken: (token) => {
-        set({ token });
-        // Also store in localStorage for axios interceptor
-        if (token) {
-          localStorage.setItem("auth-token", token);
-        }
-      },
+        // Actions
+        initializeAuth: async () => {
+          const token = localStorage.getItem("auth-token");
+          if (!token) {
+            set({ isInitialized: true });
+            return false;
+          }
 
-      login: async (email, phone, otp, userData) => {
-        set({ isLoading: true });
-        try {
-          const response = await authAPI.verifyOtp({
-            email,
-            phone,
-            otp,
-            ...userData,
-          });
+          try {
+            const response = await authAPI.getCurrentUser();
+            if (response.data.success) {
+              set({
+                user: response.data.data,
+                token,
+                isAuthenticated: true,
+                isInitialized: true,
+              });
+              return true;
+            }
+          } catch (error) {
+            console.error("Auth initialization failed:", error);
+            localStorage.removeItem("auth-token");
+          }
 
-          if (response.data.success) {
-            const { user, session } = response.data.data;
-            const token = session.access_token;
+          set({ isInitialized: true });
+          return false;
+        },
 
-            // Store token in localStorage for axios interceptor
-            localStorage.setItem("auth-token", token);
-
-            set({
-              user: user,
-              token: token,
-              isAuthenticated: true,
-              isLoading: false,
+        sendOtp: async (email, phone) => {
+          set({ isLoading: true });
+          try {
+            const response = await authAPI.sendOtp({
+              ...(email && { email }),
+              ...(phone && { phone }),
             });
             return response.data;
+          } catch (error) {
+            throw error.response?.data || error;
+          } finally {
+            set({ isLoading: false });
           }
-        } catch (error) {
-          set({ isLoading: false });
-          throw error;
-        }
-      },
+        },
 
-      logout: () => {
-        // Clear token from localStorage for axios interceptor
-        localStorage.removeItem("auth-token");
+        login: async (email, phone, otp, userData = {}) => {
+          set({ isLoading: true });
+          try {
+            const response = await authAPI.verifyOtp({
+              ...(email && { email }),
+              ...(phone && { phone }),
+              otp,
+              ...userData,
+            });
 
-        set({
-          user: null,
-          token: null,
-          isAuthenticated: false,
-        });
-      },
+            if (response.data.success) {
+              const { user, session, requires_onboarding } = response.data.data;
+              const token = session?.access_token;
 
-      sendOtp: async (email, phone) => {
-        set({ isLoading: true });
-        try {
-          const response = await authAPI.sendOtp({ email, phone });
-          set({ isLoading: false });
-          return response.data;
-        } catch (error) {
-          set({ isLoading: false });
-          throw error;
-        }
-      },
+              if (token) {
+                localStorage.setItem("auth-token", token);
 
-      updateProfile: async (updates) => {
-        set({ isLoading: true });
-        try {
-          const response = await authAPI.updateProfile(updates);
-          if (response.data.success) {
-            set({ user: response.data.data });
+                set({
+                  user: {
+                    ...user,
+                    requires_onboarding:
+                      requires_onboarding || !user.player_name,
+                  },
+                  token,
+                  isAuthenticated: true,
+                });
+              }
+
+              return response.data;
+            }
+          } catch (error) {
+            throw error.response?.data || error;
+          } finally {
+            set({ isLoading: false });
           }
-          set({ isLoading: false });
-          return response.data;
-        } catch (error) {
-          set({ isLoading: false });
-          throw error;
-        }
-      },
+        },
 
-      refreshUser: async () => {
-        try {
-          const response = await authAPI.getCurrentUser();
-          if (response.data.success) {
-            set({ user: response.data.data });
+        updateProfile: async (updates) => {
+          set({ isLoading: true });
+          try {
+            const response = await authAPI.updateProfile(updates);
+            if (response.data.success) {
+              const updatedUser = { ...get().user, ...response.data.data };
+              set({
+                user: updatedUser,
+              });
+            }
+            return response.data;
+          } catch (error) {
+            throw error.response?.data || error;
+          } finally {
+            set({ isLoading: false });
           }
-          return response.data;
-        } catch (error) {
-          throw error;
-        }
-      },
-    }),
-    {
-      name: "auth-storage",
-      partialize: (state) => ({
-        user: state.user,
-        token: state.token,
-        isAuthenticated: state.isAuthenticated,
+        },
+
+        logout: async () => {
+          try {
+            await authAPI.logout();
+          } catch (error) {
+            console.error("Logout error:", error);
+          } finally {
+            localStorage.removeItem("auth-token");
+            set({
+              user: null,
+              token: null,
+              isAuthenticated: false,
+            });
+          }
+        },
+
+        refreshUser: async () => {
+          try {
+            const response = await authAPI.getCurrentUser();
+            if (response.data.success) {
+              set({ user: response.data.data });
+            }
+            return response.data;
+          } catch (error) {
+            throw error.response?.data || error;
+          }
+        },
       }),
-    }
+      {
+        name: "auth-storage",
+        partialize: (state) => ({
+          user: state.user,
+          token: state.token,
+          isAuthenticated: state.isAuthenticated,
+        }),
+      }
+    ),
+    { name: "AuthStore" }
   )
 );

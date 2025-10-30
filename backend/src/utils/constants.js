@@ -150,11 +150,12 @@ export const HTTP_STATUS = {
 };
 
 // Rate Limiting Configuration
-export const RATE_LIMIT = {
-  WINDOW_MS: 15 * 60 * 1000, // 15 minutes
-  MAX_REQUESTS: 100,
-  MAX_OTP_REQUESTS: 5,
-  MAX_UPLOAD_REQUESTS: 10,
+export const RATE_LIMIT_CONFIG = {
+  OTP: { windowMs: 15 * 60 * 1000, max: 3 },
+  AUTH: { windowMs: 15 * 60 * 1000, max: 10 },
+  UPLOAD: { windowMs: 60 * 60 * 1000, max: 5 },
+  API: { windowMs: 15 * 60 * 1000, max: 100 },
+  ADMIN: { windowMs: 5 * 60 * 1000, max: 50 },
 };
 
 // S3 Configuration
@@ -444,7 +445,7 @@ export default {
   OTP_CONFIG,
   PAGINATION,
   HTTP_STATUS,
-  RATE_LIMIT,
+  RATE_LIMIT_CONFIG,
   S3_CONFIG,
   STRIPE_CONFIG,
   DEFAULT_SCORING_WEIGHTS,
