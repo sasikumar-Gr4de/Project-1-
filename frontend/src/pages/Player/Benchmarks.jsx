@@ -1,3 +1,4 @@
+// Benchmarks.jsx - Updated with clear, beautiful design
 import React, { useState, useEffect } from "react";
 import { useUserStore } from "@/store/userStore";
 import {
@@ -17,6 +18,10 @@ import {
   Users,
   Award,
   Star,
+  Zap,
+  Trophy,
+  TrendingDown,
+  Circle,
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { Link } from "react-router-dom";
@@ -46,24 +51,28 @@ const Benchmarks = () => {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <div>
-          {/* <h1 className="text-3xl font-bold text-white">
-            Performance Benchmarks
-          </h1>
-          <p className="text-[#B0AFAF]">Loading benchmark data...</p> */}
+      <div className="space-y-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold  font-['Inter_Tight'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent animate-pulse">
+              Performance Benchmarks
+            </h1>
+            <p className="text-[#B0AFAF] text-lg mt-2 font-['Inter_Tight'] animate-pulse">
+              Loading benchmark data...
+            </p>
+          </div>
         </div>
         <div className="grid gap-6">
           {[...Array(3)].map((_, i) => (
             <Card
               key={i}
-              className="animate-pulse bg-[#262626] border-[#404040]"
+              className="animate-pulse bg-[#262626] border-[#343434]"
             >
               <CardContent className="p-6">
-                <div className="h-6 bg-[#404040] rounded w-1/4 mb-4"></div>
+                <div className="h-6 bg-[#343434] rounded w-1/4 mb-4"></div>
                 <div className="space-y-3">
-                  <div className="h-4 bg-[#404040] rounded w-full"></div>
-                  <div className="h-4 bg-[#404040] rounded w-3/4"></div>
+                  <div className="h-4 bg-[#343434] rounded w-full"></div>
+                  <div className="h-4 bg-[#343434] rounded w-3/4"></div>
                 </div>
               </CardContent>
             </Card>
@@ -76,295 +85,374 @@ const Benchmarks = () => {
   const { benchmarks, recentReports } = benchmarkData || {};
   const latestScore = recentReports?.[0]?.overall_score;
 
+  // Mock data for demonstration
+  const performanceData = {
+    overall: {
+      yourScore: latestScore || 0,
+      average: 72,
+      top10: 88,
+      bottom10: 45,
+    },
+    pillars: [
+      {
+        name: "Technical",
+        yourScore: 82,
+        average: 75,
+        top10: 90,
+        color: "from-[#60A5FA] to-[#3B82F6]",
+      },
+      {
+        name: "Tactical",
+        yourScore: 78,
+        average: 70,
+        top10: 85,
+        color: "from-primary to-[#94D44A]",
+      },
+      {
+        name: "Physical",
+        yourScore: 85,
+        average: 78,
+        top10: 92,
+        color: "from-[#F59E0B] to-[#D97706]",
+      },
+      {
+        name: "Mental",
+        yourScore: 80,
+        average: 72,
+        top10: 87,
+        color: "from-[#8B5CF6] to-[#7C3AED]",
+      },
+    ],
+  };
+
+  const strengths = [
+    {
+      title: "Physical Dominance",
+      description: "Your physical scores are in the top 15% for your position",
+      improvement: "+8%",
+      icon: Zap,
+    },
+    {
+      title: "Technical Proficiency",
+      description: "Strong technical foundation compared to peers",
+      improvement: "+5%",
+      icon: Trophy,
+    },
+  ];
+
+  const opportunities = [
+    {
+      title: "Tactical Awareness",
+      description: "Focus on positioning and decision-making",
+      improvement: "-3%",
+      icon: TrendingDown,
+    },
+    {
+      title: "Mental Resilience",
+      description: "Develop composure in high-pressure situations",
+      improvement: "-2%",
+      icon: Users,
+    },
+  ];
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          {/* <h1 className="text-3xl font-bold text-white">
+          <h1 className="text-4xl font-bold  font-['Inter_Tight'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
             Performance Benchmarks
           </h1>
-          <p className="text-[#B0AFAF]">
-            Compare your performance with {user?.position} players in your age
-            group
-          </p> */}
+          <p className="text-[#B0AFAF] text-lg mt-2 font-['Inter_Tight']">
+            Compare your performance with {user?.position || "similar"} players
+            in your age group
+          </p>
         </div>
         <Button
-          variant="outline"
           asChild
-          className="bg-[#262626] border-[#404040] text-white hover:bg-[#333333]"
+          className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold rounded-xl px-6 py-3 h-12 shadow-lg hover:shadow-xl transition-all duration-300 font-['Inter_Tight']"
         >
           <Link to="/reports">
-            <BarChart3 className="w-4 h-4 mr-2" />
+            <BarChart3 className="w-5 h-5 mr-2" />
             View Detailed Reports
           </Link>
         </Button>
       </div>
 
-      {/* Overall Comparison */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="bg-[#262626] border-[#404040]">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">
+      {/* Key Metrics */}
+      <div className="grid gap-6 lg:grid-cols-4">
+        <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <CardTitle className="text-sm font-medium text-white font-['Inter_Tight']">
               Your Position
             </CardTitle>
-            <Target className="h-4 w-4 text-[#B0AFAF]" />
+            <div className="w-10 h-10 bg-linear-to-br from-[#60A5FA] to-[#3B82F6] rounded-xl flex items-center justify-center shadow-lg">
+              <Target className="h-5 w-5 text-white" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">
+            <div className="text-2xl font-bold text-white font-['Inter_Tight']">
               {user?.position || "--"}
             </div>
-            <p className="text-xs text-[#B0AFAF]">
+            <p className="text-xs text-[#B0AFAF] mt-2 font-['Inter_Tight']">
               Compared to {benchmarks ? "1,000+" : "0"} players
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-[#262626] border-[#404040]">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">
+        <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <CardTitle className="text-sm font-medium text-white font-['Inter_Tight']">
               Percentile Rank
             </CardTitle>
-            <TrendingUp className="h-4 w-4 text-[#B0AFAF]" />
+            <div className="w-10 h-10 bg-linear-to-br from-primary to-[#94D44A] rounded-xl flex items-center justify-center shadow-lg">
+              <TrendingUp className="h-5 w-5 text-[#0F0F0E]" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">
+            <div className="text-2xl font-bold text-primary font-['Inter_Tight']">
               {latestScore ? "Top 25%" : "--"}
             </div>
-            <p className="text-xs text-[#B0AFAF]">
+            <p className="text-xs text-[#B0AFAF] mt-2 font-['Inter_Tight']">
               {latestScore ? "Better than 75% of peers" : "No data available"}
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-[#262626] border-[#404040]">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">
+        <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <CardTitle className="text-sm font-medium text-white font-['Inter_Tight']">
               Growth Velocity
             </CardTitle>
-            <Star className="h-4 w-4 text-[#B0AFAF]" />
+            <div className="w-10 h-10 bg-linear-to-br from-[#F59E0B] to-[#D97706] rounded-xl flex items-center justify-center shadow-lg">
+              <Star className="h-5 w-5 text-white" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-[#A8E55C]">+12%</div>
-            <p className="text-xs text-[#B0AFAF]">
+            <div className="text-2xl font-bold text-[#F59E0B] font-['Inter_Tight']">
+              +12%
+            </div>
+            <p className="text-xs text-[#B0AFAF] mt-2 font-['Inter_Tight']">
               Improvement vs last quarter
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <CardTitle className="text-sm font-medium text-white font-['Inter_Tight']">
+              Consistency Score
+            </CardTitle>
+            <div className="w-10 h-10 bg-linear-to-br from-[#8B5CF6] to-[#7C3AED] rounded-xl flex items-center justify-center shadow-lg">
+              <Award className="h-5 w-5 text-white" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-[#8B5CF6] font-['Inter_Tight']">
+              84%
+            </div>
+            <p className="text-xs text-[#B0AFAF] mt-2 font-['Inter_Tight']">
+              Performance stability
             </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Benchmark Comparison */}
-      <Card className="bg-[#262626] border-[#404040]">
+      {/* Overall Performance */}
+      <Card className="bg-[#262626] border-[#343434]">
         <CardHeader>
-          <CardTitle className="text-white">Performance Comparison</CardTitle>
-          <CardDescription className="text-[#B0AFAF]">
+          <CardTitle className="text-2xl font-bold text-white font-['Inter_Tight'] flex items-center">
+            <BarChart3 className="w-6 h-6 mr-3 text-primary" />
+            Overall Performance Comparison
+          </CardTitle>
+          <CardDescription className="text-[#B0AFAF] text-lg font-['Inter_Tight']">
             How you stack up against {user?.position} players in your
             demographic
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-6">
-            {/* Overall Score Comparison */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-white">
-                  Overall GR4DE Score
-                </span>
-                <div className="flex items-center space-x-2">
-                  <Badge
-                    variant="outline"
-                    className="bg-[#333333] text-white border-[#404040]"
-                  >
-                    You: {latestScore || "--"}
-                  </Badge>
-                  <Badge
-                    variant="secondary"
-                    className="bg-[#404040] text-[#B0AFAF]"
-                  >
-                    Avg: 72
-                  </Badge>
-                  <Badge
-                    variant="secondary"
-                    className="bg-[#404040] text-[#B0AFAF]"
-                  >
-                    Top 10%: 88
-                  </Badge>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-xs text-[#B0AFAF]">
-                  <span>0</span>
-                  <span>25</span>
-                  <span>50</span>
-                  <span>75</span>
-                  <span>100</span>
-                </div>
-                <Progress
-                  value={latestScore || 0}
-                  className="h-3 bg-[#404040]"
-                />
-                <div className="flex justify-between text-xs">
-                  <span className="text-[#B0AFAF]">Bottom 10% (45)</span>
-                  <span className="text-[#B0AFAF]">Top 10% (88)</span>
-                </div>
+        <CardContent className="space-y-6">
+          {/* Overall Score */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-lg font-semibold text-white font-['Inter_Tight']">
+                Overall GR4DE Score
+              </span>
+              <div className="flex items-center space-x-3">
+                <Badge className="bg-[#343434] text-white border-[#343434] font-['Inter_Tight']">
+                  You: {performanceData.overall.yourScore || 0}
+                </Badge>
+                <Badge className="bg-[#343434] text-white border-[#343434] font-['Inter_Tight']">
+                  Average: {performanceData.overall.average}
+                </Badge>
+                <Badge className="bg-[#343434] text-white border-[#343434] font-['Inter_Tight']">
+                  Top 10%: {performanceData.overall.top10}
+                </Badge>
               </div>
             </div>
-
-            {/* Pillar Comparisons */}
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-3">
               {[
-                { name: "Technical", yourScore: 82, average: 75, top10: 90 },
-                { name: "Tactical", yourScore: 78, average: 70, top10: 85 },
-                { name: "Physical", yourScore: 85, average: 78, top10: 92 },
-                { name: "Mental", yourScore: 80, average: 72, top10: 87 },
-              ].map((pillar) => (
-                <div
-                  key={pillar.name}
-                  className="space-y-3 p-4 border rounded-lg bg-[#1A1A1A] border-[#404040]"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-white">
-                      {pillar.name}
+                {
+                  label: "Your Score",
+                  value: performanceData.overall.yourScore,
+                  color: "bg-linear-to-r from-primary to-[#94D44A]",
+                },
+                {
+                  label: "Average",
+                  value: performanceData.overall.average,
+                  color: "bg-[#60A5FA]",
+                },
+                {
+                  label: "Top 10%",
+                  value: performanceData.overall.top10,
+                  color: "bg-linear-to-r from-[#8B5CF6] to-[#7C3AED]",
+                },
+                {
+                  label: "Bottom 10%",
+                  value: performanceData.overall.bottom10,
+                  color: "bg-[#F59E0B]",
+                },
+              ].map((item, index) => (
+                <div key={index} className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-white font-medium font-['Inter_Tight']">
+                      {item.label}
                     </span>
-                    <div className="flex items-center space-x-2">
-                      <Badge
-                        variant="outline"
-                        className="bg-[#333333] text-white border-[#404040]"
-                      >
-                        You: {pillar.yourScore}
-                      </Badge>
-                    </div>
+                    <span className="text-[#B0AFAF] font-['Inter_Tight']">
+                      {item.value}
+                    </span>
                   </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-xs">
-                      <span className="text-white">You</span>
-                      <span className="text-white">{pillar.yourScore}</span>
-                    </div>
-                    <Progress
-                      value={pillar.yourScore}
-                      className="h-2 bg-[#404040]"
-                    />
-
-                    <div className="flex justify-between text-xs text-[#B0AFAF]">
-                      <span>Average</span>
-                      <span>{pillar.average}</span>
-                    </div>
-                    <Progress
-                      value={pillar.average}
-                      className="h-2 bg-[#333333]"
-                    />
-
-                    <div className="flex justify-between text-xs text-[#A8E55C]">
-                      <span>Top 10%</span>
-                      <span>{pillar.top10}</span>
-                    </div>
-                    <Progress
-                      value={pillar.top10}
-                      className="h-2 bg-[#A8E55C]/20"
-                    />
-                  </div>
+                  <Progress
+                    value={item.value}
+                    className={`h-3 ${item.color} rounded-full`}
+                  />
                 </div>
               ))}
             </div>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Insights */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="bg-[#262626] border-[#404040]">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-white">
-              <Award className="w-5 h-5 text-[#A8E55C]" />
-              <span>Your Advantages</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-3">
-              <li className="flex items-center space-x-3 p-3 bg-[#A8E55C]/10 rounded-lg border border-[#A8E55C]/20">
-                <div className="w-2 h-2 bg-[#A8E55C] rounded-full"></div>
-                <div>
-                  <span className="font-medium text-white">
-                    Physical Dominance
-                  </span>
-                  <p className="text-sm text-[#B0AFAF]">
-                    Your physical scores are in the top 15% for your position
-                  </p>
-                </div>
-              </li>
-              <li className="flex items-center space-x-3 p-3 bg-[#A8E55C]/10 rounded-lg border border-[#A8E55C]/20">
-                <div className="w-2 h-2 bg-[#A8E55C] rounded-full"></div>
-                <div>
-                  <span className="font-medium text-white">
-                    Technical Proficiency
-                  </span>
-                  <p className="text-sm text-[#B0AFAF]">
-                    Strong technical foundation compared to peers
-                  </p>
-                </div>
-              </li>
-            </ul>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-[#262626] border-[#404040]">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-white">
-              <Users className="w-5 h-5 text-[#60A5FA]" />
-              <span>Development Opportunities</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-3">
-              <li className="flex items-center space-x-3 p-3 bg-[#60A5FA]/10 rounded-lg border border-[#60A5FA]/20">
-                <div className="w-2 h-2 bg-[#60A5FA] rounded-full"></div>
-                <div>
-                  <span className="font-medium text-white">
-                    Tactical Awareness
-                  </span>
-                  <p className="text-sm text-[#B0AFAF]">
-                    Focus on positioning and decision-making
-                  </p>
-                </div>
-              </li>
-              <li className="flex items-center space-x-3 p-3 bg-[#60A5FA]/10 rounded-lg border border-[#60A5FA]/20">
-                <div className="w-2 h-2 bg-[#60A5FA] rounded-full"></div>
-                <div>
-                  <span className="font-medium text-white">
-                    Mental Resilience
-                  </span>
-                  <p className="text-sm text-[#B0AFAF]">
-                    Develop composure in high-pressure situations
-                  </p>
-                </div>
-              </li>
-            </ul>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Upgrade CTA */}
-      <Card className="bg-linear-to-r from-primary/10 to-primary/5 border-primary/20 bg-[#262626] ">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-xl font-bold text-white mb-2">
-                Unlock Advanced Analytics
-              </h3>
-              <p className="text-[#B0AFAF]">
-                Upgrade to PRO for detailed peer comparisons, trend analysis,
-                and personalized insights
-              </p>
-            </div>
-            <Button
-              asChild
-              className="bg-[#A8E55C] text-black hover:bg-[#94D44A]"
-            >
-              <a href="/subscription">Upgrade Plan</a>
-            </Button>
+          {/* Performance Pillars */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {performanceData.pillars.map((pillar, index) => (
+              <Card key={index} className="bg-[#1A1A1A] border-[#343434]">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg font-semibold text-white font-['Inter_Tight']">
+                    {pillar.name}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="text-center">
+                    <div
+                      className={`text-3xl font-bold bg-linear-to-r ${pillar.color} bg-clip-text text-transparent font-['Inter_Tight']`}
+                    >
+                      {pillar.yourScore}
+                    </div>
+                    <div className="text-sm text-[#B0AFAF] mt-1 font-['Inter_Tight']">
+                      Your Score
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-[#B0AFAF] font-['Inter_Tight']">
+                        Avg: {pillar.average}
+                      </span>
+                      <span className="text-[#B0AFAF] font-['Inter_Tight']">
+                        Top: {pillar.top10}
+                      </span>
+                    </div>
+                    <Progress
+                      value={pillar.yourScore}
+                      className={`h-2 bg-linear-to-r ${pillar.color} rounded-full`}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </CardContent>
       </Card>
+
+      {/* Strengths & Opportunities */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Strengths */}
+        <Card className="bg-[#262626] border-[#343434]">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold text-white font-['Inter_Tight'] flex items-center">
+              <div className="w-8 h-8 bg-linear-to-br from-primary to-[#94D44A] rounded-lg flex items-center justify-center mr-3">
+                <TrendingUp className="w-4 h-4 text-[#0F0F0E]" />
+              </div>
+              Key Strengths
+            </CardTitle>
+            <CardDescription className="text-[#B0AFAF] font-['Inter_Tight']">
+              Areas where you excel compared to peers
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {strengths.map((strength, index) => (
+              <div
+                key={index}
+                className="flex items-start space-x-4 p-4 bg-[#1A1A1A] rounded-xl border border-[#343434]"
+              >
+                <div className="w-12 h-12 bg-linear-to-br from-primary to-[#94D44A] rounded-xl flex items-center justify-center shrink-0">
+                  <strength.icon className="w-6 h-6 text-[#0F0F0E]" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-semibold text-white font-['Inter_Tight']">
+                      {strength.title}
+                    </h4>
+                    <Badge className="bg-primary text-[#0F0F0E] font-medium font-['Inter_Tight']">
+                      {strength.improvement}
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-[#B0AFAF] mt-1 font-['Inter_Tight']">
+                    {strength.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        {/* Opportunities */}
+        <Card className="bg-[#262626] border-[#343434]">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold text-white font-['Inter_Tight'] flex items-center">
+              <div className="w-8 h-8 bg-linear-to-br from-[#60A5FA] to-[#3B82F6] rounded-lg flex items-center justify-center mr-3">
+                <Target className="w-4 h-4 text-white" />
+              </div>
+              Growth Opportunities
+            </CardTitle>
+            <CardDescription className="text-[#B0AFAF] font-['Inter_Tight']">
+              Areas with the highest potential for improvement
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {opportunities.map((opportunity, index) => (
+              <div
+                key={index}
+                className="flex items-start space-x-4 p-4 bg-[#1A1A1A] rounded-xl border border-[#343434]"
+              >
+                <div className="w-12 h-12 bg-linear-to-br from-[#60A5FA] to-[#3B82F6] rounded-xl flex items-center justify-center shrink-0">
+                  <opportunity.icon className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-semibold text-white font-['Inter_Tight']">
+                      {opportunity.title}
+                    </h4>
+                    <Badge className="bg-[#60A5FA] text-white font-medium font-['Inter_Tight']">
+                      {opportunity.improvement}
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-[#B0AFAF] mt-1 font-['Inter_Tight']">
+                    {opportunity.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
