@@ -29,6 +29,8 @@ import ServerFileUpload from "@/pages/Developer/ServerFileUpload";
 // Other Pages
 import Landing from "@/pages/Landing";
 import { ToastProvider } from "@/contexts/ToastContext";
+import SubscriptionPlans from "@/pages/Subscription/SubscriptionPlans";
+import SubscriptionSuccess from "@/pages/Subscription/SubscriptionSuccess";
 
 function App() {
   const { isAuthenticated, user, isInitialized, initializeAuth } =
@@ -143,6 +145,12 @@ function App() {
                 </Layout>
               </ProtectedRoute>
             }
+          />
+
+          <Route path="/subscription" element={<SubscriptionPlans />} />
+          <Route
+            path="/subscription/success"
+            element={<SubscriptionSuccess />}
           />
 
           {/* Fallback Routes */}

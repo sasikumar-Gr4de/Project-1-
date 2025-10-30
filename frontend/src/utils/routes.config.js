@@ -20,6 +20,11 @@ export const ROUTES = {
   ADMIN: "/admin",
   ADMIN_DASHBOARD: "/admin/dashboard",
 
+  // Subscription routes
+  SUBSCRIPTION: "/subscription",
+  SUBSCRIPTIONSUCCESS: "/subscription/success",
+  SUBSCRIPTIONCANCEL: "/subscription/cancel",
+
   // Developer routes
   SERVER_UPLOAD: "/server/upload-image",
 };

@@ -1,6 +1,7 @@
 // userStore.js
 import { create } from "zustand";
 import api from "@/services/base.api";
+import { subscriptionService } from "@/services/subscription.service";
 
 // Create user API methods using the axios instance
 const userAPI = {
@@ -15,6 +16,7 @@ export const useUserStore = create((set, get) => ({
   dashboardData: null,
   reports: [],
   currentReport: null,
+  subscription: null,
   pagination: {
     page: 1,
     pageSize: 10,
@@ -28,6 +30,55 @@ export const useUserStore = create((set, get) => ({
   setLoading: (loading) => set({ isLoading: loading }),
   setError: (error) => set({ error }),
   clearError: () => set({ error: null }),
+
+  // Subscription Actions
+  fetchSubscription: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await subscriptionService.getSubscription();
+      if (response.success) {
+        set({
+          subscription: response.data,
+          isLoading: false,
+        });
+        return response.data;
+      }
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Failed to fetch subscription",
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  syncSubscription: async () => {
+    try {
+      const response = await subscriptionService.syncSubscription();
+      if (response.success) {
+        set({
+          subscription: response.data,
+        });
+        return response.data;
+      }
+    } catch (error) {
+      console.error("Failed to sync subscription:", error);
+      throw error;
+    }
+  },
+
+  setSubscription: (subscription) => set({ subscription }),
+
+  // Check feature access
+  checkFeatureAccess: async (feature) => {
+    try {
+      const response = await subscriptionService.checkAccess(feature);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to check feature access:", error);
+      return { hasAccess: false, reason: "Error checking access" };
+    }
+  },
 
   // Get Dashboard Data
   fetchDashboard: async () => {

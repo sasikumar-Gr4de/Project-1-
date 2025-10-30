@@ -25,6 +25,17 @@ html, body {
   display: none; /* WebKit */
 }
 
+.subscription-page {
+  overflow-y: auto !important;
+  height: 100vh;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+.subscription-page::-webkit-scrollbar {
+  display: none; /* WebKit */
+}
+
 /* Main scrollable container styles for layout pages */
 .scrollable-content {
   overflow-y: auto;
