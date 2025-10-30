@@ -262,11 +262,11 @@ const DataTable = ({
         </div>
       </div>
 
-      <h4 className="text-xl font-semibold text-white mb-3 font-['Inter']">
+      <h4 className="text-xl font-semibold text-white mb-3 ">
         {emptyStateTitle}
       </h4>
 
-      <p className="text-[#B0AFAF] max-w-md mb-6 text-sm font-['Inter']">
+      <p className="text-[#B0AFAF] max-w-md mb-6 text-sm ">
         {searchTerm
           ? "No records match your search criteria. Try adjusting your search terms."
           : emptyStateDescription}
@@ -275,7 +275,7 @@ const DataTable = ({
       {onAdd && !searchTerm && (
         <Button
           onClick={onAdd}
-          className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold font-['Inter']"
+          className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold "
         >
           <Plus className="w-4 h-4 mr-2" />
           {addButtonText}
@@ -290,17 +290,17 @@ const DataTable = ({
       <div className="w-14 h-14 bg-[#343434] rounded-full flex items-center justify-center mb-4">
         <Search className="w-6 h-6 text-[#B0AFAF]" />
       </div>
-      <h4 className="text-md font-semibold text-white mb-2 font-['Inter']">
+      <h4 className="text-md font-semibold text-white mb-2 ">
         No results found
       </h4>
-      <p className="text-[#B0AFAF] mb-4 text-sm font-['Inter']">
+      <p className="text-[#B0AFAF] mb-4 text-sm ">
         No records match "
         <span className="font-medium text-white">"{searchTerm}"</span>
       </p>
       <Button
         variant="outline"
         onClick={() => setSearchTerm("")}
-        className="px-4 py-2 bg-[#262626] border-[#343434] text-white hover:bg-[#343434] font-['Inter']"
+        className="px-4 py-2 bg-[#262626] border-[#343434] text-white hover:bg-[#343434] "
       >
         Clear search
       </Button>
@@ -321,7 +321,7 @@ const DataTable = ({
           {onAdd && (
             <Button
               onClick={onAdd}
-              className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold order-1 sm:order-2 w-full sm:w-auto h-9 font-['Inter']"
+              className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold order-1 sm:order-2 w-full sm:w-auto h-9 "
               disabled={isLoading}
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -352,37 +352,37 @@ const DataTable = ({
                         key={index}
                         className={
                           index === 0
-                            ? "h-15 pl-3 text-left align-middle font-semibold text-white whitespace-nowrap text-sm uppercase tracking-wide rounded-tl-xl font-['Inter']"
-                            : "h-15 px-6 text-left align-middle font-semibold text-white whitespace-nowrap text-sm uppercase tracking-wide font-['Inter']"
+                            ? "h-15 pl-3 text-left align-middle font-semibold text-white whitespace-nowrap text-sm uppercase tracking-wide rounded-tl-xl "
+                            : "h-15 px-6 text-left align-middle font-semibold text-white whitespace-nowrap text-sm uppercase tracking-wide "
                         }
                       >
                         {column.header}
                       </th>
                     ))}
                     {actions && (
-                      <th className="h-15 px-3 text-left align-middle font-semibold text-white whitespace-nowrap text-sm uppercase tracking-wide w-20 rounded-tr-xl font-['Inter']">
+                      <th className="h-15 px-3 text-left align-middle font-semibold text-white whitespace-nowrap text-sm uppercase tracking-wide w-20 rounded-tr-xl ">
                         <div className="flex items-center space-x-2 order-2 sm:order-1">
-                          <span className="text-sm whitespace-nowrap text-[#B0AFAF] font-['Inter']">
+                          <span className="text-sm whitespace-nowrap text-[#B0AFAF] ">
                             Items per page
                           </span>
                           <Select
                             value={itemsPerPage.toString()}
                             onValueChange={handleItemsPerPageChange}
                           >
-                            <SelectTrigger className="w-20 h-9 border-[#343434] bg-[#1A1A1A] text-white text-sm focus:border-primary font-['Inter']">
+                            <SelectTrigger className="w-20 h-9 border-[#343434] bg-[#1A1A1A] text-white text-sm focus:border-primary ">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className="bg-[#262626] border-[#343434] text-white font-['Inter']">
-                              <SelectItem value="5" className="font-['Inter']">
+                            <SelectContent className="bg-[#262626] border-[#343434] text-white ">
+                              <SelectItem value="5" className="">
                                 5
                               </SelectItem>
-                              <SelectItem value="10" className="font-['Inter']">
+                              <SelectItem value="10" className="">
                                 10
                               </SelectItem>
-                              <SelectItem value="20" className="font-['Inter']">
+                              <SelectItem value="20" className="">
                                 20
                               </SelectItem>
-                              <SelectItem value="50" className="font-['Inter']">
+                              <SelectItem value="50" className="">
                                 50
                               </SelectItem>
                             </SelectContent>
@@ -396,7 +396,7 @@ const DataTable = ({
                   {displayData.map((row, rowIndex) => (
                     <tr
                       key={rowIndex}
-                      className="group transition-all duration-200 hover:bg-[#262626] even:bg-[#1A1A1A] text-sm font-['Inter']"
+                      className="group transition-all duration-200 hover:bg-[#262626] even:bg-[#1A1A1A] text-sm "
                     >
                       {columns.map((column, colIndex) => (
                         <td
@@ -413,12 +413,12 @@ const DataTable = ({
                             column.badge ? (
                               <Badge
                                 variant={getBadgeVariant(row[column.accessor])}
-                                className="whitespace-nowrap text-sm font-medium font-['Inter']"
+                                className="whitespace-nowrap text-sm font-medium "
                               >
                                 {row[column.accessor]}
                               </Badge>
                             ) : (
-                              <span className="text-white whitespace-nowrap font-['Inter']">
+                              <span className="text-white whitespace-nowrap ">
                                 {row[column.accessor]}
                               </span>
                             )
@@ -452,7 +452,7 @@ const DataTable = ({
                         key={colIndex}
                         className="flex justify-between items-start"
                       >
-                        <span className="text-xs font-medium text-[#B0AFAF] uppercase tracking-wide font-['Inter']">
+                        <span className="text-xs font-medium text-[#B0AFAF] uppercase tracking-wide ">
                           {column.header}:
                         </span>
                         <div className="text-right max-w-[60%]">
@@ -462,12 +462,12 @@ const DataTable = ({
                             column.badge ? (
                               <Badge
                                 variant={getBadgeVariant(row[column.accessor])}
-                                className="text-xs font-medium font-['Inter']"
+                                className="text-xs font-medium "
                               >
                                 {row[column.accessor]}
                               </Badge>
                             ) : (
-                              <span className="text-white text-sm font-medium truncate block font-['Inter']">
+                              <span className="text-white text-sm font-medium truncate block ">
                                 {row[column.accessor]}
                               </span>
                             )
@@ -486,7 +486,7 @@ const DataTable = ({
                             key={colIndex}
                             className="flex justify-between items-start"
                           >
-                            <span className="text-xs font-medium text-[#B0AFAF] uppercase tracking-wide font-['Inter']">
+                            <span className="text-xs font-medium text-[#B0AFAF] uppercase tracking-wide ">
                               {column.header}:
                             </span>
                             <div className="text-right max-w-[60%]">
@@ -498,12 +498,12 @@ const DataTable = ({
                                     variant={getBadgeVariant(
                                       row[column.accessor]
                                     )}
-                                    className="text-xs font-medium font-['Inter']"
+                                    className="text-xs font-medium "
                                   >
                                     {row[column.accessor]}
                                   </Badge>
                                 ) : (
-                                  <span className="text-white text-sm truncate block font-['Inter']">
+                                  <span className="text-white text-sm truncate block ">
                                     {row[column.accessor]}
                                   </span>
                                 )
@@ -536,7 +536,7 @@ const DataTable = ({
       {!isLoading && displayTotal > 0 && (
         <div className="flex flex-col sm:flex-row items-center justify-end gap-4 p-4 border-[#343434] bg-[#262626] rounded-xl">
           {/* Results info */}
-          <div className="text-sm text-[#B0AFAF] font-['Inter']">
+          <div className="text-sm text-[#B0AFAF] ">
             <span className="font-medium text-white">
               {(currentPage - 1) * itemsPerPage + 1}
             </span>{" "}
@@ -584,8 +584,8 @@ const DataTable = ({
                 disabled={page === "..."}
                 className={
                   page === "..."
-                    ? "h-8 w-8 p-0 border-0 cursor-default text-[#B0AFAF] bg-transparent font-['Inter']"
-                    : `h-8 w-8 p-0 min-w-8 font-['Inter'] ${
+                    ? "h-8 w-8 p-0 border-0 cursor-default text-[#B0AFAF] bg-transparent "
+                    : `h-8 w-8 p-0 min-w-8  ${
                         currentPage === page
                           ? "bg-primary text-[#0F0F0E] border-primary"
                           : "border-[#343434] bg-[#1A1A1A] text-white hover:bg-[#343434]"

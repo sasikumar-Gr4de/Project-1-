@@ -117,7 +117,7 @@ const Reports = () => {
       <div className="grid gap-6 lg:grid-cols-4">
         <Card className="bg-[#262626] border-[#343434]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="text-sm font-medium text-white font-['Inter']">
+            <CardTitle className="text-sm font-medium text-white ">
               Total Reports
             </CardTitle>
             <div className="w-10 h-10 bg-linear-to-br from-[#60A5FA] to-[#3B82F6] rounded-xl flex items-center justify-center shadow-lg">
@@ -125,18 +125,16 @@ const Reports = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white font-['Inter']">
+            <div className="text-2xl font-bold text-white ">
               {reports.length}
             </div>
-            <p className="text-xs text-[#B0AFAF] mt-2 font-['Inter']">
-              All time assessments
-            </p>
+            <p className="text-xs text-[#B0AFAF] mt-2 ">All time assessments</p>
           </CardContent>
         </Card>
 
         <Card className="bg-[#262626] border-[#343434]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="text-sm font-medium text-white font-['Inter']">
+            <CardTitle className="text-sm font-medium text-white ">
               Average Score
             </CardTitle>
             <div className="w-10 h-10 bg-linear-to-br from-primary to-[#94D44A] rounded-xl flex items-center justify-center shadow-lg">
@@ -144,7 +142,7 @@ const Reports = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-primary font-['Inter']">
+            <div className="text-2xl font-bold text-primary ">
               {reports.length > 0
                 ? Math.round(
                     reports.reduce(
@@ -154,15 +152,13 @@ const Reports = () => {
                   )
                 : 0}
             </div>
-            <p className="text-xs text-[#B0AFAF] mt-2 font-['Inter']">
-              Overall performance
-            </p>
+            <p className="text-xs text-[#B0AFAF] mt-2 ">Overall performance</p>
           </CardContent>
         </Card>
 
         <Card className="bg-[#262626] border-[#343434]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="text-sm font-medium text-white font-['Inter']">
+            <CardTitle className="text-sm font-medium text-white ">
               Trend
             </CardTitle>
             <div className="w-10 h-10 bg-linear-to-br from-[#F59E0B] to-[#D97706] rounded-xl flex items-center justify-center shadow-lg">
@@ -170,18 +166,14 @@ const Reports = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-[#F59E0B] font-['Inter']">
-              +8%
-            </div>
-            <p className="text-xs text-[#B0AFAF] mt-2 font-['Inter']">
-              Since last quarter
-            </p>
+            <div className="text-2xl font-bold text-[#F59E0B] ">+8%</div>
+            <p className="text-xs text-[#B0AFAF] mt-2 ">Since last quarter</p>
           </CardContent>
         </Card>
 
         <Card className="bg-[#262626] border-[#343434]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="text-sm font-medium text-white font-['Inter']">
+            <CardTitle className="text-sm font-medium text-white ">
               Percentile
             </CardTitle>
             <div className="w-10 h-10 bg-linear-to-br from-[#8B5CF6] to-[#7C3AED] rounded-xl flex items-center justify-center shadow-lg">
@@ -189,12 +181,8 @@ const Reports = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-[#8B5CF6] font-['Inter']">
-              Top 25%
-            </div>
-            <p className="text-xs text-[#B0AFAF] mt-2 font-['Inter']">
-              Among peers
-            </p>
+            <div className="text-2xl font-bold text-[#8B5CF6] ">Top 25%</div>
+            <p className="text-xs text-[#B0AFAF] mt-2 ">Among peers</p>
           </CardContent>
         </Card>
       </div>
@@ -202,10 +190,10 @@ const Reports = () => {
       {/* Reports List */}
       <Card className="bg-[#262626] border-[#343434]">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold text-white font-['Inter']">
+          <CardTitle className="text-2xl font-bold text-white ">
             Recent Assessments
           </CardTitle>
-          <CardDescription className="text-[#B0AFAF] text-lg font-['Inter']">
+          <CardDescription className="text-[#B0AFAF] text-lg ">
             Your latest performance evaluations and reports
           </CardDescription>
         </CardHeader>
@@ -213,10 +201,10 @@ const Reports = () => {
           {reports.length === 0 ? (
             <div className="text-center py-12">
               <FileText className="w-16 h-16 text-[#343434] mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-white mb-2 font-['Inter']">
+              <h3 className="text-xl font-semibold text-white mb-2 ">
                 No Reports Available
               </h3>
-              <p className="text-[#B0AFAF] font-['Inter']">
+              <p className="text-[#B0AFAF] ">
                 Your performance reports will appear here once assessments are
                 completed.
               </p>
@@ -230,10 +218,10 @@ const Reports = () => {
                 <div className="flex-1 space-y-4 lg:space-y-2">
                   <div className="flex items-start justify-between">
                     <div className="space-y-1">
-                      <h3 className="text-xl font-semibold text-white group-hover:text-primary transition-colors duration-200 font-['Inter']">
+                      <h3 className="text-xl font-semibold text-white group-hover:text-primary transition-colors duration-200 ">
                         {report.title || `Performance Assessment #${index + 1}`}
                       </h3>
-                      <div className="flex items-center space-x-4 text-sm text-[#B0AFAF] font-['Inter']">
+                      <div className="flex items-center space-x-4 text-sm text-[#B0AFAF] ">
                         <div className="flex items-center space-x-1">
                           <Calendar className="w-4 h-4" />
                           <span>
@@ -255,13 +243,13 @@ const Reports = () => {
                         <div
                           className={`text-3xl font-bold bg-linear-to-r ${getScoreColor(
                             report.overall_score
-                          )} bg-clip-text text-transparent font-['Inter']`}
+                          )} bg-clip-text text-transparent `}
                         >
                           {report.overall_score}
                         </div>
                         <Badge
                           variant={getScoreBadgeVariant(report.overall_score)}
-                          className="mt-1 font-['Inter']"
+                          className="mt-1 "
                         >
                           {getScoreLabel(report.overall_score)}
                         </Badge>
@@ -276,10 +264,10 @@ const Reports = () => {
                         ([category, score]) => (
                           <div key={category} className="space-y-2">
                             <div className="flex justify-between text-sm">
-                              <span className="text-white font-medium capitalize font-['Inter']">
+                              <span className="text-white font-medium capitalize ">
                                 {category.replace("_", " ")}
                               </span>
-                              <span className="text-[#B0AFAF] font-['Inter']">
+                              <span className="text-[#B0AFAF] ">
                                 {score}/100
                               </span>
                             </div>
@@ -300,13 +288,13 @@ const Reports = () => {
                       <div
                         className={`text-2xl font-bold bg-linear-to-r ${getScoreColor(
                           report.overall_score
-                        )} bg-clip-text text-transparent font-['Inter']`}
+                        )} bg-clip-text text-transparent `}
                       >
                         {report.overall_score}
                       </div>
                       <Badge
                         variant={getScoreBadgeVariant(report.overall_score)}
-                        className="mt-1 font-['Inter']"
+                        className="mt-1 "
                       >
                         {getScoreLabel(report.overall_score)}
                       </Badge>
@@ -320,7 +308,7 @@ const Reports = () => {
                     asChild
                     variant="outline"
                     size="sm"
-                    className="border-[#343434] bg-[#262626] text-white hover:bg-[#343434] hover:text-white font-['Inter']"
+                    className="border-[#343434] bg-[#262626] text-white hover:bg-[#343434] hover:text-white "
                   >
                     <Link to={`/reports/${report.id}`}>
                       <Eye className="w-4 h-4 mr-2" />
@@ -330,7 +318,7 @@ const Reports = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="border-[#343434] bg-[#262626] text-white hover:bg-[#343434] hover:text-white font-['Inter']"
+                    className="border-[#343434] bg-[#262626] text-white hover:bg-[#343434] hover:text-white "
                   >
                     <Download className="w-4 h-4 mr-2" />
                     Export

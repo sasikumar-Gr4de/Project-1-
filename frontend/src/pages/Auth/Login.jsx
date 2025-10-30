@@ -340,13 +340,13 @@ const Login = () => {
                   placeholder="Enter your email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="h-12 text-base bg-[#343434] border-[#343434] text-[#E1E5DD] placeholder:text-[#E1E5DD] placeholder:opacity-70 rounded-[5px] font-['Inter']"
+                  className="h-12 text-base bg-[#343434] border-[#343434] text-[#E1E5DD] placeholder:text-[#E1E5DD] placeholder:opacity-70 rounded-[5px] "
                 />
               </div>
               <Button
                 onClick={handleSendOtp}
                 disabled={!email || isLoading}
-                className="w-full h-12 text-base font-['Inter'] bg-primary text-[#0F0F0E] hover:bg-primary/90 font-semibold rounded-[10px]"
+                className="w-full h-12 text-base  bg-primary text-[#0F0F0E] hover:bg-primary/90 font-semibold rounded-[10px]"
               >
                 {isLoading ? "Sending..." : "Send Verification Code"}
                 <ArrowRight className="w-4 h-4 ml-2" />
@@ -363,7 +363,7 @@ const Login = () => {
                   className="h-12 text-center text-lg font-mono bg-[#343434] border-[#343434] text-[#E1E5DD] rounded-[5px]"
                   maxLength={6}
                 />
-                <p className="text-sm text-[#E1E5DD] text-center px-2 font-['Inter']">
+                <p className="text-sm text-[#E1E5DD] text-center px-2 ">
                   We sent a 6-digit code to {email}
                 </p>
               </div>
@@ -371,14 +371,14 @@ const Login = () => {
                 <Button
                   variant="outline"
                   onClick={resetForm}
-                  className="flex-1 h-12 text-base font-['Inter'] border-[#343434] text-[#E1E5DD] hover:bg-[#343434] hover:text-[#E1E5DD] rounded-[5px]"
+                  className="flex-1 h-12 text-base  border-[#343434] text-[#E1E5DD] hover:bg-[#343434] hover:text-[#E1E5DD] rounded-[5px]"
                 >
                   Back
                 </Button>
                 <Button
                   onClick={handleVerifyOtp}
                   disabled={!otp || otp.length !== 6 || isLoading}
-                  className="flex-1 h-12 text-base font-['Inter'] bg-primary text-[#0F0F0E] hover:bg-primary/90 font-semibold rounded-[10px]"
+                  className="flex-1 h-12 text-base  bg-primary text-[#0F0F0E] hover:bg-primary/90 font-semibold rounded-[10px]"
                 >
                   {isLoading ? "Verifying..." : "Verify"}
                 </Button>
@@ -397,7 +397,7 @@ const Login = () => {
           {step === "input" ? (
             <div className="space-y-6">
               <div className="space-y-2">
-                {/* <label className="text-white text-base font-medium font-['Inter']">
+                {/* <label className="text-white text-base font-medium ">
                   Phone Number
                 </label> */}
                 <div className="relative">
@@ -419,14 +419,14 @@ const Login = () => {
                     autoFormat={true}
                   />
                 </div>
-                <p className="text-xs text-[#E1E5DD] px-1 mt-2 font-['Inter']">
+                <p className="text-xs text-[#E1E5DD] px-1 mt-2 ">
                   We'll send a verification code via WhatsApp
                 </p>
               </div>
               <Button
                 onClick={handleSendOtp}
                 disabled={!phone || isLoading}
-                className="w-full h-12 text-base font-['Inter'] bg-primary text-[#0F0F0E] hover:bg-primary/90 font-semibold rounded-[10px]"
+                className="w-full h-12 text-base  bg-primary text-[#0F0F0E] hover:bg-primary/90 font-semibold rounded-[10px]"
               >
                 {isLoading ? "Sending..." : "Send WhatsApp Code"}
                 <ArrowRight className="w-4 h-4 ml-2" />
@@ -443,7 +443,7 @@ const Login = () => {
                   className="h-12 text-center text-lg font-mono bg-[#343434] border-[#343434] text-[#E1E5DD] rounded-[5px]"
                   maxLength={6}
                 />
-                <p className="text-sm text-[#E1E5DD] text-center px-2 font-['Inter']">
+                <p className="text-sm text-[#E1E5DD] text-center px-2 ">
                   We sent a 6-digit code via WhatsApp to {phone}
                 </p>
               </div>
@@ -451,14 +451,14 @@ const Login = () => {
                 <Button
                   variant="outline"
                   onClick={resetForm}
-                  className="flex-1 h-12 text-base font-['Inter'] border-[#343434] text-[#E1E5DD] hover:bg-[#343434] hover:text-[#E1E5DD] rounded-[5px]"
+                  className="flex-1 h-12 text-base  border-[#343434] text-[#E1E5DD] hover:bg-[#343434] hover:text-[#E1E5DD] rounded-[5px]"
                 >
                   Back
                 </Button>
                 <Button
                   onClick={handleVerifyOtp}
                   disabled={!otp || otp.length !== 6 || isLoading}
-                  className="flex-1 h-12 text-base font-['Inter'] bg-primary text-[#0F0F0E] hover:bg-primary/90 font-semibold rounded-[10px]"
+                  className="flex-1 h-12 text-base  bg-primary text-[#0F0F0E] hover:bg-primary/90 font-semibold rounded-[10px]"
                 >
                   {isLoading ? "Verifying..." : "Verify"}
                 </Button>
@@ -477,10 +477,10 @@ const Login = () => {
           <div className="flex justify-center mb-4">
             <img src="favicon.png" alt="GR4DE Logo" className="w-20 h-20" />
           </div>
-          <CardTitle className="text-2xl sm:text-2xl font-bold font-['Inter'] text-primary">
+          <CardTitle className="text-2xl sm:text-2xl font-bold  text-primary">
             Log in
           </CardTitle>
-          <CardDescription className="text-base font-['Inter'] text-white px-2">
+          <CardDescription className="text-base  text-white px-2">
             Welcome Back! Please enter your details
           </CardDescription>
         </CardHeader>
@@ -497,7 +497,7 @@ const Login = () => {
           />
 
           {/* <div className="mt-8 text-center">
-            <p className="text-base font-['Inter'] text-white">
+            <p className="text-base  text-white">
               Don't have an account?{" "}
               <span className="text-primary font-medium cursor-pointer hover:underline">
                 Sign up

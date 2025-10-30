@@ -9,8 +9,9 @@ import { supabase } from "../config/supabase.config.js";
 // Create new player data => trigger analysis workflow
 export const createData = async (req, res) => {
   try {
+    const { id: userId } = req.user;
     const playerData = req.body;
-    const data = await createPlayerData(playerData);
+    const data = await createPlayerData(userId, playerData);
     res.json(RESPONSES.SUCCESS("Player data created successfully", data));
   } catch (error) {
     console.log("Create player data error:", error);

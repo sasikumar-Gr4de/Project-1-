@@ -32,7 +32,7 @@ import {
   Palette,
 } from "lucide-react";
 
-import { useDataStore } from "store/dataStore";
+import { useDataStore } from "@/store/dataStore";
 
 const Upload = () => {
   const { fetchDashboard } = useUserStore();
@@ -224,7 +224,7 @@ const Upload = () => {
                     : `Upload failed: ${uploadResult.error}`}
                 </p>
                 {uploadResult.success && uploadResult.data?.queue_item && (
-                  <Badge className="mt-1 bg-green-500/20 text-green-400 border-green-500/30 font-['Inter']">
+                  <Badge className="mt-1 bg-green-500/20 text-green-400 border-green-500/30 ">
                     Queue ID: {uploadResult.data.queue_item.id}
                   </Badge>
                 )}
@@ -240,10 +240,10 @@ const Upload = () => {
           <CardContent className="p-6">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-white font-['Inter']">
+                <span className="text-sm font-medium text-white ">
                   Processing upload...
                 </span>
-                <span className="text-sm text-[#B0AFAF] font-['Inter']">
+                <span className="text-sm text-[#B0AFAF] ">
                   {uploadProgress}%
                 </span>
               </div>
@@ -251,7 +251,7 @@ const Upload = () => {
                 value={uploadProgress}
                 className="w-full bg-[#343434]"
               />
-              <p className="text-xs text-[#B0AFAF] font-['Inter']">
+              <p className="text-xs text-[#B0AFAF] ">
                 Please don't close this window while your data is being
                 processed.
               </p>
@@ -266,11 +266,11 @@ const Upload = () => {
           {/* Video Upload */}
           <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2 text-white font-['Inter']">
+              <CardTitle className="flex items-center space-x-2 text-white ">
                 <Video className="w-5 h-5 text-primary" />
                 <span>Match Video</span>
               </CardTitle>
-              <CardDescription className="text-[#B0AFAF] font-['Inter']">
+              <CardDescription className="text-[#B0AFAF] ">
                 Upload your match video footage (MP4, MOV, AVI up to 100MB)
               </CardDescription>
             </CardHeader>
@@ -288,11 +288,11 @@ const Upload = () => {
           {/* GPS Data Upload */}
           <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2 text-white font-['Inter']">
+              <CardTitle className="flex items-center space-x-2 text-white ">
                 <FileText className="w-5 h-5 text-primary" />
                 <span>GPS Data (Optional)</span>
               </CardTitle>
-              <CardDescription className="text-[#B0AFAF] font-['Inter']">
+              <CardDescription className="text-[#B0AFAF] ">
                 Upload GPS tracking data in CSV or JSON format
               </CardDescription>
             </CardHeader>
@@ -313,17 +313,15 @@ const Upload = () => {
         <div className="space-y-6">
           <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
             <CardHeader>
-              <CardTitle className="text-white font-['Inter']">
-                Match Details
-              </CardTitle>
-              <CardDescription className="text-[#B0AFAF] font-['Inter']">
+              <CardTitle className="text-white ">Match Details</CardTitle>
+              <CardDescription className="text-[#B0AFAF] ">
                 Provide information about the match and your participation
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Match Date */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-white font-['Inter']">
+                <label className="text-sm font-medium text-white ">
                   Match Date *
                 </label>
                 <div className="relative">
@@ -334,7 +332,7 @@ const Upload = () => {
                     onChange={(e) =>
                       handleInputChange("match_date", e.target.value)
                     }
-                    className="pl-10 h-11 bg-[#1A1A1A] border-[#343434] text-white placeholder:text-[#B0AFAF] focus:border-primary font-['Inter']"
+                    className="pl-10 h-11 bg-[#1A1A1A] border-[#343434] text-white placeholder:text-[#B0AFAF] focus:border-primary "
                     required
                   />
                 </div>
@@ -344,7 +342,7 @@ const Upload = () => {
               <div className="grid grid-cols-2 gap-4">
                 {/* Jersey Number */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-white font-['Inter']">
+                  <label className="text-sm font-medium text-white ">
                     Jersey Number
                   </label>
                   <div className="relative">
@@ -358,7 +356,7 @@ const Upload = () => {
                       onChange={(e) =>
                         handleInputChange("jersey_number", e.target.value)
                       }
-                      className="pl-10 h-11 bg-[#1A1A1A] border-[#343434] text-white placeholder:text-[#B0AFAF] focus:border-primary font-['Inter']"
+                      className="pl-10 h-11 bg-[#1A1A1A] border-[#343434] text-white placeholder:text-[#B0AFAF] focus:border-primary "
                     />
                   </div>
                 </div>
@@ -368,7 +366,7 @@ const Upload = () => {
               <div className="grid grid-cols-3 gap-4">
                 {/* Position */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-white font-['Inter']">
+                  <label className="text-sm font-medium text-white ">
                     Position
                   </label>
                   <div className="relative">
@@ -379,15 +377,15 @@ const Upload = () => {
                         handleInputChange("position", value)
                       }
                     >
-                      <SelectTrigger className="pl-10 h-11 bg-[#1A1A1A] border-[#343434] text-white focus:border-primary font-['Inter']">
+                      <SelectTrigger className="pl-10 h-11 bg-[#1A1A1A] border-[#343434] text-white focus:border-primary ">
                         <SelectValue placeholder="Select position" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#262626] border-[#343434] text-white font-['Inter']">
+                      <SelectContent className="bg-[#262626] border-[#343434] text-white ">
                         {positionOptions.map((position) => (
                           <SelectItem
                             key={position}
                             value={position}
-                            className="font-['Inter']"
+                            className=""
                           >
                             {position}
                           </SelectItem>
@@ -399,7 +397,7 @@ const Upload = () => {
 
                 {/* Your Jersey Color */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-white font-['Inter']">
+                  <label className="text-sm font-medium text-white ">
                     Your Jersey Color
                   </label>
                   <div className="relative">
@@ -410,16 +408,12 @@ const Upload = () => {
                         handleInputChange("jersey_color", value)
                       }
                     >
-                      <SelectTrigger className="pl-10 h-11 bg-[#1A1A1A] border-[#343434] text-white focus:border-primary font-['Inter']">
+                      <SelectTrigger className="pl-10 h-11 bg-[#1A1A1A] border-[#343434] text-white focus:border-primary ">
                         <SelectValue placeholder="Select color" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#262626] border-[#343434] text-white font-['Inter'] max-h-60">
+                      <SelectContent className="bg-[#262626] border-[#343434] text-white  max-h-60">
                         {jerseyColors.map((color) => (
-                          <SelectItem
-                            key={color}
-                            value={color}
-                            className="font-['Inter']"
-                          >
+                          <SelectItem key={color} value={color} className="">
                             <div className="flex items-center space-x-2">
                               <div
                                 className="w-4 h-4 rounded border border-[#343434]"
@@ -442,7 +436,7 @@ const Upload = () => {
 
                 {/* Opponent Jersey Color */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-white font-['Inter']">
+                  <label className="text-sm font-medium text-white ">
                     Opponent Jersey Color
                   </label>
                   <div className="relative">
@@ -453,16 +447,12 @@ const Upload = () => {
                         handleInputChange("opponent_jersey_color", value)
                       }
                     >
-                      <SelectTrigger className="pl-10 h-11 bg-[#1A1A1A] border-[#343434] text-white focus:border-primary font-['Inter']">
+                      <SelectTrigger className="pl-10 h-11 bg-[#1A1A1A] border-[#343434] text-white focus:border-primary ">
                         <SelectValue placeholder="Select color" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#262626] border-[#343434] text-white font-['Inter'] max-h-60">
+                      <SelectContent className="bg-[#262626] border-[#343434] text-white  max-h-60">
                         {jerseyColors.map((color) => (
-                          <SelectItem
-                            key={color}
-                            value={color}
-                            className="font-['Inter']"
-                          >
+                          <SelectItem key={color} value={color} className="">
                             <div className="flex items-center space-x-2">
                               <div
                                 className="w-4 h-4 rounded border border-[#343434]"
@@ -486,7 +476,7 @@ const Upload = () => {
 
               {/* Notes */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-white font-['Inter']">
+                <label className="text-sm font-medium text-white ">
                   Additional Notes
                 </label>
                 <Textarea
@@ -494,16 +484,16 @@ const Upload = () => {
                   value={uploadData.notes}
                   onChange={(e) => handleInputChange("notes", e.target.value)}
                   rows={4}
-                  className="bg-[#1A1A1A] border-[#343434] text-white placeholder:text-[#B0AFAF] focus:border-primary font-['Inter']"
+                  className="bg-[#1A1A1A] border-[#343434] text-white placeholder:text-[#B0AFAF] focus:border-primary "
                 />
               </div>
 
               {/* Requirements */}
               <div className="rounded-lg bg-[#1A1A1A] p-4 space-y-2 border border-[#343434]">
-                <h4 className="text-sm font-medium text-white font-['Inter']">
+                <h4 className="text-sm font-medium text-white ">
                   Upload Requirements
                 </h4>
-                <ul className="text-sm text-[#B0AFAF] space-y-1 font-['Inter']">
+                <ul className="text-sm text-[#B0AFAF] space-y-1 ">
                   <li>• Video must be clear and show full gameplay</li>
                   <li>• Minimum video length: 15 minutes</li>
                   <li>• Maximum video size: 100MB</li>
@@ -522,7 +512,7 @@ const Upload = () => {
               <Button
                 type="submit"
                 disabled={!canSubmit}
-                className="w-full h-11 bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold disabled:bg-[#343434] disabled:text-[#B0AFAF] transition-all duration-300 font-['Inter']"
+                className="w-full h-11 bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold disabled:bg-[#343434] disabled:text-[#B0AFAF] transition-all duration-300 "
                 size="lg"
               >
                 {isUploading ? (
@@ -540,74 +530,64 @@ const Upload = () => {
           {/* Upload Status */}
           <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
             <CardHeader>
-              <CardTitle className="text-white font-['Inter']">
-                Upload Status
-              </CardTitle>
+              <CardTitle className="text-white ">Upload Status</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-white font-['Inter']">
-                  Video File
-                </span>
+                <span className="text-sm text-white ">Video File</span>
                 {files.video ? (
-                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30 font-['Inter']">
+                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30 ">
                     Uploaded
                   </Badge>
                 ) : (
                   <Badge
                     variant="outline"
-                    className="bg-[#343434] text-[#B0AFAF] border-[#343434] font-['Inter']"
+                    className="bg-[#343434] text-[#B0AFAF] border-[#343434] "
                   >
                     Required
                   </Badge>
                 )}
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-white font-['Inter']">
-                  GPS Data
-                </span>
+                <span className="text-sm text-white ">GPS Data</span>
                 {files.gps ? (
-                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30 font-['Inter']">
+                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30 ">
                     Uploaded
                   </Badge>
                 ) : (
                   <Badge
                     variant="outline"
-                    className="bg-[#343434] text-[#B0AFAF] border-[#343434] font-['Inter']"
+                    className="bg-[#343434] text-[#B0AFAF] border-[#343434] "
                   >
                     Optional
                   </Badge>
                 )}
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-white font-['Inter']">
-                  Match Details
-                </span>
+                <span className="text-sm text-white ">Match Details</span>
                 {uploadData.match_date ? (
-                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30 font-['Inter']">
+                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30 ">
                     Complete
                   </Badge>
                 ) : (
                   <Badge
                     variant="outline"
-                    className="bg-[#343434] text-[#B0AFAF] border-[#343434] font-['Inter']"
+                    className="bg-[#343434] text-[#B0AFAF] border-[#343434] "
                   >
                     Required
                   </Badge>
                 )}
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-white font-['Inter']">
-                  Player Info
-                </span>
+                <span className="text-sm text-white ">Player Info</span>
                 {uploadData.jersey_number || uploadData.position ? (
-                  <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 font-['Inter']">
+                  <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 ">
                     Added
                   </Badge>
                 ) : (
                   <Badge
                     variant="outline"
-                    className="bg-[#343434] text-[#B0AFAF] border-[#343434] font-['Inter']"
+                    className="bg-[#343434] text-[#B0AFAF] border-[#343434] "
                   >
                     Optional
                   </Badge>

@@ -1,7 +1,8 @@
+import e from "express";
 import { supabase } from "../config/supabase.config.js";
 import { PLAYER_DATA_STATUS } from "../utils/constants.js";
 
-export const createPlayerData = async (playerData) => {
+export const createPlayerData = async (userId, playerData) => {
   const {
     match_date,
     jersey_number,
@@ -9,8 +10,8 @@ export const createPlayerData = async (playerData) => {
     jersey_color,
     opponent_jersey_color,
     notes,
-    video,
-    gps,
+    video_url,
+    gps_url,
   } = playerData;
 
   const { data, error } = await supabase
@@ -22,8 +23,9 @@ export const createPlayerData = async (playerData) => {
         jersey_home_color: jersey_color,
         jersey_away_color: opponent_jersey_color,
         notes,
-        video,
-        gps,
+        video_file: video_url,
+        gps_file: gps_url,
+        player_id: userId,
         position,
         status: PLAYER_DATA_STATUS.UPLOADED, // Set initial status to "uploaded"
       },
@@ -32,6 +34,7 @@ export const createPlayerData = async (playerData) => {
     .single();
 
   if (error) {
+    console.log(error);
     throw new Error("Failed save player data");
   }
 

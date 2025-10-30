@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import api from "services/base.api.js";
+import api from "@/services/base.api.js";
 
 const playerDataAPI = {
   uploadPlayerData: (data) => api.post("/data", data),
