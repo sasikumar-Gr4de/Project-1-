@@ -54,10 +54,10 @@ const Benchmarks = () => {
       <div className="space-y-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold  font-['Inter_Tight'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent animate-pulse">
+            <h1 className="text-4xl font-bold  font-['Orbitron'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent animate-pulse">
               Performance Benchmarks
             </h1>
-            <p className="text-[#B0AFAF] text-lg mt-2 font-['Inter_Tight'] animate-pulse">
+            <p className="text-[#B0AFAF] text-lg mt-2 font-['Orbitron'] animate-pulse">
               Loading benchmark data...
             </p>
           </div>
@@ -160,10 +160,10 @@ const Benchmarks = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-bold  font-['Inter_Tight'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold  font-['Orbitron'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
             Performance Benchmarks
           </h1>
-          <p className="text-[#B0AFAF] text-lg mt-2 font-['Inter_Tight']">
+          <p className="text-[#B0AFAF] text-lg mt-2 font-['Orbitron']">
             Compare your performance with {user?.position || "similar"} players
             in your age group
           </p>

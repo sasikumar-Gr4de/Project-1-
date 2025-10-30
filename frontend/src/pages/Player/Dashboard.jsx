@@ -52,8 +52,8 @@ const Dashboard = () => {
       <div className="space-y-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white font-['Inter_Tight'] animate-pulse bg-[#262626] rounded-lg w-64 h-10"></h1>
-            <p className="text-[#B0AFAF] mt-2 font-['Inter_Tight'] animate-pulse bg-[#262626] rounded w-48 h-4"></p>
+            <h1 className="text-3xl font-bold text-white font-['Orbitron'] animate-pulse bg-[#262626] rounded-lg w-64 h-10"></h1>
+            <p className="text-[#B0AFAF] mt-2 font-['Orbitron'] animate-pulse bg-[#262626] rounded w-48 h-4"></p>
           </div>
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -81,10 +81,10 @@ const Dashboard = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-bold  font-['Inter_Tight'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold  font-['Orbitron'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent font-obitron">
             Welcome back, {user?.player_name}!
           </h1>
-          <p className="text-[#B0AFAF] text-lg mt-2 font-['Inter_Tight']">
+          <p className="text-[#B0AFAF] text-lg mt-2 font-['Orbitron']">
             Here's your latest performance overview and insights
           </p>
         </div>

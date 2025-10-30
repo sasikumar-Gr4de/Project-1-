@@ -139,7 +139,7 @@ const Profile = () => {
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-[#B0AFAF] font-['Inter_Tight'] text-lg">
+          <p className="mt-4 text-[#B0AFAF] font-['Orbitron'] text-lg">
             Loading profile...
           </p>
         </div>
@@ -172,17 +172,17 @@ const Profile = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-bold  font-['Inter_Tight'] bg-linear-to-r` from-white to-primary bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold font-['Orbitron'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
             Player Profile
           </h1>
-          <p className="text-[#B0AFAF] text-lg mt-2 font-['Inter_Tight']">
+          <p className="text-[#B0AFAF] text-lg mt-2 font-['Orbitron']">
             Manage your personal information and performance preferences
           </p>
         </div>
         {!isEditing ? (
           <Button
             onClick={() => setIsEditing(true)}
-            className="bg-linear-to-r` from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold rounded-xl px-6 py-3 h-12 shadow-lg hover:shadow-xl transition-all duration-300 font-['Inter_Tight']"
+            className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold rounded-xl px-6 py-3 h-12 shadow-lg hover:shadow-xl transition-all duration-300 font-['Inter_Tight']"
           >
             <Edit3 className="w-5 h-5 mr-2" />
             Edit Profile
@@ -199,7 +199,7 @@ const Profile = () => {
             <Button
               onClick={handleSave}
               disabled={isLoading}
-              className="bg-linear-to-r` from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold rounded-xl px-6 py-3 h-12 shadow-lg hover:shadow-xl transition-all duration-300 font-['Inter_Tight'] disabled:opacity-50"
+              className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold rounded-xl px-6 py-3 h-12 shadow-lg hover:shadow-xl transition-all duration-300 font-['Inter_Tight'] disabled:opacity-50"
             >
               <Save className="w-5 h-5 mr-2" />
               {isLoading ? "Saving..." : "Save Changes"}

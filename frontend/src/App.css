@@ -1,4 +1,4 @@
-/* App.css - Updated for scrollable layout */
+/* App.css - Updated for proper scrollable layout */
 #root {
   user-select: none;
   height: 100vh;
@@ -111,6 +111,36 @@ body {
   overflow-x: hidden;
 }
 
+/* Layout specific utilities */
+.layout-container {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+}
+
+.sticky-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  flex-shrink: 0;
+}
+
+.content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* Important for flex children to respect overflow */
+  overflow: hidden;
+}
+
 /* Mobile optimizations */
 @media (max-width: 768px) {
   .scrollable-content::-webkit-scrollbar {
@@ -120,30 +150,34 @@ body {
   .scrollable-sidebar::-webkit-scrollbar {
     width: 3px;
   }
+  
+  .sticky-sidebar {
+    position: fixed;
+    z-index: 40;
+  }
 }
 
-/* Layout specific utilities */
-.layout-container {
-  height: 100vh;
-  overflow: hidden;
-}
-
-.sticky-sidebar {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  overflow: hidden;
-}
-
-.sticky-header {
-  position: sticky;
-  top: 0;
-  z-index: 40;
-}
-
-.content-wrapper {
+/* Ensure main content area doesn't cause layout shifts */
+.main-content-area {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 0; /* Important for flex children to respect overflow */
+  overflow: hidden;
+}
+
+/* Fix for flexbox scrolling issues */
+.flex-scroll-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.flex-scroll-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.font-Orbitron{
+  font-family: 'Orbitron';
 }

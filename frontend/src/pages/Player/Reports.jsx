@@ -1,6 +1,6 @@
+// Reports.jsx - Updated with platform color palette
 import React, { useState, useEffect } from "react";
 import { useUserStore } from "@/store/userStore";
-import DataTable from "@/components/common/DataTable";
 import {
   Card,
   CardContent,
@@ -8,215 +8,337 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Download, Calendar } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import {
-  formatDate,
-  getBadgeVariant,
-  getScoreColor,
-} from "@/utils/helper.utils";
+  FileText,
+  Calendar,
+  Download,
+  Eye,
+  TrendingUp,
+  Target,
+  Users,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Reports = () => {
-  const { reports, pagination, isLoading, fetchReports, fetchReport } =
-    useUserStore();
+  const { dashboardData, fetchDashboard, isLoading } = useUserStore();
+  const [reports, setReports] = useState([]);
 
   useEffect(() => {
-    fetchReports(pagination.page, pagination.pageSize);
-  }, [pagination.page, pagination.pageSize]);
+    fetchDashboardData();
+  }, []);
 
-  const handlePageChange = (page) => {
-    fetchReports(page, pagination.pageSize);
-  };
-
-  const handlePageSizeChange = (pageSize) => {
-    fetchReports(1, pageSize);
-  };
-
-  const columns = [
-    {
-      header: "Date",
-      accessor: "created_at",
-      cell: ({ row }) => (
-        <div className="flex items-center space-x-2">
-          <Calendar className="w-4 h-4 text-muted-foreground" />
-          <span>{formatDate(row.created_at)}</span>
-        </div>
-      ),
-    },
-    {
-      header: "GR4DE Score",
-      accessor: "overall_score",
-      cell: ({ row }) => (
-        <div
-          className={`text-lg font-bold ${getScoreColor(row.overall_score)}`}
-        >
-          {row.overall_score}
-        </div>
-      ),
-    },
-    {
-      header: "Status",
-      accessor: "status",
-      badge: true,
-    },
-    {
-      header: "Technical",
-      accessor: "score_json.technical",
-      cell: ({ row }) => (
-        <span className={getScoreColor(row.score_json?.technical)}>
-          {row.score_json?.technical || "--"}
-        </span>
-      ),
-    },
-    {
-      header: "Tactical",
-      accessor: "score_json.tactical",
-      cell: ({ row }) => (
-        <span className={getScoreColor(row.score_json?.tactical)}>
-          {row.score_json?.tactical || "--"}
-        </span>
-      ),
-    },
-    {
-      header: "Physical",
-      accessor: "score_json.physical",
-      cell: ({ row }) => (
-        <span className={getScoreColor(row.score_json?.physical)}>
-          {row.score_json?.physical || "--"}
-        </span>
-      ),
-    },
-    {
-      header: "Mental",
-      accessor: "score_json.mental",
-      cell: ({ row }) => (
-        <span className={getScoreColor(row.score_json?.mental)}>
-          {row.score_json?.mental || "--"}
-        </span>
-      ),
-    },
-  ];
-
-  const actions = ({ row }) => (
-    <div className="flex items-center space-x-1">
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => handleViewReport(row.id)}
-        className="h-8 w-8"
-      >
-        <Eye className="w-4 h-4" />
-      </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => handleDownloadReport(row.id)}
-        className="h-8 w-8"
-      >
-        <Download className="w-4 h-4" />
-      </Button>
-    </div>
-  );
-
-  const handleViewReport = (reportId) => {
-    window.open(`/reports/${reportId}`, "_blank");
-  };
-
-  const handleDownloadReport = async (reportId) => {
+  const fetchDashboardData = async () => {
     try {
-      const response = await fetchReport(reportId);
-      if (response.success && response.data.pdf_url) {
-        window.open(response.data.pdf_url, "_blank");
-      }
+      await fetchDashboard();
     } catch (error) {
-      console.error("Failed to download report:", error);
+      console.error("Failed to fetch reports:", error);
     }
   };
 
+  useEffect(() => {
+    if (dashboardData?.recentReports) {
+      setReports(dashboardData.recentReports);
+    }
+  }, [dashboardData]);
+
+  const getScoreColor = (score) => {
+    if (score >= 90) return "from-primary to-[#94D44A]";
+    if (score >= 80) return "from-[#60A5FA] to-[#3B82F6]";
+    if (score >= 70) return "from-[#F59E0B] to-[#D97706]";
+    return "from-[#EF4444] to-[#DC2626]";
+  };
+
+  const getScoreBadgeVariant = (score) => {
+    if (score >= 90) return "default";
+    if (score >= 80) return "secondary";
+    if (score >= 70) return "outline";
+    return "destructive";
+  };
+
+  const getScoreLabel = (score) => {
+    if (score >= 90) return "Elite";
+    if (score >= 80) return "Excellent";
+    if (score >= 70) return "Good";
+    if (score >= 60) return "Average";
+    return "Needs Work";
+  };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold font-['Orbitron'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent animate-pulse">
+              Performance Reports
+            </h1>
+            <p className="text-[#B0AFAF] text-lg mt-2 font-['Orbitron'] animate-pulse">
+              Loading your reports...
+            </p>
+          </div>
+        </div>
+        <div className="grid gap-6">
+          {[...Array(3)].map((_, i) => (
+            <Card
+              key={i}
+              className="animate-pulse bg-[#262626] border-[#343434]"
+            >
+              <CardContent className="p-6">
+                <div className="h-6 bg-[#343434] rounded w-1/4 mb-4"></div>
+                <div className="space-y-3">
+                  <div className="h-4 bg-[#343434] rounded w-full"></div>
+                  <div className="h-4 bg-[#343434] rounded w-3/4"></div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">My Reports</h1>
-          <p className="text-muted-foreground">
-            View your performance reports and track progress
+          <h1 className="text-4xl font-bold  font-['Orbitron'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
+            Performance Reports
+          </h1>
+          <p className="text-[#B0AFAF] text-lg mt-2 font-['Orbitron']">
+            Track your progress and analyze performance trends
           </p>
         </div>
-        <Button asChild>
-          <Link to="/upload">
-            <Download className="w-4 h-4 mr-2" />
-            New Analysis
-          </Link>
-        </Button>
       </div>
 
       {/* Stats Overview */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-primary">
+      <div className="grid gap-6 lg:grid-cols-4">
+        <Card className="bg-[#262626] border-[#343434]">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <CardTitle className="text-sm font-medium text-white font-['Inter_Tight']">
+              Total Reports
+            </CardTitle>
+            <div className="w-10 h-10 bg-linear-to-br from-[#60A5FA] to-[#3B82F6] rounded-xl flex items-center justify-center shadow-lg">
+              <FileText className="h-5 w-5 text-white" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white font-['Inter_Tight']">
               {reports.length}
             </div>
-            <p className="text-sm text-muted-foreground">Total Reports</p>
+            <p className="text-xs text-[#B0AFAF] mt-2 font-['Inter_Tight']">
+              All time assessments
+            </p>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-green-500">
-              {reports.filter((r) => r.status === "generated").length}
+
+        <Card className="bg-[#262626] border-[#343434]">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <CardTitle className="text-sm font-medium text-white font-['Inter_Tight']">
+              Average Score
+            </CardTitle>
+            <div className="w-10 h-10 bg-linear-to-br from-primary to-[#94D44A] rounded-xl flex items-center justify-center shadow-lg">
+              <Target className="h-5 w-5 text-[#0F0F0E]" />
             </div>
-            <p className="text-sm text-muted-foreground">Completed</p>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-primary font-['Inter_Tight']">
+              {reports.length > 0
+                ? Math.round(
+                    reports.reduce(
+                      (acc, report) => acc + report.overall_score,
+                      0
+                    ) / reports.length
+                  )
+                : 0}
+            </div>
+            <p className="text-xs text-[#B0AFAF] mt-2 font-['Inter_Tight']">
+              Overall performance
+            </p>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-blue-500">
-              {reports.filter((r) => r.status === "generating").length}
+
+        <Card className="bg-[#262626] border-[#343434]">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <CardTitle className="text-sm font-medium text-white font-['Inter_Tight']">
+              Trend
+            </CardTitle>
+            <div className="w-10 h-10 bg-linear-to-br from-[#F59E0B] to-[#D97706] rounded-xl flex items-center justify-center shadow-lg">
+              <TrendingUp className="h-5 w-5 text-white" />
             </div>
-            <p className="text-sm text-muted-foreground">Processing</p>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-[#F59E0B] font-['Inter_Tight']">
+              +8%
+            </div>
+            <p className="text-xs text-[#B0AFAF] mt-2 font-['Inter_Tight']">
+              Since last quarter
+            </p>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-orange-500">
-              {reports.reduce(
-                (max, report) => Math.max(max, report.overall_score || 0),
-                0
-              )}
+
+        <Card className="bg-[#262626] border-[#343434]">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <CardTitle className="text-sm font-medium text-white font-['Inter_Tight']">
+              Percentile
+            </CardTitle>
+            <div className="w-10 h-10 bg-linear-to-br from-[#8B5CF6] to-[#7C3AED] rounded-xl flex items-center justify-center shadow-lg">
+              <Users className="h-5 w-5 text-white" />
             </div>
-            <p className="text-sm text-muted-foreground">Best Score</p>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-[#8B5CF6] font-['Inter_Tight']">
+              Top 25%
+            </div>
+            <p className="text-xs text-[#B0AFAF] mt-2 font-['Inter_Tight']">
+              Among peers
+            </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Reports Table */}
-      <Card>
+      {/* Reports List */}
+      <Card className="bg-[#262626] border-[#343434]">
         <CardHeader>
-          <CardTitle>Performance Reports</CardTitle>
-          <CardDescription>
-            All your generated GR4DE reports with detailed scores
+          <CardTitle className="text-2xl font-bold text-white font-['Inter_Tight']">
+            Recent Assessments
+          </CardTitle>
+          <CardDescription className="text-[#B0AFAF] text-lg font-['Inter_Tight']">
+            Your latest performance evaluations and reports
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <DataTable
-            data={reports}
-            columns={columns}
-            actions={actions}
-            isLoading={isLoading} // Pass loading state
-            pagination={{
-              page: pagination.page,
-              pageSize: pagination.pageSize,
-              total: pagination.total,
-              totalPages: pagination.totalPages,
-            }}
-            onPageChange={handlePageChange}
-            onPageSizeChange={handlePageSizeChange}
-            emptyStateTitle="No Reports Yet"
-            emptyStateDescription="Upload your first match data to generate performance reports."
-          />
+        <CardContent className="space-y-6">
+          {reports.length === 0 ? (
+            <div className="text-center py-12">
+              <FileText className="w-16 h-16 text-[#343434] mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-white mb-2 font-['Inter_Tight']">
+                No Reports Available
+              </h3>
+              <p className="text-[#B0AFAF] font-['Inter_Tight']">
+                Your performance reports will appear here once assessments are
+                completed.
+              </p>
+            </div>
+          ) : (
+            reports.map((report, index) => (
+              <div
+                key={report.id}
+                className="flex flex-col lg:flex-row lg:items-center justify-between p-6 bg-[#1A1A1A] rounded-xl border border-[#343434] hover:border-primary/30 transition-all duration-300 group"
+              >
+                <div className="flex-1 space-y-4 lg:space-y-2">
+                  <div className="flex items-start justify-between">
+                    <div className="space-y-1">
+                      <h3 className="text-xl font-semibold text-white group-hover:text-primary transition-colors duration-200 font-['Inter_Tight']">
+                        {report.title || `Performance Assessment #${index + 1}`}
+                      </h3>
+                      <div className="flex items-center space-x-4 text-sm text-[#B0AFAF] font-['Inter_Tight']">
+                        <div className="flex items-center space-x-1">
+                          <Calendar className="w-4 h-4" />
+                          <span>
+                            {report.date
+                              ? new Date(report.date).toLocaleDateString()
+                              : "Date not available"}
+                          </span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <Target className="w-4 h-4" />
+                          <span>{report.position || "General Assessment"}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Score Display - Desktop */}
+                    <div className="hidden lg:flex items-center space-x-4">
+                      <div className="text-right">
+                        <div
+                          className={`text-3xl font-bold bg-linear-to-r ${getScoreColor(
+                            report.overall_score
+                          )} bg-clip-text text-transparent font-['Inter_Tight']`}
+                        >
+                          {report.overall_score}
+                        </div>
+                        <Badge
+                          variant={getScoreBadgeVariant(report.overall_score)}
+                          className="mt-1 font-['Inter_Tight']"
+                        >
+                          {getScoreLabel(report.overall_score)}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Progress Bars */}
+                  <div className="space-y-3">
+                    {report.category_scores &&
+                      Object.entries(report.category_scores).map(
+                        ([category, score]) => (
+                          <div key={category} className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-white font-medium capitalize font-['Inter_Tight']">
+                                {category.replace("_", " ")}
+                              </span>
+                              <span className="text-[#B0AFAF] font-['Inter_Tight']">
+                                {score}/100
+                              </span>
+                            </div>
+                            <Progress
+                              value={score}
+                              className={`h-2 ${getScoreColor(
+                                score
+                              )} rounded-full`}
+                            />
+                          </div>
+                        )
+                      )}
+                  </div>
+
+                  {/* Score Display - Mobile */}
+                  <div className="lg:hidden flex items-center justify-between pt-4 border-t border-[#343434]">
+                    <div className="text-left">
+                      <div
+                        className={`text-2xl font-bold bg-linear-to-r ${getScoreColor(
+                          report.overall_score
+                        )} bg-clip-text text-transparent font-['Inter_Tight']`}
+                      >
+                        {report.overall_score}
+                      </div>
+                      <Badge
+                        variant={getScoreBadgeVariant(report.overall_score)}
+                        className="mt-1 font-['Inter_Tight']"
+                      >
+                        {getScoreLabel(report.overall_score)}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center space-x-2 lg:space-x-3 lg:ml-6 lg:pl-6 lg:border-l lg:border-[#343434] mt-4 lg:mt-0">
+                  <Button
+                    asChild
+                    variant="outline"
+                    size="sm"
+                    className="border-[#343434] bg-[#262626] text-white hover:bg-[#343434] hover:text-white font-['Inter_Tight']"
+                  >
+                    <Link to={`/reports/${report.id}`}>
+                      <Eye className="w-4 h-4 mr-2" />
+                      View Details
+                    </Link>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-[#343434] bg-[#262626] text-white hover:bg-[#343434] hover:text-white font-['Inter_Tight']"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Export
+                  </Button>
+                </div>
+              </div>
+            ))
+          )}
         </CardContent>
       </Card>
     </div>
