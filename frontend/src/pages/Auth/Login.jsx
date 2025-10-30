@@ -475,7 +475,11 @@ const Login = () => {
       <Card className="w-full max-w-md bg-transparent border-none shadow-none">
         <CardHeader className="text-center space-y-4 px-4 sm:px-6">
           <div className="flex justify-center mb-4">
-            <img src="favicon.png" alt="GR4DE Logo" className="w-20 h-20" />
+            <img
+              src="https://amzn-gr4de-bucket.s3.eu-north-1.amazonaws.com/serverfavicon.png-1761828500393-y4b46hwju9k"
+              alt="GR4DE Logo"
+              className="w-20 h-20"
+            />
           </div>
           <CardTitle className="text-2xl sm:text-2xl font-bold  text-primary">
             Log in

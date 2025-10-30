@@ -159,7 +159,7 @@ const PlayerLayout = ({ children }) => {
           {/* Logo Section */}
           <div className="flex flex-col items-center p-6 pb-4 shrink-0 border-b border-[#343434]">
             <img
-              src="favicon-flat.png"
+              src="https://amzn-gr4de-bucket.s3.eu-north-1.amazonaws.com/serverfavicon-flat.png-1761828572874-cz3vcaezhrb"
               alt="GR4DE Logo"
               className="w-24 h-14 object-contain"
             />

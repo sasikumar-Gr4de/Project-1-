@@ -24,6 +24,8 @@ import ReportDetail from "@/pages/Player/ReportDetail";
 import Benchmarks from "@/pages/Player/Benchmarks";
 import Profile from "@/pages/Player/Profile";
 
+import ServerFileUpload from "@/pages/Developer/ServerFileUpload";
+
 // Other Pages
 import Landing from "@/pages/Landing";
 import { ToastProvider } from "@/contexts/ToastContext";
@@ -56,7 +58,9 @@ function App() {
       <Router>
         <Routes>
           {/* Public Routes */}
+
           <Route path="/" element={<Landing />} />
+          <Route path="/server-upload" element={<ServerFileUpload />} />
           <Route
             path="/login"
             element={
