@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { userAPI } from "@/services/base.api";
+import { useUserStore } from "@/store/userStore";
 import {
   Card,
   CardContent,
@@ -28,25 +28,26 @@ import {
 
 const ReportDetail = () => {
   const { reportId } = useParams();
+  const { currentReport, fetchReport, isLoading } = useUserStore();
   const [report, setReport] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchReport();
+    fetchReportData();
   }, [reportId]);
 
-  const fetchReport = async () => {
+  const fetchReportData = async () => {
     try {
-      const response = await userAPI.getReport(reportId);
-      if (response.success) {
-        setReport(response.data);
-      }
+      await fetchReport(reportId);
     } catch (error) {
       console.error("Failed to fetch report:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (currentReport) {
+      setReport(currentReport);
+    }
+  }, [currentReport]);
 
   const handleDownload = () => {
     if (report?.pdf_url) {
@@ -167,58 +168,73 @@ const ReportDetail = () => {
                 <div className={`text-3xl font-bold ${getPillarColor(pillar)}`}>
                   {score}
                 </div>
-                <Progress value={score} className="mt-2" />
+                <Progress value={score} className="mt-2 h-2" />
+                <p className="text-xs text-muted-foreground mt-2">
+                  {getPillarDescription(pillar)}
+                </p>
               </CardContent>
             </Card>
           ))}
       </div>
 
-      {/* Insights */}
+      {/* Detailed Breakdown */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Strengths */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Award className="w-5 h-5 text-green-500" />
-              <span>Top Strengths</span>
+              <span>Key Strengths</span>
             </CardTitle>
             <CardDescription>
-              Areas where you excel compared to peers
+              Areas where you performed exceptionally well
             </CardDescription>
           </CardHeader>
           <CardContent>
             <ul className="space-y-3">
-              {score_json.strengths?.map((strength, index) => (
+              {getStrengths(score_json).map((strength, index) => (
                 <li
                   key={index}
                   className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg border border-green-200"
                 >
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm font-medium">{strength}</span>
+                  <div>
+                    <span className="font-medium">{strength.title}</span>
+                    <p className="text-sm text-muted-foreground">
+                      {strength.description}
+                    </p>
+                  </div>
                 </li>
               ))}
             </ul>
           </CardContent>
         </Card>
 
-        {/* Priorities */}
+        {/* Development Areas */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <BarChart3 className="w-5 h-5 text-orange-500" />
-              <span>Development Priorities</span>
+              <BarChart3 className="w-5 h-5 text-blue-500" />
+              <span>Development Areas</span>
             </CardTitle>
-            <CardDescription>Areas to focus on for improvement</CardDescription>
+            <CardDescription>
+              Opportunities for improvement and growth
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <ul className="space-y-3">
-              {score_json.priorities?.map((priority, index) => (
+              {getDevelopmentAreas(score_json).map((area, index) => (
                 <li
                   key={index}
-                  className="flex items-center space-x-3 p-3 bg-orange-50 rounded-lg border border-orange-200"
+                  className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg border border-blue-200"
                 >
-                  <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                  <span className="text-sm font-medium">{priority}</span>
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <div>
+                    <span className="font-medium">{area.title}</span>
+                    <p className="text-sm text-muted-foreground">
+                      {area.description}
+                    </p>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -226,75 +242,172 @@ const ReportDetail = () => {
         </Card>
       </div>
 
-      {/* Action Plan */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recommended Action Plan</CardTitle>
-          <CardDescription>
-            Personalized training recommendations based on your performance
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <h4 className="font-semibold">Immediate Focus (1-2 weeks)</h4>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• High-intensity interval training for stamina</li>
-                  <li>
-                    • Position-specific drills for{" "}
-                    {score_json.priorities?.[0]?.toLowerCase()}
-                  </li>
-                  <li>• Video analysis of decision-making moments</li>
-                </ul>
-              </div>
-              <div className="space-y-2">
-                <h4 className="font-semibold">
-                  Long-term Development (4-6 weeks)
-                </h4>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• Strength and conditioning program</li>
-                  <li>• Technical skill refinement sessions</li>
-                  <li>• Competitive match practice</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Match Details */}
+      {/* Match Context */}
       {player_data && (
         <Card>
           <CardHeader>
-            <CardTitle>Match Information</CardTitle>
+            <CardTitle>Match Context</CardTitle>
+            <CardDescription>Game details and conditions</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 md:grid-cols-3 text-sm">
+            <div className="grid gap-4 md:grid-cols-3">
               <div>
-                <span className="font-medium">Match Date:</span>
-                <p>{formatDate(player_data.match_date)}</p>
-              </div>
-              <div>
-                <span className="font-medium">Video Analysis:</span>
-                <p>{player_data.video_file ? "Available" : "Not provided"}</p>
-              </div>
-              <div>
-                <span className="font-medium">GPS Data:</span>
-                <p>{player_data.gps_file ? "Available" : "Not provided"}</p>
-              </div>
-              {player_data.notes && (
-                <div className="md:col-span-3">
-                  <span className="font-medium">Additional Notes:</span>
-                  <p className="text-muted-foreground">{player_data.notes}</p>
+                <h4 className="font-medium mb-2">Team Information</h4>
+                <div className="space-y-1 text-sm">
+                  <p>
+                    <span className="text-muted-foreground">Position:</span>{" "}
+                    {player_data.position || "--"}
+                  </p>
+                  <p>
+                    <span className="text-muted-foreground">Minutes:</span>{" "}
+                    {player_data.minutes_played || "--"}
+                  </p>
                 </div>
-              )}
+              </div>
+              <div>
+                <h4 className="font-medium mb-2">Performance Metrics</h4>
+                <div className="space-y-1 text-sm">
+                  <p>
+                    <span className="text-muted-foreground">Distance:</span>{" "}
+                    {player_data.total_distance || "--"}m
+                  </p>
+                  <p>
+                    <span className="text-muted-foreground">Sprints:</span>{" "}
+                    {player_data.sprints || "--"}
+                  </p>
+                </div>
+              </div>
+              <div>
+                <h4 className="font-medium mb-2">Game Conditions</h4>
+                <div className="space-y-1 text-sm">
+                  <p>
+                    <span className="text-muted-foreground">Competition:</span>{" "}
+                    {player_data.competition || "--"}
+                  </p>
+                  <p>
+                    <span className="text-muted-foreground">Result:</span>{" "}
+                    {player_data.match_result || "--"}
+                  </p>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
       )}
+
+      {/* Recommendations */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Training Recommendations</CardTitle>
+          <CardDescription>
+            Personalized exercises based on your performance
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {getRecommendations(score_json).map((rec, index) => (
+              <div
+                key={index}
+                className="p-4 border rounded-lg bg-linear-to-r from-primary/5 to-transparent"
+              >
+                <h4 className="font-medium mb-2">{rec.title}</h4>
+                <p className="text-sm text-muted-foreground mb-3">
+                  {rec.description}
+                </p>
+                <div className="flex items-center space-x-2">
+                  <Badge variant="outline">{rec.focus}</Badge>
+                  <Badge variant="secondary">{rec.duration}</Badge>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
+};
+
+// Helper functions
+const getPillarDescription = (pillar) => {
+  const descriptions = {
+    technical: "Ball control, passing, shooting technique",
+    tactical: "Positioning, decision-making, game intelligence",
+    physical: "Speed, endurance, strength, agility",
+    mental: "Focus, resilience, leadership, composure",
+  };
+  return descriptions[pillar] || "";
+};
+
+const getStrengths = (scoreJson) => {
+  const strengths = [];
+  if (scoreJson.technical >= 80) {
+    strengths.push({
+      title: "Technical Excellence",
+      description: "Superior ball control and execution under pressure",
+    });
+  }
+  if (scoreJson.physical >= 80) {
+    strengths.push({
+      title: "Physical Dominance",
+      description: "Excellent athletic performance and endurance",
+    });
+  }
+  if (scoreJson.mental >= 80) {
+    strengths.push({
+      title: "Mental Fortitude",
+      description: "Strong decision-making and composure in key moments",
+    });
+  }
+  return strengths.length > 0
+    ? strengths
+    : [
+        {
+          title: "Solid Foundation",
+          description: "Good overall performance with balanced skills",
+        },
+      ];
+};
+
+const getDevelopmentAreas = (scoreJson) => {
+  const areas = [];
+  if (scoreJson.tactical < 70) {
+    areas.push({
+      title: "Tactical Awareness",
+      description: "Improve positioning and game understanding",
+    });
+  }
+  if (scoreJson.technical < 70) {
+    areas.push({
+      title: "Technical Consistency",
+      description: "Enhance precision in key technical actions",
+    });
+  }
+  return areas.length > 0
+    ? areas
+    : [
+        {
+          title: "Fine-Tuning",
+          description: "Minor adjustments to elevate elite performance",
+        },
+      ];
+};
+
+const getRecommendations = (scoreJson) => {
+  return [
+    {
+      title: "Position-Specific Drills",
+      description:
+        "Exercises tailored to your position to enhance tactical awareness",
+      focus: "Tactical",
+      duration: "30 mins",
+    },
+    {
+      title: "High-Intensity Interval Training",
+      description: "Improve explosive power and recovery between sprints",
+      focus: "Physical",
+      duration: "45 mins",
+    },
+  ];
 };
 
 export default ReportDetail;

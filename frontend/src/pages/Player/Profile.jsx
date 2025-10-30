@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useAuthStore } from "../../store/authStore";
+import { useAuthStore } from "@/store/authStore";
+import { useUserStore } from "@/store/userStore";
 import {
   Card,
   CardContent,
@@ -38,9 +39,15 @@ import { calculateAge } from "@/utils/helper.utils";
 
 const Profile = () => {
   const { user, updateProfile } = useAuthStore();
+  const { dashboardData, fetchDashboard } = useUserStore();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [performanceStats, setPerformanceStats] = useState({
+    totalReports: 0,
+    averageScore: 0,
+    progress: 0,
+  });
 
   useEffect(() => {
     if (user) {
@@ -54,6 +61,37 @@ const Profile = () => {
     }
   }, [user]);
 
+  useEffect(() => {
+    // Fetch dashboard data to get performance stats
+    fetchDashboard();
+  }, []);
+
+  useEffect(() => {
+    if (dashboardData) {
+      const { recentReports, progressData } = dashboardData;
+
+      const totalReports = recentReports?.length || 0;
+      const averageScore = recentReports?.length
+        ? recentReports.reduce(
+            (sum, report) => sum + (report.overall_score || 0),
+            0
+          ) / recentReports.length
+        : 0;
+
+      const progress =
+        progressData?.length > 1
+          ? progressData[progressData.length - 1].overall_score -
+            progressData[0].overall_score
+          : 0;
+
+      setPerformanceStats({
+        totalReports,
+        averageScore: Math.round(averageScore),
+        progress,
+      });
+    }
+  }, [dashboardData]);
+
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
@@ -63,6 +101,8 @@ const Profile = () => {
     try {
       await updateProfile(formData);
       setIsEditing(false);
+      // Refresh dashboard data to reflect profile changes
+      fetchDashboard();
     } catch (error) {
       console.error("Failed to update profile:", error);
     } finally {
@@ -83,8 +123,9 @@ const Profile = () => {
 
   const handleAvatarUpdate = (result) => {
     if (result.success) {
-      // Avatar updated successfully
+      // Avatar updated successfully - refresh user data
       console.log("Avatar updated:", result.url);
+      // You might want to refresh the user data here
     }
   };
 
@@ -369,19 +410,32 @@ const Profile = () => {
             <CardContent>
               <div className="grid gap-4 md:grid-cols-3 text-center">
                 <div className="space-y-2 p-4 border rounded-lg">
-                  <div className="text-2xl font-bold text-primary">12</div>
+                  <div className="text-2xl font-bold text-primary">
+                    {performanceStats.totalReports}
+                  </div>
                   <div className="text-sm text-muted-foreground">
                     Total Reports
                   </div>
                 </div>
                 <div className="space-y-2 p-4 border rounded-lg">
-                  <div className="text-2xl font-bold text-green-500">84</div>
+                  <div className="text-2xl font-bold text-green-500">
+                    {performanceStats.averageScore}
+                  </div>
                   <div className="text-sm text-muted-foreground">
                     Average Score
                   </div>
                 </div>
                 <div className="space-y-2 p-4 border rounded-lg">
-                  <div className="text-2xl font-bold text-blue-500">+8%</div>
+                  <div
+                    className={`text-2xl font-bold ${
+                      performanceStats.progress >= 0
+                        ? "text-blue-500"
+                        : "text-orange-500"
+                    }`}
+                  >
+                    {performanceStats.progress >= 0 ? "+" : ""}
+                    {performanceStats.progress}%
+                  </div>
                   <div className="text-sm text-muted-foreground">Progress</div>
                 </div>
               </div>

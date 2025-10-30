@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { userAPI } from "@/services/base.api";
+import { useUserStore } from "@/store/userStore";
 import DataTable from "@/components/common/DataTable";
 import {
   Card,
@@ -18,46 +18,19 @@ import {
 } from "@/utils/helper.utils";
 
 const Reports = () => {
-  const [reports, setReports] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [pagination, setPagination] = useState({
-    page: 1,
-    pageSize: 10,
-    total: 0,
-    totalPages: 0,
-  });
+  const { reports, pagination, isLoading, fetchReports, fetchReport } =
+    useUserStore();
 
   useEffect(() => {
-    fetchReports();
+    fetchReports(pagination.page, pagination.pageSize);
   }, [pagination.page, pagination.pageSize]);
 
-  const fetchReports = async () => {
-    try {
-      const response = await userAPI.getReports(
-        pagination.page,
-        pagination.pageSize
-      );
-      if (response.success) {
-        setReports(response.data.reports);
-        setPagination((prev) => ({
-          ...prev,
-          total: response.data.pagination.total,
-          totalPages: response.data.pagination.totalPages,
-        }));
-      }
-    } catch (error) {
-      console.error("Failed to fetch reports:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handlePageChange = (page) => {
-    setPagination((prev) => ({ ...prev, page }));
+    fetchReports(page, pagination.pageSize);
   };
 
   const handlePageSizeChange = (pageSize) => {
-    setPagination((prev) => ({ ...prev, pageSize, page: 1 }));
+    fetchReports(1, pageSize);
   };
 
   const columns = [
@@ -152,7 +125,7 @@ const Reports = () => {
 
   const handleDownloadReport = async (reportId) => {
     try {
-      const response = await userAPI.getReport(reportId);
+      const response = await fetchReport(reportId);
       if (response.success && response.data.pdf_url) {
         window.open(response.data.pdf_url, "_blank");
       }

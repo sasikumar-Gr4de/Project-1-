@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { adminAPI } from "@/services/base.api";
+import { useUserStore } from "@/store/userStore";
 import {
   Card,
   CardContent,
@@ -9,20 +9,21 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import {
-  Users,
-  FileText,
-  Clock,
   TrendingUp,
-  AlertCircle,
-  CheckCircle2,
-  PlayCircle,
+  FileText,
+  Upload,
+  BarChart3,
+  Target,
+  Award,
+  Calendar,
 } from "lucide-react";
+import { formatDate, getScoreColor, calculateAge } from "@/utils/helper.utils";
 
-const AdminDashboard = () => {
-  const [metrics, setMetrics] = useState(null);
-  const [queue, setQueue] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+const Dashboard = () => {
+  const { dashboardData, fetchDashboard, isLoading } = useUserStore();
+  const [localData, setLocalData] = useState(null);
 
   useEffect(() => {
     fetchDashboardData();
@@ -30,52 +31,36 @@ const AdminDashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const [metricsResponse, queueResponse] = await Promise.all([
-        adminAPI.getSystemMetrics(),
-        adminAPI.getQueue("pending", 1, 5),
-      ]);
-
-      if (metricsResponse.success) {
-        setMetrics(metricsResponse.data);
-      }
-      if (queueResponse.success) {
-        setQueue(queueResponse.data.queue);
-      }
+      await fetchDashboard();
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  const getQueueStatusColor = (status) => {
-    switch (status) {
-      case "pending":
-        return "text-yellow-500";
-      case "processing":
-        return "text-blue-500";
-      case "completed":
-        return "text-green-500";
-      case "failed":
-        return "text-red-500";
-      default:
-        return "text-gray-500";
+  useEffect(() => {
+    if (dashboardData) {
+      setLocalData(dashboardData);
     }
-  };
+  }, [dashboardData]);
 
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <p className="text-muted-foreground">Loading system data...</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-white">Dashboard</h1>
+            <p className="text-[#B0AFAF]">Loading your performance data...</p>
+          </div>
         </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {[...Array(4)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {[...Array(6)].map((_, i) => (
+            <Card
+              key={i}
+              className="animate-pulse bg-[#262626] border-[#404040]"
+            >
               <CardContent className="p-6">
-                <div className="h-4 bg-muted rounded w-3/4 mb-4"></div>
-                <div className="h-8 bg-muted rounded w-1/2"></div>
+                <div className="h-4 bg-[#404040] rounded w-3/4 mb-4"></div>
+                <div className="h-8 bg-[#404040] rounded w-1/2"></div>
               </CardContent>
             </Card>
           ))}
@@ -84,244 +69,270 @@ const AdminDashboard = () => {
     );
   }
 
+  const { user, recentReports, progressData, benchmarks } = localData || {};
+
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        <p className="text-muted-foreground">System overview and monitoring</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-white">
+            Welcome back, {user?.player_name}!
+          </h1>
+          <p className="text-[#B0AFAF]">
+            Here's your latest performance overview
+          </p>
+        </div>
+        <Button asChild className="bg-primary text-black hover:bg-[#A8E55C]">
+          <a href="/upload">
+            <Upload className="w-4 h-4 mr-2" />
+            Upload New Data
+          </a>
+        </Button>
       </div>
 
       {/* Stats Grid */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        {/* GR4DE Score */}
+        <Card className="bg-[#262626] border-[#404040]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-white">
+              GR4DE Score
+            </CardTitle>
+            <Award className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{metrics?.totalUsers || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              Registered players and coaches
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Reports</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {metrics?.totalReports || 0}
+            <div className="text-2xl font-bold text-white">
+              {recentReports?.[0]?.overall_score ? (
+                <span className={getScoreColor(recentReports[0].overall_score)}>
+                  {recentReports[0].overall_score}
+                </span>
+              ) : (
+                "--"
+              )}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Generated performance reports
+            <p className="text-xs text-[#B0AFAF]">
+              {recentReports?.[0] ? "Latest assessment" : "No reports yet"}
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        {/* Total Reports */}
+        <Card className="bg-[#262626] border-[#404040]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Queue Status</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-white">
+              Total Reports
+            </CardTitle>
+            <FileText className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {metrics?.queue?.pending + metrics?.queue?.processing || 0}
+            <div className="text-2xl font-bold text-white">
+              {recentReports?.length || 0}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Pending and processing jobs
+            <p className="text-xs text-[#B0AFAF]">
+              {recentReports?.length
+                ? "All time reports"
+                : "No reports generated"}
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        {/* Progress Trend */}
+        <Card className="bg-[#262626] border-[#404040]">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">System Health</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-white">
+              Progress Trend
+            </CardTitle>
+            <TrendingUp className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-500">100%</div>
-            <p className="text-xs text-muted-foreground">
-              All systems operational
+            <div className="text-2xl font-bold text-white">
+              {progressData?.length > 1 ? "+" : ""}
+              {progressData?.length > 1
+                ? (
+                    progressData[progressData.length - 1].overall_score -
+                    progressData[0].overall_score
+                  ).toFixed(1)
+                : "0"}
+            </div>
+            <p className="text-xs text-[#B0AFAF]">
+              Since{" "}
+              {progressData?.[0]
+                ? formatDate(progressData[0].created_at)
+                : "start"}
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Benchmark Rank */}
+        <Card className="bg-[#262626] border-[#404040]">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-white">
+              Benchmark Rank
+            </CardTitle>
+            <Target className="h-4 w-4 text-primary" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">
+              {benchmarks ? "Top 25%" : "--"}
+            </div>
+            <p className="text-xs text-[#B0AFAF]">
+              {user?.position} •{" "}
+              {user?.date_of_birth
+                ? calculateAge(user.date_of_birth) + " years"
+                : "--"}
             </p>
           </CardContent>
         </Card>
       </div>
 
+      {/* Recent Reports & Progress Chart */}
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Processing Queue */}
-        <Card>
+        {/* Recent Reports */}
+        <Card className="bg-[#262626] border-[#404040]">
           <CardHeader>
-            <CardTitle>Recent Queue Items</CardTitle>
-            <CardDescription>
-              Latest processing jobs in the system
+            <CardTitle className="text-white">Recent Reports</CardTitle>
+            <CardDescription className="text-[#B0AFAF]">
+              Your latest performance assessments
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {queue.length > 0 ? (
+            {recentReports?.length > 0 ? (
               <div className="space-y-4">
-                {queue.map((item) => (
+                {recentReports.map((report) => (
                   <div
-                    key={item.id}
-                    className="flex items-center justify-between p-3 border rounded-lg"
+                    key={report.id}
+                    className="flex items-center justify-between p-3 border border-[#404040] rounded-lg bg-[#1A1A1A] hover:bg-[#2A2A2A] transition-colors"
                   >
                     <div className="flex items-center space-x-3">
-                      {item.status === "pending" && (
-                        <Clock className="w-4 h-4 text-yellow-500" />
-                      )}
-                      {item.status === "processing" && (
-                        <PlayCircle className="w-4 h-4 text-blue-500" />
-                      )}
-                      {item.status === "completed" && (
-                        <CheckCircle2 className="w-4 h-4 text-green-500" />
-                      )}
-                      {item.status === "failed" && (
-                        <AlertCircle className="w-4 h-4 text-red-500" />
-                      )}
+                      <div
+                        className={`w-3 h-3 rounded-full ${getScoreColor(
+                          report.overall_score
+                        ).replace("text-", "bg-")}`}
+                      />
                       <div>
-                        <p className="font-medium text-sm">
-                          {item.player_data?.user?.player_name ||
-                            "Unknown User"}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {item.player_data?.match_date
-                            ? new Date(
-                                item.player_data.match_date
-                              ).toLocaleDateString()
-                            : "No date"}
+                        <p className="font-medium text-white">GR4DE Report</p>
+                        <p className="text-sm text-[#B0AFAF]">
+                          {formatDate(report.created_at)}
                         </p>
                       </div>
                     </div>
-                    <Badge
-                      variant="outline"
-                      className={getQueueStatusColor(item.status)}
-                    >
-                      {item.status}
-                    </Badge>
+                    <div className="text-right">
+                      <p
+                        className={`text-lg font-bold ${getScoreColor(
+                          report.overall_score
+                        )}`}
+                      >
+                        {report.overall_score}
+                      </p>
+                      <Badge
+                        variant="outline"
+                        className="text-xs bg-[#404040] text-white border-[#404040]"
+                      >
+                        Overall
+                      </Badge>
+                    </div>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="text-center py-8">
-                <CheckCircle2 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">No pending jobs</p>
+                <FileText className="w-12 h-12 text-[#B0AFAF] mx-auto mb-4" />
+                <p className="text-[#B0AFAF]">No reports yet</p>
+                <Button
+                  asChild
+                  className="mt-4 bg-primary text-black hover:bg-[#A8E55C]"
+                >
+                  <a href="/upload">Upload Your First Data</a>
+                </Button>
               </div>
             )}
-            <Button variant="outline" className="w-full mt-4" asChild>
-              <a href="/admin/queue">View All Queue Items</a>
-            </Button>
           </CardContent>
         </Card>
 
-        {/* System Metrics */}
-        <Card>
+        {/* Progress Overview */}
+        <Card className="bg-[#262626] border-[#404040]">
           <CardHeader>
-            <CardTitle>System Metrics</CardTitle>
-            <CardDescription>
-              Current system performance and usage
+            <CardTitle className="text-white">Progress Overview</CardTitle>
+            <CardDescription className="text-[#B0AFAF]">
+              Your score progression over time
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Queue Distribution</span>
+            {progressData?.length > 0 ? (
+              <div className="space-y-4">
+                {progressData.slice(-6).map((data, index) => (
+                  <div key={index} className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-white">
+                        {formatDate(data.created_at)}
+                      </span>
+                      <span
+                        className={`font-medium ${getScoreColor(
+                          data.overall_score
+                        )}`}
+                      >
+                        {data.overall_score}
+                      </span>
+                    </div>
+                    <Progress
+                      value={data.overall_score}
+                      className="h-2 bg-[#404040]"
+                    />
+                  </div>
+                ))}
               </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span>Pending</span>
-                  <span>{metrics?.queue?.pending || 0}</span>
-                </div>
-                <Progress
-                  value={
-                    (metrics?.queue?.pending / (metrics?.totalReports || 1)) *
-                    100
-                  }
-                  className="h-2"
-                />
-
-                <div className="flex items-center justify-between text-sm">
-                  <span>Processing</span>
-                  <span>{metrics?.queue?.processing || 0}</span>
-                </div>
-                <Progress
-                  value={
-                    (metrics?.queue?.processing /
-                      (metrics?.totalReports || 1)) *
-                    100
-                  }
-                  className="h-2"
-                />
-
-                <div className="flex items-center justify-between text-sm">
-                  <span>Completed</span>
-                  <span>{metrics?.queue?.completed || 0}</span>
-                </div>
-                <Progress
-                  value={
-                    (metrics?.queue?.completed / (metrics?.totalReports || 1)) *
-                    100
-                  }
-                  className="h-2 bg-green-100"
-                />
-
-                <div className="flex items-center justify-between text-sm">
-                  <span>Failed</span>
-                  <span>{metrics?.queue?.failed || 0}</span>
-                </div>
-                <Progress
-                  value={
-                    (metrics?.queue?.failed / (metrics?.totalReports || 1)) *
-                    100
-                  }
-                  className="h-2 bg-red-100"
-                />
+            ) : (
+              <div className="text-center py-8">
+                <BarChart3 className="w-12 h-12 text-[#B0AFAF] mx-auto mb-4" />
+                <p className="text-[#B0AFAF]">No progress data available</p>
+                <p className="text-sm text-[#B0AFAF] mt-2">
+                  Upload more data to see your progress
+                </p>
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
       </div>
 
       {/* Quick Actions */}
       <div className="grid gap-4 md:grid-cols-3">
-        <Card className="bg-primary/5 border-primary/20">
+        <Card className="bg-[#1A1A1A] border-primary/20 hover:border-primary/40 transition-colors">
           <CardContent className="p-6">
             <div className="flex items-center space-x-3">
-              <Users className="w-8 h-8 text-primary" />
+              <Upload className="w-8 h-8 text-primary" />
               <div>
-                <h3 className="font-semibold">User Management</h3>
-                <p className="text-sm text-muted-foreground">
-                  Manage users and permissions
+                <h3 className="font-semibold text-white">Upload Match Data</h3>
+                <p className="text-sm text-[#B0AFAF]">
+                  Upload video and GPS data for analysis
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-primary/5 border-primary/20">
+        <Card className="bg-[#1A1A1A] border-primary/20 hover:border-primary/40 transition-colors">
           <CardContent className="p-6">
             <div className="flex items-center space-x-3">
-              <Clock className="w-8 h-8 text-primary" />
+              <BarChart3 className="w-8 h-8 text-primary" />
               <div>
-                <h3 className="font-semibold">Processing Queue</h3>
-                <p className="text-sm text-muted-foreground">
-                  Monitor and manage job processing
+                <h3 className="font-semibold text-white">View Benchmarks</h3>
+                <p className="text-sm text-[#B0AFAF]">
+                  Compare your performance with peers
                 </p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-primary/5 border-primary/20">
+        <Card className="bg-[#1A1A1A] border-primary/20 hover:border-primary/40 transition-colors">
           <CardContent className="p-6">
             <div className="flex items-center space-x-3">
               <FileText className="w-8 h-8 text-primary" />
               <div>
-                <h3 className="font-semibold">Reports</h3>
-                <p className="text-sm text-muted-foreground">
-                  View and manage all reports
+                <h3 className="font-semibold text-white">All Reports</h3>
+                <p className="text-sm text-[#B0AFAF]">
+                  Access your complete report history
                 </p>
               </div>
             </div>
@@ -332,4 +343,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default Dashboard;

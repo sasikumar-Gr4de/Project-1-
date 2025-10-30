@@ -1,6 +1,16 @@
+// authStore.js - Fixed to work with current base.api.js
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { authAPI } from "../services/base.api";
+import api from "@/services/base.api"; // Import the axios instance
+
+// Create API methods using the axios instance
+const authAPI = {
+  sendOtp: (data) => api.post("/auth/send-otp", data),
+  verifyOtp: (data) => api.post("/auth/verify-otp", data),
+  getCurrentUser: () => api.get("/auth/me"),
+  logout: () => api.post("/auth/logout"),
+  updateProfile: (data) => api.patch("/users/profile", data),
+};
 
 export const useAuthStore = create(
   persist(
@@ -12,7 +22,13 @@ export const useAuthStore = create(
 
       // Actions
       setUser: (user) => set({ user, isAuthenticated: !!user }),
-      setToken: (token) => set({ token }),
+      setToken: (token) => {
+        set({ token });
+        // Also store in localStorage for axios interceptor
+        if (token) {
+          localStorage.setItem("auth-token", token);
+        }
+      },
 
       login: async (email, phone, otp, userData) => {
         set({ isLoading: true });
@@ -23,14 +39,21 @@ export const useAuthStore = create(
             otp,
             ...userData,
           });
-          if (response.success) {
+
+          if (response.data.success) {
+            const { user, session } = response.data.data;
+            const token = session.access_token;
+
+            // Store token in localStorage for axios interceptor
+            localStorage.setItem("auth-token", token);
+
             set({
-              user: response.data.user,
-              token: response.data.session.access_token,
+              user: user,
+              token: token,
               isAuthenticated: true,
               isLoading: false,
             });
-            return response;
+            return response.data;
           }
         } catch (error) {
           set({ isLoading: false });
@@ -39,6 +62,9 @@ export const useAuthStore = create(
       },
 
       logout: () => {
+        // Clear token from localStorage for axios interceptor
+        localStorage.removeItem("auth-token");
+
         set({
           user: null,
           token: null,
@@ -51,7 +77,7 @@ export const useAuthStore = create(
         try {
           const response = await authAPI.sendOtp({ email, phone });
           set({ isLoading: false });
-          return response;
+          return response.data;
         } catch (error) {
           set({ isLoading: false });
           throw error;
@@ -62,11 +88,11 @@ export const useAuthStore = create(
         set({ isLoading: true });
         try {
           const response = await authAPI.updateProfile(updates);
-          if (response.success) {
-            set({ user: response.data });
+          if (response.data.success) {
+            set({ user: response.data.data });
           }
           set({ isLoading: false });
-          return response;
+          return response.data;
         } catch (error) {
           set({ isLoading: false });
           throw error;
@@ -76,10 +102,10 @@ export const useAuthStore = create(
       refreshUser: async () => {
         try {
           const response = await authAPI.getCurrentUser();
-          if (response.success) {
-            set({ user: response.data });
+          if (response.data.success) {
+            set({ user: response.data.data });
           }
-          return response;
+          return response.data;
         } catch (error) {
           throw error;
         }

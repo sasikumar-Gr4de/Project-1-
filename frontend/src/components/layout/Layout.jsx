@@ -8,13 +8,13 @@ import AuthLayout from "@/components/layout/AuthLayout";
 const Layout = ({ children }) => {
   const { user, isAuthenticated } = useAuthStore();
 
-  if (!isAuthenticated) {
-    return <AuthLayout>{children}</AuthLayout>;
-  }
+  // if (!isAuthenticated) {
+  //   return <AuthLayout>{children}</AuthLayout>;
+  // }
 
-  if (user?.role === USER_ROLES.ADMIN) {
-    return <AdminLayout>{children}</AdminLayout>;
-  }
+  // if (user?.role === USER_ROLES.ADMIN) {
+  //   return <AdminLayout>{children}</AdminLayout>;
+  // }
 
   return <PlayerLayout>{children}</PlayerLayout>;
 };

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { uploadAPI } from "../../services/base.api";
+import { useUserStore } from "@/store/userStore";
 import {
   Card,
   CardContent,
@@ -15,7 +15,6 @@ import { Badge } from "@/components/ui/badge";
 import VideoUpload from "@/components/common/VideoUpload";
 import FileUpload from "@/components/common/FileUpload";
 import {
-  // Upload,
   Video,
   FileText,
   Calendar,
@@ -24,6 +23,7 @@ import {
 } from "lucide-react";
 
 const Upload = () => {
+  const { fetchDashboard } = useUserStore();
   const [uploadData, setUploadData] = useState({
     match_date: "",
     notes: "",
@@ -59,9 +59,13 @@ const Upload = () => {
 
     try {
       const formData = new FormData();
-      formData.append("user_id", "current"); // Will be set by backend from token
+      formData.append("user_id", "current");
       formData.append("match_date", uploadData.match_date);
       formData.append("notes", uploadData.notes || "");
+      formData.append("video_url", files.video);
+      if (files.gps) {
+        formData.append("gps_url", files.gps);
+      }
 
       // Simulate progress
       const interval = setInterval(() => {
@@ -74,17 +78,29 @@ const Upload = () => {
         });
       }, 500);
 
-      const response = await uploadAPI.uploadData(formData);
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
       clearInterval(interval);
       setUploadProgress(100);
 
-      if (response.success) {
-        setUploadResult({ success: true, data: response.data });
+      if (response.ok) {
+        const result = await response.json();
+        setUploadResult({ success: true, data: result.data });
+
         // Reset form
         setUploadData({ match_date: "", notes: "" });
         setFiles({ video: null, gps: null });
+
+        // Refresh dashboard data
+        setTimeout(() => {
+          fetchDashboard();
+        }, 1000);
       } else {
-        setUploadResult({ success: false, error: response.message });
+        const error = await response.json();
+        setUploadResult({ success: false, error: error.message });
       }
     } catch (error) {
       setUploadResult({ success: false, error: error.message });
@@ -100,8 +116,8 @@ const Upload = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">Upload Match Data</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-3xl font-bold text-white">Upload Match Data</h1>
+        <p className="text-[#B0AFAF]">
           Upload your video and GPS data for performance analysis
         </p>
       </div>
@@ -111,21 +127,21 @@ const Upload = () => {
         <Card
           className={
             uploadResult.success
-              ? "border-green-200 bg-green-50"
-              : "border-red-200 bg-red-50"
+              ? "border-green-500/20 bg-green-500/10"
+              : "border-red-500/20 bg-red-500/10"
           }
         >
           <CardContent className="p-4">
             <div className="flex items-center space-x-3">
               {uploadResult.success ? (
-                <CheckCircle className="w-5 h-5 text-green-600" />
+                <CheckCircle className="w-5 h-5 text-green-500" />
               ) : (
-                <AlertCircle className="w-5 h-5 text-red-600" />
+                <AlertCircle className="w-5 h-5 text-red-500" />
               )}
               <div>
                 <p
                   className={
-                    uploadResult.success ? "text-green-800" : "text-red-800"
+                    uploadResult.success ? "text-green-400" : "text-red-400"
                   }
                 >
                   {uploadResult.success
@@ -133,10 +149,7 @@ const Upload = () => {
                     : `Upload failed: ${uploadResult.error}`}
                 </p>
                 {uploadResult.success && uploadResult.data?.queue_item && (
-                  <Badge
-                    variant="outline"
-                    className="mt-1 bg-green-100 text-green-800"
-                  >
+                  <Badge className="mt-1 bg-green-500/20 text-green-400 border-green-500/30">
                     Queue ID: {uploadResult.data.queue_item.id}
                   </Badge>
                 )}
@@ -148,19 +161,22 @@ const Upload = () => {
 
       {/* Upload Progress */}
       {isUploading && (
-        <Card>
+        <Card className="bg-[#262626] border-[#404040]">
           <CardContent className="p-6">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">
+                <span className="text-sm font-medium text-white">
                   Processing upload...
                 </span>
-                <span className="text-sm text-muted-foreground">
+                <span className="text-sm text-[#B0AFAF]">
                   {uploadProgress}%
                 </span>
               </div>
-              <Progress value={uploadProgress} className="w-full" />
-              <p className="text-xs text-muted-foreground">
+              <Progress
+                value={uploadProgress}
+                className="w-full bg-[#404040]"
+              />
+              <p className="text-xs text-[#B0AFAF]">
                 Please don't close this window while your data is being
                 processed.
               </p>
@@ -173,13 +189,13 @@ const Upload = () => {
         {/* Left Column - File Uploads */}
         <div className="space-y-6">
           {/* Video Upload */}
-          <Card>
+          <Card className="bg-[#262626] border-[#404040]">
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Video className="w-5 h-5" />
+              <CardTitle className="flex items-center space-x-2 text-white">
+                <Video className="w-5 h-5 text-primary" />
                 <span>Match Video</span>
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-[#B0AFAF]">
                 Upload your match video footage (MP4, MOV, AVI up to 100MB)
               </CardDescription>
             </CardHeader>
@@ -195,13 +211,13 @@ const Upload = () => {
           </Card>
 
           {/* GPS Data Upload */}
-          <Card>
+          <Card className="bg-[#262626] border-[#404040]">
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <FileText className="w-5 h-5" />
+              <CardTitle className="flex items-center space-x-2 text-white">
+                <FileText className="w-5 h-5 text-primary" />
                 <span>GPS Data (Optional)</span>
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-[#B0AFAF]">
                 Upload GPS tracking data in CSV or JSON format
               </CardDescription>
             </CardHeader>
@@ -220,26 +236,28 @@ const Upload = () => {
 
         {/* Right Column - Match Details */}
         <div className="space-y-6">
-          <Card>
+          <Card className="bg-[#262626] border-[#404040]">
             <CardHeader>
-              <CardTitle>Match Details</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-white">Match Details</CardTitle>
+              <CardDescription className="text-[#B0AFAF]">
                 Provide information about the match
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Match Date */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">Match Date *</label>
+                <label className="text-sm font-medium text-white">
+                  Match Date *
+                </label>
                 <div className="relative">
-                  <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Calendar className="absolute left-3 top-3 h-4 w-4 text-[#B0AFAF]" />
                   <Input
                     type="date"
                     value={uploadData.match_date}
                     onChange={(e) =>
                       handleInputChange("match_date", e.target.value)
                     }
-                    className="pl-10 h-11"
+                    className="pl-10 h-11 bg-[#1A1A1A] border-[#404040] text-white placeholder:text-[#B0AFAF]"
                     required
                   />
                 </div>
@@ -247,19 +265,24 @@ const Upload = () => {
 
               {/* Notes */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">Additional Notes</label>
+                <label className="text-sm font-medium text-white">
+                  Additional Notes
+                </label>
                 <Textarea
                   placeholder="Any additional context about the match, conditions, or specific moments to analyze..."
                   value={uploadData.notes}
                   onChange={(e) => handleInputChange("notes", e.target.value)}
                   rows={4}
+                  className="bg-[#1A1A1A] border-[#404040] text-white placeholder:text-[#B0AFAF]"
                 />
               </div>
 
               {/* Requirements */}
-              <div className="rounded-lg bg-muted p-4 space-y-2">
-                <h4 className="text-sm font-medium">Upload Requirements</h4>
-                <ul className="text-sm text-muted-foreground space-y-1">
+              <div className="rounded-lg bg-[#1A1A1A] p-4 space-y-2 border border-[#404040]">
+                <h4 className="text-sm font-medium text-white">
+                  Upload Requirements
+                </h4>
+                <ul className="text-sm text-[#B0AFAF] space-y-1">
                   <li>• Video must be clear and show full gameplay</li>
                   <li>• Minimum video length: 15 minutes</li>
                   <li>• Maximum video size: 100MB</li>
@@ -274,67 +297,70 @@ const Upload = () => {
               <Button
                 type="submit"
                 disabled={!canSubmit}
-                className="w-full h-11"
+                className="w-full h-11 bg-primary text-black hover:bg-[#A8E55C] disabled:bg-[#404040] disabled:text-[#B0AFAF]"
                 size="lg"
               >
                 {isUploading ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black mr-2"></div>
                     Processing...
                   </>
                 ) : (
-                  <>
-                    {/* <Upload className="w-4 h-4 mr-2" /> */}
-                    Submit for Analysis
-                  </>
+                  "Submit for Analysis"
                 )}
               </Button>
             </CardContent>
           </Card>
 
           {/* Upload Status */}
-          <Card>
+          <Card className="bg-[#262626] border-[#404040]">
             <CardHeader>
-              <CardTitle>Upload Status</CardTitle>
+              <CardTitle className="text-white">Upload Status</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm">Video File</span>
+                <span className="text-sm text-white">Video File</span>
                 {files.video ? (
-                  <Badge
-                    variant="default"
-                    className="bg-green-100 text-green-800"
-                  >
+                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
                     Uploaded
                   </Badge>
                 ) : (
-                  <Badge variant="outline">Pending</Badge>
+                  <Badge
+                    variant="outline"
+                    className="bg-[#404040] text-[#B0AFAF] border-[#404040]"
+                  >
+                    Pending
+                  </Badge>
                 )}
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm">GPS Data</span>
+                <span className="text-sm text-white">GPS Data</span>
                 {files.gps ? (
-                  <Badge
-                    variant="default"
-                    className="bg-green-100 text-green-800"
-                  >
+                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
                     Uploaded
                   </Badge>
                 ) : (
-                  <Badge variant="outline">Optional</Badge>
+                  <Badge
+                    variant="outline"
+                    className="bg-[#404040] text-[#B0AFAF] border-[#404040]"
+                  >
+                    Optional
+                  </Badge>
                 )}
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm">Match Details</span>
+                <span className="text-sm text-white">Match Details</span>
                 {uploadData.match_date ? (
-                  <Badge
-                    variant="default"
-                    className="bg-green-100 text-green-800"
-                  >
+                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
                     Complete
                   </Badge>
                 ) : (
-                  <Badge variant="outline">Required</Badge>
+                  <Badge
+                    variant="outline"
+                    className="bg-[#404040] text-[#B0AFAF] border-[#404040]"
+                  >
+                    Required
+                  </Badge>
                 )}
               </div>
             </CardContent>

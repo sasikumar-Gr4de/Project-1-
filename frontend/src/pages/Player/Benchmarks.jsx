@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { userAPI } from "@/services/base.api";
+import { useUserStore } from "@/store/userStore";
 import {
   Card,
   CardContent,
@@ -22,25 +22,26 @@ import { useAuthStore } from "@/store/authStore";
 
 const Benchmarks = () => {
   const { user } = useAuthStore();
+  const { dashboardData, fetchDashboard, isLoading } = useUserStore();
   const [benchmarkData, setBenchmarkData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchBenchmarkData();
+    fetchDashboardData();
   }, []);
 
-  const fetchBenchmarkData = async () => {
+  const fetchDashboardData = async () => {
     try {
-      const response = await userAPI.getDashboard();
-      if (response.success) {
-        setBenchmarkData(response.data);
-      }
+      await fetchDashboard();
     } catch (error) {
       console.error("Failed to fetch benchmark data:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (dashboardData) {
+      setBenchmarkData(dashboardData);
+    }
+  }, [dashboardData]);
 
   if (isLoading) {
     return (

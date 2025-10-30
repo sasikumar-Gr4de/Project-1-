@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { userAPI } from "@/services/base.api";
+import { useUserStore } from "@/store/userStore";
 import {
   Card,
   CardContent,
@@ -22,8 +22,8 @@ import {
 import { formatDate, getScoreColor } from "@/utils/helper.utils";
 
 const Dashboard = () => {
-  const [dashboardData, setDashboardData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { dashboardData, fetchDashboard, isLoading } = useUserStore();
+  const [localData, setLocalData] = useState(null);
 
   useEffect(() => {
     fetchDashboardData();
@@ -31,16 +31,17 @@ const Dashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const response = await userAPI.getDashboard();
-      if (response.success) {
-        setDashboardData(response.data);
-      }
+      await fetchDashboard();
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (dashboardData) {
+      setLocalData(dashboardData);
+    }
+  }, [dashboardData]);
 
   if (isLoading) {
     return (
@@ -67,7 +68,7 @@ const Dashboard = () => {
     );
   }
 
-  const { user, recentReports, progressData, benchmarks } = dashboardData || {};
+  const { user, recentReports, progressData, benchmarks } = localData || {};
 
   return (
     <div className="space-y-6">

@@ -61,14 +61,95 @@ function App() {
                   to={user?.role === "admin" ? "/admin" : "/dashboard"}
                 />
               ) : (
-                // <Layout>
                 <Login />
-                // </Layout>
               )
             }
           />
 
           <Route path="/onboarding" element={<Onboarding />} />
+
+          <Route
+            path="/dashboard"
+            element={
+              <Layout>
+                <Dashboard />
+              </Layout>
+            }
+          />
+          <Route
+            path="/upload"
+            element={
+              <Layout>
+                <Upload />
+              </Layout>
+            }
+          />
+          <Route
+            path="/reports"
+            element={
+              <Layout>
+                <Reports />
+              </Layout>
+            }
+          />
+          <Route
+            path="/reports/:reportId"
+            element={
+              <Layout>
+                <ReportDetail />
+              </Layout>
+            }
+          />
+          <Route
+            path="/benchmarks"
+            element={
+              <Layout>
+                <Benchmarks />
+              </Layout>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <Layout>
+                <Profile />
+              </Layout>
+            }
+          />
+
+          <Route
+            path="/admin"
+            element={
+              <Layout>
+                <AdminDashboard />
+              </Layout>
+            }
+          />
+          <Route
+            path="/admin/dashboard"
+            element={
+              <Layout>
+                <AdminDashboard />
+              </Layout>
+            }
+          />
+
+          <Route
+            path="/admin"
+            element={
+              <Layout>
+                <AdminDashboard />
+              </Layout>
+            }
+          />
+          <Route
+            path="/admin/dashboard"
+            element={
+              <Layout>
+                <AdminDashboard />
+              </Layout>
+            }
+          />
 
           {/* Protected Routes - Use Layout */}
           {isAuthenticated ? (
