@@ -1,3 +1,4 @@
+// Profile.jsx - Fixed with consistent input and select box sizes
 import React, { useState, useEffect } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { useUserStore } from "@/store/userStore";
@@ -10,8 +11,8 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -28,6 +29,12 @@ import {
   Target,
   Save,
   Edit3,
+  Award,
+  TrendingUp,
+  FileText,
+  Crown,
+  Clock,
+  User as UserIcon,
 } from "lucide-react";
 import {
   FOOTBALL_POSITIONS,
@@ -63,7 +70,6 @@ const Profile = () => {
   }, [user]);
 
   useEffect(() => {
-    // Fetch dashboard data to get performance stats
     fetchDashboard();
   }, []);
 
@@ -102,7 +108,6 @@ const Profile = () => {
     try {
       await updateProfile(formData);
       setIsEditing(false);
-      // Refresh dashboard data to reflect profile changes
       fetchDashboard();
     } catch (error) {
       console.error("Failed to update profile:", error);
@@ -125,266 +130,330 @@ const Profile = () => {
 
   const handleAvatarUpdate = (result) => {
     if (result.success) {
-      setFormData({
-        avatar_url: result.url,
-      });
+      setFormData((prev) => ({ ...prev, avatar_url: result.url }));
     }
   };
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center py-12">
+      <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-muted-foreground">Loading profile...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-[#B0AFAF] font-['Inter_Tight'] text-lg">
+            Loading profile...
+          </p>
         </div>
       </div>
     );
   }
 
+  const getTierBadgeColor = (tier) => {
+    switch (tier) {
+      case TIER_PLANS.ELITE:
+        return "bg-linear-to-r` from-[#FFD700] to-[#FFA500] text-[#0F0F0E]";
+      case TIER_PLANS.PRO:
+        return "bg-linear-to-r` from-primary to-[#94D44A] text-[#0F0F0E]";
+      case TIER_PLANS.BASIC:
+        return "bg-linear-to-r` from-[#60A5FA] to-[#3B82F6] text-white";
+      default:
+        return "bg-[#343434] text-white";
+    }
+  };
+
+  // Custom styles for consistent input and select sizing
+  const inputStyles =
+    "h-14 text-base bg-[#1A1A1A] border-2 border-[#343434] text-white placeholder:text-[#B0AFAF] rounded-xl focus:border-primary focus:ring-2 focus:ring-[#C1FF72]/20 transition-all duration-300 font-['Inter_Tight'] w-full";
+
+  const selectTriggerStyles =
+    "h-14 text-base bg-[#1A1A1A] border-2 border-[#343434] text-white rounded-xl focus:border-primary focus:ring-2 focus:ring-[#C1FF72]/20 transition-all duration-300 font-['Inter_Tight'] w-full [&>span]:flex [&>span]:items-center [&>span]:h-full";
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          {/* <h1 className="text-3xl font-bold">Profile</h1>
-          <p className="text-muted-foreground">
-            Manage your personal information and preferences
-          </p> */}
+          <h1 className="text-4xl font-bold  font-['Inter_Tight'] bg-linear-to-r` from-white to-primary bg-clip-text text-transparent">
+            Player Profile
+          </h1>
+          <p className="text-[#B0AFAF] text-lg mt-2 font-['Inter_Tight']">
+            Manage your personal information and performance preferences
+          </p>
         </div>
         {!isEditing ? (
-          <Button onClick={() => setIsEditing(true)}>
-            <Edit3 className="w-4 h-4 mr-2" />
+          <Button
+            onClick={() => setIsEditing(true)}
+            className="bg-linear-to-r` from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold rounded-xl px-6 py-3 h-12 shadow-lg hover:shadow-xl transition-all duration-300 font-['Inter_Tight']"
+          >
+            <Edit3 className="w-5 h-5 mr-2" />
             Edit Profile
           </Button>
         ) : (
-          <div className="flex space-x-2">
-            <Button variant="outline" onClick={handleCancel}>
+          <div className="flex space-x-3">
+            <Button
+              variant="outline"
+              onClick={handleCancel}
+              className="bg-[#262626] border-[#343434] text-white hover:bg-[#343434] hover:border-primary font-semibold rounded-xl px-6 py-3 h-12 transition-all duration-300 font-['Inter_Tight']"
+            >
               Cancel
             </Button>
-            <Button onClick={handleSave} disabled={isLoading}>
-              <Save className="w-4 h-4 mr-2" />
+            <Button
+              onClick={handleSave}
+              disabled={isLoading}
+              className="bg-linear-to-r` from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold rounded-xl px-6 py-3 h-12 shadow-lg hover:shadow-xl transition-all duration-300 font-['Inter_Tight'] disabled:opacity-50"
+            >
+              <Save className="w-5 h-5 mr-2" />
               {isLoading ? "Saving..." : "Save Changes"}
             </Button>
           </div>
         )}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Left Column - Avatar & Basic Info */}
-        <div className="space-y-6">
-          {/* Avatar Upload */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Profile Picture</CardTitle>
+      <div className="grid gap-8 lg:grid-cols-3">
+        {/* Left Column - Avatar & Account Info */}
+        <div className="space-y-8">
+          {/* Avatar Upload Card */}
+          <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-xl font-bold text-white font-['Inter_Tight'] flex items-center">
+                <UserIcon className="w-5 h-5 mr-2 text-primary" />
+                Profile Picture
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <AvatarUpload
-                onUpload={handleAvatarUpdate}
-                disabled={!isEditing}
-                existingUrl={user.avatar_url}
-                folder="avatars"
-                size="xl"
-              />
+              <div className="flex flex-col items-center space-y-4">
+                <AvatarUpload
+                  onUpload={handleAvatarUpdate}
+                  disabled={!isEditing}
+                  existingUrl={user.avatar_url}
+                  folder="avatars"
+                  size="xl"
+                />
+                {!isEditing && (
+                  <p className="text-sm text-[#B0AFAF] text-center font-['Inter_Tight']">
+                    Click edit to change your profile picture
+                  </p>
+                )}
+              </div>
             </CardContent>
           </Card>
 
-          {/* Account Info */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Account Information</CardTitle>
+          {/* Account Info Card */}
+          <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-xl font-bold text-white font-['Inter_Tight'] flex items-center">
+                <Crown className="w-5 h-5 mr-2 text-primary" />
+                Account Information
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <span className="text-sm font-medium text-muted-foreground">
-                  Plan
-                </span>
-                <div className="flex items-center space-x-2 mt-1">
+            <CardContent className="space-y-6">
+              {/* Plan Tier */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-[#B0AFAF] font-['Inter_Tight']">
+                    Subscription Plan
+                  </span>
                   <Badge
-                    variant={
-                      user.tier_plan === TIER_PLANS.ELITE
-                        ? "default"
-                        : user.tier_plan === TIER_PLANS.PRO
-                        ? "secondary"
-                        : user.tier_plan === TIER_PLANS.BASIC
-                        ? "outline"
-                        : "secondary"
-                    }
+                    className={`${getTierBadgeColor(
+                      user.tier_plan
+                    )} font-semibold font-['Inter_Tight'] px-3 py-1`}
                   >
-                    {user.tier_plan?.toUpperCase()}
+                    {user.tier_plan?.toUpperCase() || "BASIC"}
                   </Badge>
-                  {user.tier_plan !== TIER_PLANS.ELITE && (
-                    <Button variant="link" className="p-0 h-auto" asChild>
-                      <a href="/subscription">Upgrade</a>
-                    </Button>
-                  )}
                 </div>
+                {user.tier_plan !== TIER_PLANS.ELITE && (
+                  <Button
+                    variant="outline"
+                    className="w-full bg-[#343434] border-[#343434] text-primary hover:bg-primary hover:text-[#0F0F0E] font-semibold rounded-xl transition-all duration-300 font-['Inter_Tight']"
+                    asChild
+                  >
+                    <a href="/subscription">Upgrade Plan</a>
+                  </Button>
+                )}
               </div>
-              <div>
-                <span className="text-sm font-medium text-muted-foreground">
-                  Member Since
-                </span>
-                <p className="text-sm mt-1">
+
+              {/* Member Since */}
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2 text-[#B0AFAF]">
+                  <Clock className="w-4 h-4" />
+                  <span className="text-sm font-medium font-['Inter_Tight']">
+                    Member Since
+                  </span>
+                </div>
+                <p className="text-white font-semibold font-['Inter_Tight']">
                   {user.created_at
-                    ? new Date(user.created_at).toLocaleDateString()
+                    ? new Date(user.created_at).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })
                     : "--"}
                 </p>
               </div>
-              <div>
-                <span className="text-sm font-medium text-muted-foreground">
-                  Role
-                </span>
-                <p className="text-sm mt-1 capitalize">{user.role}</p>
+
+              {/* Role */}
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2 text-[#B0AFAF]">
+                  <User className="w-4 h-4" />
+                  <span className="text-sm font-medium font-['Inter_Tight']">
+                    Account Role
+                  </span>
+                </div>
+                <p className="text-white font-semibold font-['Inter_Tight'] capitalize">
+                  {user.role || "Player"}
+                </p>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Right Column - Profile Details */}
-        <div className="lg:col-span-2 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Personal Information</CardTitle>
-              <CardDescription>
+        {/* Right Column - Profile Details & Performance */}
+        <div className="lg:col-span-2 space-y-8">
+          {/* Personal Information Card */}
+          <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-xl font-bold text-white font-['Inter_Tight'] flex items-center">
+                <User className="w-5 h-5 mr-2 text-primary" />
+                Personal Information
+              </CardTitle>
+              <CardDescription className="text-[#B0AFAF] font-['Inter_Tight']">
                 {isEditing
-                  ? "Update your personal details"
-                  : "Your basic information and playing profile"}
+                  ? "Update your personal details and playing profile"
+                  : "Your basic information and football profile"}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid gap-6 md:grid-cols-2">
                 {/* Player Name */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Full Name</label>
+                <div className="space-y-3">
+                  <label className="text-sm font-medium text-white font-['Inter_Tight']">
+                    Full Name
+                  </label>
                   {isEditing ? (
                     <div className="relative">
-                      <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <User className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#B0AFAF] z-10" />
                       <Input
-                        value={formData.player_name}
+                        value={formData.player_name || ""}
                         onChange={(e) =>
                           handleInputChange("player_name", e.target.value)
                         }
-                        className="pl-10 h-11"
+                        className={`${inputStyles} pl-12`}
+                        placeholder="Enter your full name"
                       />
                     </div>
                   ) : (
-                    <div className="flex items-center space-x-2 p-3 border rounded-lg bg-muted/50">
-                      <User className="h-4 w-4 text-muted-foreground" />
-                      <span>{user.player_name || "Not set"}</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Date of Birth */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Date of Birth</label>
-                  {isEditing ? (
-                    <div className="relative">
-                      <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        type="date"
-                        value={formData.date_of_birth}
-                        onChange={(e) =>
-                          handleInputChange("date_of_birth", e.target.value)
-                        }
-                        className="pl-10 h-11"
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex items-center space-x-2 p-3 border rounded-lg bg-muted/50">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                      <span>
-                        {user.date_of_birth
-                          ? `${new Date(
-                              user.date_of_birth
-                            ).toLocaleDateString()} (${calculateAge(
-                              user.date_of_birth
-                            )} years)`
-                          : "Not set"}
+                    <div className="flex items-center space-x-3 p-4 bg-[#1A1A1A] border-2 border-[#343434] rounded-xl h-14">
+                      <User className="h-5 w-5 text-primary" />
+                      <span className="text-white font-semibold font-['Inter_Tight']">
+                        {user.player_name || "Not set"}
                       </span>
                     </div>
                   )}
                 </div>
 
-                {/* Position */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Position</label>
+                {/* Date of Birth */}
+                <div className="space-y-3">
+                  <label className="text-sm font-medium text-white font-['Inter_Tight']">
+                    Date of Birth
+                  </label>
                   {isEditing ? (
-                    <Select
-                      value={formData.position}
-                      onValueChange={(value) =>
-                        handleInputChange("position", value)
-                      }
-                    >
-                      <SelectTrigger className="h-11">
-                        <SelectValue placeholder="Select your position" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {FOOTBALL_POSITIONS.map((position) => (
-                          <SelectItem key={position} value={position}>
-                            {position}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="relative">
+                      <Calendar className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#B0AFAF] z-10" />
+                      <Input
+                        type="date"
+                        value={formData.date_of_birth || ""}
+                        onChange={(e) =>
+                          handleInputChange("date_of_birth", e.target.value)
+                        }
+                        className={`${inputStyles} pl-12`}
+                      />
+                    </div>
                   ) : (
-                    <div className="flex items-center space-x-2 p-3 border rounded-lg bg-muted/50">
-                      <Target className="h-4 w-4 text-muted-foreground" />
-                      <span>{user.position || "Not set"}</span>
+                    <div className="flex items-center space-x-3 p-4 bg-[#1A1A1A] border-2 border-[#343434] rounded-xl h-14">
+                      <Calendar className="h-5 w-5 text-primary" />
+                      <div>
+                        <span className="text-white font-semibold font-['Inter_Tight'] block">
+                          {user.date_of_birth
+                            ? new Date(user.date_of_birth).toLocaleDateString()
+                            : "Not set"}
+                        </span>
+                        {user.date_of_birth && (
+                          <span className="text-[#B0AFAF] text-sm font-['Inter_Tight']">
+                            {calculateAge(user.date_of_birth)} years old
+                          </span>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
 
-                {/* Academy */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Academy/Club</label>
+                {/* Position */}
+                <div className="space-y-3">
+                  <label className="text-sm font-medium text-white font-['Inter_Tight']">
+                    Position
+                  </label>
                   {isEditing ? (
                     <div className="relative">
-                      <Building className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Target className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#B0AFAF] z-10" />
                       <Select
-                        value={formData.academy}
+                        value={formData.position || ""}
                         onValueChange={(value) =>
-                          handleInputChange("academy", value)
+                          handleInputChange("position", value)
                         }
                       >
-                        <SelectTrigger className="h-11 pl-10">
-                          <SelectValue placeholder="Select your academy" />
+                        <SelectTrigger
+                          className={`${selectTriggerStyles} pl-12`}
+                        >
+                          <SelectValue placeholder="Select position" />
                         </SelectTrigger>
-                        <SelectContent>
-                          {ACADEMIES.map((academy) => (
-                            <SelectItem key={academy} value={academy}>
-                              {academy}
+                        <SelectContent className="bg-[#262626] border-2 border-[#343434] text-white font-['Inter_Tight'] shadow-xl">
+                          {FOOTBALL_POSITIONS.map((position) => (
+                            <SelectItem
+                              key={position}
+                              value={position}
+                              className="focus:bg-[#343434] focus:text-primary py-3 text-base"
+                            >
+                              {position}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </div>
                   ) : (
-                    <div className="flex items-center space-x-2 p-3 border rounded-lg bg-muted/50">
-                      <Building className="h-4 w-4 text-muted-foreground" />
-                      <span>{user.academy || "Not set"}</span>
+                    <div className="flex items-center space-x-3 p-4 bg-[#1A1A1A] border-2 border-[#343434] rounded-xl h-14">
+                      <Target className="h-5 w-5 text-primary" />
+                      <span className="text-white font-semibold font-['Inter_Tight']">
+                        {user.position || "Not set"}
+                      </span>
                     </div>
                   )}
                 </div>
 
                 {/* Country */}
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-medium">Country</label>
+                <div className="space-y-3">
+                  <label className="text-sm font-medium text-white font-['Inter_Tight']">
+                    Country
+                  </label>
                   {isEditing ? (
                     <div className="relative">
-                      <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#B0AFAF] z-10" />
                       <Select
-                        value={formData.country}
+                        value={formData.country || ""}
                         onValueChange={(value) =>
                           handleInputChange("country", value)
                         }
                       >
-                        <SelectTrigger className="h-11 pl-10">
-                          <SelectValue placeholder="Select your country" />
+                        <SelectTrigger
+                          className={`${selectTriggerStyles} pl-12`}
+                        >
+                          <SelectValue placeholder="Select country" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-[#262626] border-2 border-[#343434] text-white font-['Inter_Tight'] shadow-xl max-h-60">
                           {COUNTRIES.map((country) => (
-                            <SelectItem key={country} value={country}>
+                            <SelectItem
+                              key={country}
+                              value={country}
+                              className="focus:bg-[#343434] focus:text-primary py-3 text-base"
+                            >
                               {country}
                             </SelectItem>
                           ))}
@@ -392,9 +461,53 @@ const Profile = () => {
                       </Select>
                     </div>
                   ) : (
-                    <div className="flex items-center space-x-2 p-3 border rounded-lg bg-muted/50">
-                      <MapPin className="h-4 w-4 text-muted-foreground" />
-                      <span>{user.country || "Not set"}</span>
+                    <div className="flex items-center space-x-3 p-4 bg-[#1A1A1A] border-2 border-[#343434] rounded-xl h-14">
+                      <MapPin className="h-5 w-5 text-primary" />
+                      <span className="text-white font-semibold font-['Inter_Tight']">
+                        {user.country || "Not set"}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Academy */}
+                <div className="space-y-3 md:col-span-2">
+                  <label className="text-sm font-medium text-white font-['Inter_Tight']">
+                    Academy/Club
+                  </label>
+                  {isEditing ? (
+                    <div className="relative">
+                      <Building className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#B0AFAF] z-10" />
+                      <Select
+                        value={formData.academy || ""}
+                        onValueChange={(value) =>
+                          handleInputChange("academy", value)
+                        }
+                      >
+                        <SelectTrigger
+                          className={`${selectTriggerStyles} pl-12`}
+                        >
+                          <SelectValue placeholder="Select academy/club" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#262626] border-2 border-[#343434] text-white font-['Inter_Tight'] shadow-xl max-h-60">
+                          {ACADEMIES.map((academy) => (
+                            <SelectItem
+                              key={academy}
+                              value={academy}
+                              className="focus:bg-[#343434] focus:text-primary py-3 text-base"
+                            >
+                              {academy}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  ) : (
+                    <div className="flex items-center space-x-3 p-4 bg-[#1A1A1A] border-2 border-[#343434] rounded-xl h-14">
+                      <Building className="h-5 w-5 text-primary" />
+                      <span className="text-white font-semibold font-['Inter_Tight']">
+                        {user.academy || "Not set"}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -402,44 +515,95 @@ const Profile = () => {
             </CardContent>
           </Card>
 
-          {/* Performance Summary */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Performance Summary</CardTitle>
-              <CardDescription>
-                Your recent performance metrics and trends
+          {/* Performance Overview Card */}
+          <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-xl font-bold text-white font-['Inter_Tight'] flex items-center">
+                <TrendingUp className="w-5 h-5 mr-2 text-primary" />
+                Performance Overview
+              </CardTitle>
+              <CardDescription className="text-[#B0AFAF] font-['Inter_Tight']">
+                Your assessment history and performance trends
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4 md:grid-cols-3 text-center">
-                <div className="space-y-2 p-4 border rounded-lg">
-                  <div className="text-2xl font-bold text-primary">
+              <div className="grid gap-6 md:grid-cols-3">
+                {/* Total Reports */}
+                <div className="text-center p-6 border-2 border-[#343434] rounded-2xl bg-linear-to-br from-[#1A1A1A] to-[#262626] hover:border-primary/30 transition-all duration-300 group">
+                  <div className="w-12 h-12 bg-linear-to-br from-[#60A5FA] to-[#3B82F6] rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <FileText className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="text-3xl font-bold text-white font-['Inter_Tight'] group-hover:text-[#60A5FA] transition-colors">
                     {performanceStats.totalReports}
                   </div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-sm text-[#B0AFAF] font-['Inter_Tight'] mt-2">
                     Total Reports
                   </div>
                 </div>
-                <div className="space-y-2 p-4 border rounded-lg">
-                  <div className="text-2xl font-bold text-green-500">
-                    {performanceStats.averageScore}
+
+                {/* Average Score */}
+                <div className="text-center p-6 border-2 border-[#343434] rounded-2xl bg-linear-to-br from-[#1A1A1A] to-[#262626] hover:border-primary/30 transition-all duration-300 group">
+                  <div className="w-12 h-12 bg-linear-to-br from-primary to-[#94D44A] rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <Award className="w-6 h-6 text-[#0F0F0E]" />
                   </div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-3xl font-bold text-white font-['Inter_Tight'] group-hover:text-primary transition-colors">
+                    {performanceStats.averageScore || "--"}
+                  </div>
+                  <div className="text-sm text-[#B0AFAF] font-['Inter_Tight'] mt-2">
                     Average Score
                   </div>
                 </div>
-                <div className="space-y-2 p-4 border rounded-lg">
+
+                {/* Progress */}
+                <div className="text-center p-6 border-2 border-[#343434] rounded-2xl bg-linear-to-br from-[#1A1A1A] to-[#262626] hover:border-primary/30 transition-all duration-300 group">
+                  <div className="w-12 h-12 bg-linear-to-br from-[#F59E0B] to-[#D97706] rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <TrendingUp className="w-6 h-6 text-white" />
+                  </div>
                   <div
-                    className={`text-2xl font-bold ${
-                      performanceStats.progress >= 0
-                        ? "text-blue-500"
-                        : "text-orange-500"
+                    className={`text-3xl font-bold font-['Inter_Tight'] ${
+                      performanceStats.progress > 0
+                        ? "text-primary group-hover:text-primary"
+                        : performanceStats.progress < 0
+                        ? "text-[#FF6B6B] group-hover:text-[#FF6B6B]"
+                        : "text-white group-hover:text-[#F59E0B]"
+                    } transition-colors`}
+                  >
+                    {performanceStats.progress > 0 ? "+" : ""}
+                    {performanceStats.progress || 0}%
+                  </div>
+                  <div className="text-sm text-[#B0AFAF] font-['Inter_Tight'] mt-2">
+                    Overall Progress
+                  </div>
+                </div>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="mt-6 space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-white font-['Inter_Tight']">
+                    Performance Trend
+                  </span>
+                  <span
+                    className={`font-bold font-['Inter_Tight'] ${
+                      performanceStats.progress > 0
+                        ? "text-primary"
+                        : "text-[#FF6B6B]"
                     }`}
                   >
-                    {performanceStats.progress >= 0 ? "+" : ""}
-                    {performanceStats.progress}%
-                  </div>
-                  <div className="text-sm text-muted-foreground">Progress</div>
+                    {performanceStats.progress > 0 ? "+" : ""}
+                    {performanceStats.progress || 0}%
+                  </span>
+                </div>
+                <Progress
+                  value={Math.max(
+                    0,
+                    Math.min(100, 50 + performanceStats.progress)
+                  )}
+                  className="h-3 bg-[#343434] rounded-full"
+                />
+                <div className="flex justify-between text-xs text-[#B0AFAF] font-['Inter_Tight']">
+                  <span>Start</span>
+                  <span>Current</span>
                 </div>
               </div>
             </CardContent>

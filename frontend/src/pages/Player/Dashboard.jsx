@@ -1,3 +1,4 @@
+// Dashboard.jsx - Updated with beautiful harmonized design
 import React, { useState, useEffect } from "react";
 import { useUserStore } from "@/store/userStore";
 import {
@@ -18,8 +19,11 @@ import {
   Target,
   Award,
   Calendar,
+  Users,
+  Activity,
+  Zap,
 } from "lucide-react";
-import { formatDate, getScoreColor } from "@/utils/helper.utils";
+import { formatDate, getScoreColor, calculateAge } from "@/utils/helper.utils";
 
 const Dashboard = () => {
   const { dashboardData, fetchDashboard, isLoading } = useUserStore();
@@ -45,21 +49,22 @@ const Dashboard = () => {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Dashboard</h1>
-            <p className="text-muted-foreground">
-              Loading your performance data...
-            </p>
+            <h1 className="text-3xl font-bold text-white font-['Inter_Tight'] animate-pulse bg-[#262626] rounded-lg w-64 h-10"></h1>
+            <p className="text-[#B0AFAF] mt-2 font-['Inter_Tight'] animate-pulse bg-[#262626] rounded w-48 h-4"></p>
           </div>
         </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {[...Array(6)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <Card
+              key={i}
+              className="animate-pulse bg-[#262626] border-[#343434]"
+            >
               <CardContent className="p-6">
-                <div className="h-4 bg-muted rounded w-3/4 mb-4"></div>
-                <div className="h-8 bg-muted rounded w-1/2"></div>
+                <div className="h-4 bg-[#343434] rounded w-3/4 mb-4"></div>
+                <div className="h-8 bg-[#343434] rounded w-1/2"></div>
               </CardContent>
             </Card>
           ))}
@@ -69,22 +74,26 @@ const Dashboard = () => {
   }
 
   const { user, recentReports, progressData, benchmarks } = localData || {};
+  const latestReport = recentReports?.[0];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">
+          <h1 className="text-4xl font-bold  font-['Inter_Tight'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
             Welcome back, {user?.player_name}!
           </h1>
-          <p className="text-muted-foreground">
-            Here's your latest performance overview
+          <p className="text-[#B0AFAF] text-lg mt-2 font-['Inter_Tight']">
+            Here's your latest performance overview and insights
           </p>
         </div>
-        <Button asChild>
+        <Button
+          asChild
+          className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold rounded-xl px-6 py-3 h-12 shadow-lg hover:shadow-xl transition-all duration-300 font-['Inter_Tight']"
+        >
           <a href="/upload">
-            <Upload className="w-4 h-4 mr-2" />
+            <Upload className="w-5 h-5 mr-2" />
             Upload New Data
           </a>
         </Button>
@@ -93,38 +102,46 @@ const Dashboard = () => {
       {/* Stats Grid */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {/* GR4DE Score */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">GR4DE Score</CardTitle>
-            <Award className="h-4 w-4 text-primary" />
+        <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <CardTitle className="text-sm font-medium text-white font-['Inter_Tight']">
+              GR4DE Score
+            </CardTitle>
+            <div className="w-10 h-10 bg-linear-to-br from-primary to-[#94D44A] rounded-xl flex items-center justify-center shadow-lg">
+              <Award className="h-5 w-5 text-[#0F0F0E]" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {recentReports?.[0]?.overall_score ? (
-                <span className={getScoreColor(recentReports[0].overall_score)}>
-                  {recentReports[0].overall_score}
+            <div className="text-3xl font-bold text-white font-['Inter_Tight']">
+              {latestReport?.overall_score ? (
+                <span className={getScoreColor(latestReport.overall_score)}>
+                  {latestReport.overall_score}
                 </span>
               ) : (
-                "--"
+                <span className="text-[#B0AFAF]">--</span>
               )}
             </div>
-            <p className="text-xs text-muted-foreground">
-              {recentReports?.[0] ? "Latest assessment" : "No reports yet"}
+            <p className="text-xs text-[#B0AFAF] mt-2 font-['Inter_Tight']">
+              {latestReport ? "Latest assessment" : "No reports yet"}
             </p>
           </CardContent>
         </Card>
 
         {/* Total Reports */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Reports</CardTitle>
-            <FileText className="h-4 w-4 text-primary" />
+        <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <CardTitle className="text-sm font-medium text-white font-['Inter_Tight']">
+              Total Reports
+            </CardTitle>
+            <div className="w-10 h-10 bg-linear-to-br from-[#60A5FA] to-[#3B82F6] rounded-xl flex items-center justify-center shadow-lg">
+              <FileText className="h-5 w-5 text-white" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-3xl font-bold text-white font-['Inter_Tight']">
               {recentReports?.length || 0}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-[#B0AFAF] mt-2 font-['Inter_Tight']">
               {recentReports?.length
                 ? "All time reports"
                 : "No reports generated"}
@@ -133,15 +150,17 @@ const Dashboard = () => {
         </Card>
 
         {/* Progress Trend */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+        <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <CardTitle className="text-sm font-medium text-white font-['Inter_Tight']">
               Progress Trend
             </CardTitle>
-            <TrendingUp className="h-4 w-4 text-primary" />
+            <div className="w-10 h-10 bg-linear-to-br from-[#F59E0B] to-[#D97706] rounded-xl flex items-center justify-center shadow-lg">
+              <TrendingUp className="h-5 w-5 text-white" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-3xl font-bold text-primary font-['Inter_Tight']">
               {progressData?.length > 1 ? "+" : ""}
               {progressData?.length > 1
                 ? (
@@ -150,7 +169,7 @@ const Dashboard = () => {
                   ).toFixed(1)
                 : "0"}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-[#B0AFAF] mt-2 font-['Inter_Tight']">
               Since{" "}
               {progressData?.[0]
                 ? formatDate(progressData[0].created_at)
@@ -160,18 +179,20 @@ const Dashboard = () => {
         </Card>
 
         {/* Benchmark Rank */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+        <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <CardTitle className="text-sm font-medium text-white font-['Inter_Tight']">
               Benchmark Rank
             </CardTitle>
-            <Target className="h-4 w-4 text-primary" />
+            <div className="w-10 h-10 bg-linear-to-br from-[#8B5CF6] to-[#7C3AED] rounded-xl flex items-center justify-center shadow-lg">
+              <Target className="h-5 w-5 text-white" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-3xl font-bold text-white font-['Inter_Tight']">
               {benchmarks ? "Top 25%" : "--"}
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-[#B0AFAF] mt-2 font-['Inter_Tight']">
               {user?.position} •{" "}
               {user?.date_of_birth
                 ? calculateAge(user.date_of_birth) + " years"
@@ -182,45 +203,72 @@ const Dashboard = () => {
       </div>
 
       {/* Recent Reports & Progress Chart */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-8 lg:grid-cols-2">
         {/* Recent Reports */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Reports</CardTitle>
-            <CardDescription>
+        <Card className="bg-[#262626] border-[#343434]">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xl font-bold text-white font-['Inter_Tight'] flex items-center">
+              <FileText className="w-5 h-5 mr-2 text-primary" />
+              Recent Reports
+            </CardTitle>
+            <CardDescription className="text-[#B0AFAF] font-['Inter_Tight']">
               Your latest performance assessments
             </CardDescription>
           </CardHeader>
           <CardContent>
             {recentReports?.length > 0 ? (
               <div className="space-y-4">
-                {recentReports.map((report) => (
+                {recentReports.map((report, index) => (
                   <div
                     key={report.id}
-                    className="flex items-center justify-between p-3 border rounded-lg"
+                    className="flex items-center justify-between p-4 border rounded-xl bg-[#1A1A1A] border-[#343434] hover:border-primary/30 transition-all duration-300 group"
                   >
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-4">
                       <div
-                        className={`w-3 h-3 rounded-full ${getScoreColor(
+                        className={`w-12 h-12 rounded-xl flex items-center justify-center ${getScoreColor(
                           report.overall_score
-                        ).replace("text-", "bg-")}`}
-                      />
+                        ).replace(
+                          "text-",
+                          "bg-"
+                        )} bg-opacity-20 border-2 ${getScoreColor(
+                          report.overall_score
+                        ).replace("text-", "border-")} border-opacity-30`}
+                      >
+                        <Award
+                          className={`w-6 h-6 ${getScoreColor(
+                            report.overall_score
+                          )}`}
+                        />
+                      </div>
                       <div>
-                        <p className="font-medium">GR4DE Report</p>
-                        <p className="text-sm text-muted-foreground">
-                          {formatDate(report.created_at)}
+                        <p className="font-semibold text-white font-['Inter_Tight'] group-hover:text-primary transition-colors">
+                          GR4DE Report
                         </p>
+                        <div className="flex items-center space-x-2 text-sm text-[#B0AFAF] mt-1">
+                          <Calendar className="w-3 h-3" />
+                          <span className="font-['Inter_Tight']">
+                            {formatDate(report.created_at)}
+                          </span>
+                          {index === 0 && (
+                            <Badge className="bg-primary text-[#0F0F0E] text-xs font-['Inter_Tight']">
+                              Latest
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <div className="text-right">
                       <p
-                        className={`text-lg font-bold ${getScoreColor(
+                        className={`text-2xl font-bold ${getScoreColor(
                           report.overall_score
-                        )}`}
+                        )} font-['Inter_Tight']`}
                       >
                         {report.overall_score}
                       </p>
-                      <Badge variant="outline" className="text-xs">
+                      <Badge
+                        variant="outline"
+                        className="text-xs bg-[#343434] text-[#B0AFAF] border-[#343434] font-['Inter_Tight']"
+                      >
                         Overall
                       </Badge>
                     </div>
@@ -228,10 +276,18 @@ const Dashboard = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8">
-                <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">No reports yet</p>
-                <Button asChild className="mt-4">
+              <div className="text-center py-12">
+                <FileText className="w-16 h-16 text-[#B0AFAF] mx-auto mb-4 opacity-50" />
+                <p className="text-[#B0AFAF] font-['Inter_Tight'] text-lg">
+                  No reports yet
+                </p>
+                <p className="text-sm text-[#B0AFAF] mt-2 font-['Inter_Tight']">
+                  Upload your first match data to get started
+                </p>
+                <Button
+                  asChild
+                  className="mt-6 bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold rounded-xl font-['Inter_Tight']"
+                >
                   <a href="/upload">Upload Your First Data</a>
                 </Button>
               </div>
@@ -240,37 +296,47 @@ const Dashboard = () => {
         </Card>
 
         {/* Progress Overview */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Progress Overview</CardTitle>
-            <CardDescription>Your score progression over time</CardDescription>
+        <Card className="bg-[#262626] border-[#343434]">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xl font-bold text-white font-['Inter_Tight'] flex items-center">
+              <Activity className="w-5 h-5 mr-2 text-primary" />
+              Progress Overview
+            </CardTitle>
+            <CardDescription className="text-[#B0AFAF] font-['Inter_Tight']">
+              Your score progression over time
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {progressData?.length > 0 ? (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {progressData.slice(-6).map((data, index) => (
-                  <div key={index} className="space-y-2">
+                  <div key={index} className="space-y-3">
                     <div className="flex items-center justify-between text-sm">
-                      <span>{formatDate(data.created_at)}</span>
+                      <span className="text-white font-['Inter_Tight']">
+                        {formatDate(data.created_at)}
+                      </span>
                       <span
-                        className={`font-medium ${getScoreColor(
+                        className={`font-bold ${getScoreColor(
                           data.overall_score
-                        )}`}
+                        )} font-['Inter_Tight']`}
                       >
                         {data.overall_score}
                       </span>
                     </div>
-                    <Progress value={data.overall_score} className="h-2" />
+                    <Progress
+                      value={data.overall_score}
+                      className="h-3 bg-[#343434] rounded-full"
+                    />
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8">
-                <BarChart3 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">
+              <div className="text-center py-12">
+                <BarChart3 className="w-16 h-16 text-[#B0AFAF] mx-auto mb-4 opacity-50" />
+                <p className="text-[#B0AFAF] font-['Inter_Tight'] text-lg">
                   No progress data available
                 </p>
-                <p className="text-sm text-muted-foreground mt-2">
+                <p className="text-sm text-[#B0AFAF] mt-2 font-['Inter_Tight']">
                   Upload more data to see your progress
                 </p>
               </div>
@@ -280,14 +346,18 @@ const Dashboard = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="bg-primary/5 border-primary/20">
+      <div className="grid gap-6 md:grid-cols-3">
+        <Card className="bg-linear-to-br from-primary/10 to-[#94D44A]/5 border-primary/20 hover:border-primary/40 transition-all duration-300 group">
           <CardContent className="p-6">
-            <div className="flex items-center space-x-3">
-              <Upload className="w-8 h-8 text-primary" />
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-linear-to-br from-primary to-[#94D44A] rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <Upload className="w-6 h-6 text-[#0F0F0E]" />
+              </div>
               <div>
-                <h3 className="font-semibold">Upload Match Data</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="font-semibold text-white font-['Inter_Tight'] group-hover:text-primary transition-colors">
+                  Upload Match Data
+                </h3>
+                <p className="text-sm text-[#B0AFAF] mt-1 font-['Inter_Tight']">
                   Upload video and GPS data for analysis
                 </p>
               </div>
@@ -295,13 +365,17 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="bg-primary/5 border-primary/20">
+        <Card className="bg-linear-to-br from-[#60A5FA]/10 to-[#3B82F6]/5 border-[#60A5FA]/20 hover:border-[#60A5FA]/40 transition-all duration-300 group">
           <CardContent className="p-6">
-            <div className="flex items-center space-x-3">
-              <BarChart3 className="w-8 h-8 text-primary" />
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-linear-to-br from-[#60A5FA] to-[#3B82F6] rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <BarChart3 className="w-6 h-6 text-white" />
+              </div>
               <div>
-                <h3 className="font-semibold">View Benchmarks</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="font-semibold text-white font-['Inter_Tight'] group-hover:text-[#60A5FA] transition-colors">
+                  View Benchmarks
+                </h3>
+                <p className="text-sm text-[#B0AFAF] mt-1 font-['Inter_Tight']">
                   Compare your performance with peers
                 </p>
               </div>
@@ -309,13 +383,17 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="bg-primary/5 border-primary/20">
+        <Card className="bg-linear-to-br from-[#8B5CF6]/10 to-[#7C3AED]/5 border-[#8B5CF6]/20 hover:border-[#8B5CF6]/40 transition-all duration-300 group">
           <CardContent className="p-6">
-            <div className="flex items-center space-x-3">
-              <FileText className="w-8 h-8 text-primary" />
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-linear-to-br from-[#8B5CF6] to-[#7C3AED] rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <FileText className="w-6 h-6 text-white" />
+              </div>
               <div>
-                <h3 className="font-semibold">All Reports</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="font-semibold text-white font-['Inter_Tight'] group-hover:text-[#8B5CF6] transition-colors">
+                  All Reports
+                </h3>
+                <p className="text-sm text-[#B0AFAF] mt-1 font-['Inter_Tight']">
                   Access your complete report history
                 </p>
               </div>
@@ -325,23 +403,6 @@ const Dashboard = () => {
       </div>
     </div>
   );
-};
-
-// Helper function to calculate age
-const calculateAge = (dateOfBirth) => {
-  const today = new Date();
-  const birthDate = new Date(dateOfBirth);
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const monthDiff = today.getMonth() - birthDate.getMonth();
-
-  if (
-    monthDiff < 0 ||
-    (monthDiff === 0 && today.getDate() < birthDate.getDate())
-  ) {
-    age--;
-  }
-
-  return age;
 };
 
 export default Dashboard;

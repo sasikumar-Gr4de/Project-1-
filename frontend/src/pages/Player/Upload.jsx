@@ -115,12 +115,12 @@ const Upload = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
+      {/* <div>
         <h1 className="text-3xl font-bold text-white">Upload Match Data</h1>
         <p className="text-[#B0AFAF]">
           Upload your video and GPS data for performance analysis
         </p>
-      </div>
+      </div> */}
 
       {/* Upload Result */}
       {uploadResult && (

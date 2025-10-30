@@ -19,6 +19,7 @@ import {
   Star,
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
+import { Link } from "react-router-dom";
 
 const Benchmarks = () => {
   const { user } = useAuthStore();
@@ -47,10 +48,10 @@ const Benchmarks = () => {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-white">
+          {/* <h1 className="text-3xl font-bold text-white">
             Performance Benchmarks
           </h1>
-          <p className="text-[#B0AFAF]">Loading benchmark data...</p>
+          <p className="text-[#B0AFAF]">Loading benchmark data...</p> */}
         </div>
         <div className="grid gap-6">
           {[...Array(3)].map((_, i) => (
@@ -80,23 +81,23 @@ const Benchmarks = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white">
+          {/* <h1 className="text-3xl font-bold text-white">
             Performance Benchmarks
           </h1>
           <p className="text-[#B0AFAF]">
             Compare your performance with {user?.position} players in your age
             group
-          </p>
+          </p> */}
         </div>
         <Button
           variant="outline"
           asChild
           className="bg-[#262626] border-[#404040] text-white hover:bg-[#333333]"
         >
-          <a href="/reports">
+          <Link to="/reports">
             <BarChart3 className="w-4 h-4 mr-2" />
             View Detailed Reports
-          </a>
+          </Link>
         </Button>
       </div>
 
