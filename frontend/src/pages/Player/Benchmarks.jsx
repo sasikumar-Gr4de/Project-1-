@@ -170,7 +170,7 @@ const Benchmarks = () => {
         </div>
         <Button
           asChild
-          className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold rounded-xl px-6 py-3 h-12 shadow-lg hover:shadow-xl transition-all duration-300 font-['Inter_Tight']"
+          className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold rounded-xl px-6 py-3 h-12 shadow-lg hover:shadow-xl transition-all duration-300 font-['Inter']"
         >
           <Link to="/reports">
             <BarChart3 className="w-5 h-5 mr-2" />
@@ -183,7 +183,7 @@ const Benchmarks = () => {
       <div className="grid gap-6 lg:grid-cols-4">
         <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="text-sm font-medium text-white font-['Inter_Tight']">
+            <CardTitle className="text-sm font-medium text-white font-['Inter']">
               Your Position
             </CardTitle>
             <div className="w-10 h-10 bg-linear-to-br from-[#60A5FA] to-[#3B82F6] rounded-xl flex items-center justify-center shadow-lg">
@@ -191,10 +191,10 @@ const Benchmarks = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white font-['Inter_Tight']">
+            <div className="text-2xl font-bold text-white font-['Inter']">
               {user?.position || "--"}
             </div>
-            <p className="text-xs text-[#B0AFAF] mt-2 font-['Inter_Tight']">
+            <p className="text-xs text-[#B0AFAF] mt-2 font-['Inter']">
               Compared to {benchmarks ? "1,000+" : "0"} players
             </p>
           </CardContent>
@@ -202,7 +202,7 @@ const Benchmarks = () => {
 
         <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="text-sm font-medium text-white font-['Inter_Tight']">
+            <CardTitle className="text-sm font-medium text-white font-['Inter']">
               Percentile Rank
             </CardTitle>
             <div className="w-10 h-10 bg-linear-to-br from-primary to-[#94D44A] rounded-xl flex items-center justify-center shadow-lg">
@@ -210,10 +210,10 @@ const Benchmarks = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-primary font-['Inter_Tight']">
+            <div className="text-2xl font-bold text-primary font-['Inter']">
               {latestScore ? "Top 25%" : "--"}
             </div>
-            <p className="text-xs text-[#B0AFAF] mt-2 font-['Inter_Tight']">
+            <p className="text-xs text-[#B0AFAF] mt-2 font-['Inter']">
               {latestScore ? "Better than 75% of peers" : "No data available"}
             </p>
           </CardContent>
@@ -221,7 +221,7 @@ const Benchmarks = () => {
 
         <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="text-sm font-medium text-white font-['Inter_Tight']">
+            <CardTitle className="text-sm font-medium text-white font-['Inter']">
               Growth Velocity
             </CardTitle>
             <div className="w-10 h-10 bg-linear-to-br from-[#F59E0B] to-[#D97706] rounded-xl flex items-center justify-center shadow-lg">
@@ -229,10 +229,10 @@ const Benchmarks = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-[#F59E0B] font-['Inter_Tight']">
+            <div className="text-2xl font-bold text-[#F59E0B] font-['Inter']">
               +12%
             </div>
-            <p className="text-xs text-[#B0AFAF] mt-2 font-['Inter_Tight']">
+            <p className="text-xs text-[#B0AFAF] mt-2 font-['Inter']">
               Improvement vs last quarter
             </p>
           </CardContent>
@@ -240,7 +240,7 @@ const Benchmarks = () => {
 
         <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="text-sm font-medium text-white font-['Inter_Tight']">
+            <CardTitle className="text-sm font-medium text-white font-['Inter']">
               Consistency Score
             </CardTitle>
             <div className="w-10 h-10 bg-linear-to-br from-[#8B5CF6] to-[#7C3AED] rounded-xl flex items-center justify-center shadow-lg">
@@ -248,10 +248,10 @@ const Benchmarks = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-[#8B5CF6] font-['Inter_Tight']">
+            <div className="text-2xl font-bold text-[#8B5CF6] font-['Inter']">
               84%
             </div>
-            <p className="text-xs text-[#B0AFAF] mt-2 font-['Inter_Tight']">
+            <p className="text-xs text-[#B0AFAF] mt-2 font-['Inter']">
               Performance stability
             </p>
           </CardContent>
@@ -261,11 +261,11 @@ const Benchmarks = () => {
       {/* Overall Performance */}
       <Card className="bg-[#262626] border-[#343434]">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold text-white font-['Inter_Tight'] flex items-center">
+          <CardTitle className="text-2xl font-bold text-white font-['Inter'] flex items-center">
             <BarChart3 className="w-6 h-6 mr-3 text-primary" />
             Overall Performance Comparison
           </CardTitle>
-          <CardDescription className="text-[#B0AFAF] text-lg font-['Inter_Tight']">
+          <CardDescription className="text-[#B0AFAF] text-lg font-['Inter']">
             How you stack up against {user?.position} players in your
             demographic
           </CardDescription>
@@ -274,17 +274,17 @@ const Benchmarks = () => {
           {/* Overall Score */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-lg font-semibold text-white font-['Inter_Tight']">
+              <span className="text-lg font-semibold text-white font-['Inter']">
                 Overall GR4DE Score
               </span>
               <div className="flex items-center space-x-3">
-                <Badge className="bg-[#343434] text-white border-[#343434] font-['Inter_Tight']">
+                <Badge className="bg-[#343434] text-white border-[#343434] font-['Inter']">
                   You: {performanceData.overall.yourScore || 0}
                 </Badge>
-                <Badge className="bg-[#343434] text-white border-[#343434] font-['Inter_Tight']">
+                <Badge className="bg-[#343434] text-white border-[#343434] font-['Inter']">
                   Average: {performanceData.overall.average}
                 </Badge>
-                <Badge className="bg-[#343434] text-white border-[#343434] font-['Inter_Tight']">
+                <Badge className="bg-[#343434] text-white border-[#343434] font-['Inter']">
                   Top 10%: {performanceData.overall.top10}
                 </Badge>
               </div>
@@ -314,10 +314,10 @@ const Benchmarks = () => {
               ].map((item, index) => (
                 <div key={index} className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-white font-medium font-['Inter_Tight']">
+                    <span className="text-white font-medium font-['Inter']">
                       {item.label}
                     </span>
-                    <span className="text-[#B0AFAF] font-['Inter_Tight']">
+                    <span className="text-[#B0AFAF] font-['Inter']">
                       {item.value}
                     </span>
                   </div>
@@ -335,27 +335,27 @@ const Benchmarks = () => {
             {performanceData.pillars.map((pillar, index) => (
               <Card key={index} className="bg-[#1A1A1A] border-[#343434]">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg font-semibold text-white font-['Inter_Tight']">
+                  <CardTitle className="text-lg font-semibold text-white font-['Inter']">
                     {pillar.name}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="text-center">
                     <div
-                      className={`text-3xl font-bold bg-linear-to-r ${pillar.color} bg-clip-text text-transparent font-['Inter_Tight']`}
+                      className={`text-3xl font-bold bg-linear-to-r ${pillar.color} bg-clip-text text-transparent font-['Inter']`}
                     >
                       {pillar.yourScore}
                     </div>
-                    <div className="text-sm text-[#B0AFAF] mt-1 font-['Inter_Tight']">
+                    <div className="text-sm text-[#B0AFAF] mt-1 font-['Inter']">
                       Your Score
                     </div>
                   </div>
                   <div className="space-y-2">
                     <div className="flex justify-between text-xs">
-                      <span className="text-[#B0AFAF] font-['Inter_Tight']">
+                      <span className="text-[#B0AFAF] font-['Inter']">
                         Avg: {pillar.average}
                       </span>
-                      <span className="text-[#B0AFAF] font-['Inter_Tight']">
+                      <span className="text-[#B0AFAF] font-['Inter']">
                         Top: {pillar.top10}
                       </span>
                     </div>
@@ -376,13 +376,13 @@ const Benchmarks = () => {
         {/* Strengths */}
         <Card className="bg-[#262626] border-[#343434]">
           <CardHeader>
-            <CardTitle className="text-xl font-bold text-white font-['Inter_Tight'] flex items-center">
+            <CardTitle className="text-xl font-bold text-white font-['Inter'] flex items-center">
               <div className="w-8 h-8 bg-linear-to-br from-primary to-[#94D44A] rounded-lg flex items-center justify-center mr-3">
                 <TrendingUp className="w-4 h-4 text-[#0F0F0E]" />
               </div>
               Key Strengths
             </CardTitle>
-            <CardDescription className="text-[#B0AFAF] font-['Inter_Tight']">
+            <CardDescription className="text-[#B0AFAF] font-['Inter']">
               Areas where you excel compared to peers
             </CardDescription>
           </CardHeader>
@@ -397,14 +397,14 @@ const Benchmarks = () => {
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <h4 className="font-semibold text-white font-['Inter_Tight']">
+                    <h4 className="font-semibold text-white font-['Inter']">
                       {strength.title}
                     </h4>
-                    <Badge className="bg-primary text-[#0F0F0E] font-medium font-['Inter_Tight']">
+                    <Badge className="bg-primary text-[#0F0F0E] font-medium font-['Inter']">
                       {strength.improvement}
                     </Badge>
                   </div>
-                  <p className="text-sm text-[#B0AFAF] mt-1 font-['Inter_Tight']">
+                  <p className="text-sm text-[#B0AFAF] mt-1 font-['Inter']">
                     {strength.description}
                   </p>
                 </div>
@@ -416,13 +416,13 @@ const Benchmarks = () => {
         {/* Opportunities */}
         <Card className="bg-[#262626] border-[#343434]">
           <CardHeader>
-            <CardTitle className="text-xl font-bold text-white font-['Inter_Tight'] flex items-center">
+            <CardTitle className="text-xl font-bold text-white font-['Inter'] flex items-center">
               <div className="w-8 h-8 bg-linear-to-br from-[#60A5FA] to-[#3B82F6] rounded-lg flex items-center justify-center mr-3">
                 <Target className="w-4 h-4 text-white" />
               </div>
               Growth Opportunities
             </CardTitle>
-            <CardDescription className="text-[#B0AFAF] font-['Inter_Tight']">
+            <CardDescription className="text-[#B0AFAF] font-['Inter']">
               Areas with the highest potential for improvement
             </CardDescription>
           </CardHeader>
@@ -437,14 +437,14 @@ const Benchmarks = () => {
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <h4 className="font-semibold text-white font-['Inter_Tight']">
+                    <h4 className="font-semibold text-white font-['Inter']">
                       {opportunity.title}
                     </h4>
-                    <Badge className="bg-[#60A5FA] text-white font-medium font-['Inter_Tight']">
+                    <Badge className="bg-[#60A5FA] text-white font-medium font-['Inter']">
                       {opportunity.improvement}
                     </Badge>
                   </div>
-                  <p className="text-sm text-[#B0AFAF] mt-1 font-['Inter_Tight']">
+                  <p className="text-sm text-[#B0AFAF] mt-1 font-['Inter']">
                     {opportunity.description}
                   </p>
                 </div>

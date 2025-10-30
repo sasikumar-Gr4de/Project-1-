@@ -21,6 +21,13 @@ export const UPLOAD_STATUS = {
   FAILED: "failed",
 };
 
+export const PLAYER_DATA_STATUS = {
+  UPLOADED: "uploaded",
+  PROCESSING: "processing",
+  COMPLETED: "completed",
+  FAILED: "failed",
+};
+
 // Processing Queue Status
 export const QUEUE_STATUS = {
   PENDING: "pending",

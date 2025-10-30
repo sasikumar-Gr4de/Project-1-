@@ -186,6 +186,25 @@ export const validateApiFile = (req, res, next) => {
   next();
 };
 
+export const createDataSchema = Joi.object({
+  match_date: commonPatterns.date.required(),
+  jersey_number: Joi.number().integer().min(1).max(99).required(),
+  position: Joi.string()
+    .valid(...FOOTBALL_POSITIONS)
+    .required(),
+  jersey_color: Joi.string().max(50).required(),
+  opponent_jersey_color: Joi.string().max(50).required(),
+  notes: commonPatterns.text.optional(),
+  video: commonPatterns.url.optional(),
+  gps: Joi.object().optional(),
+});
+
+export const changeDataStatusSchema = Joi.object({
+  status: Joi.string()
+    .valid("uploaded", "processing", "completed", "failed")
+    .required(),
+});
+
 // Export all API schemas
 export default {
   // Auth
@@ -211,4 +230,8 @@ export default {
   validateParams,
   validateQuery,
   validateApiFile,
+
+  // Player Data
+  createDataSchema,
+  changeDataStatusSchema,
 };

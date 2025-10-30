@@ -6,7 +6,7 @@ import { supabase } from "../config/supabase.config.js";
  */
 export const getQueue = async (req, res) => {
   try {
-    const { status, page = 1, limit = 20 } = req.query;
+    const { status, page = 1, limit = 10 } = req.query;
     const start = (page - 1) * limit;
     const end = start + limit - 1;
 

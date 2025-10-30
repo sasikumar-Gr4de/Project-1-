@@ -86,19 +86,17 @@ const Onboarding = () => {
           <div className="flex justify-center mb-4">
             <img src="/favicon.png" alt="GR4DE Logo" className="w-20 h-20" />
           </div>
-          <CardTitle className="text-2xl font-bold font-['Inter_Tight'] text-primary">
+          <CardTitle className="text-2xl font-bold font-['Inter'] text-primary">
             Complete Your Profile
           </CardTitle>
-          <CardDescription className="text-base font-['Inter_Tight'] text-white">
+          <CardDescription className="text-base font-['Inter'] text-white">
             Tell us about yourself to get personalized insights
           </CardDescription>
         </CardHeader>
         <CardContent>
           {error && (
             <div className="mb-4 p-3 bg-red-500/20 border border-red-500 rounded-md">
-              <p className="text-red-400 text-sm font-['Inter_Tight']">
-                {error}
-              </p>
+              <p className="text-red-400 text-sm font-['Inter']">{error}</p>
             </div>
           )}
 
@@ -106,7 +104,7 @@ const Onboarding = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Player Name */}
               <div className="space-y-2">
-                <label className="text-white text-base font-medium font-['Inter_Tight']">
+                <label className="text-white text-base font-medium font-['Inter']">
                   Full Name *
                 </label>
                 <div className="relative">
@@ -117,7 +115,7 @@ const Onboarding = () => {
                     onChange={(e) =>
                       handleChange("player_name", e.target.value)
                     }
-                    className="pl-10 h-12 text-base bg-[#343434] border-[#343434] text-[#E1E5DD] placeholder:text-[#E1E5DD] placeholder:opacity-70 rounded-[5px] font-['Inter_Tight']"
+                    className="pl-10 h-12 text-base bg-[#343434] border-[#343434] text-[#E1E5DD] placeholder:text-[#E1E5DD] placeholder:opacity-70 rounded-[5px] font-['Inter']"
                     required
                     minLength={2}
                     maxLength={100}
@@ -127,7 +125,7 @@ const Onboarding = () => {
 
               {/* Date of Birth */}
               <div className="space-y-2">
-                <label className="text-white text-base font-medium font-['Inter_Tight']">
+                <label className="text-white text-base font-medium font-['Inter']">
                   Date of Birth *
                 </label>
                 <div className="relative">
@@ -140,7 +138,7 @@ const Onboarding = () => {
                     }
                     min={minDate}
                     max={maxDate}
-                    className="pl-10 h-12 text-base bg-[#343434] border-[#343434] text-[#E1E5DD] placeholder:text-[#E1E5DD] placeholder:opacity-70 rounded-[5px] font-['Inter_Tight']"
+                    className="pl-10 h-12 text-base bg-[#343434] border-[#343434] text-[#E1E5DD] placeholder:text-[#E1E5DD] placeholder:opacity-70 rounded-[5px] font-['Inter']"
                     required
                   />
                 </div>
@@ -151,7 +149,7 @@ const Onboarding = () => {
 
               {/* Position */}
               <div className="space-y-2">
-                <label className="text-white text-base font-medium font-['Inter_Tight']">
+                <label className="text-white text-base font-medium font-['Inter']">
                   Position *
                 </label>
                 <Select
@@ -159,10 +157,10 @@ const Onboarding = () => {
                   onValueChange={(value) => handleChange("position", value)}
                   required
                 >
-                  <SelectTrigger className="h-12 text-base bg-[#343434] border-[#343434] text-[#E1E5DD] rounded-[5px] font-['Inter_Tight']">
+                  <SelectTrigger className="h-12 text-base bg-[#343434] border-[#343434] text-[#E1E5DD] rounded-[5px] font-['Inter']">
                     <SelectValue placeholder="Select your position" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#343434] border-[#343434] text-[#E1E5DD] font-['Inter_Tight']">
+                  <SelectContent className="bg-[#343434] border-[#343434] text-[#E1E5DD] font-['Inter']">
                     {FOOTBALL_POSITIONS.map((position) => (
                       <SelectItem
                         key={position}
@@ -178,7 +176,7 @@ const Onboarding = () => {
 
               {/* Academy */}
               <div className="space-y-2">
-                <label className="text-white text-base font-medium font-['Inter_Tight']">
+                <label className="text-white text-base font-medium font-['Inter']">
                   Academy/Club
                 </label>
                 <div className="relative">
@@ -187,10 +185,10 @@ const Onboarding = () => {
                     value={formData.academy}
                     onValueChange={(value) => handleChange("academy", value)}
                   >
-                    <SelectTrigger className="h-12 pl-10 text-base bg-[#343434] border-[#343434] text-[#E1E5DD] rounded-[5px] font-['Inter_Tight']">
+                    <SelectTrigger className="h-12 pl-10 text-base bg-[#343434] border-[#343434] text-[#E1E5DD] rounded-[5px] font-['Inter']">
                       <SelectValue placeholder="Select your academy" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#343434] border-[#343434] text-[#E1E5DD] font-['Inter_Tight']">
+                    <SelectContent className="bg-[#343434] border-[#343434] text-[#E1E5DD] font-['Inter']">
                       {ACADEMIES.map((academy) => (
                         <SelectItem
                           key={academy}
@@ -207,7 +205,7 @@ const Onboarding = () => {
 
               {/* Country */}
               <div className="space-y-2 md:col-span-2">
-                <label className="text-white text-base font-medium font-['Inter_Tight']">
+                <label className="text-white text-base font-medium font-['Inter']">
                   Country
                 </label>
                 <div className="relative">
@@ -216,10 +214,10 @@ const Onboarding = () => {
                     value={formData.country}
                     onValueChange={(value) => handleChange("country", value)}
                   >
-                    <SelectTrigger className="h-12 pl-10 text-base bg-[#343434] border-[#343434] text-[#E1E5DD] rounded-[5px] font-['Inter_Tight']">
+                    <SelectTrigger className="h-12 pl-10 text-base bg-[#343434] border-[#343434] text-[#E1E5DD] rounded-[5px] font-['Inter']">
                       <SelectValue placeholder="Select your country" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#343434] border-[#343434] text-[#E1E5DD] font-['Inter_Tight']">
+                    <SelectContent className="bg-[#343434] border-[#343434] text-[#E1E5DD] font-['Inter']">
                       {COUNTRIES.map((country) => (
                         <SelectItem
                           key={country}
@@ -244,7 +242,7 @@ const Onboarding = () => {
                   !formData.date_of_birth ||
                   !formData.position
                 }
-                className="w-full h-12 text-base font-['Inter_Tight'] bg-primary text-[#0F0F0E] hover:bg-primary/90 font-semibold rounded-[10px]"
+                className="w-full h-12 text-base font-['Inter'] bg-primary text-[#0F0F0E] hover:bg-primary/90 font-semibold rounded-[10px]"
               >
                 {isLoading ? "Saving..." : "Complete Profile"}
               </Button>

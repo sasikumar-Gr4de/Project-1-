@@ -179,16 +179,16 @@ const PlayerLayout = ({ children }) => {
                     className="w-10 h-10 rounded-full object-cover border-2 border-[#1A1A1A]"
                   />
                 ) : (
-                  <span className="text-[#0F0F0E] text-sm font-bold font-['Inter_Tight']">
+                  <span className="text-[#0F0F0E] text-sm font-bold font-['Inter']">
                     {user?.player_name?.charAt(0)?.toUpperCase() || "U"}
                   </span>
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-white font-medium text-sm truncate font-['Inter_Tight']">
+                <p className="text-white font-medium text-sm truncate font-['Inter']">
                   {user?.player_name || "Player"}
                 </p>
-                <p className="text-primary text-xs truncate font-['Inter_Tight']">
+                <p className="text-primary text-xs truncate font-['Inter']">
                   {user?.position || "Football Player"}
                 </p>
               </div>
@@ -321,14 +321,14 @@ const PlayerLayout = ({ children }) => {
                         >
                           <div className="flex justify-between items-start gap-2 lg:gap-3">
                             <div className="flex-1">
-                              <h4 className="font-semibold text-white text-xs lg:text-sm flex-1 font-['Inter_Tight'] group-hover:text-primary transition-colors">
+                              <h4 className="font-semibold text-white text-xs lg:text-sm flex-1 font-['Inter'] group-hover:text-primary transition-colors">
                                 {notification.title}
                               </h4>
-                              <p className="text-xs text-[#B0AFAF] mt-1 font-['Inter_Tight']">
+                              <p className="text-xs text-[#B0AFAF] mt-1 font-['Inter']">
                                 {notification.message}
                               </p>
                             </div>
-                            <span className="text-xs text-[#B0AFAF] whitespace-nowrap font-['Inter_Tight'] bg-[#343434] px-2 py-1 rounded-full">
+                            <span className="text-xs text-[#B0AFAF] whitespace-nowrap font-['Inter'] bg-[#343434] px-2 py-1 rounded-full">
                               {notification.time}
                             </span>
                           </div>
@@ -355,16 +355,16 @@ const PlayerLayout = ({ children }) => {
                           className="w-8 h-8 lg:w-10 lg:h-10 rounded-full object-cover border-2 border-[#1A1A1A]"
                         />
                       ) : (
-                        <span className="text-[#0F0F0E] text-xs lg:text-sm font-bold font-['Inter_Tight']">
+                        <span className="text-[#0F0F0E] text-xs lg:text-sm font-bold font-['Inter']">
                           {user?.player_name?.charAt(0)?.toUpperCase() || "U"}
                         </span>
                       )}
                     </div>
                     <div className="hidden sm:block text-left">
-                      <p className="text-white font-medium text-xs lg:text-sm font-['Inter_Tight']">
+                      <p className="text-white font-medium text-xs lg:text-sm font-['Inter']">
                         {user?.player_name || "User"}
                       </p>
-                      <p className="text-primary text-xs font-['Inter_Tight']">
+                      <p className="text-primary text-xs font-['Inter']">
                         {user?.position || "Player"}
                       </p>
                     </div>
@@ -380,19 +380,19 @@ const PlayerLayout = ({ children }) => {
                 {userMenuOpen && (
                   <div className="absolute right-0 top-full mt-2 w-56 lg:w-64 bg-[#262626] border border-[#343434] rounded-xl lg:rounded-2xl shadow-2xl z-50 backdrop-blur-sm">
                     <div className="p-3 lg:p-4 border-b border-[#343434]">
-                      <p className="text-white font-semibold text-sm truncate font-['Inter_Tight']">
+                      <p className="text-white font-semibold text-sm truncate font-['Inter']">
                         {user?.player_name || "User"}
                       </p>
-                      <p className="text-[#B0AFAF] text-xs mt-1 truncate font-['Inter_Tight']">
+                      <p className="text-[#B0AFAF] text-xs mt-1 truncate font-['Inter']">
                         {user?.email}
                       </p>
                     </div>
                     <div className="p-1 lg:p-2">
-                      <button className="flex items-center space-x-2 w-full px-2 lg:px-3 py-2 lg:py-3 text-xs lg:text-sm text-[#B0AFAF] hover:text-white hover:bg-[#343434] rounded-lg lg:rounded-xl transition-all duration-300 font-['Inter_Tight']">
+                      <button className="flex items-center space-x-2 w-full px-2 lg:px-3 py-2 lg:py-3 text-xs lg:text-sm text-[#B0AFAF] hover:text-white hover:bg-[#343434] rounded-lg lg:rounded-xl transition-all duration-300 font-['Inter']">
                         <User className="w-3 h-3 lg:w-4 lg:h-4" />
                         <span>View Profile</span>
                       </button>
-                      <button className="flex items-center space-x-2 w-full px-2 lg:px-3 py-2 lg:py-3 text-xs lg:text-sm text-[#B0AFAF] hover:text-white hover:bg-[#343434] rounded-lg lg:rounded-xl transition-all duration-300 font-['Inter_Tight']">
+                      <button className="flex items-center space-x-2 w-full px-2 lg:px-3 py-2 lg:py-3 text-xs lg:text-sm text-[#B0AFAF] hover:text-white hover:bg-[#343434] rounded-lg lg:rounded-xl transition-all duration-300 font-['Inter']">
                         <Settings className="w-3 h-3 lg:w-4 lg:h-4" />
                         <span>Settings</span>
                       </button>
@@ -400,7 +400,7 @@ const PlayerLayout = ({ children }) => {
                     <div className="p-1 lg:p-2 border-t border-[#343434]">
                       <button
                         onClick={handleLogout}
-                        className="flex items-center space-x-2 w-full px-2 lg:px-3 py-2 lg:py-3 text-xs lg:text-sm text-[#FF6B6B] hover:bg-[#FF6B6B]/10 rounded-lg lg:rounded-xl transition-all duration-300 font-['Inter_Tight']"
+                        className="flex items-center space-x-2 w-full px-2 lg:px-3 py-2 lg:py-3 text-xs lg:text-sm text-[#FF6B6B] hover:bg-[#FF6B6B]/10 rounded-lg lg:rounded-xl transition-all duration-300 font-['Inter']"
                       >
                         <LogOut className="w-3 h-3 lg:w-4 lg:h-4" />
                         <span>Sign out</span>
