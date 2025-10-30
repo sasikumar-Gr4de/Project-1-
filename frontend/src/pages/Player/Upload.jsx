@@ -32,6 +32,8 @@ import {
   Palette,
 } from "lucide-react";
 
+import { useDataStore } from "store/dataStore";
+
 const Upload = () => {
   const { fetchDashboard } = useUserStore();
   const [uploadData, setUploadData] = useState({
@@ -49,6 +51,8 @@ const Upload = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadResult, setUploadResult] = useState(null);
+
+  const { uploadPlayerData } = useDataStore();
 
   const handleInputChange = (field, value) => {
     setUploadData((prev) => ({ ...prev, [field]: value }));
@@ -99,16 +103,12 @@ const Upload = () => {
         });
       }, 500);
 
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
+      const result = await uploadPlayerData(formData);
 
       clearInterval(interval);
       setUploadProgress(100);
 
-      if (response.ok) {
-        const result = await response.json();
+      if (result.success) {
         setUploadResult({ success: true, data: result.data });
 
         // Reset form
@@ -127,8 +127,7 @@ const Upload = () => {
           fetchDashboard();
         }, 1000);
       } else {
-        const error = await response.json();
-        setUploadResult({ success: false, error: error.message });
+        setUploadResult({ success: false, error: result.message });
       }
     } catch (error) {
       setUploadResult({ success: false, error: error.message });
@@ -153,12 +152,13 @@ const Upload = () => {
     "Goalkeeper",
     "Center Back",
     "Full Back",
+    "Wing Back",
     "Defensive Midfielder",
     "Central Midfielder",
     "Attacking Midfielder",
     "Winger",
-    "Forward",
     "Striker",
+    "Forward",
   ];
 
   // Jersey color options
