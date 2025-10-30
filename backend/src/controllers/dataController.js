@@ -4,7 +4,6 @@ import {
   getAllPlayerDataByPlayerId,
 } from "../services/dataService.js";
 import { RESPONSES } from "../utils/messages.js";
-import { supabase } from "../config/supabase.config.js";
 
 // Create new player data => trigger analysis workflow
 export const createData = async (req, res) => {
