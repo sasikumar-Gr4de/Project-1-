@@ -43,6 +43,7 @@ import {
   TIER_PLANS,
 } from "@/utils/constants";
 import { calculateAge } from "@/utils/helper.utils";
+import { useToast } from "@/contexts/ToastContext";
 
 const Profile = () => {
   const { user, updateProfile } = useAuthStore();
@@ -55,6 +56,7 @@ const Profile = () => {
     averageScore: 0,
     progress: 0,
   });
+  const { toast } = useToast();
 
   useEffect(() => {
     if (user) {
@@ -107,10 +109,20 @@ const Profile = () => {
     setIsLoading(true);
     try {
       await updateProfile(formData);
+      toast({
+        title: "Success",
+        description: "Profile updated successfully",
+        variant: "success",
+      });
       setIsEditing(false);
       fetchDashboard();
     } catch (error) {
       console.error("Failed to update profile:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update profile",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }

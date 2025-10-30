@@ -1,4 +1,3 @@
-import e from "express";
 import { supabase } from "../config/supabase.config.js";
 import { PLAYER_DATA_STATUS } from "../utils/constants.js";
 
