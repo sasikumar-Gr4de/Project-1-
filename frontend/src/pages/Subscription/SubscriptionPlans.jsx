@@ -189,7 +189,7 @@ const SubscriptionPlans = () => {
 
                   {/* Price Section */}
                   <div className="flex items-baseline justify-center mb-3">
-                    <span className="text-5xl font-bold text-white font-['Orbitron']">
+                    <span className="text-5xl font-bold text-primary font-['Orbitron']">
                       {plan.price}
                     </span>
                     <span className="ml-2 text-xl text-[#B0AFAF] font-['Orbitron']">
@@ -198,7 +198,7 @@ const SubscriptionPlans = () => {
                   </div>
 
                   {/* Description */}
-                  <p className="text-[#B0AFAF] text-sm font-['Orbitron'] px-4">
+                  <p className="text-[#B0AFAF] text-sm px-4">
                     {plan.description}
                   </p>
                 </div>
@@ -207,7 +207,7 @@ const SubscriptionPlans = () => {
               <CardContent className="flex flex-col flex-1 space-y-6">
                 {/* Features List */}
                 <div className="space-y-4 flex-1">
-                  <h4 className="text-sm font-semibold text-white uppercase tracking-wide font-['Orbitron'] text-center">
+                  <h4 className="text-sm font-semibold text-white uppercase tracking-wide text-center">
                     What's Included
                   </h4>
                   <ul className="space-y-3">
@@ -310,23 +310,15 @@ const SubscriptionPlans = () => {
                   </thead>
                   <tbody>
                     <tr className="border-b border-[#343434]">
-                      <td className="py-4 text-[#B0AFAF] font-['Orbitron']">
-                        Monthly Reports
-                      </td>
-                      <td className="text-center py-4 text-white font-['Orbitron']">
-                        5
-                      </td>
-                      <td className="text-center py-4 text-white font-['Orbitron']">
-                        20
-                      </td>
-                      <td className="text-center py-4 text-white font-['Orbitron']">
+                      <td className="py-4 text-[#B0AFAF] ">Monthly Reports</td>
+                      <td className="text-center py-4 text-white ">5</td>
+                      <td className="text-center py-4 text-white ">20</td>
+                      <td className="text-center py-4 text-white ">
                         Unlimited
                       </td>
                     </tr>
                     <tr className="border-b border-[#343434]">
-                      <td className="py-4 text-[#B0AFAF] font-['Orbitron']">
-                        Video Analysis
-                      </td>
+                      <td className="py-4 text-[#B0AFAF] ">Video Analysis</td>
                       <td className="text-center py-4">
                         <div className="h-2 w-2 bg-[#B0AFAF] rounded-full mx-auto" />
                       </td>
@@ -338,7 +330,7 @@ const SubscriptionPlans = () => {
                       </td>
                     </tr>
                     <tr className="border-b border-[#343434]">
-                      <td className="py-4 text-[#B0AFAF] font-['Orbitron']">
+                      <td className="py-4 text-[#B0AFAF] ">
                         Advanced Analytics
                       </td>
                       <td className="text-center py-4">
@@ -352,16 +344,14 @@ const SubscriptionPlans = () => {
                       </td>
                     </tr>
                     <tr className="border-b border-[#343434]">
-                      <td className="py-4 text-[#B0AFAF] font-['Orbitron']">
-                        Support
-                      </td>
-                      <td className="text-center py-4 text-white font-['Orbitron'] text-sm">
+                      <td className="py-4 text-[#B0AFAF] ">Support</td>
+                      <td className="text-center py-4 text-white  text-sm">
                         Email
                       </td>
-                      <td className="text-center py-4 text-white font-['Orbitron'] text-sm">
+                      <td className="text-center py-4 text-white  text-sm">
                         Priority
                       </td>
-                      <td className="text-center py-4 text-white font-['Orbitron'] text-sm">
+                      <td className="text-center py-4 text-white  text-sm">
                         24/7 Phone
                       </td>
                     </tr>
