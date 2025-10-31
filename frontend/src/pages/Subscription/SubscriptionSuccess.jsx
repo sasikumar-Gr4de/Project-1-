@@ -17,23 +17,24 @@ import {
 const SubscriptionSuccess = () => {
   const navigate = useNavigate();
   const { syncSubscription, subscription } = useUserStore();
-  const { showToast } = useToast();
+  const { toast } = useToast();
 
   useEffect(() => {
     const initialize = async () => {
       try {
         await syncSubscription();
-        showToast(
-          "Welcome to Pro! Your subscription is now active.",
-          "success"
-        );
+        toast({
+          title: "Welcome to update your plan!",
+          description: " Your subscription is now active.",
+          variant: "success",
+        });
       } catch (error) {
         console.error("Failed to sync subscription:", error);
       }
     };
 
     initialize();
-  }, [syncSubscription, showToast]);
+  }, [syncSubscription, toast]);
 
   const getPlanIcon = (planType) => {
     switch (planType) {
@@ -107,7 +108,7 @@ const SubscriptionSuccess = () => {
               <h3 className="font-semibold text-primary mb-3 font-['Orbitron']">
                 What's next?
               </h3>
-              <ul className="text-sm text-[#B0AFAF] space-y-2 font-['Orbitron']">
+              <ul className="text-sm text-[#B0AFAF] space-y-2">
                 <li className="flex items-center">
                   <Zap className="w-4 h-4 text-primary mr-2" />
                   Explore your enhanced dashboard
