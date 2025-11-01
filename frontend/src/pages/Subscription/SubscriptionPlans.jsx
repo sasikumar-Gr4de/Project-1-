@@ -9,7 +9,7 @@ import { Loader2, Check, Zap, Target, Award, Sparkles } from "lucide-react";
 
 const SubscriptionPlans = () => {
   const { user, subscription, fetchSubscription } = useUserStore();
-  const { showToast } = useToast();
+  const { toast } = useToast();
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -26,7 +26,11 @@ const SubscriptionPlans = () => {
         setPlans(response.data);
       }
     } catch (error) {
-      showToast("Failed to load plans", "error");
+      toast({
+        title: "Error",
+        description: "Failed to load plans",
+        variant: "destructive",
+      });
     }
   };
 
@@ -43,7 +47,11 @@ const SubscriptionPlans = () => {
         window.location.href = response.data.url;
       }
     } catch (error) {
-      showToast("Failed to create checkout session", "error");
+      toast({
+        title: "Error",
+        description: "Failed to create checkout session",
+        variant: "destructive",
+      });
       setSelectedPlan(null);
     } finally {
       setLoading(false);
