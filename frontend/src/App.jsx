@@ -31,6 +31,7 @@ import Landing from "@/pages/Landing";
 import { ToastProvider } from "@/contexts/ToastContext";
 import SubscriptionPlans from "@/pages/Subscription/SubscriptionPlans";
 import SubscriptionSuccess from "@/pages/Subscription/SubscriptionSuccess";
+import ContentManager from "@/pages/Admin/ContentManager";
 
 function App() {
   const { isAuthenticated, user, isInitialized, initializeAuth } =
@@ -151,6 +152,15 @@ function App() {
           <Route
             path="/subscription/success"
             element={<SubscriptionSuccess />}
+          />
+
+          <Route
+            path="/admin/contnet"
+            element={
+              <ProtectedRoute>
+                <ContentManager />
+              </ProtectedRoute>
+            }
           />
 
           {/* Fallback Routes */}
