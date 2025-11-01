@@ -29,7 +29,7 @@ const GallerySection = ({ content }) => {
       description: "Identifying and nurturing young football talent",
     },
   ];
-
+  console.log(content);
   const galleryImages = content?.gallerySection?.images || defaultImages;
 
   return (
@@ -48,7 +48,7 @@ const GallerySection = ({ content }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {galleryImages.map((image) => (
             <div
-              key={image.id}
+              key={`gallery-image-${image.title}`}
               className="group bg-[#262626] border border-[#343434] rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105 hover:border-primary/30"
             >
               <div className="aspect-square overflow-hidden relative">

@@ -70,12 +70,12 @@ const Landing = () => {
                 >
                   How It Works
                 </a>
-                <a
+                {/* <a
                   href="#pricing"
                   className="text-[#B0AFAF] hover:text-white transition-colors font-['Orbitron']"
                 >
                   Pricing
-                </a>
+                </a> */}
                 <a
                   href="#about"
                   className="text-[#B0AFAF] hover:text-white transition-colors font-['Orbitron']"
@@ -112,7 +112,7 @@ const Landing = () => {
         <GallerySection content={content} />
 
         {/* Pricing Section */}
-        <PricingSection content={content} />
+        {/* <PricingSection content={content} /> */}
 
         {/* CTA Section */}
         <CTASection content={content} />
