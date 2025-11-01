@@ -44,7 +44,7 @@ export const createCheckoutSession = async (req, res) => {
         })
         .eq("id", req.user.id);
     }
-
+    console.log("Create session", req.user);
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       payment_method_types: ["card"],
@@ -59,6 +59,11 @@ export const createCheckoutSession = async (req, res) => {
         `${process.env.CLIENT_URL}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl || `${process.env.CLIENT_URL}/subscription`,
       customer: customerId,
+      subscription_data: {
+        metadata: {
+          userId: req.user.id,
+        },
+      },
       metadata: {
         userId: req.user.id,
       },
@@ -340,14 +345,17 @@ export const handleWebhook = async (req, res) => {
 
 // Helper functions
 async function handleSubscriptionUpdate(subscription) {
+  let userId = subscription.metadata?.userId;
   const { data: existing, error } = await supabase
     .from("subscriptions")
     .select("*")
     .eq("stripe_subscription_id", subscription.id)
     .single();
 
+  console.log(subscription);
+
   const subscriptionData = {
-    user_id: subscription.metadata?.userId,
+    user_id: userId,
     stripe_subscription_id: subscription.id,
     stripe_customer_id: subscription.customer,
     plan_type: mapPriceToPlan(subscription.items.data[0].price.id),
@@ -370,7 +378,10 @@ async function handleSubscriptionUpdate(subscription) {
   } else {
     subscriptionData.created_at = new Date().toISOString();
     console.log("new subscription", subscriptionData);
-    await supabase.from("subscriptions").insert(subscriptionData);
+    const { data, error } = await supabase
+      .from("subscriptions")
+      .insert(subscriptionData);
+    console.log(error);
   }
 
   // Update user tier if subscription is active

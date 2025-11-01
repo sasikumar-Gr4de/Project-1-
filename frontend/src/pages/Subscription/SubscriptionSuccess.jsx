@@ -34,7 +34,7 @@ const SubscriptionSuccess = () => {
     };
 
     initialize();
-  }, [syncSubscription, toast]);
+  }, [syncSubscription]);
 
   const getPlanIcon = (planType) => {
     switch (planType) {

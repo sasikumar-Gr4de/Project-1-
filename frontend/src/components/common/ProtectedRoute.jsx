@@ -5,7 +5,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import LoadingSpinner from "./LoadingSpinner";
 
 const ProtectedRoute = ({ children, requireOnboarding = false }) => {
-  const { isAuthenticated, user, isInitialized, initializeAuth } =
+  const { isAuthenticated, user, isInitialized, initializeAuth, logout } =
     useAuthStore();
   const location = useLocation();
   const [isChecking, setIsChecking] = useState(true);
@@ -25,6 +25,8 @@ const ProtectedRoute = ({ children, requireOnboarding = false }) => {
   if (isChecking || !isInitialized) {
     return <LoadingSpinner />;
   }
+
+  if (localStorage.getItem("auth-token") === null) logout();
 
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
