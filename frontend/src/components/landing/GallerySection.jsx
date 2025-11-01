@@ -29,7 +29,7 @@ const GallerySection = ({ content }) => {
       description: "Identifying and nurturing young football talent",
     },
   ];
-  // console.log(content);
+  console.log(content.gallerySection);
   const galleryImages = content?.gallerySection?.images || defaultImages;
   // const galleryImages = defaultImages;
 
@@ -54,8 +54,8 @@ const GallerySection = ({ content }) => {
             >
               <div className="aspect-square overflow-hidden relative">
                 <img
-                  src={image.src}
-                  alt={image.alt}
+                  src={image.imageUrl}
+                  alt={image.title}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
