@@ -184,7 +184,7 @@ const Onboarding = () => {
                   Academy/Club
                 </label>
                 <div className="relative">
-                  <Building className="absolute left-3 top-2 h-4 w-4 text-[#E1E5DD] z-10" />
+                  <Building className="absolute left-3 top-3 h-4 w-4 text-[#E1E5DD] z-10" />
                   <Select
                     value={formData.academy}
                     onValueChange={(value) => handleChange("academy", value)}
@@ -213,7 +213,7 @@ const Onboarding = () => {
                   Country
                 </label>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-2 h-4 w-4 text-[#E1E5DD] z-10" />
+                  <MapPin className="absolute left-3 top-3 h-4 w-4 text-[#E1E5DD] z-10" />
                   <Select
                     value={formData.country}
                     onValueChange={(value) => handleChange("country", value)}
