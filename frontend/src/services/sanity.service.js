@@ -7,7 +7,7 @@ const sanityClient = createClient({
   dataset: import.meta.env.VITE_SANITY_DATASET || "production",
   useCdn: true,
   apiVersion: "2024-01-01",
-  //   token: import.meta.env.VITE_SANITY_TOKEN, // Optional: for private datasets
+  //   token: import.meta.env.VITE_SANITY_TOKEN,
 });
 
 // Initialize image URL builder
@@ -20,12 +20,16 @@ export const sanityService = {
   async getLandingPageContent() {
     try {
       const query = `*[_type == "landingPage"][0]{
+        _id,
+        _rev,
+        title,
         heroSection {
           tagline,
           mainHeading,
           highlightedText,
           subheading,
-          demoVideoUrl
+          demoVideoUrl,
+          ctaButtonText
         },
         aboutSection {
           heading,
@@ -150,17 +154,157 @@ export const sanityService = {
   },
 
   /**
+   * Update landing page content
+   */
+  async updateLandingPageContent(newContent) {
+    try {
+      // First, get the document ID
+      const existingDoc = await sanityClient.fetch(
+        '*[_type == "landingPage"][0]{_id, _rev}'
+      );
+
+      if (existingDoc?._id) {
+        // Update existing document
+        const result = await sanityClient
+          .patch(existingDoc._id)
+          .set({
+            ...newContent,
+            _updatedAt: new Date().toISOString(),
+          })
+          .commit();
+
+        console.log("Content updated successfully:", result);
+        return result;
+      } else {
+        // Create new document
+        const result = await sanityClient.create({
+          _type: "landingPage",
+          ...newContent,
+          _createdAt: new Date().toISOString(),
+          _updatedAt: new Date().toISOString(),
+        });
+
+        console.log("Content created successfully:", result);
+        return result;
+      }
+    } catch (error) {
+      console.error("Error updating Sanity content:", error);
+      throw new Error(`Failed to update content: ${error.message}`);
+    }
+  },
+
+  /**
+   * Update specific section
+   */
+  async updateSection(sectionName, sectionData) {
+    try {
+      const existingDoc = await sanityClient.fetch(
+        '*[_type == "landingPage"][0]{_id}'
+      );
+
+      if (existingDoc?._id) {
+        const result = await sanityClient
+          .patch(existingDoc._id)
+          .set({
+            [sectionName]: sectionData,
+            _updatedAt: new Date().toISOString(),
+          })
+          .commit();
+
+        return result;
+      } else {
+        throw new Error("No landing page document found to update");
+      }
+    } catch (error) {
+      console.error(`Error updating ${sectionName}:`, error);
+      throw error;
+    }
+  },
+
+  /**
+   * Upload image to Sanity
+   */
+  async uploadImage(file) {
+    try {
+      console.log("Uploading image:", file.name);
+
+      const result = await sanityClient.assets.upload("image", file, {
+        contentType: file.type,
+        filename: file.name,
+      });
+
+      console.log("Image uploaded successfully:", result);
+      return result;
+    } catch (error) {
+      console.error("Error uploading image to Sanity:", error);
+      throw new Error(`Failed to upload image: ${error.message}`);
+    }
+  },
+
+  /**
+   * Delete image from Sanity
+   */
+  async deleteImage(imageId) {
+    try {
+      const result = await sanityClient.delete(imageId);
+      console.log("Image deleted successfully:", result);
+      return result;
+    } catch (error) {
+      console.error("Error deleting image from Sanity:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Delete entire landing page content
+   */
+  async deleteLandingPageContent() {
+    try {
+      const existingDoc = await sanityClient.fetch(
+        '*[_type == "landingPage"][0]{_id}'
+      );
+
+      if (existingDoc?._id) {
+        const result = await sanityClient.delete(existingDoc._id);
+        console.log("Landing page content deleted successfully");
+        return result;
+      }
+
+      console.log("No landing page content found to delete");
+      return null;
+    } catch (error) {
+      console.error("Error deleting Sanity content:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Reset to default content
+   */
+  async resetToDefault() {
+    try {
+      const defaultContent = this.getDefaultContent();
+      return await this.updateLandingPageContent(defaultContent);
+    } catch (error) {
+      console.error("Error resetting to default content:", error);
+      throw error;
+    }
+  },
+
+  /**
    * Get default content as fallback
    */
   getDefaultContent() {
     return {
+      title: "GR4DE Landing Page",
       heroSection: {
         tagline: "AI-Powered Football Analytics",
         mainHeading: "Measure Football Talent",
         highlightedText: "Objectively",
         subheading:
           "GR4DE transforms raw match data into actionable insights, combining data science, motion tracking, and elite benchmarks to standardize talent measurement.",
-        demoVideoUrl: null,
+        demoVideoUrl: "",
+        ctaButtonText: "Start Free Trial",
       },
       aboutSection: {
         heading: "About GR4DE",
@@ -174,9 +318,9 @@ export const sanityService = {
           "Transform raw match data into actionable insights using AI-driven performance intelligence.",
       },
       featuresSection: {
-        heading: "How GR4DE Works",
+        heading: "Powerful Features",
         subheading:
-          "Our AI-driven platform combines multiple data sources to deliver comprehensive performance insights",
+          "Everything you need to measure, analyze, and develop football talent with precision",
         features: [
           {
             title: "Data Analytics",
@@ -320,27 +464,48 @@ export const sanityService = {
       return {
         healthy: true,
         message: `Successfully connected to Sanity. Found ${count} landing page documents.`,
+        count: count,
       };
     } catch (error) {
       return {
         healthy: false,
         message: `Failed to connect to Sanity: ${error.message}`,
+        error: error.message,
       };
     }
   },
 
   /**
-   * Subscribe to real-time updates (optional)
+   * Subscribe to real-time updates
    */
   subscribeToUpdates(callback) {
-    const subscription = sanityClient
-      .listen('*[_type == "landingPage"]')
-      .subscribe((update) => {
-        console.log("Sanity update received:", update);
-        callback(update);
-      });
+    try {
+      const subscription = sanityClient
+        .listen('*[_type == "landingPage"]')
+        .subscribe((update) => {
+          console.log("Sanity update received:", update);
+          if (callback) callback(update);
+        });
 
-    return subscription;
+      return subscription;
+    } catch (error) {
+      console.error("Error setting up subscription:", error);
+      return null;
+    }
+  },
+
+  /**
+   * Get content history (revisions)
+   */
+  async getContentHistory() {
+    try {
+      const query = `*[_type == "landingPage"] | order(_updatedAt desc)`;
+      const history = await sanityClient.fetch(query);
+      return history;
+    } catch (error) {
+      console.error("Error fetching content history:", error);
+      return [];
+    }
   },
 };
 
