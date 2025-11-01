@@ -1,20 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useUserStore } from "@/store/userStore";
 import { subscriptionService } from "@/services/subscription.service";
 import { useToast } from "@/contexts/ToastContext";
-import {
-  Loader2,
-  Check,
-  Crown,
-  Star,
-  Zap,
-  Target,
-  Award,
-  Sparkles,
-} from "lucide-react";
+import { Loader2, Check, Zap, Target, Award, Sparkles } from "lucide-react";
 
 const SubscriptionPlans = () => {
   const { user, subscription, fetchSubscription } = useUserStore();

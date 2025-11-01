@@ -362,12 +362,14 @@ async function handleSubscriptionUpdate(subscription) {
   };
 
   if (existing) {
+    console.log("existing subscription", subscriptionData);
     await supabase
       .from("subscriptions")
       .update(subscriptionData)
       .eq("id", existing.id);
   } else {
     subscriptionData.created_at = new Date().toISOString();
+    console.log("new subscription", subscriptionData);
     await supabase.from("subscriptions").insert(subscriptionData);
   }
 
