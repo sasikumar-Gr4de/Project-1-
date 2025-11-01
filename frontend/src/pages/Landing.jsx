@@ -7,7 +7,7 @@ import { sanityService } from "@/services/sanity.service";
 import HeroSection from "@/components/landing/HeroSection";
 import HowItWorksSection from "@/components/landing/HowItWorksSection";
 import TestimonialsSection from "@/components/landing/TestimonialsSection";
-import PricingSection from "@/components/landing/PricingSection";
+// import PricingSection from "@/components/landing/PricingSection";
 
 // Import existing sections (to be updated with CMS)
 import AboutSection from "@/components/landing/AboutSection";
@@ -36,8 +36,13 @@ const Landing = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0F0F0E] flex items-center justify-center">
-        <div className="text-white">Loading...</div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">
+            Loading GR4DE Platform...
+          </p>
+        </div>
       </div>
     );
   }

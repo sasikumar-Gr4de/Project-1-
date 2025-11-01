@@ -370,7 +370,7 @@ const Upload = () => {
                     Position
                   </label>
                   <div className="relative">
-                    <MapPin className="absolute left-3 top-2 h-4 w-4 text-[#B0AFAF] z-10" />
+                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-[#B0AFAF] z-10" />
                     <Select
                       value={uploadData.position}
                       onValueChange={(value) =>
@@ -401,7 +401,7 @@ const Upload = () => {
                     Your Jersey Color
                   </label>
                   <div className="relative">
-                    <Palette className="absolute left-3 top-2 h-4 w-4 text-[#B0AFAF] z-10" />
+                    <Palette className="absolute left-3 top-3 h-4 w-4 text-[#B0AFAF] z-10" />
                     <Select
                       value={uploadData.jersey_color}
                       onValueChange={(value) =>
@@ -440,7 +440,7 @@ const Upload = () => {
                     Opponent Jersey Color
                   </label>
                   <div className="relative">
-                    <Palette className="absolute left-3 top-2 h-4 w-4 text-[#B0AFAF] z-10" />
+                    <Palette className="absolute left-3 top-3 h-4 w-4 text-[#B0AFAF] z-10" />
                     <Select
                       value={uploadData.opponent_jersey_color}
                       onValueChange={(value) =>

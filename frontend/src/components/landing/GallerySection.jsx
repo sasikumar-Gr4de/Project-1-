@@ -29,8 +29,9 @@ const GallerySection = ({ content }) => {
       description: "Identifying and nurturing young football talent",
     },
   ];
-  console.log(content);
+  // console.log(content);
   const galleryImages = content?.gallerySection?.images || defaultImages;
+  // const galleryImages = defaultImages;
 
   return (
     <section className="py-16 px-4 bg-[#1A1A1A]">
