@@ -162,11 +162,11 @@ const Profile = () => {
   const getTierBadgeColor = (tier) => {
     switch (tier) {
       case TIER_PLANS.ELITE:
-        return "bg-linear-to-r` from-[#FFD700] to-[#FFA500] text-[#0F0F0E]";
+        return "bg-linear-to-r` from-[#FFD700] to-[#FFA500] text-purple";
       case TIER_PLANS.PRO:
-        return "bg-linear-to-r` from-primary to-[#94D44A] text-[#0F0F0E]";
+        return "bg-linear-to-r` from-primary to-[#94D44A] text-blue";
       case TIER_PLANS.BASIC:
-        return "bg-linear-to-r` from-[#60A5FA] to-[#3B82F6] text-white";
+        return "bg-linear-to-r` from-[#60A5FA] to-[#3B82F6] text-green";
       default:
         return "bg-[#343434] text-white";
     }
