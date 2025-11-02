@@ -1,122 +1,165 @@
+// backend/src/controllers/adminController.js
+import { adminService } from "../services/adminService.js";
 import { RESPONSES } from "../utils/messages.js";
-import { supabase } from "../config/supabase.config.js";
 
-/**
- * Get processing queue
- */
-export const getQueue = async (req, res) => {
-  try {
-    const { status, page = 1, limit = 10 } = req.query;
-    const start = (page - 1) * limit;
-    const end = start + limit - 1;
-
-    let query = supabase
-      .from("processing_queue")
-      .select(
-        `
-        *,
-        player_data:player_data_id (
-          user_id,
-          match_date,
-          notes,
-          user:user_id (
-            player_name,
-            position,
-            academy
-          )
-        )
-      `,
-        { count: "exact" }
-      )
-      .order("created_at", { ascending: false })
-      .range(start, end);
-
-    if (status && status !== "all") {
-      query = query.eq("status", status);
-    }
-
-    const { data, count, error } = await query;
-
-    if (error) throw error;
-
-    res.json(
-      RESPONSES.SUCCESS("Queue fetched", {
-        queue: data,
-        pagination: {
-          page: parseInt(page),
-          limit: parseInt(limit),
-          total: count,
-          totalPages: Math.ceil(count / limit),
-        },
-      })
-    );
-  } catch (error) {
-    console.error("Get queue error:", error);
-    res.status(500).json(RESPONSES.SERVER_ERROR("Failed to fetch queue"));
-  }
-};
-
-/**
- * Get system metrics
- */
+// Get system metrics
 export const getSystemMetrics = async (req, res) => {
   try {
-    // Get total users
-    const { count: totalUsers } = await supabase
-      .from("users")
-      .select("*", { count: "exact", head: true });
-
-    // Get total reports
-    const { count: totalReports } = await supabase
-      .from("reports")
-      .select("*", { count: "exact", head: true });
-
-    // Get queue stats
-    const { data: queueStats } = await supabase
-      .from("processing_queue")
-      .select("status")
-      .in("status", ["pending", "processing", "completed", "failed"]);
-
-    const metrics = {
-      totalUsers: totalUsers || 0,
-      totalReports: totalReports || 0,
-      queue: {
-        pending: queueStats?.filter((q) => q.status === "pending").length || 0,
-        processing:
-          queueStats?.filter((q) => q.status === "processing").length || 0,
-        completed:
-          queueStats?.filter((q) => q.status === "completed").length || 0,
-        failed: queueStats?.filter((q) => q.status === "failed").length || 0,
-      },
-      storage: {
-        // TODO: Add S3 storage metrics
-        used: "0 GB",
-        available: "0 GB",
-      },
-    };
-
-    res.json(RESPONSES.SUCCESS("Metrics fetched", metrics));
+    const metrics = await adminService.getSystemMetrics();
+    res.json(RESPONSES.SUCCESS("System metrics fetched successfully", metrics));
   } catch (error) {
-    console.error("Get metrics error:", error);
-    res.status(500).json(RESPONSES.SERVER_ERROR("Failed to fetch metrics"));
+    res
+      .status(500)
+      .json(RESPONSES.SERVER_ERROR("Failed to fetch system metrics"));
   }
 };
 
-/**
- * Update scoring weights
- */
-export const updateScoringWeights = async (req, res) => {
+// Queue management
+export const getProcessingQueue = async (req, res) => {
   try {
-    const { weights } = req.body;
-
-    // TODO: Store scoring weights in database or config
-    // This would update your scoring engine configuration
-
-    res.json(RESPONSES.SUCCESS("Scoring weights updated", { weights }));
+    const { status, page = 1, limit = 50 } = req.query;
+    const queue = await adminService.getProcessingQueue({
+      status,
+      page: parseInt(page),
+      limit: parseInt(limit),
+    });
+    res.json(RESPONSES.SUCCESS("Processing queue fetched successfully", queue));
   } catch (error) {
-    console.error("Update scoring weights error:", error);
     res
       .status(500)
-      .json(RESPONSES.SERVER_ERROR("Failed to update scoring weights"));
+      .json(RESPONSES.SERVER_ERROR("Failed to fetch processing queue"));
+  }
+};
+
+export const retryJob = async (req, res) => {
+  try {
+    const { jobId } = req.params;
+    const result = await adminService.retryJob(jobId);
+    res.json(RESPONSES.SUCCESS("Job retry initiated successfully", result));
+  } catch (error) {
+    res.status(500).json(RESPONSES.SERVER_ERROR("Failed to retry job"));
+  }
+};
+
+export const deleteJob = async (req, res) => {
+  try {
+    const { jobId } = req.params;
+    await adminService.deleteJob(jobId);
+    res.json(RESPONSES.SUCCESS("Job deleted successfully"));
+  } catch (error) {
+    res.status(500).json(RESPONSES.SERVER_ERROR("Failed to delete job"));
+  }
+};
+
+// User management
+export const getUsers = async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 20,
+      search,
+      status,
+      role,
+      sortBy = "created_at",
+      sortOrder = "desc",
+    } = req.query;
+
+    const users = await adminService.getUsers({
+      page: parseInt(page),
+      limit: parseInt(limit),
+      search,
+      status,
+      role,
+      sortBy,
+      sortOrder,
+    });
+
+    res.json(RESPONSES.SUCCESS("Users fetched successfully", users));
+  } catch (error) {
+    res.status(500).json(RESPONSES.SERVER_ERROR("Failed to fetch users"));
+  }
+};
+
+export const updateUserStatus = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { status } = req.body;
+
+    const user = await adminService.updateUserStatus(userId, status);
+    res.json(RESPONSES.SUCCESS("User status updated successfully", user));
+  } catch (error) {
+    res
+      .status(500)
+      .json(RESPONSES.SERVER_ERROR("Failed to update user status"));
+  }
+};
+
+// Report management
+export const getReports = async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 20,
+      search,
+      status,
+      userId,
+      dateFrom,
+      dateTo,
+      sortBy = "created_at",
+      sortOrder = "desc",
+    } = req.query;
+
+    const reports = await adminService.getReports({
+      page: parseInt(page),
+      limit: parseInt(limit),
+      search,
+      status,
+      userId,
+      dateFrom,
+      dateTo,
+      sortBy,
+      sortOrder,
+    });
+
+    res.json(RESPONSES.SUCCESS("Reports fetched successfully", reports));
+  } catch (error) {
+    res.status(500).json(RESPONSES.SERVER_ERROR("Failed to fetch reports"));
+  }
+};
+
+export const deleteReport = async (req, res) => {
+  try {
+    const { reportId } = req.params;
+    await adminService.deleteReport(reportId);
+    res.json(RESPONSES.SUCCESS("Report deleted successfully"));
+  } catch (error) {
+    res.status(500).json(RESPONSES.SERVER_ERROR("Failed to delete report"));
+  }
+};
+
+export const regenerateReport = async (req, res) => {
+  try {
+    const { reportId } = req.params;
+    const result = await adminService.regenerateReport(reportId);
+    res.json(
+      RESPONSES.SUCCESS("Report regeneration initiated successfully", result)
+    );
+  } catch (error) {
+    res.status(500).json(RESPONSES.SERVER_ERROR("Failed to regenerate report"));
+  }
+};
+
+// System analytics
+export const getSystemAnalytics = async (req, res) => {
+  try {
+    const { dateRange = "7d" } = req.query;
+    const analytics = await adminService.getSystemAnalytics(dateRange);
+    res.json(
+      RESPONSES.SUCCESS("System analytics fetched successfully", analytics)
+    );
+  } catch (error) {
+    res
+      .status(500)
+      .json(RESPONSES.SERVER_ERROR("Failed to fetch system analytics"));
   }
 };
