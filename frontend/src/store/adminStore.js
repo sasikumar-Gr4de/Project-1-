@@ -143,4 +143,16 @@ export const useAdminStore = create((set, get) => ({
       filters: { ...state.filters, ...newFilters },
     }));
   },
+
+  fetchSystemAnalytics: async (params = {}) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await adminService.getSystemAnalytics(params);
+      set({ analytics: response.data, isLoading: false });
+      return response;
+    } catch (error) {
+      set({ error: error.message, isLoading: false });
+      throw error;
+    }
+  },
 }));

@@ -25,6 +25,20 @@ export const UPLOAD_STATUS = {
   FAILED: "failed",
 };
 
+export const DATA_STATUS = {
+  UPLOADED: "uploaded",
+  PENDING: "pending",
+  PROCESSING: "processing",
+  COMPLETED: "completed",
+  FAILED: "failed",
+};
+
+export const REPORT_STATUS = {
+  GENERATING: "generating",
+  GENERATED: "generated",
+  FAILED: "failed",
+};
+
 // Football Positions
 export const FOOTBALL_POSITIONS = [
   "Goalkeeper",
@@ -110,11 +124,36 @@ export const NAV_ITEMS = {
     { name: "Profile", href: "/profile", icon: "User" },
   ],
   ADMIN: [
-    { name: "Dashboard", href: "/admin", icon: "LayoutDashboard" },
-    { name: "Users", href: "/admin/users", icon: "Users" },
-    { name: "Processing Queue", href: "/admin/queue", icon: "Clock" },
-    { name: "Reports", href: "/admin/reports", icon: "FileText" },
-    { name: "System", href: "/admin/system", icon: "Settings" },
+    {
+      name: "Dashboard",
+      href: "/admin/dashboard",
+      icon: "LayoutDashboard",
+      description: "System overview and metrics",
+    },
+    {
+      name: "Queue Management",
+      href: "/admin/queue",
+      icon: "Activity",
+      description: "Process pending analysis jobs",
+    },
+    {
+      name: "User Management",
+      href: "/admin/users",
+      icon: "Users",
+      description: "Manage players and accounts",
+    },
+    {
+      name: "Report Management",
+      href: "/admin/reports",
+      icon: "FileText",
+      description: "View and manage all reports",
+    },
+    {
+      name: "System Analytics",
+      href: "/admin/analytics",
+      icon: "BarChart3",
+      description: "Platform performance insights",
+    },
   ],
 };
 
