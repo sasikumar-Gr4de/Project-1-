@@ -1,161 +1,146 @@
-// adminStore.js
 import { create } from "zustand";
-import api from "@/services/base.api";
-
-// Create admin API methods using the axios instance
-const adminAPI = {
-  getSystemMetrics: () => api.get("/admin/metrics"),
-  getQueue: (status = "pending", page = 1, limit = 10) =>
-    api.get(`/admin/queue?status=${status}&page=${page}&limit=${limit}`),
-  getUsers: (page = 1, limit = 10) =>
-    api.get(`/admin/users?page=${page}&limit=${limit}`),
-  getReports: (page = 1, limit = 10) =>
-    api.get(`/admin/reports?page=${page}&limit=${limit}`),
-};
+import { adminService } from "@/services/admin.service";
 
 export const useAdminStore = create((set, get) => ({
   // State
   metrics: null,
-  queue: [],
-  users: [],
-  reports: [],
-  pagination: {
-    page: 1,
-    pageSize: 10,
-    total: 0,
-    totalPages: 0,
-  },
+  queue: { items: [], pagination: {} },
+  users: { items: [], pagination: {} },
+  reports: { items: [], pagination: {} },
   isLoading: false,
   error: null,
+  filters: {
+    status: "all",
+    dateRange: "7d",
+    search: "",
+  },
 
   // Actions
   setLoading: (loading) => set({ isLoading: loading }),
   setError: (error) => set({ error }),
   clearError: () => set({ error: null }),
 
-  // Get System Metrics
+  // System Metrics
   fetchSystemMetrics: async () => {
     set({ isLoading: true, error: null });
     try {
-      const response = await adminAPI.getSystemMetrics();
-      if (response.data.success) {
-        set({
-          metrics: response.data.data,
-          isLoading: false,
-        });
-        return response.data;
-      }
+      const response = await adminService.getSystemMetrics();
+      set({ metrics: response.data, isLoading: false });
+      return response.data;
     } catch (error) {
-      set({
-        error:
-          error.response?.data?.message || "Failed to fetch system metrics",
-        isLoading: false,
-      });
+      set({ error: error.message, isLoading: false });
       throw error;
     }
   },
 
-  // Get Queue Items
-  fetchQueue: async (status = "pending", page = 1, limit = 10) => {
+  // Queue Management
+  fetchQueue: async (filters = {}) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await adminAPI.getQueue(status, page, limit);
-      if (response.data.success) {
-        set({
-          queue: response.data.data.queue || [],
-          pagination: {
-            page: response.data.data.pagination?.page || page,
-            pageSize: response.data.data.pagination?.pageSize || limit,
-            total: response.data.data.pagination?.total || 0,
-            totalPages: response.data.data.pagination?.totalPages || 0,
-          },
-          isLoading: false,
-        });
-        return response.data;
-      }
+      const response = await adminService.getProcessingQueue(filters);
+      set({ queue: response.data, isLoading: false });
+      return response.data;
     } catch (error) {
-      set({
-        error: error.response?.data?.message || "Failed to fetch queue",
-        isLoading: false,
-      });
+      set({ error: error.message, isLoading: false });
       throw error;
     }
   },
 
-  // Get Users
-  fetchUsers: async (page = 1, limit = 10) => {
+  retryJob: async (jobId) => {
+    try {
+      await adminService.retryJob(jobId);
+      const queue = get().queue;
+      const updatedItems = queue.items.map((item) =>
+        item.id === jobId ? { ...item, status: "pending" } : item
+      );
+      set({ queue: { ...queue, items: updatedItems } });
+    } catch (error) {
+      set({ error: error.message });
+      throw error;
+    }
+  },
+
+  deleteJob: async (jobId) => {
+    try {
+      await adminService.deleteJob(jobId);
+      const queue = get().queue;
+      const updatedItems = queue.items.filter((item) => item.id !== jobId);
+      set({ queue: { ...queue, items: updatedItems } });
+    } catch (error) {
+      set({ error: error.message });
+      throw error;
+    }
+  },
+
+  // User Management
+  fetchUsers: async (params = {}) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await adminAPI.getUsers(page, limit);
-      if (response.data.success) {
-        set({
-          users: response.data.data.users || [],
-          pagination: {
-            page: response.data.data.pagination?.page || page,
-            pageSize: response.data.data.pagination?.pageSize || limit,
-            total: response.data.data.pagination?.total || 0,
-            totalPages: response.data.data.pagination?.totalPages || 0,
-          },
-          isLoading: false,
-        });
-        return response.data;
-      }
+      const response = await adminService.getUsers(params);
+      set({ users: response.data, isLoading: false });
+      return response.data;
     } catch (error) {
-      set({
-        error: error.response?.data?.message || "Failed to fetch users",
-        isLoading: false,
-      });
+      set({ error: error.message, isLoading: false });
       throw error;
     }
   },
 
-  // Get Reports
-  fetchReports: async (page = 1, limit = 10) => {
+  updateUserStatus: async (userId, status) => {
+    try {
+      await adminService.updateUserStatus(userId, status);
+      const users = get().users;
+      const updatedItems = users.items.map((user) =>
+        user.id === userId ? { ...user, status } : user
+      );
+      set({ users: { ...users, items: updatedItems } });
+    } catch (error) {
+      set({ error: error.message });
+      throw error;
+    }
+  },
+
+  // Report Management
+  fetchReports: async (params = {}) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await adminAPI.getReports(page, limit);
-      if (response.data.success) {
-        set({
-          reports: response.data.data.reports || [],
-          pagination: {
-            page: response.data.data.pagination?.page || page,
-            pageSize: response.data.data.pagination?.pageSize || limit,
-            total: response.data.data.pagination?.total || 0,
-            totalPages: response.data.data.pagination?.totalPages || 0,
-          },
-          isLoading: false,
-        });
-        return response.data;
-      }
+      const response = await adminService.getReports(params);
+      set({ reports: response.data, isLoading: false });
+      return response.data;
     } catch (error) {
-      set({
-        error: error.response?.data?.message || "Failed to fetch reports",
-        isLoading: false,
-      });
+      set({ error: error.message, isLoading: false });
       throw error;
     }
   },
 
-  // Update pagination
-  setPagination: (pagination) =>
-    set({
-      pagination: { ...get().pagination, ...pagination },
-    }),
+  deleteReport: async (reportId) => {
+    try {
+      await adminService.deleteReport(reportId);
+      const reports = get().reports;
+      const updatedItems = reports.items.filter((item) => item.id !== reportId);
+      set({ reports: { ...reports, items: updatedItems } });
+    } catch (error) {
+      set({ error: error.message });
+      throw error;
+    }
+  },
 
-  // Reset store
-  reset: () =>
-    set({
-      metrics: null,
-      queue: [],
-      users: [],
-      reports: [],
-      pagination: {
-        page: 1,
-        pageSize: 10,
-        total: 0,
-        totalPages: 0,
-      },
-      isLoading: false,
-      error: null,
-    }),
+  regenerateReport: async (reportId) => {
+    try {
+      await adminService.regenerateReport(reportId);
+      const reports = get().reports;
+      const updatedItems = reports.items.map((item) =>
+        item.id === reportId ? { ...item, status: "generating" } : item
+      );
+      set({ reports: { ...reports, items: updatedItems } });
+    } catch (error) {
+      set({ error: error.message });
+      throw error;
+    }
+  },
+
+  updateFilters: (newFilters) => {
+    set((state) => ({
+      filters: { ...state.filters, ...newFilters },
+    }));
+  },
 }));

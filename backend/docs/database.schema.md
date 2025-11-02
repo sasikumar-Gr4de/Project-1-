@@ -1,191 +1,220 @@
 ```sql
--- Enable necessary extensions
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+create table public.alerts (
+  id uuid not null default extensions.uuid_generate_v4 (),
+  user_id uuid not null,
+  type text not null,
+  status text null default 'pending'::text,
+  subject text null,
+  message text null,
+  metadata jsonb null,
+  sent_at timestamp with time zone null,
+  created_at timestamp with time zone null default now(),
+  constraint alerts_pkey primary key (id),
+  constraint alerts_user_id_fkey foreign KEY (user_id) references users (id),
+  constraint alerts_status_check check (
+    (
+      status = any (
+        array['pending'::text, 'sent'::text, 'failed'::text]
+      )
+    )
+  ),
+  constraint alerts_type_check check (
+    (
+      type = any (array['email'::text, 'whatsapp'::text])
+    )
+  )
+) TABLESPACE pg_default;
 
--- Users table (extends Supabase auth.users)
-CREATE TABLE users (
-id UUID REFERENCES gen_random_uuid() PRIMARY KEY,
-role TEXT NOT NULL DEFAULT 'player' CHECK (role IN ('player', 'coach', 'admin')),
-player_name TEXT,
-date_of_birth DATE,
-position TEXT,
-academy TEXT,
-tier_plan TEXT NOT NULL DEFAULT 'free' CHECK (tier_plan IN ('free', 'basic', 'pro', 'elite')),
-country TEXT,
-created_at TIMESTAMPTZ DEFAULT NOW(),
-updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+create table public.auth_otp (
+  id uuid not null default extensions.uuid_generate_v4 (),
+  email text null,
+  phone text null,
+  otp text not null,
+  expires_at timestamp with time zone not null,
+  used boolean null default false,
+  created_at timestamp with time zone null default now(),
+  constraint auth_otp_pkey primary key (id)
+) TABLESPACE pg_default;
 
--- RLS for users
-ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+create index IF not exists idx_auth_otp_email on public.auth_otp using btree (email) TABLESPACE pg_default;
 
--- Users can read their own data, admins can read all
-CREATE POLICY "Users can view own profile" ON users
-FOR SELECT USING (auth.uid() = id);
+create index IF not exists idx_auth_otp_phone on public.auth_otp using btree (phone) TABLESPACE pg_default;
 
-CREATE POLICY "Admins can view all users" ON users
-FOR SELECT USING (
-EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')
-);
+create index IF not exists idx_auth_otp_expires on public.auth_otp using btree (expires_at) TABLESPACE pg_default;
 
--- Users can update their own data
-CREATE POLICY "Users can update own profile" ON users
-FOR UPDATE USING (auth.uid() = id);
+create table public.auth_otp (
+  id uuid not null default extensions.uuid_generate_v4 (),
+  email text null,
+  phone text null,
+  otp text not null,
+  expires_at timestamp with time zone not null,
+  used boolean null default false,
+  created_at timestamp with time zone null default now(),
+  constraint auth_otp_pkey primary key (id)
+) TABLESPACE pg_default;
 
--- Player data table
-CREATE TABLE player_data (
-id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-user_id UUID REFERENCES users(id) NOT NULL,
-gps_file TEXT,
-video_file TEXT,
-match_date DATE NOT NULL,
-notes TEXT,
-status TEXT DEFAULT 'uploaded' CHECK (status IN ('uploaded', 'processing', 'completed', 'failed')),
-created_at TIMESTAMPTZ DEFAULT NOW()
-);
+create index IF not exists idx_auth_otp_email on public.auth_otp using btree (email) TABLESPACE pg_default;
 
--- RLS for player_data
-ALTER TABLE player_data ENABLE ROW LEVEL SECURITY;
+create index IF not exists idx_auth_otp_phone on public.auth_otp using btree (phone) TABLESPACE pg_default;
 
-CREATE POLICY "Users can view own player data" ON player_data
-FOR SELECT USING (auth.uid() = user_id);
+create index IF not exists idx_auth_otp_expires on public.auth_otp using btree (expires_at) TABLESPACE pg_default;
 
-CREATE POLICY "Users can insert own player data" ON player_data
-FOR INSERT WITH CHECK (auth.uid() = user_id);
+create table public.player_data (
+  id uuid not null default extensions.uuid_generate_v4 (),
+  player_id uuid not null,
+  gps_file text null,
+  video_file text null,
+  match_date date not null,
+  notes text null,
+  status text null default 'uploaded'::text,
+  created_at timestamp with time zone null default now(),
+  jersey_number integer null default 1,
+  jersey_home_color text null,
+  jersey_away_color text null,
+  position text null,
+  constraint player_data_pkey primary key (id),
+  constraint player_data_user_id_fkey foreign KEY (player_id) references users (id),
+  constraint player_data_status_check check (
+    (
+      status = any (
+        array[
+          'uploaded'::text,
+          'processing'::text,
+          'completed'::text,
+          'failed'::text
+        ]
+      )
+    )
+  )
+) TABLESPACE pg_default;
 
-CREATE POLICY "Admins can view all player data" ON player_data
-FOR SELECT USING (
-EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')
-);
+create table public.player_data (
+  id uuid not null default extensions.uuid_generate_v4 (),
+  player_id uuid not null,
+  gps_file text null,
+  video_file text null,
+  match_date date not null,
+  notes text null,
+  status text null default 'uploaded'::text,
+  created_at timestamp with time zone null default now(),
+  jersey_number integer null default 1,
+  jersey_home_color text null,
+  jersey_away_color text null,
+  position text null,
+  constraint player_data_pkey primary key (id),
+  constraint player_data_user_id_fkey foreign KEY (player_id) references users (id),
+  constraint player_data_status_check check (
+    (
+      status = any (
+        array[
+          'uploaded'::text,
+          'processing'::text,
+          'completed'::text,
+          'failed'::text
+        ]
+      )
+    )
+  )
+) TABLESPACE pg_default;
 
--- Processing queue table
-CREATE TABLE processing_queue (
-id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-player_data_id UUID REFERENCES player_data(id) NOT NULL,
-status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'completed', 'failed')),
-logs TEXT,
-started_at TIMESTAMPTZ,
-completed_at TIMESTAMPTZ,
-created_at TIMESTAMPTZ DEFAULT NOW()
-);
+create table public.reports (
+  id uuid not null default extensions.uuid_generate_v4 (),
+  player_id uuid not null,
+  player_data_id uuid not null,
+  score_json jsonb not null,
+  pdf_url text null,
+  overall_score integer null,
+  status text null default 'generated'::text,
+  created_at timestamp with time zone null default now(),
+  constraint reports_pkey primary key (id),
+  constraint reports_player_data_id_fkey foreign KEY (player_data_id) references player_data (id),
+  constraint reports_player_id_fkey foreign KEY (player_id) references users (id),
+  constraint reports_overall_score_check check (
+    (
+      (overall_score >= 0)
+      and (overall_score <= 100)
+    )
+  ),
+  constraint reports_status_check check (
+    (
+      status = any (
+        array[
+          'generating'::text,
+          'generated'::text,
+          'failed'::text
+        ]
+      )
+    )
+  )
+) TABLESPACE pg_default;
 
--- RLS for processing_queue (admin only)
-ALTER TABLE processing_queue ENABLE ROW LEVEL SECURITY;
+create table public.reports (
+  id uuid not null default extensions.uuid_generate_v4 (),
+  player_id uuid not null,
+  player_data_id uuid not null,
+  score_json jsonb not null,
+  pdf_url text null,
+  overall_score integer null,
+  status text null default 'generated'::text,
+  created_at timestamp with time zone null default now(),
+  constraint reports_pkey primary key (id),
+  constraint reports_player_data_id_fkey foreign KEY (player_data_id) references player_data (id),
+  constraint reports_player_id_fkey foreign KEY (player_id) references users (id),
+  constraint reports_overall_score_check check (
+    (
+      (overall_score >= 0)
+      and (overall_score <= 100)
+    )
+  ),
+  constraint reports_status_check check (
+    (
+      status = any (
+        array[
+          'generating'::text,
+          'generated'::text,
+          'failed'::text
+        ]
+      )
+    )
+  )
+) TABLESPACE pg_default;
 
-CREATE POLICY "Only admins can access processing queue" ON processing_queue
-FOR ALL USING (
-EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')
-);
-
--- Reports table
-CREATE TABLE reports (
-id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-player_id UUID REFERENCES users(id) NOT NULL,
-player_data_id UUID REFERENCES player_data(id) NOT NULL,
-score_json JSONB NOT NULL,
-pdf_url TEXT,
-overall_score INTEGER CHECK (overall_score >= 0 AND overall_score <= 100),
-status TEXT DEFAULT 'generated' CHECK (status IN ('generating', 'generated', 'failed')),
-created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- RLS for reports
-ALTER TABLE reports ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can view own reports" ON reports
-FOR SELECT USING (auth.uid() = player_id);
-
-CREATE POLICY "Admins can view all reports" ON reports
-FOR SELECT USING (
-EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')
-);
-
--- Benchmarks table
-CREATE TABLE benchmarks (
-id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-position TEXT NOT NULL,
-age_group TEXT NOT NULL,
-averages_json JSONB NOT NULL,
-season TEXT,
-is_active BOOLEAN DEFAULT true,
-created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- RLS for benchmarks (read-only for authenticated users)
-ALTER TABLE benchmarks ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Authenticated users can view benchmarks" ON benchmarks
-FOR SELECT USING (auth.role() = 'authenticated' AND is_active = true);
-
--- Subscriptions table
-CREATE TABLE subscriptions (
-id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-user_id UUID REFERENCES users(id) NOT NULL,
-stripe_subscription_id TEXT UNIQUE,
-stripe_customer_id TEXT,
-plan_type TEXT NOT NULL CHECK (plan_type IN ('basic', 'pro', 'elite')),
-status TEXT NOT NULL CHECK (status IN ('active', 'canceled', 'past_due', 'unpaid')),
-current_period_start TIMESTAMPTZ,
-current_period_end TIMESTAMPTZ,
-created_at TIMESTAMPTZ DEFAULT NOW(),
-updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- RLS for subscriptions
-ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can view own subscriptions" ON subscriptions
-FOR SELECT USING (auth.uid() = user_id);
-
-CREATE POLICY "Admins can view all subscriptions" ON subscriptions
-FOR SELECT USING (
-EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')
-);
-
--- Alerts table
-CREATE TABLE alerts (
-id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-user_id UUID REFERENCES users(id) NOT NULL,
-type TEXT NOT NULL CHECK (type IN ('email', 'whatsapp')),
-status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'sent', 'failed')),
-subject TEXT,
-message TEXT,
-metadata JSONB,
-sent_at TIMESTAMPTZ,
-created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- RLS for alerts
-ALTER TABLE alerts ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can view own alerts" ON alerts
-FOR SELECT USING (auth.uid() = user_id);
-
-CREATE POLICY "Admins can view all alerts" ON alerts
-FOR SELECT USING (
-EXISTS (SELECT 1 FROM users WHERE id = auth.uid() AND role = 'admin')
-);
-
-
--- OTP table for authentication
-CREATE TABLE auth_otp (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    email TEXT,
-    phone TEXT,
-    otp TEXT NOT NULL,
-    expires_at TIMESTAMPTZ NOT NULL,
-    used BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE INDEX idx_auth_otp_email ON auth_otp(email);
-CREATE INDEX idx_auth_otp_phone ON auth_otp(phone);
-CREATE INDEX idx_auth_otp_expires ON auth_otp(expires_at);
-
--- RLS for auth_otp (no direct user access needed)
-ALTER TABLE auth_otp ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "No direct access to OTP table" ON auth_otp FOR ALL USING (false);
+create table public.users (
+  id uuid not null default gen_random_uuid (),
+  role text not null default 'player'::text,
+  player_name text null,
+  date_of_birth date null,
+  position text null,
+  academy text null,
+  tier_plan text not null default 'free'::text,
+  country text null,
+  created_at timestamp with time zone null default now(),
+  updated_at timestamp with time zone null default now(),
+  email character varying null,
+  phone character varying null,
+  avatar_url character varying null,
+  stripe_customer_id text null,
+  constraint users_pkey primary key (id),
+  constraint users_role_check check (
+    (
+      role = any (
+        array['player'::text, 'coach'::text, 'admin'::text]
+      )
+    )
+  ),
+  constraint users_tier_plan_check check (
+    (
+      tier_plan = any (
+        array[
+          'free'::text,
+          'basic'::text,
+          'pro'::text,
+          'elite'::text
+        ]
+      )
+    )
+  )
+) TABLESPACE pg_default;
 
 ```
 
