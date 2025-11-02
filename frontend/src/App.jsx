@@ -1,4 +1,4 @@
-// App.jsx - Fixed routing configuration
+// App.jsx - Professional routing configuration
 import {
   BrowserRouter as Router,
   Route,
@@ -11,6 +11,7 @@ import "@/App.css";
 import { useAuthStore } from "@/store/authStore";
 import Layout from "@/components/layout/Layout";
 import ProtectedRoute from "@/components/common/ProtectedRoute";
+import RoleProtectedRoute from "@/components/common/RoleProtectedRoute";
 
 // Auth Pages
 import Login from "@/pages/Auth/Login";
@@ -24,15 +25,7 @@ import ReportDetail from "@/pages/Player/ReportDetail";
 import Benchmarks from "@/pages/Player/Benchmarks";
 import Profile from "@/pages/Player/Profile";
 
-import ServerFileUpload from "@/pages/Developer/ServerFileUpload";
-
-// Other Pages
-import Landing from "@/pages/Landing";
-import { ToastProvider } from "@/contexts/ToastContext";
-import SubscriptionPlans from "@/pages/Subscription/SubscriptionPlans";
-import SubscriptionSuccess from "@/pages/Subscription/SubscriptionSuccess";
-import ContentManager from "@/pages/Admin/ContentManager";
-
+// Admin Pages
 import AdminLayout from "@/components/layout/AdminLayout";
 import AdminDashboard from "@/pages/Admin/Dashboard";
 import QueueManagement from "@/pages/Admin/QueueManagement";
@@ -40,7 +33,16 @@ import UserManagement from "@/pages/Admin/UserManagement";
 import ReportManagement from "@/pages/Admin/ReportManagement";
 import ContentManager from "@/pages/Admin/ContentManager";
 import SystemAnalytics from "@/pages/Admin/SystemAnalytics";
-import RoleProtectedRoute from "@/components/common/RoleProtectedRoute";
+
+// Other Pages
+import Landing from "@/pages/Landing";
+import ServerFileUpload from "@/pages/Developer/ServerFileUpload";
+import SubscriptionPlans from "@/pages/Subscription/SubscriptionPlans";
+import SubscriptionSuccess from "@/pages/Subscription/SubscriptionSuccess";
+import Unauthorized from "@/pages/Error/Unauthorized";
+import NotFoundPage from "@/pages/Error/NotFoundPage";
+
+import { ToastProvider } from "@/contexts/ToastContext";
 
 function App() {
   const { isAuthenticated, user, isInitialized, initializeAuth } =
@@ -70,7 +72,6 @@ function App() {
       <Router>
         <Routes>
           {/* Public Routes */}
-
           <Route path="/" element={<Landing />} />
           <Route path="/server-upload" element={<ServerFileUpload />} />
           <Route
@@ -79,6 +80,12 @@ function App() {
               isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />
             }
           />
+          <Route path="/subscription" element={<SubscriptionPlans />} />
+          <Route
+            path="/subscription/success"
+            element={<SubscriptionSuccess />}
+          />
+          <Route path="/unauthorized" element={<Unauthorized />} />
 
           {/* Onboarding Route - Special handling */}
           <Route
@@ -90,116 +97,81 @@ function App() {
             }
           />
 
-          {/* Protected Routes that require completed onboarding */}
+          {/* Player Routes */}
           <Route
-            path="/dashboard"
+            path="/*"
             element={
               <ProtectedRoute>
-                <Layout>
-                  <Dashboard />
-                </Layout>
+                <RoleProtectedRoute
+                  allowedRoles={["player", "admin"]}
+                  fallbackPath="/unauthorized"
+                >
+                  <PlayerRoutes />
+                </RoleProtectedRoute>
               </ProtectedRoute>
             }
           />
 
+          {/* Admin Routes */}
           <Route
-            path="/upload"
+            path="/admin/*"
             element={
               <ProtectedRoute>
-                <Layout>
-                  <Upload />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/reports"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <Reports />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/reports/:reportId"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <ReportDetail />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/benchmarks"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <Benchmarks />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <Profile />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route path="/subscription" element={<SubscriptionPlans />} />
-          <Route
-            path="/subscription/success"
-            element={<SubscriptionSuccess />}
-          />
-
-          <Route
-            path="/admin/contnet"
-            element={
-              <ProtectedRoute>
-                <ContentManager />
+                <RoleProtectedRoute
+                  allowedRoles={["admin"]}
+                  fallbackPath="/unauthorized"
+                >
+                  <AdminRoutes />
+                </RoleProtectedRoute>
               </ProtectedRoute>
             }
           />
 
           {/* Fallback Routes */}
+          <Route path="/404" element={<NotFoundPage />} />
           <Route
             path="*"
             element={
               <Navigate to={isAuthenticated ? "/dashboard" : "/"} replace />
             }
           />
-
-          <Route
-            path="/admin"
-            element={<RoleProtectedRoute allowedRoles={["admin"]} />}
-          >
-            <Route element={<AdminLayout />}>
-              <Route path="dashboard" element={<AdminDashboard />} />
-              <Route path="queue" element={<QueueManagement />} />
-              <Route path="users" element={<UserManagement />} />
-              <Route path="reports" element={<ReportManagement />} />
-              <Route path="content" element={<ContentManager />} />
-              <Route path="analytics" element={<SystemAnalytics />} />
-              <Route
-                index
-                element={<Navigate to="/admin/dashboard" replace />}
-              />
-            </Route>
-          </Route>
         </Routes>
       </Router>
     </ToastProvider>
+  );
+}
+
+// Player Routes Component
+function PlayerRoutes() {
+  return (
+    <Layout>
+      <Routes>
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/upload" element={<Upload />} />
+        <Route path="/reports" element={<Reports />} />
+        <Route path="/reports/:reportId" element={<ReportDetail />} />
+        <Route path="/benchmarks" element={<Benchmarks />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route index element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </Layout>
+  );
+}
+
+// Admin Routes Component
+function AdminRoutes() {
+  return (
+    <AdminLayout>
+      <Routes>
+        <Route path="/dashboard" element={<AdminDashboard />} />
+        <Route path="/queue" element={<QueueManagement />} />
+        <Route path="/users" element={<UserManagement />} />
+        <Route path="/reports" element={<ReportManagement />} />
+        <Route path="/content" element={<ContentManager />} />
+        <Route path="/analytics" element={<SystemAnalytics />} />
+        <Route index element={<Navigate to="/admin/dashboard" replace />} />
+      </Routes>
+    </AdminLayout>
   );
 }
 

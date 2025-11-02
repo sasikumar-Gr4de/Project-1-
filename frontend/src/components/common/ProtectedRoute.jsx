@@ -1,4 +1,4 @@
-// components/common/ProtectedRoute.jsx - Fixed version
+// components/common/ProtectedRoute.jsx - Enhanced version
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { Navigate, useLocation } from "react-router-dom";
@@ -26,7 +26,10 @@ const ProtectedRoute = ({ children, requireOnboarding = false }) => {
     return <LoadingSpinner />;
   }
 
-  if (localStorage.getItem("auth-token") === null) logout();
+  // Clear invalid tokens
+  if (localStorage.getItem("auth-token") === null && isAuthenticated) {
+    logout();
+  }
 
   // Redirect to login if not authenticated
   if (!isAuthenticated) {

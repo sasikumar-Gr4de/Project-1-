@@ -1,5 +1,5 @@
 // backend/src/controllers/adminController.js
-import { adminService } from "../services/adminService.js";
+import * as adminService from "../services/adminService.js";
 import { RESPONSES } from "../utils/messages.js";
 
 // Get system metrics

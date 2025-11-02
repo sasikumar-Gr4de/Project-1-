@@ -30,8 +30,14 @@ const AdminDashboard = () => {
     isLoading,
   } = useAdminStore();
   const [lastUpdated, setLastUpdated] = useState(null);
+  window.alert(
+    "Admin Dashboard is under active development. Some features may be incomplete or subject to change."
+  );
 
   useEffect(() => {
+    window.alert(
+      "Admin Dashboard is under active development. Some features may be incomplete or subject to change."
+    );
     loadData();
   }, []);
 

@@ -1,83 +1,61 @@
-// Route paths
 export const ROUTES = {
   // Public routes
-  LANDING: "/",
-  LOGIN: "/login",
-  UNAUTHORIZED: "/unauthorized",
+  PUBLIC: {
+    LANDING: "/",
+    LOGIN: "/login",
+    SUBSCRIPTION: "/subscription",
+    SUBSCRIPTION_SUCCESS: "/subscription/success",
+    UNAUTHORIZED: "/unauthorized",
+    NOT_FOUND: "/404",
+  },
 
   // Auth routes
-  ONBOARDING: "/onboarding",
+  AUTH: {
+    ONBOARDING: "/onboarding",
+  },
 
   // Player routes
-  DASHBOARD: "/dashboard",
-  UPLOAD: "/upload",
-  REPORTS: "/reports",
-  REPORT_DETAIL: "/reports/:reportId",
-  BENCHMARKS: "/benchmarks",
-  PROFILE: "/profile",
+  PLAYER: {
+    DASHBOARD: "/dashboard",
+    UPLOAD: "/upload",
+    REPORTS: "/reports",
+    REPORT_DETAIL: "/reports/:reportId",
+    BENCHMARKS: "/benchmarks",
+    PROFILE: "/profile",
+  },
 
   // Admin routes
-  ADMIN: "/admin",
-  ADMIN_DASHBOARD: "/admin/dashboard",
-
-  // Subscription routes
-  SUBSCRIPTION: "/subscription",
-  SUBSCRIPTIONSUCCESS: "/subscription/success",
-  SUBSCRIPTIONCANCEL: "/subscription/cancel",
+  ADMIN: {
+    DASHBOARD: "/admin/dashboard",
+    QUEUE: "/admin/queue",
+    USERS: "/admin/users",
+    REPORTS: "/admin/reports",
+    CONTENT: "/admin/content",
+    ANALYTICS: "/admin/analytics",
+  },
 
   // Developer routes
-  SERVER_UPLOAD: "/server/upload-image",
+  DEVELOPER: {
+    SERVER_UPLOAD: "/server-upload",
+  },
 };
 
-// Route permissions
-export const ROUTE_PERMISSIONS = {
-  [ROUTES.LANDING]: { public: true },
-  [ROUTES.LOGIN]: { public: true },
-  [ROUTES.UNAUTHORIZED]: { public: true },
-  [ROUTES.ONBOARDING]: { protected: true, requireOnboarding: true },
-  [ROUTES.DASHBOARD]: { protected: true, roles: ["player", "admin"] },
-  [ROUTES.UPLOAD]: { protected: true, roles: ["player"] },
-  [ROUTES.REPORTS]: { protected: true, roles: ["player"] },
-  [ROUTES.REPORT_DETAIL]: { protected: true, roles: ["player"] },
-  [ROUTES.BENCHMARKS]: { protected: true, roles: ["player"] },
-  [ROUTES.PROFILE]: { protected: true, roles: ["player", "admin"] },
-  [ROUTES.ADMIN]: { protected: true, roles: ["admin"] },
-  [ROUTES.ADMIN_DASHBOARD]: { protected: true, roles: ["admin"] },
-  [ROUTES.SERVER_UPLOAD]: { public: true }, // Developer route
+export const USER_ROLES = {
+  PLAYER: "player",
+  ADMIN: "admin",
 };
 
-// Navigation configuration
-export const NAVIGATION = {
-  player: [
-    { path: ROUTES.DASHBOARD, label: "Dashboard", icon: "dashboard" },
-    { path: ROUTES.UPLOAD, label: "Upload", icon: "upload" },
-    { path: ROUTES.REPORTS, label: "Reports", icon: "reports" },
-    { path: ROUTES.BENCHMARKS, label: "Benchmarks", icon: "benchmarks" },
-    { path: ROUTES.PROFILE, label: "Profile", icon: "profile" },
-  ],
-  admin: [
-    { path: ROUTES.ADMIN_DASHBOARD, label: "Dashboard", icon: "dashboard" },
-    { path: ROUTES.PROFILE, label: "Profile", icon: "profile" },
-  ],
-};
-
-// Helper functions
-export const getRoutePermissions = (path) => {
-  return ROUTE_PERMISSIONS[path] || { public: false };
-};
-
-export const isPublicRoute = (path) => {
-  return getRoutePermissions(path).public === true;
-};
-
-export const isProtectedRoute = (path) => {
-  return getRoutePermissions(path).protected === true;
-};
-
-export const getAllowedRoles = (path) => {
-  return getRoutePermissions(path).roles || [];
-};
-
-export const requiresOnboarding = (path) => {
-  return getRoutePermissions(path).requireOnboarding === true;
+// Route access configuration
+export const ROUTE_ACCESS = {
+  [ROUTES.PLAYER.DASHBOARD]: [USER_ROLES.PLAYER, USER_ROLES.ADMIN],
+  [ROUTES.PLAYER.UPLOAD]: [USER_ROLES.PLAYER, USER_ROLES.ADMIN],
+  [ROUTES.PLAYER.REPORTS]: [USER_ROLES.PLAYER, USER_ROLES.ADMIN],
+  [ROUTES.PLAYER.BENCHMARKS]: [USER_ROLES.PLAYER, USER_ROLES.ADMIN],
+  [ROUTES.PLAYER.PROFILE]: [USER_ROLES.PLAYER, USER_ROLES.ADMIN],
+  [ROUTES.ADMIN.DASHBOARD]: [USER_ROLES.ADMIN],
+  [ROUTES.ADMIN.QUEUE]: [USER_ROLES.ADMIN],
+  [ROUTES.ADMIN.USERS]: [USER_ROLES.ADMIN],
+  [ROUTES.ADMIN.REPORTS]: [USER_ROLES.ADMIN],
+  [ROUTES.ADMIN.CONTENT]: [USER_ROLES.ADMIN],
+  [ROUTES.ADMIN.ANALYTICS]: [USER_ROLES.ADMIN],
 };
