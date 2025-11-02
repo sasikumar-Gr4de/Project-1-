@@ -41,6 +41,7 @@ import SubscriptionPlans from "@/pages/Subscription/SubscriptionPlans";
 import SubscriptionSuccess from "@/pages/Subscription/SubscriptionSuccess";
 import Unauthorized from "@/pages/Error/Unauthorized";
 import NotFoundPage from "@/pages/Error/NotFoundPage";
+import AppLoading from "@/components/common/AppLoading";
 
 import { ToastProvider } from "@/contexts/ToastContext";
 
@@ -55,16 +56,7 @@ function App() {
 
   // Show loading while initializing
   if (!isInitialized) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-muted-foreground">
-            Loading GR4DE Platform...
-          </p>
-        </div>
-      </div>
-    );
+    return <AppLoading size="lg" variant="default" />;
   }
 
   return (
