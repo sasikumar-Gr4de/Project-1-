@@ -33,6 +33,15 @@ import SubscriptionPlans from "@/pages/Subscription/SubscriptionPlans";
 import SubscriptionSuccess from "@/pages/Subscription/SubscriptionSuccess";
 import ContentManager from "@/pages/Admin/ContentManager";
 
+import AdminLayout from "@/components/layout/AdminLayout";
+import AdminDashboard from "@/pages/Admin/Dashboard";
+import QueueManagement from "@/pages/Admin/QueueManagement";
+import UserManagement from "@/pages/Admin/UserManagement";
+import ReportManagement from "@/pages/Admin/ReportManagement";
+import ContentManager from "@/pages/Admin/ContentManager";
+import SystemAnalytics from "@/pages/Admin/SystemAnalytics";
+import RoleProtectedRoute from "@/components/common/RoleProtectedRoute";
+
 function App() {
   const { isAuthenticated, user, isInitialized, initializeAuth } =
     useAuthStore();
@@ -170,6 +179,24 @@ function App() {
               <Navigate to={isAuthenticated ? "/dashboard" : "/"} replace />
             }
           />
+
+          <Route
+            path="/admin"
+            element={<RoleProtectedRoute allowedRoles={["admin"]} />}
+          >
+            <Route element={<AdminLayout />}>
+              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="queue" element={<QueueManagement />} />
+              <Route path="users" element={<UserManagement />} />
+              <Route path="reports" element={<ReportManagement />} />
+              <Route path="content" element={<ContentManager />} />
+              <Route path="analytics" element={<SystemAnalytics />} />
+              <Route
+                index
+                element={<Navigate to="/admin/dashboard" replace />}
+              />
+            </Route>
+          </Route>
         </Routes>
       </Router>
     </ToastProvider>

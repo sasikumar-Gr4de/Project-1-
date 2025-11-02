@@ -154,6 +154,12 @@ export const NAV_ITEMS = {
       icon: "BarChart3",
       description: "Platform performance insights",
     },
+    {
+      name: "Content Manager",
+      href: "/admin/content",
+      icon: "Database",
+      description: "Manage platform content",
+    },
   ],
 };
 

@@ -12,9 +12,9 @@ const Layout = ({ children }) => {
   //   return <AuthLayout>{children}</AuthLayout>;
   // }
 
-  // if (user?.role === USER_ROLES.ADMIN) {
-  //   return <AdminLayout>{children}</AdminLayout>;
-  // }
+  if (user?.role === USER_ROLES.ADMIN) {
+    return <AdminLayout>{children}</AdminLayout>;
+  }
 
   return <PlayerLayout>{children}</PlayerLayout>;
 };
