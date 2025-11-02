@@ -7,7 +7,7 @@ const sanityClient = createClient({
   dataset: import.meta.env.VITE_SANITY_DATASET || "production",
   useCdn: true,
   apiVersion: "2024-01-01",
-  //   token: import.meta.env.VITE_SANITY_TOKEN,
+  token: import.meta.env.VITE_SANITY_TOKEN,
 });
 
 // Initialize image URL builder

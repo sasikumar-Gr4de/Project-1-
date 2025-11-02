@@ -6,6 +6,13 @@ import AdminSection from "@/components/admin/AdminSection";
 import StatusBadge from "@/components/admin/StatusBadge";
 import { Button } from "@/components/ui/button";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   FileText,
   Search,
   Filter,
@@ -184,22 +191,27 @@ const ReportManagement = () => {
               />
             </div>
           </div>
-          <select
+
+          <Select
             value={filters.status}
-            onChange={(e) =>
+            onValueChange={(value) => {
               setFilters((prev) => ({
                 ...prev,
-                status: e.target.value,
+                status: value,
                 page: 1,
-              }))
-            }
-            className="px-4 py-2 bg-[#1A1A1A] border border-[#343434] rounded-lg text-white focus:outline-none focus:border-primary transition-colors"
+              }));
+            }}
           >
-            <option value="all">All Status</option>
-            <option value="generating">Generating</option>
-            <option value="generated">Generated</option>
-            <option value="failed">Failed</option>
-          </select>
+            <SelectTrigger className="w-full sm:w-auto px-4 py-2 bg-[#1A1A1A] border border-[#343434] rounded-lg text-white focus:outline-none focus:border-primary transition-colors">
+              <SelectValue placeholder="All Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="generating">Generating</SelectItem>
+              <SelectItem value="generated">Generated</SelectItem>
+              <SelectItem value="failed">Failed</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </AdminSection>
 

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useAdminStore } from "@/store/adminStore";
 import AdminStatsCard from "@/components/admin/AdminStatsCard";
 import AdminSection from "@/components/admin/AdminSection";
-import DataTable from "@/components/common/DataTable";
+import QueueActivityList from "@/components/admin/QueueActivityList";
 import StatusBadge from "@/components/admin/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -15,11 +15,9 @@ import {
   Server,
   BarChart3,
   RefreshCw,
-  Play,
-  Trash2,
 } from "lucide-react";
 
-const AdminDashboard = () => {
+const Dashboard = () => {
   const {
     metrics,
     queue,
@@ -30,14 +28,8 @@ const AdminDashboard = () => {
     isLoading,
   } = useAdminStore();
   const [lastUpdated, setLastUpdated] = useState(null);
-  window.alert(
-    "Admin Dashboard is under active development. Some features may be incomplete or subject to change."
-  );
 
   useEffect(() => {
-    window.alert(
-      "Admin Dashboard is under active development. Some features may be incomplete or subject to change."
-    );
     loadData();
   }, []);
 
@@ -54,73 +46,6 @@ const AdminDashboard = () => {
     if (!num && num !== 0) return "0";
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
-
-  const queueColumns = [
-    {
-      accessorKey: "users.player_name",
-      header: "Player",
-      cell: ({ row }) => (
-        <div>
-          <div className="font-medium text-white">
-            {row.original.users?.player_name || "Unknown Player"}
-          </div>
-          <div className="text-xs text-[#B0AFAF]">
-            {row.original.users?.position}
-          </div>
-        </div>
-      ),
-    },
-    {
-      accessorKey: "match_date",
-      header: "Match Date",
-      cell: ({ row }) => (
-        <span className="text-white text-sm">
-          {new Date(row.getValue("match_date")).toLocaleDateString()}
-        </span>
-      ),
-    },
-    {
-      accessorKey: "status",
-      header: "Status",
-      cell: ({ row }) => <StatusBadge status={row.getValue("status")} />,
-    },
-    {
-      accessorKey: "created_at",
-      header: "Submitted",
-      cell: ({ row }) => (
-        <span className="text-[#B0AFAF] text-sm">
-          {new Date(row.getValue("created_at")).toLocaleDateString()}
-        </span>
-      ),
-    },
-    {
-      id: "actions",
-      header: "Actions",
-      cell: ({ row }) => (
-        <div className="flex items-center space-x-2">
-          {row.original.status === "failed" && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => retryJob(row.original.id)}
-              className="h-8 px-3 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
-            >
-              <Play className="w-3 h-3 mr-1" />
-              Retry
-            </Button>
-          )}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => deleteJob(row.original.id)}
-            className="h-8 px-3 bg-[#EF4444]/10 text-[#EF4444] border-[#EF4444]/20 hover:bg-[#EF4444]/20"
-          >
-            <Trash2 className="w-3 h-3 mr-1" />
-          </Button>
-        </div>
-      ),
-    },
-  ];
 
   const getQueueProgress = () => {
     if (!metrics?.queue) return {};
@@ -250,13 +175,13 @@ const AdminDashboard = () => {
           actionText="View All"
           onAction={() => (window.location.href = "/admin/queue")}
         >
-          <DataTable
-            columns={queueColumns}
-            data={queue.items || []}
-            isLoading={isLoading}
-            pagination={queue.pagination}
-            emptyStateTitle="No Active Jobs"
-            emptyStateDescription="There are no data processing jobs in the queue at the moment."
+          <QueueActivityList
+            jobs={queue.items || []}
+            onRetry={retryJob}
+            onDelete={deleteJob}
+            avgProcessingTime={metrics?.avgProcessingTime || 15}
+            viewAllHref="/admin/queue"
+            viewAllText="View All Jobs"
           />
         </AdminSection>
       </div>
@@ -301,4 +226,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default Dashboard;

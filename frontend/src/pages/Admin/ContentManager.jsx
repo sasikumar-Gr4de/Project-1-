@@ -2,19 +2,25 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import Tabs from "@/components/common/Tabs";
 import {
   Save,
   RefreshCw,
-  Upload,
-  Image as ImageIcon,
-  Plus,
   Trash2,
   Eye,
   Download,
+  FileText,
+  Settings,
+  Users,
+  Star,
+  Camera,
+  Play,
+  Target,
 } from "lucide-react";
 import { sanityService } from "@/services/sanity.service";
+import AdminSection from "@/components/admin/AdminSection";
+import StatusBadge from "@/components/admin/StatusBadge";
 
 const ContentManager = () => {
   const [content, setContent] = useState(null);
@@ -30,8 +36,13 @@ const ContentManager = () => {
   }, []);
 
   const checkHealth = async () => {
-    const healthStatus = await sanityService.healthCheck();
-    setHealth(healthStatus);
+    try {
+      const healthStatus = await sanityService.healthCheck();
+      setHealth(healthStatus);
+    } catch (error) {
+      console.error("Health check failed:", error);
+      setHealth({ healthy: false, message: "Connection failed" });
+    }
   };
 
   const loadContent = async () => {
@@ -41,7 +52,6 @@ const ContentManager = () => {
       setContent(data);
     } catch (error) {
       console.error("Error loading content:", error);
-      alert("Error loading content from CMS");
     } finally {
       setLoading(false);
     }
@@ -51,11 +61,9 @@ const ContentManager = () => {
     setSaving(true);
     try {
       await sanityService.updateLandingPageContent(content);
-      alert("Content saved successfully!");
-      await loadContent(); // Reload to get latest _rev
+      await loadContent();
     } catch (error) {
       console.error("Error saving content:", error);
-      alert(`Error saving content: ${error.message}`);
     } finally {
       setSaving(false);
     }
@@ -69,11 +77,9 @@ const ContentManager = () => {
     ) {
       try {
         await sanityService.resetToDefault();
-        alert("Content reset to default successfully!");
         await loadContent();
       } catch (error) {
         console.error("Error resetting content:", error);
-        alert(`Error resetting content: ${error.message}`);
       }
     }
   };
@@ -88,7 +94,6 @@ const ContentManager = () => {
     try {
       const result = await sanityService.uploadImage(file);
 
-      // Update content with new image reference
       setContent((prev) => {
         const newContent = { ...prev };
         let current = newContent;
@@ -107,14 +112,11 @@ const ContentManager = () => {
 
         return newContent;
       });
-
-      alert("Image uploaded successfully!");
     } catch (error) {
       console.error("Error uploading image:", error);
-      alert(`Error uploading image: ${error.message}`);
     } finally {
       setUploadingImages((prev) => ({ ...prev, [imageField]: false }));
-      event.target.value = ""; // Reset file input
+      event.target.value = "";
     }
   };
 
@@ -172,7 +174,6 @@ const ContentManager = () => {
     const dataStr = JSON.stringify(content, null, 2);
     const dataUri =
       "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
-
     const exportFileDefaultName = `gr4de-content-${
       new Date().toISOString().split("T")[0]
     }.json`;
@@ -183,29 +184,33 @@ const ContentManager = () => {
     linkElement.click();
   };
 
-  // Define tabs for the Tabs component
+  // Define tabs for the Tabs component - COMPLETE VERSION
   const tabs = [
     {
       id: "hero",
       label: "Hero",
       content: (
-        <Card>
-          <CardHeader>
-            <CardTitle>Hero Section</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <AdminSection
+          title="Hero Section"
+          description="Main landing page hero content"
+          icon={Target}
+        >
+          <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Tagline</label>
+              <label className="block text-sm font-medium mb-2 text-white">
+                Tagline
+              </label>
               <Input
                 value={content?.heroSection?.tagline || ""}
                 onChange={(e) =>
                   updateField("heroSection.tagline", e.target.value)
                 }
                 placeholder="AI-Powered Football Analytics"
+                className="bg-[#1A1A1A] border-[#343434] text-white"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium mb-2 text-white">
                 Main Heading
               </label>
               <Input
@@ -214,10 +219,11 @@ const ContentManager = () => {
                   updateField("heroSection.mainHeading", e.target.value)
                 }
                 placeholder="Measure Football Talent"
+                className="bg-[#1A1A1A] border-[#343434] text-white"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium mb-2 text-white">
                 Highlighted Text
               </label>
               <Input
@@ -226,10 +232,11 @@ const ContentManager = () => {
                   updateField("heroSection.highlightedText", e.target.value)
                 }
                 placeholder="Objectively"
+                className="bg-[#1A1A1A] border-[#343434] text-white"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium mb-2 text-white">
                 Subheading
               </label>
               <Textarea
@@ -239,10 +246,11 @@ const ContentManager = () => {
                 }
                 placeholder="Description of your platform..."
                 rows={3}
+                className="bg-[#1A1A1A] border-[#343434] text-white"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium mb-2 text-white">
                 Demo Video URL
               </label>
               <Input
@@ -251,10 +259,11 @@ const ContentManager = () => {
                   updateField("heroSection.demoVideoUrl", e.target.value)
                 }
                 placeholder="https://youtube.com/watch?v=..."
+                className="bg-[#1A1A1A] border-[#343434] text-white"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium mb-2 text-white">
                 CTA Button Text
               </label>
               <Input
@@ -263,32 +272,37 @@ const ContentManager = () => {
                   updateField("heroSection.ctaButtonText", e.target.value)
                 }
                 placeholder="Start Free Trial"
+                className="bg-[#1A1A1A] border-[#343434] text-white"
               />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </AdminSection>
       ),
     },
     {
       id: "about",
       label: "About",
       content: (
-        <Card>
-          <CardHeader>
-            <CardTitle>About Section</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <AdminSection
+          title="About Section"
+          description="Company information and mission"
+          icon={Users}
+        >
+          <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Heading</label>
+              <label className="block text-sm font-medium mb-2 text-white">
+                Heading
+              </label>
               <Input
                 value={content?.aboutSection?.heading || ""}
                 onChange={(e) =>
                   updateField("aboutSection.heading", e.target.value)
                 }
+                className="bg-[#1A1A1A] border-[#343434] text-white"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium mb-2 text-white">
                 Description
               </label>
               <Textarea
@@ -297,10 +311,11 @@ const ContentManager = () => {
                   updateField("aboutSection.description", e.target.value)
                 }
                 rows={3}
+                className="bg-[#1A1A1A] border-[#343434] text-white"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium mb-2 text-white">
                 Goal Title
               </label>
               <Input
@@ -308,10 +323,11 @@ const ContentManager = () => {
                 onChange={(e) =>
                   updateField("aboutSection.goalTitle", e.target.value)
                 }
+                className="bg-[#1A1A1A] border-[#343434] text-white"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium mb-2 text-white">
                 Goal Description
               </label>
               <Textarea
@@ -320,10 +336,11 @@ const ContentManager = () => {
                   updateField("aboutSection.goalDescription", e.target.value)
                 }
                 rows={2}
+                className="bg-[#1A1A1A] border-[#343434] text-white"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium mb-2 text-white">
                 Mission Title
               </label>
               <Input
@@ -331,10 +348,11 @@ const ContentManager = () => {
                 onChange={(e) =>
                   updateField("aboutSection.missionTitle", e.target.value)
                 }
+                className="bg-[#1A1A1A] border-[#343434] text-white"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium mb-2 text-white">
                 Mission Description
               </label>
               <Textarea
@@ -343,45 +361,46 @@ const ContentManager = () => {
                   updateField("aboutSection.missionDescription", e.target.value)
                 }
                 rows={2}
+                className="bg-[#1A1A1A] border-[#343434] text-white"
               />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </AdminSection>
       ),
     },
     {
       id: "features",
       label: "Features",
       content: (
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Features Section</CardTitle>
-            <Button
-              size="sm"
-              onClick={() =>
-                addArrayItem("featuresSection.features", {
-                  title: "New Feature",
-                  description: "Feature description",
-                  icon: "BarChart3",
-                })
-              }
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Feature
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-6">
+        <AdminSection
+          title="Features Section"
+          description="Platform features and capabilities"
+          icon={Settings}
+          action={true}
+          actionText="Add Feature"
+          onAction={() =>
+            addArrayItem("featuresSection.features", {
+              title: "New Feature",
+              description: "Feature description",
+              icon: "BarChart3",
+            })
+          }
+        >
+          <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium mb-2">Heading</label>
+              <label className="block text-sm font-medium mb-2 text-white">
+                Heading
+              </label>
               <Input
                 value={content?.featuresSection?.heading || ""}
                 onChange={(e) =>
                   updateField("featuresSection.heading", e.target.value)
                 }
+                className="bg-[#1A1A1A] border-[#343434] text-white"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium mb-2 text-white">
                 Subheading
               </label>
               <Textarea
@@ -390,29 +409,33 @@ const ContentManager = () => {
                   updateField("featuresSection.subheading", e.target.value)
                 }
                 rows={2}
+                className="bg-[#1A1A1A] border-[#343434] text-white"
               />
             </div>
 
             <div className="space-y-4">
-              <h3 className="font-semibold">Features</h3>
+              <h3 className="font-semibold text-white">Features</h3>
               {content?.featuresSection?.features?.map((feature, index) => (
-                <Card key={index}>
+                <Card key={index} className="bg-[#1A1A1A] border-[#343434]">
                   <CardContent className="p-4">
                     <div className="flex justify-between items-start mb-4">
-                      <h4 className="font-medium">Feature {index + 1}</h4>
+                      <h4 className="font-medium text-white">
+                        Feature {index + 1}
+                      </h4>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() =>
                           removeArrayItem("featuresSection.features", index)
                         }
+                        className="text-[#EF4444] hover:bg-[#EF4444]/10"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                     <div className="space-y-3">
                       <div>
-                        <label className="block text-sm font-medium mb-1">
+                        <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
                           Title
                         </label>
                         <Input
@@ -427,10 +450,11 @@ const ContentManager = () => {
                               newFeatures
                             );
                           }}
+                          className="bg-[#1A1A1A] border-[#343434] text-white"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-1">
+                        <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
                           Description
                         </label>
                         <Textarea
@@ -446,10 +470,11 @@ const ContentManager = () => {
                             );
                           }}
                           rows={2}
+                          className="bg-[#1A1A1A] border-[#343434] text-white"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-1">
+                        <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
                           Icon Name
                         </label>
                         <Input
@@ -465,6 +490,7 @@ const ContentManager = () => {
                             );
                           }}
                           placeholder="BarChart3, Cpu, Shield, Users"
+                          className="bg-[#1A1A1A] border-[#343434] text-white"
                         />
                       </div>
                     </div>
@@ -472,46 +498,46 @@ const ContentManager = () => {
                 </Card>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </AdminSection>
       ),
     },
     {
       id: "howitworks",
       label: "How It Works",
       content: (
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>How It Works Section</CardTitle>
-            <Button
-              size="sm"
-              onClick={() =>
-                addArrayItem("howItWorksSection.steps", {
-                  stepNumber: `${
-                    (content?.howItWorksSection?.steps?.length || 0) + 1
-                  }`,
-                  title: "New Step",
-                  description: "Step description",
-                  icon: "Cpu",
-                })
-              }
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Step
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-6">
+        <AdminSection
+          title="How It Works Section"
+          description="Step-by-step process explanation"
+          icon={Play}
+          action={true}
+          actionText="Add Step"
+          onAction={() =>
+            addArrayItem("howItWorksSection.steps", {
+              stepNumber: `${
+                (content?.howItWorksSection?.steps?.length || 0) + 1
+              }`,
+              title: "New Step",
+              description: "Step description",
+              icon: "Cpu",
+            })
+          }
+        >
+          <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium mb-2">Heading</label>
+              <label className="block text-sm font-medium mb-2 text-white">
+                Heading
+              </label>
               <Input
                 value={content?.howItWorksSection?.heading || ""}
                 onChange={(e) =>
                   updateField("howItWorksSection.heading", e.target.value)
                 }
+                className="bg-[#1A1A1A] border-[#343434] text-white"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium mb-2 text-white">
                 Subheading
               </label>
               <Textarea
@@ -520,29 +546,33 @@ const ContentManager = () => {
                   updateField("howItWorksSection.subheading", e.target.value)
                 }
                 rows={2}
+                className="bg-[#1A1A1A] border-[#343434] text-white"
               />
             </div>
 
             <div className="space-y-4">
-              <h3 className="font-semibold">Steps</h3>
+              <h3 className="font-semibold text-white">Steps</h3>
               {content?.howItWorksSection?.steps?.map((step, index) => (
-                <Card key={index}>
+                <Card key={index} className="bg-[#1A1A1A] border-[#343434]">
                   <CardContent className="p-4">
                     <div className="flex justify-between items-start mb-4">
-                      <h4 className="font-medium">Step {step.stepNumber}</h4>
+                      <h4 className="font-medium text-white">
+                        Step {step.stepNumber}
+                      </h4>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() =>
                           removeArrayItem("howItWorksSection.steps", index)
                         }
+                        className="text-[#EF4444] hover:bg-[#EF4444]/10"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                     <div className="space-y-3">
                       <div>
-                        <label className="block text-sm font-medium mb-1">
+                        <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
                           Step Number
                         </label>
                         <Input
@@ -554,10 +584,11 @@ const ContentManager = () => {
                             newSteps[index].stepNumber = e.target.value;
                             updateField("howItWorksSection.steps", newSteps);
                           }}
+                          className="bg-[#1A1A1A] border-[#343434] text-white"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-1">
+                        <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
                           Title
                         </label>
                         <Input
@@ -569,10 +600,11 @@ const ContentManager = () => {
                             newSteps[index].title = e.target.value;
                             updateField("howItWorksSection.steps", newSteps);
                           }}
+                          className="bg-[#1A1A1A] border-[#343434] text-white"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-1">
+                        <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
                           Description
                         </label>
                         <Textarea
@@ -585,10 +617,11 @@ const ContentManager = () => {
                             updateField("howItWorksSection.steps", newSteps);
                           }}
                           rows={2}
+                          className="bg-[#1A1A1A] border-[#343434] text-white"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-1">
+                        <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
                           Icon Name
                         </label>
                         <Input
@@ -601,6 +634,7 @@ const ContentManager = () => {
                             updateField("howItWorksSection.steps", newSteps);
                           }}
                           placeholder="Cpu, BarChart3, Star"
+                          className="bg-[#1A1A1A] border-[#343434] text-white"
                         />
                       </div>
                     </div>
@@ -608,45 +642,45 @@ const ContentManager = () => {
                 </Card>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </AdminSection>
       ),
     },
     {
       id: "testimonials",
       label: "Testimonials",
       content: (
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Testimonials Section</CardTitle>
-            <Button
-              size="sm"
-              onClick={() =>
-                addArrayItem("testimonialsSection.testimonials", {
-                  name: "New Customer",
-                  role: "Role",
-                  club: "Club",
-                  content: "Testimonial content...",
-                  avatar: null,
-                })
-              }
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Testimonial
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-6">
+        <AdminSection
+          title="Testimonials Section"
+          description="Customer testimonials and reviews"
+          icon={Star}
+          action={true}
+          actionText="Add Testimonial"
+          onAction={() =>
+            addArrayItem("testimonialsSection.testimonials", {
+              name: "New Customer",
+              role: "Role",
+              club: "Club",
+              content: "Testimonial content...",
+              avatar: null,
+            })
+          }
+        >
+          <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium mb-2">Heading</label>
+              <label className="block text-sm font-medium mb-2 text-white">
+                Heading
+              </label>
               <Input
                 value={content?.testimonialsSection?.heading || ""}
                 onChange={(e) =>
                   updateField("testimonialsSection.heading", e.target.value)
                 }
+                className="bg-[#1A1A1A] border-[#343434] text-white"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium mb-2 text-white">
                 Subheading
               </label>
               <Textarea
@@ -655,17 +689,20 @@ const ContentManager = () => {
                   updateField("testimonialsSection.subheading", e.target.value)
                 }
                 rows={2}
+                className="bg-[#1A1A1A] border-[#343434] text-white"
               />
             </div>
 
             <div className="space-y-4">
-              <h3 className="font-semibold">Testimonials</h3>
+              <h3 className="font-semibold text-white">Testimonials</h3>
               {content?.testimonialsSection?.testimonials?.map(
                 (testimonial, index) => (
-                  <Card key={index}>
+                  <Card key={index} className="bg-[#1A1A1A] border-[#343434]">
                     <CardContent className="p-4">
                       <div className="flex justify-between items-start mb-4">
-                        <h4 className="font-medium">Testimonial {index + 1}</h4>
+                        <h4 className="font-medium text-white">
+                          Testimonial {index + 1}
+                        </h4>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -675,49 +712,54 @@ const ContentManager = () => {
                               index
                             )
                           }
+                          className="text-[#EF4444] hover:bg-[#EF4444]/10"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                       <div className="space-y-3">
-                        <div>
-                          <label className="block text-sm font-medium mb-1">
-                            Name
-                          </label>
-                          <Input
-                            value={testimonial.name || ""}
-                            onChange={(e) => {
-                              const newTestimonials = [
-                                ...content.testimonialsSection.testimonials,
-                              ];
-                              newTestimonials[index].name = e.target.value;
-                              updateField(
-                                "testimonialsSection.testimonials",
-                                newTestimonials
-                              );
-                            }}
-                          />
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
+                              Name
+                            </label>
+                            <Input
+                              value={testimonial.name || ""}
+                              onChange={(e) => {
+                                const newTestimonials = [
+                                  ...content.testimonialsSection.testimonials,
+                                ];
+                                newTestimonials[index].name = e.target.value;
+                                updateField(
+                                  "testimonialsSection.testimonials",
+                                  newTestimonials
+                                );
+                              }}
+                              className="bg-[#1A1A1A] border-[#343434] text-white"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
+                              Role
+                            </label>
+                            <Input
+                              value={testimonial.role || ""}
+                              onChange={(e) => {
+                                const newTestimonials = [
+                                  ...content.testimonialsSection.testimonials,
+                                ];
+                                newTestimonials[index].role = e.target.value;
+                                updateField(
+                                  "testimonialsSection.testimonials",
+                                  newTestimonials
+                                );
+                              }}
+                              className="bg-[#1A1A1A] border-[#343434] text-white"
+                            />
+                          </div>
                         </div>
                         <div>
-                          <label className="block text-sm font-medium mb-1">
-                            Role
-                          </label>
-                          <Input
-                            value={testimonial.role || ""}
-                            onChange={(e) => {
-                              const newTestimonials = [
-                                ...content.testimonialsSection.testimonials,
-                              ];
-                              newTestimonials[index].role = e.target.value;
-                              updateField(
-                                "testimonialsSection.testimonials",
-                                newTestimonials
-                              );
-                            }}
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium mb-1">
+                          <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
                             Club
                           </label>
                           <Input
@@ -732,10 +774,11 @@ const ContentManager = () => {
                                 newTestimonials
                               );
                             }}
+                            className="bg-[#1A1A1A] border-[#343434] text-white"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium mb-1">
+                          <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
                             Content
                           </label>
                           <Textarea
@@ -751,32 +794,8 @@ const ContentManager = () => {
                               );
                             }}
                             rows={3}
+                            className="bg-[#1A1A1A] border-[#343434] text-white"
                           />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium mb-1">
-                            Avatar
-                          </label>
-                          <div className="flex items-center gap-2">
-                            <Input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) =>
-                                handleImageUpload(
-                                  e,
-                                  `testimonialsSection.testimonials.${index}.avatar`
-                                )
-                              }
-                              disabled={
-                                uploadingImages[
-                                  `testimonialsSection.testimonials.${index}.avatar`
-                                ]
-                              }
-                            />
-                            {uploadingImages[
-                              `testimonialsSection.testimonials.${index}.avatar`
-                            ] && <RefreshCw className="h-4 w-4 animate-spin" />}
-                          </div>
                         </div>
                       </div>
                     </CardContent>
@@ -784,30 +803,34 @@ const ContentManager = () => {
                 )
               )}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </AdminSection>
       ),
     },
     {
       id: "pricing",
       label: "Pricing",
       content: (
-        <Card>
-          <CardHeader>
-            <CardTitle>Pricing Section</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <AdminSection
+          title="Pricing Section"
+          description="Subscription plans and pricing"
+          icon={FileText}
+        >
+          <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Heading</label>
+              <label className="block text-sm font-medium mb-2 text-white">
+                Heading
+              </label>
               <Input
                 value={content?.pricingSection?.heading || ""}
                 onChange={(e) =>
                   updateField("pricingSection.heading", e.target.value)
                 }
+                className="bg-[#1A1A1A] border-[#343434] text-white"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium mb-2 text-white">
                 Subheading
               </label>
               <Textarea
@@ -816,45 +839,46 @@ const ContentManager = () => {
                   updateField("pricingSection.subheading", e.target.value)
                 }
                 rows={2}
+                className="bg-[#1A1A1A] border-[#343434] text-white"
               />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </AdminSection>
       ),
     },
     {
       id: "gallery",
       label: "Gallery",
       content: (
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Gallery Section</CardTitle>
-            <Button
-              size="sm"
-              onClick={() =>
-                addArrayItem("gallerySection.images", {
-                  title: "New Image",
-                  description: "Image description",
-                  image: null,
-                })
-              }
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Image
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-6">
+        <AdminSection
+          title="Gallery Section"
+          description="Image gallery and visual content"
+          icon={Camera}
+          action={true}
+          actionText="Add Image"
+          onAction={() =>
+            addArrayItem("gallerySection.images", {
+              title: "New Image",
+              description: "Image description",
+              image: null,
+            })
+          }
+        >
+          <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium mb-2">Heading</label>
+              <label className="block text-sm font-medium mb-2 text-white">
+                Heading
+              </label>
               <Input
                 value={content?.gallerySection?.heading || ""}
                 onChange={(e) =>
                   updateField("gallerySection.heading", e.target.value)
                 }
+                className="bg-[#1A1A1A] border-[#343434] text-white"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium mb-2 text-white">
                 Subheading
               </label>
               <Textarea
@@ -863,29 +887,33 @@ const ContentManager = () => {
                   updateField("gallerySection.subheading", e.target.value)
                 }
                 rows={2}
+                className="bg-[#1A1A1A] border-[#343434] text-white"
               />
             </div>
 
             <div className="space-y-4">
-              <h3 className="font-semibold">Gallery Images</h3>
+              <h3 className="font-semibold text-white">Gallery Images</h3>
               {content?.gallerySection?.images?.map((image, index) => (
-                <Card key={index}>
+                <Card key={index} className="bg-[#1A1A1A] border-[#343434]">
                   <CardContent className="p-4">
                     <div className="flex justify-between items-start mb-4">
-                      <h4 className="font-medium">Image {index + 1}</h4>
+                      <h4 className="font-medium text-white">
+                        Image {index + 1}
+                      </h4>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() =>
                           removeArrayItem("gallerySection.images", index)
                         }
+                        className="text-[#EF4444] hover:bg-[#EF4444]/10"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                     <div className="space-y-3">
                       <div>
-                        <label className="block text-sm font-medium mb-1">
+                        <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
                           Title
                         </label>
                         <Input
@@ -897,10 +925,11 @@ const ContentManager = () => {
                             newImages[index].title = e.target.value;
                             updateField("gallerySection.images", newImages);
                           }}
+                          className="bg-[#1A1A1A] border-[#343434] text-white"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-1">
+                        <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
                           Description
                         </label>
                         <Textarea
@@ -913,10 +942,11 @@ const ContentManager = () => {
                             updateField("gallerySection.images", newImages);
                           }}
                           rows={2}
+                          className="bg-[#1A1A1A] border-[#343434] text-white"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-1">
+                        <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
                           Image Upload
                         </label>
                         <div className="flex items-center gap-2">
@@ -934,10 +964,13 @@ const ContentManager = () => {
                                 `gallerySection.images.${index}.image`
                               ]
                             }
+                            className="bg-[#1A1A1A] border-[#343434] text-white"
                           />
                           {uploadingImages[
                             `gallerySection.images.${index}.image`
-                          ] && <RefreshCw className="h-4 w-4 animate-spin" />}
+                          ] && (
+                            <RefreshCw className="h-4 w-4 animate-spin text-primary" />
+                          )}
                         </div>
                       </div>
                     </div>
@@ -945,18 +978,18 @@ const ContentManager = () => {
                 </Card>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </AdminSection>
       ),
     },
   ];
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background p-8 flex items-center justify-center">
+      <div className="min-h-screen p-8 flex items-center justify-center">
         <div className="text-center">
-          <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p>Loading content...</p>
+          <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-white">Loading content...</p>
         </div>
       </div>
     );
@@ -964,74 +997,105 @@ const ContentManager = () => {
 
   if (!content) {
     return (
-      <div className="min-h-screen bg-background p-8">
+      <div className="min-h-screen p-8">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">No Content Found</h1>
-          <Button onClick={handleReset}>Initialize Default Content</Button>
+          <h1 className="text-2xl font-bold mb-4 text-white">
+            No Content Found
+          </h1>
+          <Button
+            onClick={handleReset}
+            className="bg-primary text-[#0F0F0E] hover:bg-primary/90"
+          >
+            Initialize Default Content
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold">Landing Page Content Manager</h1>
-            <p className="text-muted-foreground mt-2">
-              Manage all content for the GR4DE landing page
-              {health && (
-                <span
-                  className={`ml-2 px-2 py-1 rounded text-xs ${
-                    health.healthy
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
-                  }`}
-                >
-                  {health.healthy ? "✓ Connected" : "✗ Disconnected"}
-                </span>
-              )}
-            </p>
-          </div>
-
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={exportContent}>
-              <Download className="h-4 w-4 mr-2" />
-              Export
-            </Button>
-            <Button variant="outline" onClick={handleReset}>
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Reset
-            </Button>
-            <Button onClick={handleSave} disabled={saving}>
-              <Save className="h-4 w-4 mr-2" />
-              {saving ? "Saving..." : "Save Changes"}
-            </Button>
-          </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-white font-['Orbitron']">
+            Content Manager
+          </h1>
+          <p className="text-[#B0AFAF] mt-2 font-['Orbitron']">
+            Manage landing page content and structure
+            {/* {health && (
+              <StatusBadge
+                status={health.healthy ? "healthy" : "failed"}
+                className="ml-2"
+              />
+            )} */}
+          </p>
         </div>
 
-        {/* Tabs Component */}
-        <Tabs
-          tabs={tabs}
-          defaultTab={activeTab}
-          onTabChange={setActiveTab}
-          variant="pills"
-          size="md"
-          fullWidth={true}
-          responsive={true}
-          className="space-y-6"
-        />
-
-        {/* Preview Button */}
-        <div className="mt-8 text-center">
-          <Button variant="outline" onClick={() => window.open("/", "_blank")}>
-            <Eye className="h-4 w-4 mr-2" />
-            Preview Landing Page
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={exportContent}
+            className="bg-[#1A1A1A] border-[#343434] text-white hover:bg-[#262626]"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Export
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleReset}
+            className="bg-[#1A1A1A] border-[#343434] text-white hover:bg-[#262626]"
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Reset
+          </Button>
+          <Button
+            onClick={handleSave}
+            disabled={saving}
+            className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold"
+          >
+            <Save className="h-4 w-4 mr-2" />
+            {saving ? "Saving..." : "Save Changes"}
           </Button>
         </div>
       </div>
+
+      {/* Content Tabs */}
+      <Card className="bg-[#1A1A1A] border-[#343434]">
+        <CardContent className="p-6">
+          <Tabs
+            tabs={tabs}
+            defaultTab={activeTab}
+            onTabChange={setActiveTab}
+            variant="pills"
+            size="md"
+            fullWidth={true}
+            responsive={true}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Preview Section */}
+      <AdminSection
+        title="Preview"
+        description="Preview your changes on the live site"
+        icon={Eye}
+      >
+        <div className="text-center p-8 border-2 border-dashed border-[#343434] rounded-lg">
+          <Eye className="w-12 h-12 text-[#B0AFAF] mx-auto mb-4" />
+          <p className="text-[#B0AFAF] mb-4">
+            Preview your landing page changes
+          </p>
+          <Button
+            variant="outline"
+            onClick={() => window.open("/", "_blank")}
+            className="bg-[#1A1A1A] border-[#343434] text-white hover:bg-[#262626]"
+          >
+            <Eye className="h-4 w-4 mr-2" />
+            Open Landing Page
+          </Button>
+        </div>
+      </AdminSection>
     </div>
   );
 };
