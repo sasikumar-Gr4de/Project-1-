@@ -46,7 +46,7 @@ const DataTable = ({
     ? externalPagination.page
     : internalPage;
   const itemsPerPage = isExternalPagination
-    ? externalPagination.pageSize
+    ? externalPagination.limit
     : internalPageSize;
   const totalItems = isExternalPagination
     ? externalPagination.total

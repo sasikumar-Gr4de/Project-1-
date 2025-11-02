@@ -38,6 +38,8 @@ export const useAdminStore = create((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await adminService.getProcessingQueue(filters);
+      console.log("Fetched Queue:", response.data);
+      window.alert("Fetched Queue: " + JSON.stringify(response.data));
       set({ queue: response.data, isLoading: false });
       return response.data;
     } catch (error) {

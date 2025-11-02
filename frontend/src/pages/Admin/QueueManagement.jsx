@@ -36,11 +36,9 @@ const QueueManagement = () => {
       cell: ({ row }) => (
         <div>
           <div className="font-medium text-white">
-            {row.original.users?.player_name || "Unknown Player"}
+            {row.users?.player_name || "Unknown Player"}
           </div>
-          <div className="text-xs text-[#B0AFAF]">
-            {row.original.users?.email}
-          </div>
+          <div className="text-xs text-[#B0AFAF]">{row.users?.email}</div>
         </div>
       ),
     },
@@ -49,7 +47,7 @@ const QueueManagement = () => {
       header: "Match Date",
       cell: ({ row }) => (
         <span className="text-white text-sm">
-          {new Date(row.getValue("match_date")).toLocaleDateString()}
+          {new Date(row?.match_date).toLocaleDateString()}
         </span>
       ),
     },
@@ -58,21 +56,21 @@ const QueueManagement = () => {
       header: "Position",
       cell: ({ row }) => (
         <Badge variant="outline" className="capitalize">
-          {row.getValue("position") || "N/A"}
+          {row?.position || "N/A"}
         </Badge>
       ),
     },
     {
       accessorKey: "status",
       header: "Status",
-      cell: ({ row }) => <StatusBadge status={row.getValue("status")} />,
+      cell: ({ row }) => <StatusBadge status={row?.status} />,
     },
     {
       accessorKey: "created_at",
       header: "Submitted",
       cell: ({ row }) => (
         <span className="text-[#B0AFAF] text-sm">
-          {new Date(row.getValue("created_at")).toLocaleDateString()}
+          {new Date(row?.created_at).toLocaleDateString()}
         </span>
       ),
     },
@@ -89,11 +87,11 @@ const QueueManagement = () => {
             <Eye className="w-3 h-3 mr-1" />
             View
           </Button>
-          {row.original.status === "failed" && (
+          {row.status === "failed" && (
             <Button
               variant="outline"
               size="sm"
-              onClick={() => retryJob(row.original.id)}
+              onClick={() => retryJob(row.id)}
               className="h-8 px-3 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
             >
               <Play className="w-3 h-3 mr-1" />
@@ -103,10 +101,11 @@ const QueueManagement = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => deleteJob(row.original.id)}
+            onClick={() => deleteJob(row.id)}
             className="h-8 px-3 bg-[#EF4444]/10 text-[#EF4444] border-[#EF4444]/20 hover:bg-[#EF4444]/20"
           >
             <Trash2 className="w-3 h-3 mr-1" />
+            Delete
           </Button>
         </div>
       ),
@@ -203,24 +202,24 @@ const QueueManagement = () => {
       </AdminSection>
 
       {/* Queue Table */}
-      <AdminSection
+      {/* <AdminSection
         title="Processing Queue"
         description="All data processing jobs in the system"
         icon={Activity}
-      >
-        <DataTable
-          columns={columns}
-          data={queue.items || []}
-          isLoading={isLoading}
-          pagination={queue.pagination}
-          onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
-          onPageSizeChange={(pageSize) =>
-            setFilters((prev) => ({ ...prev, limit: pageSize, page: 1 }))
-          }
-          emptyStateTitle="No Jobs in Queue"
-          emptyStateDescription="There are no data processing jobs in the queue at the moment."
-        />
-      </AdminSection>
+      > */}
+      <DataTable
+        columns={columns}
+        data={queue.items || []}
+        isLoading={isLoading}
+        pagination={queue.pagination}
+        onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
+        onPageSizeChange={(pageSize) =>
+          setFilters((prev) => ({ ...prev, limit: pageSize, page: 1 }))
+        }
+        emptyStateTitle="No Jobs in Queue"
+        emptyStateDescription="There are no data processing jobs in the queue at the moment."
+      />
+      {/* </AdminSection> */}
     </div>
   );
 };

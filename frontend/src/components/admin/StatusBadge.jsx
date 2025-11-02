@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Clock, Play, XCircle, RefreshCw } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const StatusBadge = ({ status, size = "md" }) => {
   const statusConfig = {
