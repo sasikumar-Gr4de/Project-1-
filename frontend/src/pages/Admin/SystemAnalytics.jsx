@@ -4,6 +4,13 @@ import AdminSection from "@/components/admin/AdminSection";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   BarChart3,
   Users,
   FileText,
@@ -83,15 +90,25 @@ const SystemAnalytics = () => {
           </p>
         </div>
         <div className="flex items-center space-x-4">
-          <select
-            value={dateRange}
-            onChange={(e) => setDateRange(e.target.value)}
-            className="px-4 py-2 bg-[#1A1A1A] border border-[#343434] rounded-lg text-white focus:outline-none focus:border-primary transition-colors"
-          >
-            <option value="24h">Last 24 Hours</option>
-            <option value="7d">Last 7 Days</option>
-            <option value="30d">Last 30 Days</option>
-          </select>
+          <Select value={dateRange} onValueChange={setDateRange}>
+            <SelectTrigger className="w-40 h-10 bg-[#1A1A1A] border border-[#343434] rounded-lg text-white focus:outline-none focus:border-primary transition-colors">
+              <SelectValue
+                placeholder="Select Date Range"
+                className="text-white"
+              />
+            </SelectTrigger>
+            <SelectContent className="bg-[#1A1A1A] border border-[#343434] rounded-lg">
+              <SelectItem value="24h" className="text-white">
+                Last 24 Hours
+              </SelectItem>
+              <SelectItem value="7d" className="text-white">
+                Last 7 Days
+              </SelectItem>
+              <SelectItem value="30d" className="text-white">
+                Last 30 Days
+              </SelectItem>
+            </SelectContent>
+          </Select>
           <Button
             onClick={loadAnalytics}
             disabled={isLoading}

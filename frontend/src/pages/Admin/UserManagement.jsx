@@ -57,11 +57,19 @@ const UserManagement = () => {
       header: "User",
       cell: ({ row }) => (
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-linear-to-br from-primary to-[#94D44A] rounded-full flex items-center justify-center">
-            <span className="text-[#0F0F0E] text-sm font-bold">
-              {row.player_name?.charAt(0)?.toUpperCase() || "U"}
-            </span>
-          </div>
+          {!row.avatar_url ? (
+            <div className="w-10 h-10 bg-linear-to-br from-primary to-[#94D44A] rounded-full flex items-center justify-center">
+              <span className="text-[#0F0F0E] text-sm font-bold">
+                {row.player_name?.charAt(0)?.toUpperCase() || "U"}
+              </span>
+            </div>
+          ) : (
+            <img
+              src={row.avatar_url}
+              alt="Avatar"
+              className="w-10 h-10 rounded-full object-cover"
+            />
+          )}
           <div>
             <div className="font-medium text-white">
               {row.player_name || "Unknown User"}

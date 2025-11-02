@@ -56,4 +56,9 @@ export const adminService = {
     const response = await api.post(`/admin/reports/${reportId}/regenerate`);
     return response.data;
   },
+
+  async getSystemAnalytics() {
+    const response = await api.get("/admin/analytics");
+    return response.data;
+  },
 };

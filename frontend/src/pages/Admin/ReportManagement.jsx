@@ -1,11 +1,10 @@
 // frontend/src/pages/Admin/ReportManagement.jsx
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useAdminStore } from "@/store/adminStore";
 import DataTable from "@/components/common/DataTable";
 import AdminSection from "@/components/admin/AdminSection";
 import StatusBadge from "@/components/admin/StatusBadge";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   FileText,
   Search,
@@ -48,11 +47,9 @@ const ReportManagement = () => {
       cell: ({ row }) => (
         <div>
           <div className="font-medium text-white">
-            {row.original.users?.player_name || "Unknown Player"}
+            {row.users?.player_name || "Unknown Player"}
           </div>
-          <div className="text-xs text-[#B0AFAF]">
-            {row.original.users?.position}
-          </div>
+          <div className="text-xs text-[#B0AFAF]">{row.users?.position}</div>
         </div>
       ),
     },
@@ -61,8 +58,8 @@ const ReportManagement = () => {
       header: "Match Date",
       cell: ({ row }) => (
         <span className="text-white text-sm">
-          {row.original.player_data?.match_date
-            ? new Date(row.original.player_data.match_date).toLocaleDateString()
+          {row.player_data?.match_date
+            ? new Date(row.player_data.match_date).toLocaleDateString()
             : "N/A"}
         </span>
       ),
@@ -107,7 +104,7 @@ const ReportManagement = () => {
             <Eye className="w-3 h-3 mr-1" />
             View
           </Button>
-          {row.original.pdf_url && (
+          {row.pdf_url && (
             <Button
               variant="outline"
               size="sm"
@@ -117,11 +114,11 @@ const ReportManagement = () => {
               PDF
             </Button>
           )}
-          {row.original.status === "failed" && (
+          {row.status === "failed" && (
             <Button
               variant="outline"
               size="sm"
-              onClick={() => regenerateReport(row.original.id)}
+              onClick={() => regenerateReport(row.id)}
               className="h-8 px-3 bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/20 hover:bg-[#F59E0B]/20"
             >
               <RefreshCw className="w-3 h-3 mr-1" />
@@ -131,7 +128,7 @@ const ReportManagement = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => deleteReport(row.original.id)}
+            onClick={() => deleteReport(row.id)}
             className="h-8 px-3 bg-[#EF4444]/10 text-[#EF4444] border-[#EF4444]/20 hover:bg-[#EF4444]/20"
           >
             <Trash2 className="w-3 h-3 mr-1" />
@@ -207,24 +204,24 @@ const ReportManagement = () => {
       </AdminSection>
 
       {/* Reports Table */}
-      <AdminSection
+      {/* <AdminSection
         title="Performance Reports"
         description="All generated player performance reports"
         icon={FileText}
-      >
-        <DataTable
-          columns={columns}
-          data={reports.items || []}
-          isLoading={isLoading}
-          pagination={reports.pagination}
-          onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
-          onPageSizeChange={(pageSize) =>
-            setFilters((prev) => ({ ...prev, limit: pageSize, page: 1 }))
-          }
-          emptyStateTitle="No Reports Found"
-          emptyStateDescription="No reports match your current filters."
-        />
-      </AdminSection>
+      > */}
+      <DataTable
+        columns={columns}
+        data={reports.items || []}
+        isLoading={isLoading}
+        pagination={reports.pagination}
+        onPageChange={(page) => setFilters((prev) => ({ ...prev, page }))}
+        onPageSizeChange={(pageSize) =>
+          setFilters((prev) => ({ ...prev, limit: pageSize, page: 1 }))
+        }
+        emptyStateTitle="No Reports Found"
+        emptyStateDescription="No reports match your current filters."
+      />
+      {/* </AdminSection> */}
     </div>
   );
 };
