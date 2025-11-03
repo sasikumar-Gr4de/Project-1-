@@ -148,21 +148,6 @@ const AppLoading = ({
           </div>
         </div>
       </div>
-
-      {/* Custom CSS for animations */}
-      <style jsx>{`
-        @keyframes progress {
-          0% {
-            width: 0%;
-          }
-          50% {
-            width: 60%;
-          }
-          100% {
-            width: 100%;
-          }
-        }
-      `}</style>
     </div>
   );
 };
