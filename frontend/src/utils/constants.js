@@ -25,12 +25,12 @@ export const UPLOAD_STATUS = {
   FAILED: "failed",
 };
 
-export const DATA_STATUS = {
-  UPLOADED: "uploaded",
-  PENDING: "pending",
-  PROCESSING: "processing",
-  COMPLETED: "completed",
-  FAILED: "failed",
+export const QUEUE_STATUS = {
+  UPLOADED: { key: "uploaded", label: "Uploaded" },
+  PENDING: { key: "pending", label: "Pending" },
+  PROCESSING: { key: "processing", label: "Processing" },
+  COMPLETED: { key: "completed", label: "Completed" },
+  FAILED: { key: "failed", label: "Failed" },
 };
 
 export const REPORT_STATUS = {

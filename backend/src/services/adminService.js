@@ -109,6 +109,29 @@ export const getProcessingQueue = async ({ status, page = 1, limit = 50 }) => {
       query = query.eq("status", status);
     }
 
+    // Get counts by status for categories
+    const { data: allData, error: allError } = await supabase
+      .from("player_data")
+      .select("status");
+
+    console.log("All Data for Categories:", allData);
+    if (allError) throw allError;
+
+    const categories = {
+      all: allData.length,
+      uploaded: 0,
+      pending: 0,
+      processing: 0,
+      completed: 0,
+      failed: 0,
+    };
+
+    allData.forEach((item) => {
+      if (categories[item.status] !== undefined) {
+        categories[item.status] += 1;
+      }
+    });
+
     const from = (page - 1) * limit;
     const to = from + limit - 1;
 
@@ -118,6 +141,7 @@ export const getProcessingQueue = async ({ status, page = 1, limit = 50 }) => {
 
     return {
       items: data || [],
+      categories,
       pagination: {
         page,
         limit,

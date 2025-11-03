@@ -6,7 +6,8 @@ import AdminSection from "@/components/admin/AdminSection";
 import StatusBadge from "@/components/admin/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Play, Trash2, Eye, Filter, Activity } from "lucide-react";
+import { RefreshCw, Play, Trash2, Eye, Filter } from "lucide-react";
+import { capitalize } from "@/utils/helper.utils";
 
 const QueueManagement = () => {
   const { queue, fetchQueue, retryJob, deleteJob, isLoading } = useAdminStore();
@@ -112,40 +113,6 @@ const QueueManagement = () => {
     },
   ];
 
-  const statusFilters = [
-    { value: "all", label: "All Status", count: queue.pagination?.total || 0 },
-    {
-      value: "uploaded",
-      label: "Uploaded",
-      count:
-        queue.items?.filter((item) => item.status === "uploaded").length || 0,
-    },
-    {
-      value: "pending",
-      label: "Pending",
-      count:
-        queue.items?.filter((item) => item.status === "pending").length || 0,
-    },
-    {
-      value: "processing",
-      label: "Processing",
-      count:
-        queue.items?.filter((item) => item.status === "processing").length || 0,
-    },
-    {
-      value: "completed",
-      label: "Completed",
-      count:
-        queue.items?.filter((item) => item.status === "completed").length || 0,
-    },
-    {
-      value: "failed",
-      label: "Failed",
-      count:
-        queue.items?.filter((item) => item.status === "failed").length || 0,
-    },
-  ];
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -176,28 +143,27 @@ const QueueManagement = () => {
         icon={Filter}
       >
         <div className="flex flex-wrap gap-3">
-          {statusFilters.map((filter) => (
-            <Button
-              key={filter.value}
-              variant={filters.status === filter.value ? "default" : "outline"}
-              onClick={() => handleStatusFilter(filter.value)}
-              className={`flex items-center space-x-2 ${
-                filters.status === filter.value
-                  ? "bg-primary text-[#0F0F0E] border-primary"
-                  : "bg-[#1A1A1A] border-[#343434] text-white hover:bg-[#262626]"
-              }`}
-            >
-              <span>{filter.label}</span>
-              <Badge
-                variant={
-                  filters.status === filter.value ? "secondary" : "outline"
-                }
-                className="ml-1"
+          {queue.categories &&
+            Object.keys(queue.categories).map((filter) => (
+              <Button
+                key={filter}
+                variant={filters.status === filter ? "default" : "outline"}
+                onClick={() => handleStatusFilter(filter)}
+                className={`flex items-center space-x-2 ${
+                  filters.status === filter
+                    ? "bg-primary text-[#0F0F0E] border-primary"
+                    : "bg-[#1A1A1A] border-[#343434] text-white hover:bg-[#262626]"
+                }`}
               >
-                {filter.count}
-              </Badge>
-            </Button>
-          ))}
+                <span>{capitalize(filter)}</span>
+                <Badge
+                  variant={filters.status === filter ? "secondary" : "outline"}
+                  className="ml-1"
+                >
+                  {queue.categories[filter]}
+                </Badge>
+              </Button>
+            ))}
         </div>
       </AdminSection>
 

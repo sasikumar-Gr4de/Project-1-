@@ -17,7 +17,7 @@ export const getSystemMetrics = async (req, res) => {
 // Queue management
 export const getProcessingQueue = async (req, res) => {
   try {
-    const { status, page = 1, limit = 50 } = req.query;
+    const { status, page = 1, limit = 10 } = req.query;
     const queue = await adminService.getProcessingQueue({
       status,
       page: parseInt(page),
