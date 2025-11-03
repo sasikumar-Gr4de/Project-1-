@@ -3,6 +3,7 @@ export const USER_ROLES = {
   PLAYER: "player",
   COACH: "coach",
   ADMIN: "admin",
+  SCOUT: "scout_readonly", // Future role
 };
 
 // Subscription Tier Plans
@@ -463,45 +464,43 @@ export const REPORT_TYPES = {
   SEASON: "season",
 };
 
-// Export all constants as a single object for easy importing
-export default {
-  USER_ROLES,
-  TIER_PLANS,
-  UPLOAD_STATUS,
-  QUEUE_STATUS,
-  REPORT_STATUS,
-  SUBSCRIPTION_STATUS,
-  ALERT_TYPES,
-  ALERT_STATUS,
-  FOOTBALL_POSITIONS,
-  AGE_GROUPS,
-  SCORE_PILLARS,
-  FILE_TYPES,
-  ALLOWED_VIDEO_TYPES,
-  ALLOWED_DATA_TYPES,
-  FILE_SIZE_LIMITS,
-  OTP_CONFIG,
-  PAGINATION,
-  HTTP_STATUS,
-  RATE_LIMIT_CONFIG,
-  S3_CONFIG,
-  STRIPE_CONFIG,
-  DEFAULT_SCORING_WEIGHTS,
-  BENCHMARK_CONFIG,
-  NOTIFICATION_TEMPLATES,
-  COUNTRIES,
-  ACADEMIES,
-  PERFORMANCE_METRICS,
-  INSIGHT_TYPES,
-  DATE_FORMATS,
-  ENVIRONMENT,
-  CACHE_KEYS,
-  ERROR_CODES,
-  API_MESSAGES,
-  FEATURE_FLAGS,
-  TIER_LIMITS,
-  PASSPORT_STATUS,
-  DOCUMENT_TYPES,
-  METRICS_SOURCES,
-  REPORT_TYPES,
+// RBAC Permissions Matrix
+export const PERMISSIONS = {
+  [USER_ROLES.PLAYER]: {
+    read: [
+      "own_profile",
+      "own_identity",
+      "own_passport",
+      "own_metrics",
+      "own_reports",
+      "own_media",
+      "own_verifications",
+      "benchmarks",
+    ],
+    write: ["own_profile", "own_identity", "own_media", "own_verifications"],
+    delete: ["own_media"],
+  },
+  [USER_ROLES.COACH]: {
+    read: [
+      "all_profiles",
+      "all_identities",
+      "all_passports",
+      "all_metrics",
+      "all_reports",
+      "all_media",
+      "benchmarks",
+    ],
+    write: ["metrics", "media", "reports"],
+    delete: ["media"],
+  },
+  [USER_ROLES.ADMIN]: {
+    read: ["all_data"],
+    write: ["all_data"],
+    delete: ["all_data"],
+  },
+  [USER_ROLES.SCOUT]: {
+    read: ["profiles", "identities", "passports", "metrics", "reports"],
+    write: [],
+    delete: [],
+  },
 };

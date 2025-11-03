@@ -7,6 +7,7 @@ export const USER_ROLES = {
   PLAYER: "player",
   COACH: "coach",
   ADMIN: "admin",
+  SCOUT: "scout_readonly", // Future role
 };
 
 // Subscription Tier Plans
