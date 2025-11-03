@@ -1,0 +1,75 @@
+import * as verificationService from "../services/verificationService.js";
+import * as passportService from "../services/passportService.js";
+import { RESPONSES } from "../utils/messages.js";
+
+// Get pending verifications (admin only)
+export const getPendingVerifications = async (req, res) => {
+  try {
+    const { document_type, page = 1, limit = 20 } = req.query;
+
+    const verifications = await verificationService.getPendingVerifications({
+      document_type,
+      page: parseInt(page),
+      limit: parseInt(limit),
+    });
+
+    res.json(
+      RESPONSES.SUCCESS(
+        "Pending verifications fetched successfully",
+        verifications
+      )
+    );
+  } catch (error) {
+    console.error("Get pending verifications error:", error);
+    res
+      .status(500)
+      .json(RESPONSES.SERVER_ERROR("Failed to fetch pending verifications"));
+  }
+};
+
+// Review verification (admin only)
+export const reviewVerification = async (req, res) => {
+  try {
+    const { verification_id } = req.params;
+    const { action, note } = req.body;
+    const adminId = req.user.id;
+
+    if (!["approved", "rejected"].includes(action)) {
+      return res
+        .status(400)
+        .json(RESPONSES.BAD_REQUEST("Action must be 'approved' or 'rejected'"));
+    }
+
+    const verification = await passportService.reviewVerification(
+      verification_id,
+      adminId,
+      action,
+      note
+    );
+
+    res.json(
+      RESPONSES.SUCCESS(`Verification ${action} successfully`, verification)
+    );
+  } catch (error) {
+    console.error("Review verification error:", error);
+    res
+      .status(500)
+      .json(RESPONSES.SERVER_ERROR("Failed to review verification"));
+  }
+};
+
+// Get verification stats (admin only)
+export const getVerificationStats = async (req, res) => {
+  try {
+    const stats = await verificationService.getVerificationStats();
+
+    res.json(
+      RESPONSES.SUCCESS("Verification stats fetched successfully", stats)
+    );
+  } catch (error) {
+    console.error("Get verification stats error:", error);
+    res
+      .status(500)
+      .json(RESPONSES.SERVER_ERROR("Failed to fetch verification stats"));
+  }
+};
