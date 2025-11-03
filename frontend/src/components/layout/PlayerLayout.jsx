@@ -161,7 +161,7 @@ const PlayerLayout = ({ children }) => {
             <img
               src="https://amzn-gr4de-bucket.s3.eu-north-1.amazonaws.com/serverfavicon-flat.png-1761828572874-cz3vcaezhrb"
               alt="GR4DE Logo"
-              className="w-24 h-14 object-contain"
+              className="w-36 h-24 object-contain"
             />
             <p className="text-sm text-[#B0AFAF] mt-2 font-['Orbitron']">
               The Game Reads you Back

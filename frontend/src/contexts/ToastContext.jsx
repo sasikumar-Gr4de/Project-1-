@@ -65,7 +65,7 @@ export const ToastProvider = ({ children }) => {
           className="w-6 h-6 rounded-full flex items-center justify-center"
           style={{ backgroundColor: "rgb(218,65,60)" }}
         >
-          <span className="text-black text-xs font-bold">!</span>
+          <span className="text-black text-xs font-bold">X</span>
         </div>
       ),
       success: (

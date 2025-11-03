@@ -168,7 +168,7 @@ const AdminLayout = ({ children }) => {
             <img
               src="https://amzn-gr4de-bucket.s3.eu-north-1.amazonaws.com/serverfavicon-flat.png-1761828572874-cz3vcaezhrb"
               alt="GR4DE Logo"
-              className="w-24 h-14 object-contain"
+              className="w-36 h-24 object-contain"
             />
             <div className="flex items-center space-x-2 mt-2">
               <Shield className="w-4 h-4 text-primary" />
