@@ -1,0 +1,79 @@
+import { supabase } from "../config/supabase.config.js";
+import crypto from "crypto";
+
+export const getPendingVerifications = async (filters = {}) => {
+  try {
+    let query = supabase
+      .from("player_verifications")
+      .select(
+        `
+        *,
+        users:player_id (
+          player_name,
+          email,
+          avatar_url
+        )
+        `,
+        { count: "exact" }
+      )
+      .eq("status", "pending")
+      .order("created_at", { ascending: false });
+
+    if (filters.document_type && filters.document_type !== "all") {
+      query = query.eq("document_type", filters.document_type);
+    }
+
+    const { data, error, count } = await query;
+
+    if (error) throw error;
+
+    return {
+      items: data || [],
+      total: count || 0,
+    };
+  } catch (error) {
+    console.error("Get pending verifications error:", error);
+    throw new Error("Failed to fetch pending verifications");
+  }
+};
+
+export const calculateFileHash = async (fileBuffer) => {
+  return crypto.createHash("sha256").update(fileBuffer).digest("hex");
+};
+
+export const getVerificationStats = async () => {
+  try {
+    const { data, error } = await supabase
+      .from("player_verifications")
+      .select("status, document_type");
+
+    if (error) throw error;
+
+    const stats = {
+      total: data.length,
+      pending: data.filter((v) => v.status === "pending").length,
+      approved: data.filter((v) => v.status === "approved").length,
+      rejected: data.filter((v) => v.status === "rejected").length,
+      byType: {},
+    };
+
+    // Count by document type
+    data.forEach((verification) => {
+      if (!stats.byType[verification.document_type]) {
+        stats.byType[verification.document_type] = {
+          total: 0,
+          pending: 0,
+          approved: 0,
+          rejected: 0,
+        };
+      }
+      stats.byType[verification.document_type].total++;
+      stats.byType[verification.document_type][verification.status]++;
+    });
+
+    return stats;
+  } catch (error) {
+    console.error("Get verification stats error:", error);
+    throw new Error("Failed to fetch verification stats");
+  }
+};
