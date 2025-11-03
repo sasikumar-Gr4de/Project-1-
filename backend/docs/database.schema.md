@@ -42,22 +42,16 @@ create index IF not exists idx_auth_otp_phone on public.auth_otp using btree (ph
 
 create index IF not exists idx_auth_otp_expires on public.auth_otp using btree (expires_at) TABLESPACE pg_default;
 
-create table public.auth_otp (
+create table public.benchmarks (
   id uuid not null default extensions.uuid_generate_v4 (),
-  email text null,
-  phone text null,
-  otp text not null,
-  expires_at timestamp with time zone not null,
-  used boolean null default false,
+  position text not null,
+  age_group text not null,
+  averages_json jsonb not null,
+  season text null,
+  is_active boolean null default true,
   created_at timestamp with time zone null default now(),
-  constraint auth_otp_pkey primary key (id)
+  constraint benchmarks_pkey primary key (id)
 ) TABLESPACE pg_default;
-
-create index IF not exists idx_auth_otp_email on public.auth_otp using btree (email) TABLESPACE pg_default;
-
-create index IF not exists idx_auth_otp_phone on public.auth_otp using btree (phone) TABLESPACE pg_default;
-
-create index IF not exists idx_auth_otp_expires on public.auth_otp using btree (expires_at) TABLESPACE pg_default;
 
 create table public.player_data (
   id uuid not null default extensions.uuid_generate_v4 (),
@@ -88,26 +82,21 @@ create table public.player_data (
   )
 ) TABLESPACE pg_default;
 
-create table public.player_data (
+create table public.processing_queue (
   id uuid not null default extensions.uuid_generate_v4 (),
-  player_id uuid not null,
-  gps_file text null,
-  video_file text null,
-  match_date date not null,
-  notes text null,
-  status text null default 'uploaded'::text,
+  player_data_id uuid not null,
+  status text null default 'pending'::text,
+  logs text null,
+  started_at timestamp with time zone null,
+  completed_at timestamp with time zone null,
   created_at timestamp with time zone null default now(),
-  jersey_number integer null default 1,
-  jersey_home_color text null,
-  jersey_away_color text null,
-  position text null,
-  constraint player_data_pkey primary key (id),
-  constraint player_data_user_id_fkey foreign KEY (player_id) references users (id),
-  constraint player_data_status_check check (
+  constraint processing_queue_pkey primary key (id),
+  constraint processing_queue_player_data_id_fkey foreign KEY (player_data_id) references player_data (id),
+  constraint processing_queue_status_check check (
     (
       status = any (
         array[
-          'uploaded'::text,
+          'pending'::text,
           'processing'::text,
           'completed'::text,
           'failed'::text
@@ -148,31 +137,33 @@ create table public.reports (
   )
 ) TABLESPACE pg_default;
 
-create table public.reports (
+create table public.subscriptions (
   id uuid not null default extensions.uuid_generate_v4 (),
-  player_id uuid not null,
-  player_data_id uuid not null,
-  score_json jsonb not null,
-  pdf_url text null,
-  overall_score integer null,
-  status text null default 'generated'::text,
+  user_id uuid not null,
+  stripe_subscription_id text null,
+  stripe_customer_id text null,
+  plan_type text not null,
+  status text not null,
+  current_period_start timestamp with time zone null,
+  current_period_end timestamp with time zone null,
   created_at timestamp with time zone null default now(),
-  constraint reports_pkey primary key (id),
-  constraint reports_player_data_id_fkey foreign KEY (player_data_id) references player_data (id),
-  constraint reports_player_id_fkey foreign KEY (player_id) references users (id),
-  constraint reports_overall_score_check check (
+  updated_at timestamp with time zone null default now(),
+  constraint subscriptions_pkey primary key (id),
+  constraint subscriptions_stripe_subscription_id_key unique (stripe_subscription_id),
+  constraint subscriptions_user_id_fkey foreign KEY (user_id) references users (id),
+  constraint subscriptions_plan_type_check check (
     (
-      (overall_score >= 0)
-      and (overall_score <= 100)
+      plan_type = any (array['basic'::text, 'pro'::text, 'elite'::text])
     )
   ),
-  constraint reports_status_check check (
+  constraint subscriptions_status_check check (
     (
       status = any (
         array[
-          'generating'::text,
-          'generated'::text,
-          'failed'::text
+          'active'::text,
+          'canceled'::text,
+          'past_due'::text,
+          'unpaid'::text
         ]
       )
     )
@@ -194,6 +185,7 @@ create table public.users (
   phone character varying null,
   avatar_url character varying null,
   stripe_customer_id text null,
+  status text null,
   constraint users_pkey primary key (id),
   constraint users_role_check check (
     (
