@@ -208,6 +208,112 @@ create table public.users (
   )
 ) TABLESPACE pg_default;
 
+
+## Digital Player Passport Tables
+
+-- Player Identity (1:1 with users)
+CREATE TABLE player_identity (
+    player_id uuid PRIMARY KEY REFERENCES users(id),
+    first_name text,
+    last_name text,
+    dob date,
+    nationality text,
+    height_cm integer,
+    weight_kg integer,
+    preferred_foot text CHECK (preferred_foot IN ('left', 'right', 'both')),
+    positions text[],
+    headshot_url text,
+    guardian_name text,
+    guardian_email text,
+    guardian_phone text,
+    created_at timestamptz DEFAULT now(),
+    updated_at timestamptz DEFAULT now()
+);
+
+-- Player Passport
+CREATE TABLE player_passport (
+    passport_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    player_id uuid REFERENCES users(id),
+    current_club text,
+    season text,
+    squad_level text,
+    shirt_number text,
+    notes text,
+    created_at timestamptz DEFAULT now(),
+    updated_at timestamptz DEFAULT now()
+);
+
+-- Player Metrics
+CREATE TABLE player_metrics (
+    metric_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    player_id uuid REFERENCES users(id),
+    match_id uuid,
+    date date NOT NULL,
+    competition text,
+    minutes integer,
+    gps_summary jsonb,
+    event_summary jsonb,
+    gr4de_score numeric(5,2) CHECK (gr4de_score >= 0 AND gr4de_score <= 100),
+    benchmarks jsonb,
+    source text CHECK (source IN ('catapult', 'playmaker', 'stepout', 'manual')),
+    raw_file_url text,
+    created_at timestamptz DEFAULT now()
+);
+
+-- Player Reports (enhanced)
+CREATE TABLE player_reports (
+    report_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    player_id uuid REFERENCES users(id),
+    report_type text CHECK (report_type IN ('weekly', 'monthly', 'season')),
+    period_start date,
+    period_end date,
+    summary_json jsonb,
+    pdf_url text,
+    created_at timestamptz DEFAULT now(),
+    UNIQUE(player_id, period_start, period_end, report_type)
+);
+
+-- Player Media
+CREATE TABLE player_media (
+    media_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    player_id uuid REFERENCES users(id),
+    media_type text CHECK (media_type IN ('video', 'image', 'link')),
+    title text,
+    description text,
+    url text,
+    created_at timestamptz DEFAULT now()
+);
+
+-- Player Verifications
+CREATE TABLE player_verifications (
+    verification_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    player_id uuid REFERENCES users(id),
+    document_type text CHECK (document_type IN ('passport', 'club_letter', 'consent')),
+    file_url text,
+    status text DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+    reviewed_by uuid REFERENCES users(id),
+    reviewed_at timestamptz,
+    hash_sha256 text,
+    created_at timestamptz DEFAULT now()
+);
+
+-- Audit Logs
+CREATE TABLE audit_logs (
+    log_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    actor_id uuid REFERENCES users(id),
+    entity text,
+    entity_id uuid,
+    action text CHECK (action IN ('create', 'update', 'delete', 'verify')),
+    diff_json jsonb,
+    created_at timestamptz DEFAULT now()
+);
+
+-- Indexes
+CREATE INDEX idx_player_metrics_player_date ON player_metrics(player_id, date DESC);
+CREATE INDEX idx_player_reports_player_period ON player_reports(player_id, period_start, period_end);
+CREATE INDEX idx_player_verifications_status ON player_verifications(status);
+CREATE INDEX idx_audit_logs_entity ON audit_logs(entity, entity_id);
+
 ```
 
 # GR4DE Platform Database Schema

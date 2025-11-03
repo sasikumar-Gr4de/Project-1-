@@ -122,6 +122,12 @@ export const NAV_ITEMS = {
     { name: "My Reports", href: "/reports", icon: "FileText" },
     { name: "Benchmarks", href: "/benchmarks", icon: "BarChart3" },
     { name: "Profile", href: "/profile", icon: "User" },
+    {
+      name: "Passport",
+      href: "/passport",
+      icon: "FileText",
+      description: "Digital player passport",
+    },
   ],
   ADMIN: [
     {
@@ -159,6 +165,18 @@ export const NAV_ITEMS = {
       href: "/admin/content",
       icon: "Database",
       description: "Manage platform content",
+    },
+    {
+      name: "Passport Manager",
+      href: "/admin/passports",
+      icon: "FileText",
+      description: "Manage player passports",
+    },
+    {
+      name: "Verification",
+      href: "/admin/verifications",
+      icon: "Shield",
+      description: "Review document verification",
     },
   ],
 };
@@ -203,5 +221,25 @@ export const PLAN_FEATURES = {
       "Scout access",
     ],
     color: "purple",
+  },
+};
+
+export const PASSPORT_CONSTANTS = {
+  VERIFICATION_STATUS: {
+    VERIFIED: "verified",
+    PENDING: "pending",
+    REJECTED: "rejected",
+    UNVERIFIED: "unverified",
+  },
+  DOCUMENT_TYPES: {
+    PASSPORT: "passport",
+    CLUB_LETTER: "club_letter",
+    CONSENT: "consent",
+  },
+  METRICS_PERIODS: {
+    WEEK: "1week",
+    MONTH: "4weeks",
+    QUARTER: "3months",
+    YEAR: "1year",
   },
 };
