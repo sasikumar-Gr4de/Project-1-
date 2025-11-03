@@ -205,6 +205,61 @@ export const changeDataStatusSchema = Joi.object({
     .required(),
 });
 
+export const updateIdentitySchema = Joi.object({
+  first_name: commonPatterns.name.optional(),
+  last_name: commonPatterns.name.optional(),
+  dob: commonPatterns.date.optional(),
+  nationality: Joi.string().max(100).optional(),
+  height_cm: Joi.number().integer().min(100).max(250).optional(),
+  weight_kg: Joi.number().integer().min(30).max(150).optional(),
+  preferred_foot: Joi.string().valid("left", "right", "both").optional(),
+  positions: Joi.array().items(Joi.string().max(50)).optional(),
+  headshot_url: commonPatterns.url.optional(),
+  guardian_name: commonPatterns.name.optional(),
+  guardian_email: commonPatterns.email.optional(),
+  guardian_phone: commonPatterns.phone.optional(),
+}).min(1);
+
+export const ingestMetricsSchema = Joi.object({
+  match_id: commonPatterns.uuid.optional(),
+  date: commonPatterns.date.required(),
+  competition: Joi.string().max(200).required(),
+  minutes: Joi.number().integer().min(0).max(120).required(),
+  gps_summary: Joi.object({
+    distance_m: Joi.number().min(0),
+    hsr_m: Joi.number().min(0).optional(),
+    sprints: Joi.number().integer().min(0).optional(),
+    top_speed_ms: Joi.number().min(0).optional(),
+  }).optional(),
+  event_summary: Joi.object({
+    passes_completed: Joi.number().integer().min(0).optional(),
+    passes_attempted: Joi.number().integer().min(0).optional(),
+    shots: Joi.number().integer().min(0).optional(),
+    tackles: Joi.number().integer().min(0).optional(),
+    duels_won: Joi.number().integer().min(0).optional(),
+    interceptions: Joi.number().integer().min(0).optional(),
+  }).optional(),
+  gr4de_score: Joi.number().min(0).max(100).required(),
+  benchmarks: Joi.object().optional(),
+  source: Joi.string()
+    .valid("catapult", "playmaker", "stepout", "manual")
+    .required(),
+  raw_file_url: commonPatterns.url.optional(),
+});
+
+export const uploadVerificationSchema = Joi.object({
+  document_type: Joi.string()
+    .valid("passport", "club_letter", "consent")
+    .required(),
+  file_url: commonPatterns.url.required(),
+  hash_sha256: Joi.string().length(64).optional(), // SHA256 hash
+});
+
+export const reviewVerificationSchema = Joi.object({
+  action: Joi.string().valid("approved", "rejected").required(),
+  note: Joi.string().max(500).optional(),
+});
+
 // Export all API schemas
 export default {
   // Auth
@@ -234,4 +289,9 @@ export default {
   // Player Data
   createDataSchema,
   changeDataStatusSchema,
+
+  updateIdentitySchema,
+  ingestMetricsSchema,
+  uploadVerificationSchema,
+  reviewVerificationSchema,
 };

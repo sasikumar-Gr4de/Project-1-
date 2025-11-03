@@ -432,6 +432,37 @@ export const TIER_LIMITS = {
   },
 };
 
+export const PASSPORT_STATUS = {
+  ACTIVE: "active",
+  INACTIVE: "inactive",
+  ARCHIVED: "archived",
+};
+
+export const VERIFICATION_STATUS = {
+  PENDING: "pending",
+  APPROVED: "approved",
+  REJECTED: "rejected",
+};
+
+export const DOCUMENT_TYPES = {
+  PASSPORT: "passport",
+  CLUB_LETTER: "club_letter",
+  CONSENT: "consent",
+};
+
+export const METRICS_SOURCES = {
+  CATAPULT: "catapult",
+  PLAYMAKER: "playmaker",
+  STEPOUT: "stepout",
+  MANUAL: "manual",
+};
+
+export const REPORT_TYPES = {
+  WEEKLY: "weekly",
+  MONTHLY: "monthly",
+  SEASON: "season",
+};
+
 // Export all constants as a single object for easy importing
 export default {
   USER_ROLES,
@@ -469,4 +500,8 @@ export default {
   API_MESSAGES,
   FEATURE_FLAGS,
   TIER_LIMITS,
+  PASSPORT_STATUS,
+  DOCUMENT_TYPES,
+  METRICS_SOURCES,
+  REPORT_TYPES,
 };
