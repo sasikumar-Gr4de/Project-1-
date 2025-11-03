@@ -212,7 +212,7 @@ const UserManagement = () => {
             <SelectContent>
               <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
+              {/* <SelectItem value="inactive">Inactive</SelectItem> */}
               <SelectItem value="suspended">Suspended</SelectItem>
             </SelectContent>
           </Select>

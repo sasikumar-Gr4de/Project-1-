@@ -114,6 +114,16 @@ const Profile = () => {
         description: "Profile updated successfully",
         variant: "success",
       });
+      toast({
+        title: "Warning",
+        description: "Some changes may require re-login to take effect",
+        variant: "warning",
+      });
+      toast({
+        title: "Error",
+        description: "Failed to update profile",
+        variant: "destructive",
+      });
       setIsEditing(false);
       fetchDashboard();
     } catch (error) {
