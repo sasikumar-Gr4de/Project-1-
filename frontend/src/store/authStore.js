@@ -1,4 +1,3 @@
-// store/authStore.js - Professional version
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import api from "@/services/base.api";

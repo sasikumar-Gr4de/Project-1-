@@ -33,6 +33,7 @@ import UserManagement from "@/pages/Admin/UserManagement";
 import ReportManagement from "@/pages/Admin/ReportManagement";
 import ContentManager from "@/pages/Admin/ContentManager";
 import SystemAnalytics from "@/pages/Admin/SystemAnalytics";
+import PassportManager from "@/pages/Admin/PassportManager";
 
 // Other Pages
 import Landing from "@/pages/Landing";
@@ -144,6 +145,8 @@ function PlayerRoutes() {
         <Route path="/reports/:reportId" element={<ReportDetail />} />
         <Route path="/benchmarks" element={<Benchmarks />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/passport" element={<Passport />} />
+        <Route path="/passport/:playerId" element={<Passport />} />
         <Route index element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Layout>
@@ -161,6 +164,8 @@ function AdminRoutes() {
         <Route path="/reports" element={<ReportManagement />} />
         <Route path="/content" element={<ContentManager />} />
         <Route path="/analytics" element={<SystemAnalytics />} />
+        <Route path="/passports" element={<PassportManager />} />
+        <Route path="/verifications" element={<VerificationReview />} />
         <Route index element={<Navigate to="/admin/dashboard" replace />} />
       </Routes>
     </AdminLayout>
