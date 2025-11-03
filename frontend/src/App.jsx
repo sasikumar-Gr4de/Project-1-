@@ -24,6 +24,7 @@ import Reports from "@/pages/Player/Reports";
 import ReportDetail from "@/pages/Player/ReportDetail";
 import Benchmarks from "@/pages/Player/Benchmarks";
 import Profile from "@/pages/Player/Profile";
+import Passport from "@/pages/Player/Passport";
 
 // Admin Pages
 import AdminLayout from "@/components/layout/AdminLayout";
@@ -34,6 +35,7 @@ import ReportManagement from "@/pages/Admin/ReportManagement";
 import ContentManager from "@/pages/Admin/ContentManager";
 import SystemAnalytics from "@/pages/Admin/SystemAnalytics";
 import PassportManager from "@/pages/Admin/PassportManager";
+import VerificationReview from "@/pages/Admin/VerificationReview";
 
 // Other Pages
 import Landing from "@/pages/Landing";

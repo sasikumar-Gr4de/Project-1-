@@ -9,6 +9,8 @@ import reportRoutes from "./routes/reportRoutes.js";
 import subscriptionRoutes from "./routes/subscriptionRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import dataRoutes from "./routes/dataRoutes.js";
+import passportRoutes from "./routes/passportRoutes.js";
+import verficationRoutes from "./routes/verificationRoutes.js";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -48,6 +50,8 @@ app.use("/api/reports", reportRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/data", dataRoutes);
+app.use("/api/passport", passportRoutes);
+app.use("/api/verifications", verficationRoutes);
 
 app.get("/api", (req, res) => {
   res.json({ success: true, message: "API is running" });

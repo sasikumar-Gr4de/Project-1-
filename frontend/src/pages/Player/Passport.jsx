@@ -8,7 +8,7 @@ import PerformanceTimeline from "@/components/passport/PerformanceTimeline";
 import ReportLibrary from "@/components/passport/ReportLibrary";
 import MetricsSummary from "@/components/passport/MetricsSummary";
 import MediaGallery from "@/components/passport/MediaGallery";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Tabs from "@/components/common/Tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { FileText, TrendingUp, BarChart3, Image, User } from "lucide-react";
 
@@ -39,6 +39,39 @@ const Passport = () => {
       });
     }
   };
+
+  // Define tabs for the custom Tabs component
+  const passportTabs = [
+    {
+      id: "timeline",
+      label: "Timeline",
+      icon: TrendingUp,
+      content: (
+        <PerformanceTimeline
+          timeline={passport?.timeline}
+          metrics={passport?.metrics}
+        />
+      ),
+    },
+    {
+      id: "metrics",
+      label: "Metrics",
+      icon: BarChart3,
+      content: <MetricsSummary playerId={targetPlayerId} />,
+    },
+    {
+      id: "reports",
+      label: "Reports",
+      icon: FileText,
+      content: <ReportLibrary reports={passport?.reports} />,
+    },
+    {
+      id: "media",
+      label: "Media",
+      icon: Image,
+      content: <MediaGallery media={passport?.media} />,
+    },
+  ];
 
   if (isLoading) {
     return (
@@ -126,57 +159,15 @@ const Passport = () => {
       <PassportHeader passport={passport} player={user} />
 
       {/* Main Content Tabs */}
-      <Tabs defaultValue="timeline" className="space-y-6">
-        <TabsList className="bg-[#1A1A1A] border border-[#343434] p-1 rounded-xl">
-          <TabsTrigger
-            value="timeline"
-            className="flex items-center space-x-2 data-[state=active]:bg-linear-to-r data-[state=active]:from-primary data-[state=active]:to-[#94D44A] data-[state=active]:text-[#0F0F0E] rounded-lg transition-all duration-300"
-          >
-            <TrendingUp className="w-4 h-4" />
-            <span>Timeline</span>
-          </TabsTrigger>
-          <TabsTrigger
-            value="metrics"
-            className="flex items-center space-x-2 data-[state=active]:bg-linear-to-r data-[state=active]:from-primary data-[state=active]:to-[#94D44A] data-[state=active]:text-[#0F0F0E] rounded-lg transition-all duration-300"
-          >
-            <BarChart3 className="w-4 h-4" />
-            <span>Metrics</span>
-          </TabsTrigger>
-          <TabsTrigger
-            value="reports"
-            className="flex items-center space-x-2 data-[state=active]:bg-linear-to-r data-[state=active]:from-primary data-[state=active]:to-[#94D44A] data-[state=active]:text-[#0F0F0E] rounded-lg transition-all duration-300"
-          >
-            <FileText className="w-4 h-4" />
-            <span>Reports</span>
-          </TabsTrigger>
-          <TabsTrigger
-            value="media"
-            className="flex items-center space-x-2 data-[state=active]:bg-linear-to-r data-[state=active]:from-primary data-[state=active]:to-[#94D44A] data-[state=active]:text-[#0F0F0E] rounded-lg transition-all duration-300"
-          >
-            <Image className="w-4 h-4" />
-            <span>Media</span>
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="timeline" className="space-y-6">
-          <PerformanceTimeline
-            timeline={passport.timeline}
-            metrics={passport.metrics}
-          />
-        </TabsContent>
-
-        <TabsContent value="metrics" className="space-y-6">
-          <MetricsSummary playerId={targetPlayerId} />
-        </TabsContent>
-
-        <TabsContent value="reports" className="space-y-6">
-          <ReportLibrary reports={passport.reports} />
-        </TabsContent>
-
-        <TabsContent value="media" className="space-y-6">
-          <MediaGallery media={passport.media} />
-        </TabsContent>
-      </Tabs>
+      <Tabs
+        tabs={passportTabs}
+        defaultTab={0}
+        variant="pills"
+        size="md"
+        fullWidth={false}
+        responsive={true}
+        className="space-y-6"
+      />
     </div>
   );
 };
