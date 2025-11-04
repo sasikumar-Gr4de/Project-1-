@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { sanityService } from "@/services/sanity.service";
 import AdminSection from "@/components/admin/AdminSection";
-import StatusBadge from "@/components/admin/StatusBadge";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 const ContentManager = () => {
   const [content, setContent] = useState(null);
@@ -984,17 +984,6 @@ const ContentManager = () => {
     },
   ];
 
-  if (loading) {
-    return (
-      <div className="min-h-screen p-8 flex items-center justify-center">
-        <div className="text-center">
-          <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-white">Loading content...</p>
-        </div>
-      </div>
-    );
-  }
-
   if (!content) {
     return (
       <div className="min-h-screen p-8">
@@ -1018,7 +1007,7 @@ const ContentManager = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white font-['Orbitron']">
+          <h1 className="text-4xl font-bold font-['Orbitron'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
             Content Manager
           </h1>
           <p className="text-[#B0AFAF] mt-2 font-['Orbitron']">

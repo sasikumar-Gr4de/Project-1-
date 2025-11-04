@@ -114,7 +114,6 @@ export const getProcessingQueue = async ({ status, page = 1, limit = 50 }) => {
       .from("player_data")
       .select("status");
 
-    console.log("All Data for Categories:", allData);
     if (allError) throw allError;
 
     const categories = {

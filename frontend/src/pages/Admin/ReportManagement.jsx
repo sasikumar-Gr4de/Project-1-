@@ -149,7 +149,7 @@ const ReportManagement = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white font-['Orbitron']">
+          <h1 className="text-4xl font-bold font-['Orbitron'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
             Report Management
           </h1>
           <p className="text-[#B0AFAF] mt-2 font-['Orbitron']">
