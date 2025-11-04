@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import AdminSection from "@/components/admin/AdminSection";
 import {
   Select,
   SelectContent,
@@ -20,6 +21,7 @@ import {
   Clock,
   XCircle,
   FileText,
+  Filter,
 } from "lucide-react";
 
 const PassportManager = () => {
@@ -53,12 +55,8 @@ const PassportManager = () => {
 
   const getVerificationBadge = (user) => {
     // This would come from the user's verification status in a real implementation
-    const status =
-      Math.random() > 0.7
-        ? "verified"
-        : Math.random() > 0.5
-        ? "pending"
-        : "unverified";
+    console.log(user)
+    const status = "verified";
 
     switch (status) {
       case "verified":
@@ -115,13 +113,15 @@ const PassportManager = () => {
         </Button>
       </div>
 
-      {/* Filters */}
-      <Card className="bg-[var(--surface-1)] border-[var(--surface-2)]">
-        <CardContent className="p-6">
-          <div className="grid gap-4 md:grid-cols-4">
-            {/* Search */}
+      <AdminSection
+        title="Filters & Search"
+        description="Filter players by status, verification, or search by name"
+        icon={Filter}
+      >
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-1">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[var(--muted-text)]" />
+             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[var(--muted-text)]" />
               <Input
                 placeholder="Search players..."
                 value={filters.search}
@@ -129,12 +129,12 @@ const PassportManager = () => {
                 className="pl-10 bg-[var(--surface-0)] border-[var(--surface-2)] text-foreground placeholder:text-[var(--muted-text)]"
               />
             </div>
+          </div>
 
-            {/* Status Filter */}
             <Select
-              value={filters.status}
-              onValueChange={(value) => handleFilterChange("status", value)}
-            >
+                value={filters.status}
+                onValueChange={(value) => handleFilterChange("status", value)}
+              >
               <SelectTrigger className="bg-[var(--surface-0)] border-[var(--surface-2)] text-foreground">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
@@ -146,7 +146,6 @@ const PassportManager = () => {
               </SelectContent>
             </Select>
 
-            {/* Verification Filter */}
             <Select
               value={filters.verification}
               onValueChange={(value) =>
@@ -163,17 +162,10 @@ const PassportManager = () => {
                 <SelectItem value="unverified">Unverified</SelectItem>
               </SelectContent>
             </Select>
+        </div>
+      </AdminSection>
 
-            {/* Results Count */}
-            <div className="flex items-center justify-end">
-              <span className="text-sm text-[var(--muted-text)]">
-                {filteredUsers.length} players
-              </span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
+  
       {/* Users Grid */}
       <div className="grid gap-6">
         {isLoading ? (
@@ -268,14 +260,14 @@ const PassportManager = () => {
             );
           })
         ) : (
-          // Empty state
+      // Empty state
       <Card className="bg-[var(--surface-1)] border-[var(--surface-2)]">
             <CardContent className="p-12 text-center">
           <User className="w-16 h-16 text-[var(--muted-text)] mx-auto mb-4 opacity-50" />
               <h3 className="text-lg font-semibold text-white mb-2">
                 No players found
               </h3>
-          <p className="text-[var(--muted-text)]">
+              <p className="text-[var(--muted-text)]">
                 {filters.search ||
                 filters.status !== "all" ||
                 filters.verification !== "all"
