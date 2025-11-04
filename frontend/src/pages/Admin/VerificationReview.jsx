@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@/contexts/ToastContext";
 import { usePassportStore } from "@/store/passportStore";
+import AdminSection from "@/components/admin/AdminSection";
 import {
   Card,
   CardContent,
@@ -29,6 +30,8 @@ import {
   User,
   Eye,
   Shield,
+  Filter,
+  RefreshCw,
 } from "lucide-react";
 
 const VerificationReview = () => {
@@ -246,21 +249,28 @@ const VerificationReview = () => {
           <Button
             variant="outline"
             onClick={loadVerifications}
-            className="bg-[var(--surface-1)] border-[var(--surface-2)] text-foreground hover:bg-[var(--surface-2)]"
+           className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold rounded-xl px-6 py-3 h-12"
           >
+            <RefreshCw
+              className={`w-5 h-5 mr-2 ${isLoading ? "animate-spin" : ""}`}
+            />
             Refresh
           </Button>
-          <Button className="bg-linear-to-r from-primary to-[var(--accent-2)] text-[var(--ink)] hover:from-[var(--accent-2)] hover:to-primary font-semibold">
+          {/* <Button className="bg-linear-to-r from-primary to-[var(--accent-2)] text-[var(--ink)] hover:from-[var(--accent-2)] hover:to-primary font-semibold">
             <Shield className="w-4 h-4 mr-2" />
             Verification Stats
-          </Button>
+          </Button> */}
         </div>
       </div>
 
       {/* Filters */}
-      <Card className="bg-[var(--surface-1)] border-[var(--surface-2)]">
-        <CardContent className="p-6">
-          <div className="grid gap-4 md:grid-cols-4">
+      <AdminSection
+        title="Filters & Search"
+        description="Filter users by role, status, or search by name/email"
+        icon={Filter}
+      >
+          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-1">
             {/* Search */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[var(--muted-text)]" />
@@ -270,6 +280,7 @@ const VerificationReview = () => {
                 onChange={(e) => handleFilterChange("search", e.target.value)}
                 className="pl-10 bg-[var(--surface-0)] border-[var(--surface-2)] text-foreground placeholder:text-[var(--muted-text)]"
               />
+            </div>
             </div>
 
             {/* Status Filter */}
@@ -307,14 +318,13 @@ const VerificationReview = () => {
             </Select>
 
             {/* Results Count */}
-            <div className="flex items-center justify-end">
+            {/* <div className="flex items-center justify-end">
               <span className="text-sm text-[var(--muted-text)]">
                 {filteredVerifications.length} documents
               </span>
-            </div>
+            </div> */}
           </div>
-        </CardContent>
-      </Card>
+        </AdminSection>
 
       {/* Stats Overview */}
       <div className="grid gap-6 md:grid-cols-4">
