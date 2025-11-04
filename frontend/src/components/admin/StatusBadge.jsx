@@ -26,13 +26,13 @@ const StatusBadge = ({ status, size = "md" }) => {
       variant: "destructive",
       icon: XCircle,
       label: "Failed",
-      color: "text-[#EF4444]",
+      color: "text-[#FFEEEE]",
     },
     uploaded: {
       variant: "secondary",
       icon: Play,
       label: "Uploaded",
-      color: "text-[#B0AFAF]",
+      color: "text-[#333333]",
     },
     generating: {
       variant: "primary",
@@ -62,7 +62,7 @@ const StatusBadge = ({ status, size = "md" }) => {
       variant: "destructive",
       icon: XCircle,
       label: "Suspended",
-      color: "text-[#EF4444]",
+      color: "text-[#FFEEEE]",
     },
   };
 

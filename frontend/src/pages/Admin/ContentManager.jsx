@@ -1023,12 +1023,7 @@ const ContentManager = () => {
           </h1>
           <p className="text-[#B0AFAF] mt-2 font-['Orbitron']">
             Manage landing page content and structure
-            {/* {health && (
-              <StatusBadge
-                status={health.healthy ? "healthy" : "failed"}
-                className="ml-2"
-              />
-            )} */}
+            
           </p>
         </div>
 
@@ -1048,6 +1043,14 @@ const ContentManager = () => {
           >
             <RefreshCw className="h-4 w-4 mr-2" />
             Reset
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => window.open("/", "_blank")}
+            className="bg-[#1A1A1A] border-[#343434] text-white hover:bg-[#262626]"
+          >
+            <Eye className="h-4 w-4 mr-2" />
+            Open Landing Page
           </Button>
           <Button
             onClick={handleSave}
@@ -1073,29 +1076,7 @@ const ContentManager = () => {
             responsive={true}
           />
         </CardContent>
-      </Card>
-
-      {/* Preview Section */}
-      <AdminSection
-        title="Preview"
-        description="Preview your changes on the live site"
-        icon={Eye}
-      >
-        <div className="text-center p-8 border-2 border-dashed border-[#343434] rounded-lg">
-          <Eye className="w-12 h-12 text-[#B0AFAF] mx-auto mb-4" />
-          <p className="text-[#B0AFAF] mb-4">
-            Preview your landing page changes
-          </p>
-          <Button
-            variant="outline"
-            onClick={() => window.open("/", "_blank")}
-            className="bg-[#1A1A1A] border-[#343434] text-white hover:bg-[#262626]"
-          >
-            <Eye className="h-4 w-4 mr-2" />
-            Open Landing Page
-          </Button>
-        </div>
-      </AdminSection>
+      </Card>     
     </div>
   );
 };

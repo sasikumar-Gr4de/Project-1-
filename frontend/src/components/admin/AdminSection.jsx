@@ -61,7 +61,7 @@ const AdminSection = ({
           )}
         </div>
       </CardHeader>
-      <CardContent className="p-6">{children}</CardContent>
+      <CardContent className="pl-6 pr-6 pt-2">{children}</CardContent>
     </Card>
   );
 };
