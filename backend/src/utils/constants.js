@@ -22,12 +22,8 @@ export const UPLOAD_STATUS = {
   FAILED: "failed",
 };
 
-export const PLAYER_DATA_STATUS = {
-  UPLOADED: "uploaded",
-  PROCESSING: "processing",
-  COMPLETED: "completed",
-  FAILED: "failed",
-};
+// Alias for backwards compatibility; keep a single source of truth
+export const PLAYER_DATA_STATUS = UPLOAD_STATUS;
 
 // Processing Queue Status
 export const QUEUE_STATUS = {

@@ -76,7 +76,7 @@ const PassportManager = () => {
       default:
         return {
           label: "Unverified",
-          color: "bg-[#343434] text-[#B0AFAF] border-[#343434]",
+          color: "bg-[var(--surface-2)] text-[var(--muted-text)] border-[var(--surface-2)]",
           icon: XCircle,
         };
     }
@@ -105,28 +105,28 @@ const PassportManager = () => {
           <h1 className="text-4xl font-bold font-['Orbitron'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
             Passport Management
           </h1>
-          <p className="text-[#B0AFAF] text-lg mt-2 font-['Orbitron']">
+          <p className="text-[var(--muted-text)] text-lg mt-2 font-['Orbitron']">
             Manage player passports and verification status
           </p>
         </div>
-        <Button className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold">
+        <Button className="bg-linear-to-r from-primary to-[var(--accent-2)] text-[var(--ink)] hover:from-[var(--accent-2)] hover:to-primary font-semibold">
           <Download className="w-4 h-4 mr-2" />
           Export Data
         </Button>
       </div>
 
       {/* Filters */}
-      <Card className="bg-[#262626] border-[#343434]">
+      <Card className="bg-[var(--surface-1)] border-[var(--surface-2)]">
         <CardContent className="p-6">
           <div className="grid gap-4 md:grid-cols-4">
             {/* Search */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#B0AFAF]" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[var(--muted-text)]" />
               <Input
                 placeholder="Search players..."
                 value={filters.search}
                 onChange={(e) => handleFilterChange("search", e.target.value)}
-                className="pl-10 bg-[#1A1A1A] border-[#343434] text-white placeholder:text-[#B0AFAF]"
+                className="pl-10 bg-[var(--surface-0)] border-[var(--surface-2)] text-foreground placeholder:text-[var(--muted-text)]"
               />
             </div>
 
@@ -135,10 +135,10 @@ const PassportManager = () => {
               value={filters.status}
               onValueChange={(value) => handleFilterChange("status", value)}
             >
-              <SelectTrigger className="bg-[#1A1A1A] border-[#343434] text-white">
+              <SelectTrigger className="bg-[var(--surface-0)] border-[var(--surface-2)] text-foreground">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
-              <SelectContent className="bg-[#262626] border-[#343434] text-white">
+              <SelectContent className="bg-[var(--surface-1)] border-[var(--surface-2)] text-foreground">
                 <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="active">Active</SelectItem>
                 <SelectItem value="inactive">Inactive</SelectItem>
@@ -153,10 +153,10 @@ const PassportManager = () => {
                 handleFilterChange("verification", value)
               }
             >
-              <SelectTrigger className="bg-[#1A1A1A] border-[#343434] text-white">
+              <SelectTrigger className="bg-[var(--surface-0)] border-[var(--surface-2)] text-foreground">
                 <SelectValue placeholder="Verification" />
               </SelectTrigger>
-              <SelectContent className="bg-[#262626] border-[#343434] text-white">
+              <SelectContent className="bg-[var(--surface-1)] border-[var(--surface-2)] text-foreground">
                 <SelectItem value="all">All Verification</SelectItem>
                 <SelectItem value="verified">Verified</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
@@ -166,7 +166,7 @@ const PassportManager = () => {
 
             {/* Results Count */}
             <div className="flex items-center justify-end">
-              <span className="text-sm text-[#B0AFAF]">
+              <span className="text-sm text-[var(--muted-text)]">
                 {filteredUsers.length} players
               </span>
             </div>
@@ -181,14 +181,14 @@ const PassportManager = () => {
           [...Array(6)].map((_, i) => (
             <Card
               key={i}
-              className="animate-pulse bg-[#262626] border-[#343434]"
+              className="animate-pulse bg-[var(--surface-1)] border-[var(--surface-2)]"
             >
               <CardContent className="p-6">
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-[#343434] rounded-full"></div>
+                  <div className="w-12 h-12 bg-[var(--surface-2)] rounded-full"></div>
                   <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-[#343434] rounded w-1/4"></div>
-                    <div className="h-3 bg-[#343434] rounded w-1/2"></div>
+                    <div className="h-4 bg-[var(--surface-2)] rounded w-1/4"></div>
+                    <div className="h-3 bg-[var(--surface-2)] rounded w-1/2"></div>
                   </div>
                 </div>
               </CardContent>
@@ -202,21 +202,21 @@ const PassportManager = () => {
             return (
               <Card
                 key={user.id}
-                className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300"
+                className="bg-[var(--surface-1)] border-[var(--surface-2)] hover:border-primary/30 transition-all duration-300"
               >
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
                       {/* Avatar */}
-                      <div className="w-12 h-12 bg-linear-to-br from-primary to-[#94D44A] rounded-full flex items-center justify-center shadow-lg">
+                      <div className="w-12 h-12 bg-linear-to-br from-primary to-[var(--accent-2)] rounded-full flex items-center justify-center shadow-lg">
                         {user.avatar_url ? (
                           <img
                             src={user.avatar_url}
                             alt={user.player_name}
-                            className="w-12 h-12 rounded-full object-cover border-2 border-[#1A1A1A]"
+                            className="w-12 h-12 rounded-full object-cover border-2 border-[var(--surface-0)]"
                           />
                         ) : (
-                          <User className="w-6 h-6 text-[#0F0F0E]" />
+                          <User className="w-6 h-6 text-[var(--ink)]" />
                         )}
                       </div>
 
@@ -225,7 +225,7 @@ const PassportManager = () => {
                         <h3 className="font-semibold text-white">
                           {user.player_name || "Unnamed Player"}
                         </h3>
-                        <div className="flex items-center space-x-3 text-sm text-[#B0AFAF] mt-1">
+                        <div className="flex items-center space-x-3 text-sm text-[var(--muted-text)] mt-1">
                           <span>{user.email}</span>
                           <span>•</span>
                           <span className="capitalize">
@@ -269,13 +269,13 @@ const PassportManager = () => {
           })
         ) : (
           // Empty state
-          <Card className="bg-[#262626] border-[#343434]">
+      <Card className="bg-[var(--surface-1)] border-[var(--surface-2)]">
             <CardContent className="p-12 text-center">
-              <User className="w-16 h-16 text-[#B0AFAF] mx-auto mb-4 opacity-50" />
+          <User className="w-16 h-16 text-[var(--muted-text)] mx-auto mb-4 opacity-50" />
               <h3 className="text-lg font-semibold text-white mb-2">
                 No players found
               </h3>
-              <p className="text-[#B0AFAF]">
+          <p className="text-[var(--muted-text)]">
                 {filters.search ||
                 filters.status !== "all" ||
                 filters.verification !== "all"

@@ -62,6 +62,11 @@ function App() {
     return <AppLoading size="lg" variant="default" />;
   }
 
+  const getDefaultPathByRole = (role) => {
+    if (role === "admin") return "/admin/dashboard";
+    return "/dashboard";
+  };
+
   return (
     <ToastProvider>
       <Router>
@@ -72,7 +77,11 @@ function App() {
           <Route
             path="/login"
             element={
-              isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />
+              isAuthenticated ? (
+                <Navigate to={getDefaultPathByRole(user?.role)} replace />
+              ) : (
+                <Login />
+              )
             }
           />
           <Route path="/subscription" element={<SubscriptionPlans />} />
@@ -127,7 +136,10 @@ function App() {
           <Route
             path="*"
             element={
-              <Navigate to={isAuthenticated ? "/dashboard" : "/"} replace />
+              <Navigate
+                to={isAuthenticated ? getDefaultPathByRole(user?.role) : "/"}
+                replace
+              />
             }
           />
         </Routes>

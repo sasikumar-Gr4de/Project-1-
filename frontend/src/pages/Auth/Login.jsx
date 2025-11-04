@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ import Tabs from "@/components/common/Tabs";
 import { Mail, Phone, ArrowRight } from "lucide-react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import { useToast } from "@/contexts/ToastContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -22,6 +24,8 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { sendOtp, login } = useAuthStore();
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     const styleElement = document.createElement("style");
@@ -34,27 +38,64 @@ const Login = () => {
   }, []);
 
   const handleSendOtp = async () => {
-    if (!email && !phone) return;
+    if (!email && !phone) {
+      toast({ title: "Provide email or phone", variant: "warning" });
+      return;
+    }
+
+    if (email) {
+      const emailValid = /[^\s@]+@[^\s@]+\.[^\s@]+/.test(email);
+      if (!emailValid) {
+        toast({ title: "Invalid email address", variant: "destructive" });
+        return;
+      }
+    }
 
     setIsLoading(true);
     try {
       await sendOtp(email || undefined, phone || undefined);
       setStep("verify");
+      toast({ title: "Verification code sent", variant: "success" });
     } catch (error) {
       console.error("Failed to send OTP:", error);
+      toast({
+        title: "Failed to send code",
+        description: error?.message || "Try again",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleVerifyOtp = async () => {
-    if (!otp) return;
+    if (!otp || otp.length !== 6) {
+      toast({ title: "Enter 6-digit code", variant: "warning" });
+      return;
+    }
 
     setIsLoading(true);
     try {
-      await login(email, phone, otp, {});
+      const result = await login(email, phone, otp, {});
+      if (result?.success) {
+        const role = result.data?.user?.role;
+        const requiresOnboarding = result.data?.requires_onboarding;
+        toast({ title: "Logged in", variant: "success" });
+        if (requiresOnboarding) {
+          navigate("/onboarding", { replace: true });
+        } else if (role === "admin") {
+          navigate("/admin/dashboard", { replace: true });
+        } else {
+          navigate("/dashboard", { replace: true });
+        }
+      }
     } catch (error) {
       console.error("Failed to verify OTP:", error);
+      toast({
+        title: "Invalid code",
+        description: error?.message || "Please try again",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -71,7 +112,7 @@ const Login = () => {
     }
   };
 
-  // Updated styles using the exact color palette from Figma
+  // Updated styles using theme tokens from index.css
   const phoneInputStyles = `
     /* ===== MAIN CONTAINER ===== */
     .react-tel-input {
@@ -85,10 +126,10 @@ const Login = () => {
       width: 100% !important;
       height: 46px !important;
       font-size: 16px !important;
-      background: #343434 !important;
-      border: 1px solid #343434 !important;
+      background: var(--surface-2) !important;
+      border: 1px solid var(--surface-2) !important;
       border-radius: 5px !important;
-      color: #E1E5DD !important;
+      color: var(--foreground) !important;
       padding-left: 60px !important;
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       font-family: 'Inter Tight', inherit !important;
@@ -96,15 +137,13 @@ const Login = () => {
     }
 
     .react-tel-input .form-control:hover {
-      
-      background: #343434 !important;
+      background: var(--surface-2) !important;
     }
 
     .react-tel-input .form-control:focus {
-      
       box-shadow: 0 0 0 2px rgba(193, 255, 114, 0.2) !important;
       outline: none !important;
-      background: #343434 !important;
+      background: var(--surface-2) !important;
     }
 
     /* ===== FLAG DROPDOWN CONTAINER ===== */
@@ -113,22 +152,22 @@ const Login = () => {
       top: 0 !important;
       bottom: 0 !important;
       left: 0 !important;
-      background: #343434 !important;
-      border: 1px solid #343434 !important;
+      background: var(--surface-2) !important;
+      border: 1px solid var(--surface-2) !important;
       border-radius: 5px 0 0 5px !important;
-      border-right: 1px solid #343434 !important;
+      border-right: 1px solid var(--surface-2) !important;
       padding: 0 !important;
       margin: 0 !important;
     }
 
     .react-tel-input .flag-dropdown.open {
-      background: #343434 !important;
-      border-color: #C1FF72 !important;
+      background: var(--surface-2) !important;
+      border-color: var(--primary) !important;
       border-bottom-left-radius: 0 !important;
     }
 
     .react-tel-input .flag-dropdown:hover {
-      background: #343434 !important;
+      background: var(--surface-2) !important;
     }
 
     /* ===== SELECTED FLAG BUTTON ===== */
@@ -146,7 +185,7 @@ const Login = () => {
     }
 
     .react-tel-input .selected-flag:hover {
-      background: #343434 !important;
+      background: var(--surface-2) !important;
     }
 
     /* ===== DROPDOWN ARROW ===== */
@@ -155,7 +194,7 @@ const Login = () => {
       right: 8px !important;
       top: 50% !important;
       transform: translateY(-50%) !important;
-      border-top: 5px solid #E1E5DD !important;
+      border-top: 5px solid var(--foreground) !important;
       border-left: 4px solid transparent !important;
       border-right: 4px solid transparent !important;
       transition: all 0.2s ease-in-out !important;
@@ -163,18 +202,18 @@ const Login = () => {
 
     .react-tel-input .selected-flag .arrow.up {
       border-top: none !important;
-      border-bottom: 5px solid #C1FF72 !important;
+      border-bottom: 5px solid var(--primary) !important;
       transform: translateY(-50%) !important;
     }
 
     .react-tel-input .flag-dropdown.open .selected-flag .arrow {
-      border-top-color: #C1FF72 !important;
+      border-top-color: var(--primary) !important;
     }
 
     /* ===== COUNTRY LIST DROPDOWN ===== */
     .react-tel-input .country-list {
-      background: #343434 !important;
-      border: 1px solid #343434 !important;
+      background: var(--surface-2) !important;
+      border: 1px solid var(--surface-2) !important;
       border-radius: 0 5px 5px 5px !important;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3) !important;
       margin-top: -1px !important;
@@ -188,19 +227,19 @@ const Login = () => {
     .react-tel-input .country-list .search {
       position: sticky !important;
       top: 0 !important;
-      background: #343434 !important;
+      background: var(--surface-2) !important;
       padding: 12px !important;
-      border-bottom: 1px solid #343434 !important;
+      border-bottom: 1px solid var(--surface-2) !important;
       z-index: 1000 !important;
       margin: 0 !important;
     }
 
     /* ===== SEARCH INPUT ===== */
     .react-tel-input .country-list .search-box {
-      background: #0F0F0E !important;
-      border: 1px solid #343434 !important;
+      background: var(--ink) !important;
+      border: 1px solid var(--surface-2) !important;
       border-radius: 5px !important;
-      color: #E1E5DD !important;
+      color: var(--foreground) !important;
       width: 100% !important;
       padding: 10px 12px !important;
       font-size: 14px !important;
@@ -210,21 +249,21 @@ const Login = () => {
     }
 
     .react-tel-input .country-list .search-box:focus {
-      border-color: #C1FF72 !important;
+      border-color: var(--primary) !important;
       box-shadow: 0 0 0 2px rgba(193, 255, 114, 0.2) !important;
       outline: none !important;
-      background: #0F0F0E !important;
+      background: var(--ink) !important;
     }
 
     .react-tel-input .country-list .search-box::placeholder {
-      color: #E1E5DD !important;
+      color: var(--foreground) !important;
       opacity: 0.7;
     }
 
     /* ===== INDIVIDUAL COUNTRY ITEMS ===== */
     .react-tel-input .country-list .country {
-      color: #E1E5DD !important;
-      background: #343434 !important;
+      color: var(--foreground) !important;
+      background: var(--surface-2) !important;
       padding: 12px 16px !important;
       font-size: 14px !important;
       border-bottom: 1px solid rgba(52, 52, 52, 0.5) !important;
@@ -240,19 +279,19 @@ const Login = () => {
     }
 
     .react-tel-input .country-list .country:hover {
-      background: #4a4a4a !important;
-      color: #C1FF72 !important;
+      background: var(--surface-3) !important;
+      color: var(--primary) !important;
     }
 
     .react-tel-input .country-list .country.highlight {
-      background: #4a4a4a !important;
-      color: #C1FF72 !important;
-      border-left: 3px solid #C1FF72 !important;
+      background: var(--surface-3) !important;
+      color: var(--primary) !important;
+      border-left: 3px solid var(--primary) !important;
     }
 
     /* ===== COUNTRY DIAL CODE ===== */
     .react-tel-input .country-list .dial-code {
-      color: #E1E5DD !important;
+      color: var(--foreground) !important;
       font-size: 13px !important;
       font-weight: 500;
       margin-left: auto !important;
@@ -260,7 +299,7 @@ const Login = () => {
     }
 
     .react-tel-input .country-list .country:hover .dial-code {
-      color: #C1FF72 !important;
+      color: var(--primary) !important;
       opacity: 1;
     }
 
@@ -274,18 +313,18 @@ const Login = () => {
 
     /* ===== DIVIDER ===== */
     .react-tel-input .country-list .divider {
-      border-bottom: 1px solid #343434 !important;
+      border-bottom: 1px solid var(--surface-2) !important;
       margin: 8px 0 !important;
       opacity: 0.5;
     }
 
     /* ===== NO RESULTS MESSAGE ===== */
     .react-tel-input .country-list .no-entries-message {
-      color: #E1E5DD !important;
+      color: var(--foreground) !important;
       padding: 20px 16px !important;
       text-align: center !important;
       font-size: 14px !important;
-      background: #343434 !important;
+      background: var(--surface-2) !important;
       font-style: italic;
     }
 
@@ -303,25 +342,25 @@ const Login = () => {
     }
 
     .react-tel-input .country-list::-webkit-scrollbar-track {
-      background: #4a4a4a !important;
+      background: var(--surface-3) !important;
       border-radius: 4px !important;
       margin: 4px 0;
     }
 
     .react-tel-input .country-list::-webkit-scrollbar-thumb {
-      background: #E1E5DD !important;
+      background: var(--foreground) !important;
       border-radius: 4px !important;
-      border: 2px solid #4a4a4a !important;
+      border: 2px solid var(--surface-3) !important;
     }
 
     .react-tel-input .country-list::-webkit-scrollbar-thumb:hover {
-      background: #C1FF72 !important;
+      background: var(--primary) !important;
     }
 
     /* Firefox scrollbar */
     .react-tel-input .country-list {
       scrollbar-width: thin !important;
-      scrollbar-color: #E1E5DD #4a4a4a !important;
+      scrollbar-color: var(--foreground) var(--surface-3) !important;
     }
   `;
 
@@ -340,13 +379,13 @@ const Login = () => {
                   placeholder="Enter your email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="h-12 text-base bg-[#343434] border-[#343434] text-[#E1E5DD] placeholder:text-[#E1E5DD] placeholder:opacity-70 rounded-[5px] "
+                  className="h-12 text-base bg-input border-input text-foreground placeholder:text-foreground/70 rounded-[5px] "
                 />
               </div>
               <Button
                 onClick={handleSendOtp}
                 disabled={!email || isLoading}
-                className="w-full h-12 text-base  bg-primary text-[#0F0F0E] hover:bg-primary/90 font-semibold rounded-[10px]"
+                className="w-full h-12 text-base  bg-primary text-[var(--ink)] hover:bg-primary/90 font-semibold rounded-[10px]"
               >
                 {isLoading ? "Sending..." : "Send Verification Code"}
                 <ArrowRight className="w-4 h-4 ml-2" />
@@ -360,10 +399,10 @@ const Login = () => {
                   placeholder="Enter verification code"
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
-                  className="h-12 text-center text-lg font-mono bg-[#343434] border-[#343434] text-[#E1E5DD] rounded-[5px]"
+                  className="h-12 text-center text-lg font-mono bg-input border-input text-foreground rounded-[5px]"
                   maxLength={6}
                 />
-                <p className="text-sm text-[#E1E5DD] text-center px-2 ">
+                <p className="text-sm text-foreground text-center px-2 ">
                   We sent a 6-digit code to {email}
                 </p>
               </div>
@@ -371,14 +410,14 @@ const Login = () => {
                 <Button
                   variant="outline"
                   onClick={resetForm}
-                  className="flex-1 h-12 text-base  border-[#343434] text-[#E1E5DD] hover:bg-[#343434] hover:text-[#E1E5DD] rounded-[5px]"
+                  className="flex-1 h-12 text-base  border-border text-foreground hover:bg-muted hover:text-foreground rounded-[5px]"
                 >
                   Back
                 </Button>
                 <Button
                   onClick={handleVerifyOtp}
                   disabled={!otp || otp.length !== 6 || isLoading}
-                  className="flex-1 h-12 text-base  bg-primary text-[#0F0F0E] hover:bg-primary/90 font-semibold rounded-[10px]"
+                  className="flex-1 h-12 text-base  bg-primary text-[var(--ink)] hover:bg-primary/90 font-semibold rounded-[10px]"
                 >
                   {isLoading ? "Verifying..." : "Verify"}
                 </Button>
@@ -419,14 +458,14 @@ const Login = () => {
                     autoFormat={true}
                   />
                 </div>
-                <p className="text-xs text-[#E1E5DD] px-1 mt-2 ">
+                <p className="text-xs text-foreground px-1 mt-2 ">
                   We'll send a verification code via WhatsApp
                 </p>
               </div>
               <Button
                 onClick={handleSendOtp}
                 disabled={!phone || isLoading}
-                className="w-full h-12 text-base  bg-primary text-[#0F0F0E] hover:bg-primary/90 font-semibold rounded-[10px]"
+                className="w-full h-12 text-base  bg-primary text-[var(--ink)] hover:bg-primary/90 font-semibold rounded-[10px]"
               >
                 {isLoading ? "Sending..." : "Send WhatsApp Code"}
                 <ArrowRight className="w-4 h-4 ml-2" />
@@ -440,10 +479,10 @@ const Login = () => {
                   placeholder="Enter verification code"
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
-                  className="h-12 text-center text-lg font-mono bg-[#343434] border-[#343434] text-[#E1E5DD] rounded-[5px]"
+                  className="h-12 text-center text-lg font-mono bg-input border-input text-foreground rounded-[5px]"
                   maxLength={6}
                 />
-                <p className="text-sm text-[#E1E5DD] text-center px-2 ">
+                <p className="text-sm text-foreground text-center px-2 ">
                   We sent a 6-digit code via WhatsApp to {phone}
                 </p>
               </div>
@@ -458,7 +497,7 @@ const Login = () => {
                 <Button
                   onClick={handleVerifyOtp}
                   disabled={!otp || otp.length !== 6 || isLoading}
-                  className="flex-1 h-12 text-base  bg-primary text-[#0F0F0E] hover:bg-primary/90 font-semibold rounded-[10px]"
+                  className="flex-1 h-12 text-base  bg-primary text-[var(--ink)] hover:bg-primary/90 font-semibold rounded-[10px]"
                 >
                   {isLoading ? "Verifying..." : "Verify"}
                 </Button>

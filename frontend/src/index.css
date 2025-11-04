@@ -53,6 +53,14 @@
   --card-foreground: #e2e8f0;
   --popover: #24272d;
   --popover-foreground: #e2e8f0;
+  /* Semantic surfaces/text tokens extracted from codebase */
+  --surface-0: #1a1a1a; /* deep surface */
+  --surface-1: #262626; /* card alt */
+  --surface-2: #343434; /* input/border alt */
+  --surface-3: #4a4a4a; /* hover alt */
+  --muted-text: #b0afaf; /* subdued text */
+  --ink: #0f0f0e; /* dark text for light tokens */
+  --accent-2: #94d44a; /* gradient secondary */
   
   /* Primary - Bright Neon Green */
   --primary: #C1FF72;
@@ -91,6 +99,14 @@
   --border: #3a3f47;
   --input: #24272d;
   --ring: #C1FF72;
+  /* Mirror semantic tokens for dark */
+  --surface-0: #1a1a1a;
+  --surface-1: #262626;
+  --surface-2: #343434;
+  --surface-3: #4a4a4a;
+  --muted-text: #b0afaf;
+  --ink: #0f0f0e;
+  --accent-2: #94d44a;
 }
 
 @layer base {

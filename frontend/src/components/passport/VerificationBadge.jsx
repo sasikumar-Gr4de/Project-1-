@@ -26,8 +26,8 @@ const VerificationBadge = ({ status, label, size = "default" }) => {
       default:
         return {
           icon: AlertCircle,
-          color: "bg-[#343434] text-[#B0AFAF]",
-          iconColor: "text-[#B0AFAF]",
+          color: "bg-[var(--surface-2)] text-[var(--muted-text)]",
+          iconColor: "text-[var(--muted-text)]",
         };
     }
   };

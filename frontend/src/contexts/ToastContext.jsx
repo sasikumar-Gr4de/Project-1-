@@ -40,14 +40,14 @@ export const ToastProvider = ({ children }) => {
   };
 
   const getToastStyles = (variant) => {
-    const baseStyles = "w-80 p-4 rounded-xl shadow-lg border-0";
+    const baseStyles = "w-80 p-4 rounded-xl shadow-lg border border-border";
 
     const variants = {
-      default: "bg-gradient-to-br from-[#1f352f] to-[#212629] text-white",
-      destructive: "bg-gradient-to-br from-[#32292c] to-[#212629] text-white",
-      success: "bg-gradient-to-br from-[#1f352f] to-[#212629] text-white",
-      warning: "bg-gradient-to-br from-[#2f322c] to-[#212629] text-white",
-      info: "bg-gradient-to-br from-[#1f352f] to-[#212629] text-white",
+      default: "bg-card text-foreground",
+      destructive: "bg-destructive text-foreground",
+      success: "bg-card text-foreground",
+      warning: "bg-card text-foreground",
+      info: "bg-card text-foreground",
     };
 
     return `${baseStyles} ${variants[variant] || variants.default}`;
@@ -56,37 +56,28 @@ export const ToastProvider = ({ children }) => {
   const getIcon = (variant) => {
     const icons = {
       default: (
-        <div className="w-6 h-6 rounded-full bg-gray-400 flex items-center justify-center">
-          <span className="text-black text-xs font-bold">i</span>
+        <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center">
+          <span className="text-foreground text-xs font-bold">i</span>
         </div>
       ),
       destructive: (
-        <div
-          className="w-6 h-6 rounded-full flex items-center justify-center"
-          style={{ backgroundColor: "rgb(218,65,60)" }}
-        >
-          <span className="text-black text-xs font-bold">X</span>
+        <div className="w-6 h-6 rounded-full flex items-center justify-center bg-destructive">
+          <span className="text-foreground text-xs font-bold">X</span>
         </div>
       ),
       success: (
-        <div
-          className="w-6 h-6 rounded-full flex items-center justify-center"
-          style={{ backgroundColor: "rgb(12,222,112)" }}
-        >
-          <span className="text-black text-xs font-bold">✓</span>
+        <div className="w-6 h-6 rounded-full flex items-center justify-center bg-primary">
+          <span className="text-foreground text-xs font-bold">✓</span>
         </div>
       ),
       warning: (
-        <div
-          className="w-6 h-6 rounded-full flex items-center justify-center"
-          style={{ backgroundColor: "rgb(253,204,32)" }}
-        >
-          <span className="text-black text-xs font-bold">!</span>
+        <div className="w-6 h-6 rounded-full flex items-center justify-center bg-accent">
+          <span className="text-foreground text-xs font-bold">!</span>
         </div>
       ),
       info: (
-        <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center">
-          <span className="text-black text-xs font-bold">i</span>
+        <div className="w-6 h-6 rounded-full bg-ring flex items-center justify-center">
+          <span className="text-foreground text-xs font-bold">i</span>
         </div>
       ),
     };
@@ -111,11 +102,11 @@ export const ToastProvider = ({ children }) => {
   const ProgressBar = ({ variant, duration }) => {
     const getProgressColor = (variant) => {
       const colors = {
-        destructive: "rgb(218,65,60)",
-        success: "rgb(12,222,112)",
-        warning: "rgb(253,204,32)",
-        info: "rgb(59,130,246)",
-        default: "rgb(156,163,175)",
+        destructive: "var(--destructive)",
+        success: "var(--primary)",
+        warning: "var(--accent)",
+        info: "var(--ring)",
+        default: "var(--muted-foreground)",
       };
 
       return colors[variant] || colors.default;
@@ -165,11 +156,11 @@ export const ToastProvider = ({ children }) => {
 
               {/* Content */}
               <div className="flex-1 min-w-0">
-                <div className="font-semibold text-sm leading-tight wrap-break-word text-white">
+                <div className="font-semibold text-sm leading-tight wrap-break-word text-foreground">
                   {toast.title}
                 </div>
                 {toast.description && (
-                  <div className="text-sm mt-1 leading-relaxed wrap-break-word text-gray-300">
+                  <div className="text-sm mt-1 leading-relaxed wrap-break-word text-muted-foreground">
                     {toast.description}
                   </div>
                 )}

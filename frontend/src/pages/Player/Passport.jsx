@@ -78,19 +78,19 @@ const Passport = () => {
       <div className="space-y-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white font-['Orbitron'] animate-pulse bg-[#262626] rounded-lg w-64 h-10"></h1>
-            <p className="text-[#B0AFAF] mt-2 font-['Orbitron'] animate-pulse bg-[#262626] rounded w-48 h-4"></p>
+            <h1 className="text-3xl font-bold text-foreground font-['Orbitron'] animate-pulse bg-[var(--surface-1)] rounded-lg w-64 h-10"></h1>
+            <p className="text-[var(--muted-text)] mt-2 font-['Orbitron'] animate-pulse bg-[var(--surface-1)] rounded w-48 h-4"></p>
           </div>
         </div>
         <div className="space-y-6">
           {[...Array(3)].map((_, i) => (
             <Card
               key={i}
-              className="animate-pulse bg-[#262626] border-[#343434]"
+              className="animate-pulse bg-[var(--surface-1)] border-[var(--surface-2)]"
             >
               <CardContent className="p-6">
-                <div className="h-4 bg-[#343434] rounded w-3/4 mb-4"></div>
-                <div className="h-8 bg-[#343434] rounded w-1/2"></div>
+                <div className="h-4 bg-[var(--surface-2)] rounded w-3/4 mb-4"></div>
+                <div className="h-8 bg-[var(--surface-2)] rounded w-1/2"></div>
               </CardContent>
             </Card>
           ))}
@@ -109,10 +109,10 @@ const Passport = () => {
           <h2 className="text-2xl font-bold text-white mb-2">
             Failed to Load Passport
           </h2>
-          <p className="text-[#B0AFAF] mb-6">{error}</p>
+          <p className="text-[var(--muted-text)] mb-6">{error}</p>
           <button
             onClick={loadPassport}
-            className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold rounded-xl px-6 py-3 transition-all duration-300"
+            className="bg-linear-to-r from-primary to-[var(--accent-2)] text-[var(--ink)] hover:from-[var(--accent-2)] hover:to-primary font-semibold rounded-xl px-6 py-3 transition-all duration-300"
           >
             Try Again
           </button>
@@ -125,13 +125,13 @@ const Passport = () => {
     return (
       <div className="space-y-8">
         <div className="text-center py-12">
-          <div className="w-16 h-16 bg-[#343434] rounded-full flex items-center justify-center mx-auto mb-4">
-            <User className="w-8 h-8 text-[#B0AFAF]" />
+          <div className="w-16 h-16 bg-[var(--surface-2)] rounded-full flex items-center justify-center mx-auto mb-4">
+            <User className="w-8 h-8 text-[var(--muted-text)]" />
           </div>
           <h2 className="text-2xl font-bold text-white mb-2">
             No Passport Data
           </h2>
-          <p className="text-[#B0AFAF]">
+          <p className="text-[var(--muted-text)]">
             {targetPlayerId === user?.id
               ? "Complete your player profile to get started with your digital passport."
               : "This player doesn't have a passport yet."}
@@ -149,7 +149,7 @@ const Passport = () => {
           <h1 className="text-4xl font-bold font-['Orbitron'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
             Digital Player Passport
           </h1>
-          <p className="text-[#B0AFAF] text-lg mt-2 font-['Orbitron']">
+          <p className="text-[var(--muted-text)] text-lg mt-2 font-['Orbitron']">
             Comprehensive player profile and performance history
           </p>
         </div>

@@ -1,5 +1,6 @@
 import { supabase } from "../config/supabase.config.js";
 import crypto from "crypto";
+import { VERIFICATION_STATUS } from "../utils/constants.js";
 
 export const getPendingVerifications = async (filters = {}) => {
   try {
@@ -16,7 +17,7 @@ export const getPendingVerifications = async (filters = {}) => {
         `,
         { count: "exact" }
       )
-      .eq("status", "pending")
+      .eq("status", VERIFICATION_STATUS.PENDING)
       .order("created_at", { ascending: false });
 
     if (filters.document_type && filters.document_type !== "all") {
@@ -51,9 +52,9 @@ export const getVerificationStats = async () => {
 
     const stats = {
       total: data.length,
-      pending: data.filter((v) => v.status === "pending").length,
-      approved: data.filter((v) => v.status === "approved").length,
-      rejected: data.filter((v) => v.status === "rejected").length,
+      pending: data.filter((v) => v.status === VERIFICATION_STATUS.PENDING).length,
+      approved: data.filter((v) => v.status === VERIFICATION_STATUS.APPROVED).length,
+      rejected: data.filter((v) => v.status === VERIFICATION_STATUS.REJECTED).length,
       byType: {},
     };
 

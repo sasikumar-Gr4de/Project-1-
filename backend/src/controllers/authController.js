@@ -6,6 +6,7 @@ import {
   updateUserProfile,
 } from "../services/authService.js";
 import { RESPONSES, AUTH_MESSAGES } from "../utils/messages.js";
+import { OTP_CONFIG } from "../utils/constants.js";
 import { supabase } from "../config/supabase.config.js";
 import { generateCustomToken } from "../services/tokenService.js";
 
@@ -44,7 +45,7 @@ export const sendOtp = async (req, res) => {
     res.json(
       RESPONSES.SUCCESS(AUTH_MESSAGES.OTP_SENT, {
         channel: email ? "email" : "whatsapp",
-        expires_in: "5 minutes",
+        expires_in: `${OTP_CONFIG.EXPIRY_MINUTES} minutes`,
         // Development only - never expose OTP in production
         ...(process.env.NODE_ENV === "development" && { otp }),
       })

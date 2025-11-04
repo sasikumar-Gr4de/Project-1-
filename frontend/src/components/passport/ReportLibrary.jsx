@@ -28,7 +28,7 @@ const ReportLibrary = ({ reports }) => {
       case "season":
         return "bg-purple-500/20 text-purple-400 border-purple-500/30";
       default:
-        return "bg-[#343434] text-[#B0AFAF] border-[#343434]";
+        return "bg-[var(--surface-2)] text-[var(--muted-text)] border-[var(--surface-2)]";
     }
   };
 
@@ -70,21 +70,21 @@ const ReportLibrary = ({ reports }) => {
 
   if (!reports || reports.length === 0) {
     return (
-      <Card className="bg-[#262626] border-[#343434]">
+      <Card className="bg-[var(--surface-1)] border-[var(--surface-2)]">
         <CardHeader>
           <CardTitle className="text-xl font-bold text-white flex items-center">
             <FileText className="w-5 h-5 mr-2 text-primary" />
             Report Library
           </CardTitle>
-          <CardDescription className="text-[#B0AFAF]">
+          <CardDescription className="text-[var(--muted-text)]">
             Your performance reports will appear here
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-center py-12">
-            <FileText className="w-16 h-16 text-[#B0AFAF] mx-auto mb-4 opacity-50" />
-            <p className="text-[#B0AFAF] text-lg">No reports available</p>
-            <p className="text-sm text-[#B0AFAF] mt-2">
+            <FileText className="w-16 h-16 text-[var(--muted-text)] mx-auto mb-4 opacity-50" />
+            <p className="text-[var(--muted-text)] text-lg">No reports available</p>
+            <p className="text-sm text-[var(--muted-text)] mt-2">
               Performance reports will be generated after match analysis
             </p>
           </div>
@@ -94,7 +94,7 @@ const ReportLibrary = ({ reports }) => {
   }
 
   return (
-    <Card className="bg-[#262626] border-[#343434]">
+    <Card className="bg-[var(--surface-1)] border-[var(--surface-2)]">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
@@ -102,16 +102,16 @@ const ReportLibrary = ({ reports }) => {
               <FileText className="w-5 h-5 mr-2 text-primary" />
               Report Library
             </CardTitle>
-            <CardDescription className="text-[#B0AFAF]">
+            <CardDescription className="text-[var(--muted-text)]">
               Access your complete performance report history
             </CardDescription>
           </div>
           <div className="flex items-center space-x-2">
-            <Filter className="w-4 h-4 text-[#B0AFAF]" />
+            <Filter className="w-4 h-4 text-[var(--muted-text)]" />
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="bg-[#1A1A1A] border border-[#343434] text-white text-sm rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 px-3 py-2 transition-all duration-300"
+              className="bg-[var(--surface-0)] border border-[var(--surface-2)] text-foreground text-sm rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 px-3 py-2 transition-all duration-300"
             >
               <option value="all">All Reports</option>
               <option value="weekly">Weekly</option>
@@ -126,11 +126,11 @@ const ReportLibrary = ({ reports }) => {
           {filteredReports.map((report, index) => (
             <div
               key={report.report_id}
-              className="flex items-center justify-between p-4 border rounded-xl bg-[#1A1A1A] border-[#343434] hover:border-primary/30 transition-all duration-300 group"
+              className="flex items-center justify-between p-4 border rounded-xl bg-[var(--surface-0)] border-[var(--surface-2)] hover:border-primary/30 transition-all duration-300 group"
             >
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-linear-to-br from-primary to-[#94D44A] rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <FileText className="w-6 h-6 text-[#0F0F0E]" />
+                <div className="w-12 h-12 bg-linear-to-br from-primary to-[var(--accent-2)] rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <FileText className="w-6 h-6 text-[var(--ink)]" />
                 </div>
                 <div>
                   <div className="flex items-center space-x-3">
@@ -144,7 +144,7 @@ const ReportLibrary = ({ reports }) => {
                       {report.report_type.toUpperCase()}
                     </Badge>
                   </div>
-                  <div className="flex items-center space-x-4 text-sm text-[#B0AFAF] mt-1">
+                  <div className="flex items-center space-x-4 text-sm text-[var(--muted-text)] mt-1">
                     <div className="flex items-center space-x-1">
                       <Calendar className="w-3 h-3" />
                       <span>
@@ -162,7 +162,7 @@ const ReportLibrary = ({ reports }) => {
                   variant="outline"
                   size="sm"
                   onClick={() => handleView(report)}
-                  className="bg-[#343434] border-[#343434] text-white hover:bg-[#4A4A4A] hover:border-primary transition-all duration-300"
+                  className="bg-[var(--surface-2)] border-[var(--surface-2)] text-foreground hover:bg-[var(--surface-3)] hover:border-primary transition-all duration-300"
                 >
                   <Eye className="w-4 h-4 mr-1" />
                   View
@@ -170,7 +170,7 @@ const ReportLibrary = ({ reports }) => {
                 <Button
                   size="sm"
                   onClick={() => handleDownload(report)}
-                  className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold transition-all duration-300"
+                  className="bg-linear-to-r from-primary to-[var(--accent-2)] text-[var(--ink)] hover:from-[var(--accent-2)] hover:to-primary font-semibold transition-all duration-300"
                 >
                   <Download className="w-4 h-4 mr-1" />
                   Download
@@ -181,25 +181,25 @@ const ReportLibrary = ({ reports }) => {
         </div>
 
         {/* Summary */}
-        <div className="mt-6 pt-6 border-t border-[#343434]">
+        <div className="mt-6 pt-6 border-t border-[var(--surface-2)]">
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
               <div className="text-2xl font-bold text-white">
                 {reports.filter((r) => r.report_type === "weekly").length}
               </div>
-              <div className="text-sm text-[#B0AFAF]">Weekly Reports</div>
+              <div className="text-sm text-[var(--muted-text)]">Weekly Reports</div>
             </div>
             <div>
               <div className="text-2xl font-bold text-white">
                 {reports.filter((r) => r.report_type === "monthly").length}
               </div>
-              <div className="text-sm text-[#B0AFAF]">Monthly Reports</div>
+              <div className="text-sm text-[var(--muted-text)]">Monthly Reports</div>
             </div>
             <div>
               <div className="text-2xl font-bold text-white">
                 {reports.filter((r) => r.report_type === "season").length}
               </div>
-              <div className="text-sm text-[#B0AFAF]">Season Reports</div>
+              <div className="text-sm text-[var(--muted-text)]">Season Reports</div>
             </div>
           </div>
         </div>
