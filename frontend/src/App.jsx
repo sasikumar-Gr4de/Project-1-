@@ -25,6 +25,7 @@ import ReportDetail from "@/pages/Player/ReportDetail";
 import Benchmarks from "@/pages/Player/Benchmarks";
 import Profile from "@/pages/Player/Profile";
 import Passport from "@/pages/Player/Passport";
+import Verification from "@/pages/Player/Verification";
 
 // Admin Pages
 import AdminLayout from "@/components/layout/AdminLayout";
@@ -160,6 +161,7 @@ function PlayerRoutes() {
         <Route path="/benchmarks" element={<Benchmarks />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/passport" element={<Passport />} />
+        <Route path="/verification" element={<Verification />} />
         <Route path="/passport/:playerId" element={<Passport />} />
         <Route index element={<Navigate to="/dashboard" replace />} />
       </Routes>
@@ -180,6 +182,7 @@ function AdminRoutes() {
         <Route path="/analytics" element={<SystemAnalytics />} />
         <Route path="/passports" element={<PassportManager />} />
         <Route path="/verifications" element={<VerificationReview />} />
+
         <Route index element={<Navigate to="/admin/dashboard" replace />} />
       </Routes>
     </AdminLayout>

@@ -124,6 +124,12 @@ export const NAV_ITEMS = {
     { name: "Benchmarks", href: "/benchmarks", icon: "BarChart3" },
     { name: "Profile", href: "/profile", icon: "User" },
     {
+      name: "Verification",
+      href: "/verification",
+      icon: "Shield",
+      description: "Verify your identity",
+    },
+    {
       name: "Passport",
       href: "/passport",
       icon: "FileText",
