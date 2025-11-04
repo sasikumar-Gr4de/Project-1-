@@ -58,7 +58,7 @@ const VerificationReview = () => {
     try {
       setIsLoading(true);
       // This would come from your admin service
-      const response = await fetch("/api/admin/verifications/pending");
+      const response = await fetch("/api/verifications/pending");
       const data = await response.json();
 
       if (data.success) {
@@ -113,7 +113,7 @@ const VerificationReview = () => {
   const handleReview = async (verificationId, action) => {
     try {
       const response = await fetch(
-        `/api/admin/verifications/${verificationId}/review`,
+        `/api/verifications/${verificationId}/review`,
         {
           method: "POST",
           headers: {

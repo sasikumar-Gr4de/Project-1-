@@ -15,16 +15,16 @@ router.use(authenticateToken);
 router.use(requireRole(["admin"]));
 
 // Get pending verifications
-router.get("/verifications/pending", getPendingVerifications);
+router.get("/pending", getPendingVerifications);
 
 // Review verification
 router.post(
-  "/verifications/:verification_id/review",
+  "/:verification_id/review",
   validate(reviewVerificationSchema),
   reviewVerification
 );
 
 // Get verification stats
-router.get("/verifications/stats", getVerificationStats);
+router.get("/stats", getVerificationStats);
 
 export default router;

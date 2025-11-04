@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import {
   TrendingUp,
   Calendar,
@@ -21,7 +22,13 @@ const PerformanceTimeline = ({ timeline, metrics }) => {
   const [expanded, setExpanded] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState("12months");
 
-  const displayItems = expanded ? timeline : timeline.slice(0, 5);
+  // Use provided timeline or build from metrics
+  const displayTimeline =
+    timeline && timeline.length > 0
+      ? timeline
+      : buildTimelineFromMetrics(metrics);
+
+  const displayItems = expanded ? displayTimeline : displayTimeline.slice(0, 5);
 
   const getScoreColor = (score) => {
     if (score >= 90) return "text-green-400";
@@ -61,7 +68,25 @@ const PerformanceTimeline = ({ timeline, metrics }) => {
     });
   };
 
-  if (!timeline || timeline.length === 0) {
+  // Helper function to build timeline from metrics if not provided
+  function buildTimelineFromMetrics(metrics = []) {
+    if (!metrics || metrics.length === 0) return [];
+
+    return metrics
+      .map((metric) => ({
+        type: "metric",
+        date: metric.date,
+        title: "Match Performance",
+        description: `GR4DE Score: ${metric.gr4de_score} | ${
+          metric.competition || "Match"
+        }`,
+        data: metric,
+        sortDate: new Date(metric.date),
+      }))
+      .sort((a, b) => new Date(b.sortDate) - new Date(a.sortDate));
+  }
+
+  if (!displayTimeline || displayTimeline.length === 0) {
     return (
       <Card className="bg-[#262626] border-[#343434]">
         <CardHeader>
@@ -211,7 +236,7 @@ const PerformanceTimeline = ({ timeline, metrics }) => {
         </div>
 
         {/* Show more/less button */}
-        {timeline.length > 5 && (
+        {displayTimeline.length > 5 && (
           <div className="flex justify-center mt-6">
             <Button
               variant="outline"
@@ -226,7 +251,7 @@ const PerformanceTimeline = ({ timeline, metrics }) => {
               ) : (
                 <>
                   <ChevronDown className="w-4 h-4 mr-2" />
-                  Show More ({timeline.length - 5} more)
+                  Show More ({displayTimeline.length - 5} more)
                 </>
               )}
             </Button>
