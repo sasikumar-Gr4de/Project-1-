@@ -39,14 +39,22 @@ const Login = () => {
 
   const handleSendOtp = async () => {
     if (!email && !phone) {
-      toast({ title: "Provide email or phone", variant: "warning" });
+      toast({
+        title: "Warning",
+        description: "Provide email or phone",
+        variant: "warning",
+      });
       return;
     }
 
     if (email) {
       const emailValid = /[^\s@]+@[^\s@]+\.[^\s@]+/.test(email);
       if (!emailValid) {
-        toast({ title: "Invalid email address", variant: "destructive" });
+        toast({
+          title: "Error",
+          description: "Invalid email address",
+          variant: "destructive",
+        });
         return;
       }
     }
@@ -55,11 +63,15 @@ const Login = () => {
     try {
       await sendOtp(email || undefined, phone || undefined);
       setStep("verify");
-      toast({ title: "Verification code sent", variant: "success" });
+      toast({
+        title: "Success",
+        description: "Verification code sent",
+        variant: "success",
+      });
     } catch (error) {
       console.error("Failed to send OTP:", error);
       toast({
-        title: "Failed to send code",
+        title: "Error",
         description: error?.message || "Try again",
         variant: "destructive",
       });
@@ -70,7 +82,11 @@ const Login = () => {
 
   const handleVerifyOtp = async () => {
     if (!otp || otp.length !== 6) {
-      toast({ title: "Enter 6-digit code", variant: "warning" });
+      toast({
+        title: "Warning",
+        description: "Enter 6-digit code",
+        variant: "warning",
+      });
       return;
     }
 
@@ -80,7 +96,11 @@ const Login = () => {
       if (result?.success) {
         const role = result.data?.user?.role;
         const requiresOnboarding = result.data?.requires_onboarding;
-        toast({ title: "Logged in", variant: "success" });
+        toast({
+          title: "Welcome Back!",
+          description: "Successfully logged in",
+          variant: "success",
+        });
         if (requiresOnboarding) {
           navigate("/onboarding", { replace: true });
         } else if (role === "admin") {
