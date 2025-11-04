@@ -1022,8 +1022,7 @@ const ContentManager = () => {
             Content Manager
           </h1>
           <p className="text-[#B0AFAF] mt-2 font-['Orbitron']">
-            Manage landing page content and structure
-            
+            Manage landing page content and structure            
           </p>
         </div>
 

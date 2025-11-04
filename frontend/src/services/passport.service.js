@@ -29,13 +29,13 @@ export const passportService = {
 
   // Admin verification endpoints
   getPendingVerifications: (params = {}) =>
-    api.get("/verifications/verifications/pending", { params }),
+    api.get("/verifications/pending", { params }),
 
   reviewVerification: (verificationId, reviewData) =>
     api.post(
-      `/verifications/verifications/${verificationId}/review`,
+      `/verifications/${verificationId}/review`,
       reviewData
     ),
 
-  getVerificationStats: () => api.get("/verifications/verifications/stats"),
+  getVerificationStats: () => api.get("/verifications/stats"),
 };

@@ -30,9 +30,9 @@ export const ToastProvider = ({ children }) => {
     setToasts((prev) => [...prev, newToast]);
 
     // Auto remove after duration
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((toast) => toast.id !== id));
-    }, duration);
+    // setTimeout(() => {
+    //   setToasts((prev) => prev.filter((toast) => toast.id !== id));
+    // }, duration);
   };
 
   const removeToast = (id) => {
@@ -65,7 +65,7 @@ export const ToastProvider = ({ children }) => {
           className="w-6 h-6 rounded-full flex items-center justify-center"
           style={{ backgroundColor: "rgb(218,65,60)" }}
         >
-          <span className="text-black text-xs font-bold">X</span>
+          <span className="text-black text-xs font-bold">!</span>
         </div>
       ),
       success: (
@@ -169,7 +169,7 @@ export const ToastProvider = ({ children }) => {
                   {toast.title}
                 </div>
                 {toast.description && (
-                  <div className="text-sm mt-1 leading-relaxed wrap-break-word text-gray-300">
+                  <div className="text-sm mt-1 wrap-break-word text-gray-300">
                     {toast.description}
                   </div>
                 )}
@@ -193,7 +193,7 @@ export const ToastProvider = ({ children }) => {
       </div>
 
       {/* Add CSS animation to your global CSS file or index.css */}
-      <style>{`
+      {/* <style>{`
         @keyframes shrink {
           from {
             width: 100%;
@@ -202,7 +202,7 @@ export const ToastProvider = ({ children }) => {
             width: 0%;
           }
         }
-      `}</style>
+      `}</style> */}
     </ToastContext.Provider>
   );
 };

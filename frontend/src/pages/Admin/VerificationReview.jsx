@@ -1,7 +1,6 @@
-// frontend/src/pages/Admin/VerificationReview.jsx
 import { useState, useEffect } from "react";
-import { useAuthStore } from "@/store/authStore";
 import { useToast } from "@/contexts/ToastContext";
+import { usePassportStore } from "@/store/passportStore";
 import {
   Card,
   CardContent,
@@ -33,7 +32,7 @@ import {
 } from "lucide-react";
 
 const VerificationReview = () => {
-  const { user } = useAuthStore();
+  const { fetchPendingVerifications } = usePassportStore();
   const { toast } = useToast();
   const [verifications, setVerifications] = useState([]);
   const [filteredVerifications, setFilteredVerifications] = useState([]);
@@ -58,14 +57,14 @@ const VerificationReview = () => {
     try {
       setIsLoading(true);
       // This would come from your admin service
-      const response = await fetch("/api/verifications/pending");
-      const data = await response.json();
+      const response = await fetchPendingVerifications();
+      console.log(response);
 
-      if (data.success) {
-        setVerifications(data.data.items || []);
-      } else {
-        throw new Error(data.message);
-      }
+      // if (data.success) {
+      //   setVerifications(data.data.items || []);
+      // } else {
+      //   throw new Error(data.message);
+      // }
     } catch (error) {
       console.error("Failed to load verifications:", error);
       toast({

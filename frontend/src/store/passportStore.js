@@ -122,6 +122,29 @@ export const usePassportStore = create((set, get) => ({
     }
   },
 
+  fetchPendingVerifications: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await passportService.getPendingVerifications();
+
+      if (response.status !== 200) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      console.log(response);
+      const data = response.data;
+
+      if (data.success) {
+        set({ pendingVerifications: data.data.items || [], isLoading: false });
+        return data.data.items;
+      } else {
+        throw new Error(data.message || "Failed to load verifications");
+      }
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Failed to fetch pending verifications", isLoading: false });
+      throw error;
+    }
+  },
+
   // Clear passport data
   clearPassport: () =>
     set({
