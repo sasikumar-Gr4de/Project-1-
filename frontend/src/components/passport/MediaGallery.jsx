@@ -43,7 +43,7 @@ const MediaGallery = ({ media }) => {
       case "link":
         return "bg-green-500/20 text-green-400 border-green-500/30";
       default:
-        return "bg-[var(--surface-2)] text-[var(--muted-text)] border-[var(--surface-2)]";
+        return "bg-[var(--surface-2)] text-(--muted-text) border-(--surface-2)";
     }
   };
 
@@ -65,21 +65,21 @@ const MediaGallery = ({ media }) => {
 
   if (!media || media.length === 0) {
     return (
-      <Card className="bg-[var(--surface-1)] border-[var(--surface-2)]">
+      <Card className="bg-(--surface-1) border-(--surface-2)">
         <CardHeader>
           <CardTitle className="text-xl font-bold text-white flex items-center">
             <Image className="w-5 h-5 mr-2 text-primary" />
             Media & Highlights
           </CardTitle>
-          <CardDescription className="text-[var(--muted-text)]">
+          <CardDescription className="text-(--muted-text)">
             Your match highlights and media will appear here
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-center py-12">
-            <Image className="w-16 h-16 text-[var(--muted-text)] mx-auto mb-4 opacity-50" />
-            <p className="text-[var(--muted-text)] text-lg">No media available</p>
-            <p className="text-sm text-[var(--muted-text)] mt-2">
+            <Image className="w-16 h-16 text-(--muted-text) mx-auto mb-4 opacity-50" />
+            <p className="text-(--muted-text) text-lg">No media available</p>
+            <p className="text-sm text-(--muted-text) mt-2">
               Match highlights and media will be added by your coaches
             </p>
           </div>
@@ -90,7 +90,7 @@ const MediaGallery = ({ media }) => {
 
   return (
     <>
-      <Card className="bg-[var(--surface-1)] border-[var(--surface-2)]">
+      <Card className="bg-(--surface-1) border-(--surface-2)">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -98,11 +98,11 @@ const MediaGallery = ({ media }) => {
                 <Image className="w-5 h-5 mr-2 text-primary" />
                 Media & Highlights
               </CardTitle>
-              <CardDescription className="text-[var(--muted-text)]">
+              <CardDescription className="text-(--muted-text)">
                 Match highlights, photos, and external media
               </CardDescription>
             </div>
-            <Button className="bg-linear-to-r from-primary to-[var(--accent-2)] text-[var(--ink)] hover:from-[var(--accent-2)] hover:to-primary font-semibold">
+            <Button className="bg-linear-to-r from-primary to-(--accent-2) text-(--ink) hover:from-(--accent-2) hover:to-primary font-semibold">
               <Plus className="w-4 h-4 mr-2" />
               Add Media
             </Button>
@@ -116,17 +116,17 @@ const MediaGallery = ({ media }) => {
                 className="group cursor-pointer"
                 onClick={() => handleMediaClick(item)}
               >
-                <div className="border-2 border-[var(--surface-2)] rounded-xl bg-[var(--surface-0)] overflow-hidden hover:border-primary/30 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-primary/10">
+                <div className="border-2 border-(--surface-2) rounded-xl bg-(--surface-0) overflow-hidden hover:border-primary/30 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-primary/10">
                   {/* Media Thumbnail */}
-                  <div className="aspect-video bg-[var(--surface-1)] relative overflow-hidden">
+                  <div className="aspect-video bg-(--surface-1) relative overflow-hidden">
                     {item.media_type === "video" ? (
                       <>
-                        <div className="w-full h-full bg-linear-to-br from-[var(--surface-0)] to-[var(--surface-1)] flex items-center justify-center">
-                          <Video className="w-12 h-12 text-[var(--muted-text)] opacity-50" />
+                        <div className="w-full h-full bg-linear-to-br from-(--surface-0) to-(--surface-1) flex items-center justify-center">
+                          <Video className="w-12 h-12 text-(--muted-text) opacity-50" />
                         </div>
                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                           <div className="w-16 h-16 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
-                            <Play className="w-6 h-6 text-[var(--ink)] ml-1" />
+                            <Play className="w-6 h-6 text-(--ink) ml-1" />
                           </div>
                         </div>
                       </>
@@ -137,8 +137,8 @@ const MediaGallery = ({ media }) => {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     ) : (
-                      <div className="w-full h-full bg-linear-to-br from-[var(--surface-0)] to-[var(--surface-1)] flex items-center justify-center">
-                        <ExternalLink className="w-12 h-12 text-[var(--muted-text)] opacity-50" />
+                      <div className="w-full h-full bg-linear-to-br from-(--surface-0) to-(--surface-1) flex items-center justify-center">
+                        <ExternalLink className="w-12 h-12 text-(--muted-text) opacity-50" />
                       </div>
                     )}
 
@@ -161,16 +161,16 @@ const MediaGallery = ({ media }) => {
                       {item.title}
                     </h3>
                     {item.description && (
-                      <p className="text-sm text-[var(--muted-text)] mt-1 line-clamp-2">
+                      <p className="text-sm text-(--muted-text) mt-1 line-clamp-2">
                         {item.description}
                       </p>
                     )}
                     <div className="flex items-center justify-between mt-3">
-                      <span className="text-xs text-[var(--muted-text)]">
+                      <span className="text-xs text-(--muted-text)">
                         {formatDate(item.created_at)}
                       </span>
                       {item.media_type === "link" && (
-                        <ExternalLink className="w-3 h-3 text-[var(--muted-text)]" />
+                        <ExternalLink className="w-3 h-3 text-(--muted-text)" />
                       )}
                     </div>
                   </div>
@@ -180,25 +180,25 @@ const MediaGallery = ({ media }) => {
           </div>
 
           {/* Media Summary */}
-          <div className="mt-6 pt-6 border-t border-[var(--surface-2)]">
+          <div className="mt-6 pt-6 border-t border-(--surface-2)">
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
                 <div className="text-2xl font-bold text-white">
                   {media.filter((m) => m.media_type === "video").length}
                 </div>
-                <div className="text-sm text-[var(--muted-text)]">Videos</div>
+                <div className="text-sm text-(--muted-text)">Videos</div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-white">
                   {media.filter((m) => m.media_type === "image").length}
                 </div>
-                <div className="text-sm text-[var(--muted-text)]">Images</div>
+                <div className="text-sm text-(--muted-text)">Images</div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-white">
                   {media.filter((m) => m.media_type === "link").length}
                 </div>
-                <div className="text-sm text-[var(--muted-text)]">Links</div>
+                <div className="text-sm text-(--muted-text)">Links</div>
               </div>
             </div>
           </div>
@@ -208,8 +208,8 @@ const MediaGallery = ({ media }) => {
       {/* Media Modal */}
       {selectedMedia && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[var(--surface-0)] rounded-2xl border border-[var(--surface-2)] max-w-4xl w-full max-h-[90vh] overflow-hidden">
-            <div className="p-4 border-b border-[var(--surface-2)] flex items-center justify-between">
+          <div className="bg-(--surface-0) rounded-2xl border border-(--surface-2) max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            <div className="p-4 border-b border-(--surface-2) flex items-center justify-between">
               <h3 className="text-lg font-semibold text-white">
                 {selectedMedia.title}
               </h3>
@@ -217,7 +217,7 @@ const MediaGallery = ({ media }) => {
                 variant="ghost"
                 size="icon"
                 onClick={() => setSelectedMedia(null)}
-                className="text-[var(--muted-text)] hover:text-foreground"
+                className="text-(--muted-text) hover:text-foreground"
               >
                 <svg
                   className="w-5 h-5"
@@ -253,14 +253,14 @@ const MediaGallery = ({ media }) => {
                   <p className="text-white text-lg mb-4">External Link</p>
                   <Button
                     onClick={() => window.open(selectedMedia.url, "_blank")}
-                    className="bg-linear-to-r from-primary to-[var(--accent-2)] text-[var(--ink)] hover:from-[var(--accent-2)] hover:to-primary font-semibold"
+                    className="bg-linear-to-r from-primary to-(--accent-2) text-(--ink) hover:from-(--accent-2) hover:to-primary font-semibold"
                   >
                     Open Link
                   </Button>
                 </div>
               )}
               {selectedMedia.description && (
-                <p className="text-[var(--muted-text)] mt-4">
+                <p className="text-(--muted-text) mt-4">
                   {selectedMedia.description}
                 </p>
               )}

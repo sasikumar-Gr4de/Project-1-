@@ -215,7 +215,7 @@ const VerificationReview = () => {
         return (
           <Badge
             variant="outline"
-            className="bg-[var(--surface-2)] text-[var(--muted-text)] border-[var(--surface-2)]"
+            className="bg-(--surface-2) text-(--muted-text) border-(--surface-2)"
           >
             {type}
           </Badge>
@@ -241,7 +241,7 @@ const VerificationReview = () => {
           <h1 className="text-4xl font-bold font-['Orbitron'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
             Document Verification
           </h1>
-          <p className="text-[var(--muted-text)] text-lg mt-2 font-['Orbitron']">
+          <p className="text-(--muted-text) text-lg mt-2 font-['Orbitron']">
             Review and verify player identity documents
           </p>
         </div>
@@ -249,14 +249,14 @@ const VerificationReview = () => {
           <Button
             variant="outline"
             onClick={loadVerifications}
-           className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold rounded-xl px-6 py-3 h-12"
+            className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold rounded-xl px-6 py-3 h-12"
           >
             <RefreshCw
               className={`w-5 h-5 mr-2 ${isLoading ? "animate-spin" : ""}`}
             />
             Refresh
           </Button>
-          {/* <Button className="bg-linear-to-r from-primary to-[var(--accent-2)] text-[var(--ink)] hover:from-[var(--accent-2)] hover:to-primary font-semibold">
+          {/* <Button className="bg-linear-to-r from-primary to-(--accent-2) text-(--ink) hover:from-[var(--accent-2)] hover:to-primary font-semibold">
             <Shield className="w-4 h-4 mr-2" />
             Verification Stats
           </Button> */}
@@ -269,70 +269,70 @@ const VerificationReview = () => {
         description="Filter users by role, status, or search by name/email"
         icon={Filter}
       >
-          <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
             {/* Search */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[var(--muted-text)]" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-(--muted-text)" />
               <Input
                 placeholder="Search players..."
                 value={filters.search}
                 onChange={(e) => handleFilterChange("search", e.target.value)}
-                className="pl-10 bg-[var(--surface-0)] border-[var(--surface-2)] text-foreground placeholder:text-[var(--muted-text)]"
+                className="pl-10 bg-(--surface-0) border-(--surface-2) text-foreground placeholder:text-(--muted-text)"
               />
             </div>
-            </div>
+          </div>
 
-            {/* Status Filter */}
-            <Select
-              value={filters.status}
-              onValueChange={(value) => handleFilterChange("status", value)}
-            >
-              <SelectTrigger className="bg-[var(--surface-0)] border-[var(--surface-2)] text-foreground">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent className="bg-[var(--surface-1)] border-[var(--surface-2)] text-foreground">
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="approved">Approved</SelectItem>
-                <SelectItem value="rejected">Rejected</SelectItem>
-              </SelectContent>
-            </Select>
+          {/* Status Filter */}
+          <Select
+            value={filters.status}
+            onValueChange={(value) => handleFilterChange("status", value)}
+          >
+            <SelectTrigger className="bg-(--surface-0) border-(--surface-2) text-foreground">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent className="bg-(--surface-1) border-(--surface-2) text-foreground">
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="approved">Approved</SelectItem>
+              <SelectItem value="rejected">Rejected</SelectItem>
+            </SelectContent>
+          </Select>
 
-            {/* Document Type Filter */}
-            <Select
-              value={filters.document_type}
-              onValueChange={(value) =>
-                handleFilterChange("document_type", value)
-              }
-            >
-              <SelectTrigger className="bg-[var(--surface-0)] border-[var(--surface-2)] text-foreground">
-                <SelectValue placeholder="Document Type" />
-              </SelectTrigger>
-              <SelectContent className="bg-[var(--surface-1)] border-[var(--surface-2)] text-foreground">
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="passport">Passport</SelectItem>
-                <SelectItem value="club_letter">Club Letter</SelectItem>
-                <SelectItem value="consent">Consent Form</SelectItem>
-              </SelectContent>
-            </Select>
+          {/* Document Type Filter */}
+          <Select
+            value={filters.document_type}
+            onValueChange={(value) =>
+              handleFilterChange("document_type", value)
+            }
+          >
+            <SelectTrigger className="bg-(--surface-0) border-(--surface-2) text-foreground">
+              <SelectValue placeholder="Document Type" />
+            </SelectTrigger>
+            <SelectContent className="bg-(--surface-1) border-(--surface-2) text-foreground">
+              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="passport">Passport</SelectItem>
+              <SelectItem value="club_letter">Club Letter</SelectItem>
+              <SelectItem value="consent">Consent Form</SelectItem>
+            </SelectContent>
+          </Select>
 
-            {/* Results Count */}
-            {/* <div className="flex items-center justify-end">
-              <span className="text-sm text-[var(--muted-text)]">
+          {/* Results Count */}
+          {/* <div className="flex items-center justify-end">
+              <span className="text-sm text-(--muted-text)">
                 {filteredVerifications.length} documents
               </span>
             </div> */}
-          </div>
-        </AdminSection>
+        </div>
+      </AdminSection>
 
       {/* Stats Overview */}
       <div className="grid gap-6 md:grid-cols-4">
-        <Card className="bg-[var(--surface-1)] border-[var(--surface-2)]">
+        <Card className="bg-(--surface-1) border-(--surface-2)">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-[var(--muted-text)]">
+                <p className="text-sm font-medium text-(--muted-text)">
                   Pending Review
                 </p>
                 <p className="text-2xl font-bold text-white mt-1">
@@ -346,11 +346,13 @@ const VerificationReview = () => {
           </CardContent>
         </Card>
 
-        <Card className="bg-[var(--surface-1)] border-[var(--surface-2)]">
+        <Card className="bg-(--surface-1) border-(--surface-2)">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-[var(--muted-text)]">Approved</p>
+                <p className="text-sm font-medium text-(--muted-text)">
+                  Approved
+                </p>
                 <p className="text-2xl font-bold text-white mt-1">
                   {verifications.filter((v) => v.status === "approved").length}
                 </p>
@@ -362,11 +364,13 @@ const VerificationReview = () => {
           </CardContent>
         </Card>
 
-        <Card className="bg-[var(--surface-1)] border-[var(--surface-2)]">
+        <Card className="bg-(--surface-1) border-(--surface-2)">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-[var(--muted-text)]">Rejected</p>
+                <p className="text-sm font-medium text-(--muted-text)">
+                  Rejected
+                </p>
                 <p className="text-2xl font-bold text-white mt-1">
                   {verifications.filter((v) => v.status === "rejected").length}
                 </p>
@@ -378,11 +382,11 @@ const VerificationReview = () => {
           </CardContent>
         </Card>
 
-        <Card className="bg-[var(--surface-1)] border-[var(--surface-2)]">
+        <Card className="bg-(--surface-1) border-(--surface-2)">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-[var(--muted-text)]">Total</p>
+                <p className="text-sm font-medium text-(--muted-text)">Total</p>
                 <p className="text-2xl font-bold text-white mt-1">
                   {verifications.length}
                 </p>
@@ -402,14 +406,14 @@ const VerificationReview = () => {
           [...Array(5)].map((_, i) => (
             <Card
               key={i}
-              className="animate-pulse bg-[var(--surface-1)] border-[var(--surface-2)]"
+              className="animate-pulse bg-(--surface-1) border-(--surface-2)"
             >
               <CardContent className="p-6">
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-[var(--surface-2)] rounded-full"></div>
+                  <div className="w-12 h-12 bg-(--surface-2) rounded-full"></div>
                   <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-[var(--surface-2)] rounded w-1/4"></div>
-                    <div className="h-3 bg-[var(--surface-2)] rounded w-1/2"></div>
+                    <div className="h-4 bg-(--surface-2) rounded w-1/4"></div>
+                    <div className="h-3 bg-(--surface-2) rounded w-1/2"></div>
                   </div>
                 </div>
               </CardContent>
@@ -419,21 +423,21 @@ const VerificationReview = () => {
           filteredVerifications.map((verification) => (
             <Card
               key={verification.verification_id}
-              className="bg-[var(--surface-1)] border-[var(--surface-2)] hover:border-primary/30 transition-all duration-300"
+              className="bg-(--surface-1) border-(--surface-2) hover:border-primary/30 transition-all duration-300"
             >
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     {/* Player Avatar */}
-                    <div className="w-12 h-12 bg-linear-to-br from-primary to-[var(--accent-2)] rounded-full flex items-center justify-center shadow-lg">
+                    <div className="w-12 h-12 bg-linear-to-br from-primary to-(--accent-2) rounded-full flex items-center justify-center shadow-lg">
                       {verification.users?.avatar_url ? (
                         <img
                           src={verification.users.avatar_url}
                           alt={verification.users.player_name}
-                          className="w-12 h-12 rounded-full object-cover border-2 border-[var(--surface-0)]"
+                          className="w-12 h-12 rounded-full object-cover border-2 border-(--surface-0)"
                         />
                       ) : (
-                        <User className="w-6 h-6 text-[var(--ink)]" />
+                        <User className="w-6 h-6 text-(--ink)" />
                       )}
                     </div>
 
@@ -446,7 +450,7 @@ const VerificationReview = () => {
                         {getStatusBadge(verification.status)}
                         {getDocumentTypeBadge(verification.document_type)}
                       </div>
-                      <div className="flex items-center space-x-4 text-sm text-[var(--muted-text)] mt-1">
+                      <div className="flex items-center space-x-4 text-sm text-(--muted-text) mt-1">
                         <span>
                           Submitted {formatDate(verification.created_at)}
                         </span>
@@ -462,7 +466,7 @@ const VerificationReview = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => setSelectedVerification(verification)}
-                      className="bg-[var(--surface-2)] border-[var(--surface-2)] text-foreground hover:bg-[var(--surface-3)]"
+                      className="bg-(--surface-2) border-(--surface-2) text-foreground hover:bg-(--surface-3)"
                     >
                       <Eye className="w-4 h-4 mr-1" />
                       Review
@@ -505,15 +509,15 @@ const VerificationReview = () => {
           ))
         ) : (
           // Empty state
-          <Card className="bg-[var(--surface-1)] border-[var(--surface-2)]">
+          <Card className="bg-(--surface-1) border-(--surface-2)">
             <CardContent className="p-12 text-center">
-              <Shield className="w-16 h-16 text-[var(--muted-text)] mx-auto mb-4 opacity-50" />
+              <Shield className="w-16 h-16 text-(--muted-text) mx-auto mb-4 opacity-50" />
               <h3 className="text-lg font-semibold text-white mb-2">
                 {filters.status === "pending"
                   ? "No pending verifications"
                   : "No documents found"}
               </h3>
-              <p className="text-[var(--muted-text)]">
+              <p className="text-(--muted-text)">
                 {filters.status === "pending"
                   ? "All documents have been reviewed. Check back later for new submissions."
                   : "Try adjusting your filters to see more results."}
@@ -526,14 +530,14 @@ const VerificationReview = () => {
       {/* Review Modal */}
       {selectedVerification && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <Card className="bg-[var(--surface-0)] border-[var(--surface-2)] max-w-4xl w-full max-h-[90vh] overflow-hidden">
-            <CardHeader className="border-b border-[var(--surface-2)]">
+          <Card className="bg-(--surface-0) border-(--surface-2) max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            <CardHeader className="border-b border-(--surface-2)">
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-xl text-white">
                     Review Document
                   </CardTitle>
-                  <CardDescription className="text-[var(--muted-text)]">
+                  <CardDescription className="text-(--muted-text)">
                     {selectedVerification.users?.player_name} -{" "}
                     {selectedVerification.document_type}
                   </CardDescription>
@@ -542,7 +546,7 @@ const VerificationReview = () => {
                   variant="ghost"
                   size="icon"
                   onClick={() => setSelectedVerification(null)}
-                  className="text-[var(--muted-text)] hover:text-foreground"
+                  className="text-(--muted-text) hover:text-foreground"
                 >
                   <svg
                     className="w-5 h-5"
@@ -565,7 +569,7 @@ const VerificationReview = () => {
                 {/* Document Preview */}
                 <div className="space-y-4">
                   <h3 className="font-semibold text-white">Document Preview</h3>
-                  <div className="border-2 border-[var(--surface-2)] rounded-lg bg-[var(--surface-1)] aspect-video flex items-center justify-center">
+                  <div className="border-2 border-(--surface-2) rounded-lg bg-(--surface-1) aspect-video flex items-center justify-center">
                     {selectedVerification.file_url ? (
                       <iframe
                         src={selectedVerification.file_url}
@@ -574,8 +578,8 @@ const VerificationReview = () => {
                       />
                     ) : (
                       <div className="text-center">
-                        <FileText className="w-16 h-16 text-[var(--muted-text)] mx-auto mb-4 opacity-50" />
-                        <p className="text-[var(--muted-text)]">
+                        <FileText className="w-16 h-16 text-(--muted-text) mx-auto mb-4 opacity-50" />
+                        <p className="text-(--muted-text)">
                           Document preview not available
                         </p>
                         <Button
@@ -602,7 +606,7 @@ const VerificationReview = () => {
                       <label className="text-sm font-medium text-white">
                         Player
                       </label>
-                      <p className="text-[var(--muted-text)]">
+                      <p className="text-(--muted-text)">
                         {selectedVerification.users?.player_name}
                       </p>
                     </div>
@@ -611,7 +615,7 @@ const VerificationReview = () => {
                       <label className="text-sm font-medium text-white">
                         Document Type
                       </label>
-                      <p className="text-[var(--muted-text)] capitalize">
+                      <p className="text-(--muted-text) capitalize">
                         {selectedVerification.document_type}
                       </p>
                     </div>
@@ -620,7 +624,7 @@ const VerificationReview = () => {
                       <label className="text-sm font-medium text-white">
                         Submitted
                       </label>
-                      <p className="text-[var(--muted-text)]">
+                      <p className="text-(--muted-text)">
                         {formatDate(selectedVerification.created_at)}
                       </p>
                     </div>
@@ -634,7 +638,7 @@ const VerificationReview = () => {
                       placeholder="Add notes about your review decision..."
                       value={reviewNote}
                       onChange={(e) => setReviewNote(e.target.value)}
-                      className="bg-[var(--surface-1)] border-[var(--surface-2)] text-foreground placeholder:text-[var(--muted-text)] min-h-[100px]"
+                      className="bg-(--surface-1) border-(--surface-2) text-foreground placeholder:text-(--muted-text) min-h-[100px]"
                     />
                   </div>
 
