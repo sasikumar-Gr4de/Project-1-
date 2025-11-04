@@ -35,11 +35,24 @@ const QueueManagement = () => {
       accessorKey: "users.player_name",
       header: "Player",
       cell: ({ row }) => (
-        <div>
+        <div className="flex items-center space-x-4">
+           <div className="w-12 h-12 bg-linear-to-br from-primary to-[var(--accent-2)] rounded-full flex items-center justify-center shadow-lg">
+              {row.users?.avatar_url ? (
+                <img
+                  src={row.users?.avatar_url }
+                  alt={row.users?.player_name }
+                  className="w-12 h-12 rounded-full object-cover border-2 border-[var(--surface-0)]"
+                />
+              ) : (
+                <User className="w-6 h-6 text-[var(--ink)]" />
+              )}
+            </div>
+            <div>
           <div className="font-medium text-white">
             {row.users?.player_name || "Unknown Player"}
           </div>
           <div className="text-xs text-[#B0AFAF]">{row.users?.email}</div>
+          </div>
         </div>
       ),
     },

@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState } from "react";
 
 const ToastContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useToast = () => {
   const context = useContext(ToastContext);
   if (!context) {
@@ -30,9 +31,9 @@ export const ToastProvider = ({ children }) => {
     setToasts((prev) => [...prev, newToast]);
 
     // Auto remove after duration
-    // setTimeout(() => {
-    //   setToasts((prev) => prev.filter((toast) => toast.id !== id));
-    // }, duration);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((toast) => toast.id !== id));
+    }, duration);
   };
 
   const removeToast = (id) => {
@@ -137,7 +138,6 @@ export const ToastProvider = ({ children }) => {
   return (
     <ToastContext.Provider value={{ toast, toasts, removeToast }}>
       {children}
-
       {/* Global Toast Container */}
       <div className="fixed top-4 right-4 left-4 sm:left-auto sm:right-4 z-100 space-y-3 pointer-events-none">
         {toasts.map((toast) => (
@@ -191,9 +191,8 @@ export const ToastProvider = ({ children }) => {
           </div>
         ))}
       </div>
-
       {/* Add CSS animation to your global CSS file or index.css */}
-      {/* <style>{`
+      <style>{`
         @keyframes shrink {
           from {
             width: 100%;
@@ -202,7 +201,8 @@ export const ToastProvider = ({ children }) => {
             width: 0%;
           }
         }
-      `}</style> */}
+      `}</style>{" "}
+      */
     </ToastContext.Provider>
   );
 };
