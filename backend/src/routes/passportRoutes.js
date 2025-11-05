@@ -7,6 +7,7 @@ import {
   uploadVerificationDocument,
   ingestPlayerMetrics,
   getPlayerMetrics,
+  restartVerification,
 } from "../controllers/passportController.js";
 import { authenticateToken, requireRole } from "../middleware/auth.js";
 import { validate } from "../middleware/validation.js";
@@ -42,6 +43,12 @@ router.post(
   "/players/:player_id/verifications",
   validate(uploadVerificationSchema),
   uploadVerificationDocument
+);
+
+router.post(
+  "/players/:player_id/verifications/restart",
+
+  restartVerification
 );
 
 // Metrics routes

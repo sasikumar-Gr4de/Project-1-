@@ -4,19 +4,16 @@ export const getPlayerPassport = async (playerId) => {
   try {
     const [identity, passport, metrics, reports, media, verifications] =
       await Promise.all([
-        // Get player identity
         supabase
           .from("player_identities")
           .select("*")
           .eq("player_id", playerId)
           .single(),
-        // Get passport data
         supabase
           .from("player_passports")
           .select("*")
           .eq("player_id", playerId)
           .single(),
-        // Get recent metrics (last 12 months)
         supabase
           .from("player_metrics")
           .select("*")
@@ -28,19 +25,16 @@ export const getPlayerPassport = async (playerId) => {
               .split("T")[0]
           )
           .order("date", { ascending: true }),
-        // Get reports
         supabase
           .from("player_reports")
           .select("*")
           .eq("player_id", playerId)
           .order("period_start", { ascending: false }),
-        // Get media
         supabase
           .from("player_media")
           .select("*")
           .eq("player_id", playerId)
           .order("created_at", { ascending: false }),
-        // Get verifications
         supabase
           .from("player_verifications")
           .select("*")
@@ -48,7 +42,6 @@ export const getPlayerPassport = async (playerId) => {
           .order("created_at", { ascending: false }),
       ]);
 
-    // Handle errors
     const errors = [
       identity.error,
       passport.error,
@@ -93,7 +86,6 @@ export const createPlayerIdentity = async (playerId, identityData) => {
 
     if (error) throw error;
 
-    // Start verification process
     await startVerificationProcess(playerId);
 
     await createAuditLog(
@@ -134,10 +126,14 @@ export const getVerificationStatus = async (playerId) => {
     if (errors.length > 0) throw errors[0];
 
     const verificationBadge = calculateVerificationBadge(verifications.data);
-
     const verificationProgress = calculateVerificationProgress(
       identity.data,
       verifications.data
+    );
+    const currentStep = getCurrentVerificationStep(
+      identity.data,
+      verifications.data,
+      verificationBadge
     );
 
     return {
@@ -145,11 +141,7 @@ export const getVerificationStatus = async (playerId) => {
       verifications: verifications.data || [],
       verificationBadge,
       verificationProgress,
-      currentStep: getCurrentVerificationStep(
-        identity.data,
-        verifications.data,
-        verificationBadge
-      ),
+      currentStep,
     };
   } catch (error) {
     console.error("Get verification status error:", error);
@@ -159,6 +151,12 @@ export const getVerificationStatus = async (playerId) => {
 
 export const uploadVerificationDocument = async (playerId, documentData) => {
   try {
+    // Validate document type
+    const validDocumentTypes = ["passport", "club_letter", "consent"];
+    if (!validDocumentTypes.includes(documentData.document_type)) {
+      throw new Error("Invalid document type");
+    }
+
     const { data, error } = await supabase
       .from("player_verifications")
       .insert([
@@ -220,7 +218,6 @@ export const updateHeadshot = async (playerId, headshotUrl) => {
 // Helper functions
 const startVerificationProcess = async (playerId) => {
   try {
-    // Create initial verification record or update status
     await supabase.from("verification_process").upsert({
       player_id: playerId,
       current_step: "identity",
@@ -241,23 +238,26 @@ const calculateVerificationProgress = (identity, verifications) => {
     approval: 0,
   };
 
-  // Calculate documents progress
-  const requiredDocs = ["passport", "club_letter"];
-  const uploadedDocs =
-    verifications?.filter((v) => requiredDocs.includes(v.document_type)) || [];
-  progress.documents = Math.round(
-    (uploadedDocs.length / requiredDocs.length) * 100
-  );
+  // Calculate documents progress - any one document is enough
+  const hasAnyDocument =
+    verifications?.some((v) => v.file_url && v.file_url.trim() !== "") || false;
+
+  progress.documents = hasAnyDocument ? 100 : 0;
 
   // Calculate approval progress
   const approvedDocs =
     verifications?.filter((v) => v.status === "approved") || [];
-  if (approvedDocs.length >= 2) {
+  const pendingDocs =
+    verifications?.filter((v) => v.status === "pending") || [];
+  const rejectedDocs =
+    verifications?.filter((v) => v.status === "rejected") || [];
+
+  if (approvedDocs.length >= 1) {
     progress.approval = 100;
-  } else if (verifications?.some((v) => v.status === "rejected")) {
+  } else if (rejectedDocs.length > 0) {
     progress.approval = 0;
-  } else if (verifications?.length > 0) {
-    progress.approval = 50; // Under review
+  } else if (pendingDocs.length > 0) {
+    progress.approval = 50;
   }
 
   return progress;
@@ -268,23 +268,27 @@ const getCurrentVerificationStep = (
   verifications,
   verificationBadge
 ) => {
-  if (!identity) return 1;
-  if (!identity.headshot_url) return 1;
+  // Step 1: Identity not completed
+  if (!identity || !identity.first_name || !identity.headshot_url) {
+    return 1;
+  }
 
-  // Check document types and also url is not empty
-  const requiredDocs = ["passport", "club_letter"];
-  const uploadedDocs =
-    verifications?.filter(
-      (v) => requiredDocs.includes(v.document_type) && v.file_url
-    ) || [];
-  const hasRequiredDocs = uploadedDocs.length;
+  // Step 2: Check if any document is uploaded
+  const hasAnyDocument = verifications?.some(
+    (v) => v.status === "pending" && v.file_url && v.file_url.trim() !== ""
+  );
 
-  if (!hasRequiredDocs) return 2;
-  if (verificationBadge.status === "pending") return 3;
-  if (verificationBadge.status === "verified") return 4;
-  if (verificationBadge.status === "rejected") return 5;
+  if (!hasAnyDocument) {
+    return 2;
+  }
 
-  return 2;
+  // Step 3: Check verification status
+  if (verificationBadge.status === "pending") {
+    return 3;
+  }
+
+  // Step 4: Final step (approved or rejected)
+  return 4;
 };
 
 const calculateVerificationBadge = (verifications) => {
@@ -296,7 +300,10 @@ const calculateVerificationBadge = (verifications) => {
   const pendingDocs = verifications.filter((v) => v.status === "pending");
   const rejectedDocs = verifications.filter((v) => v.status === "rejected");
 
-  if (approvedDocs.length >= 1) {
+  // Check if any document is approved
+  const hasAnyApproved = approvedDocs.length > 0;
+
+  if (hasAnyApproved) {
     return { status: "verified", label: "Verified", color: "green" };
   } else if (rejectedDocs.length > 0) {
     return { status: "rejected", label: "Documents Rejected", color: "red" };
@@ -347,5 +354,55 @@ const createAuditLog = async (actorId, entity, entityId, action, diff) => {
     ]);
   } catch (error) {
     console.error("Create audit log error:", error);
+  }
+};
+
+export const restartVerificationProcess = async (playerId) => {
+  try {
+    // Delete player identity
+    const { error: deleteIdentityError } = await supabase
+      .from("player_identities")
+      .delete()
+      .eq("player_id", playerId);
+
+    if (deleteIdentityError) throw deleteIdentityError;
+
+    // Get current verifications for audit log
+    const { data: currentVerifications } = await supabase
+      .from("player_verifications")
+      .select("*")
+      .eq("player_id", playerId);
+
+    // // Reset verification process
+    // const { error: processError } = await supabase
+    //   .from("verification_process")
+    //   .update({
+    //     current_step: "identity",
+    //     status: "in_progress",
+    //     updated_at: new Date().toISOString(),
+    //   })
+    //   .eq("player_id", playerId);
+
+    // if (processError) throw processError;
+
+    await createAuditLog(
+      playerId,
+      "verification_process",
+      playerId,
+      "restart",
+      {
+        old_verifications_count: currentVerifications?.length || 0,
+        restart_reason: "user_requested",
+      }
+    );
+
+    return {
+      success: true,
+      message: "Verification process restarted successfully",
+      oldVerifications: currentVerifications || [],
+    };
+  } catch (error) {
+    console.error("Restart verification process error:", error);
+    throw new Error(error.message || "Failed to restart verification process");
   }
 };

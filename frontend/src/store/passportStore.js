@@ -7,6 +7,7 @@ export const usePassportStore = create((set, get) => ({
   verificationStatus: null,
   isLoading: false,
   error: null,
+  pendingVerifications: null,
 
   // Actions
   setLoading: (loading) => set({ isLoading: loading }),
@@ -17,10 +18,7 @@ export const usePassportStore = create((set, get) => ({
   fetchPlayerPassport: async (playerId) => {
     set({ isLoading: true, error: null });
     try {
-      const { data: response } = await passportService.getPlayerPassport(
-        playerId
-      );
-      console.log(response.data);
+      const response = await passportService.getPlayerPassport(playerId);
       set({
         passport: response.data,
         isLoading: false,
@@ -101,7 +99,7 @@ export const usePassportStore = create((set, get) => ({
     }
   },
 
-  // Verification
+  // Verification - FIXED: Added missing getVerificationStatus function
   getVerificationStatus: async (playerId) => {
     set({ isLoading: true, error: null });
     try {
@@ -204,4 +202,34 @@ export const usePassportStore = create((set, get) => ({
       verificationStatus: null,
       pendingVerifications: null,
     }),
+
+  restartVerification: async (playerId) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await passportService.restartVerification(playerId);
+
+      if (response.status !== 200) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = response.data;
+
+      if (data.success) {
+        // Refresh verification status to get updated state
+        await get().getVerificationStatus(playerId);
+
+        set({ isLoading: false });
+        return data.data;
+      } else {
+        throw new Error(data.message || "Failed to restart verification");
+      }
+    } catch (error) {
+      set({
+        error:
+          error.response?.data?.message || "Failed to restart verification",
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
 }));

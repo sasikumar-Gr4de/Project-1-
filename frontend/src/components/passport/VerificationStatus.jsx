@@ -1,168 +1,127 @@
-// components/passport/VerificationStatus.jsx
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Shield,
   CheckCircle,
   Clock,
   XCircle,
-  FileText,
   AlertCircle,
+  RefreshCw,
 } from "lucide-react";
-import { Link } from "react-router-dom";
 
-const VerificationStatus = ({ verificationStatus, verifications }) => {
-  console.log("Verification Status:", verificationStatus);
-  const getStatusBadge = (status) => {
+const VerificationStatus = ({
+  status,
+  currentStep,
+  onRestart,
+  loading = false,
+}) => {
+  const getStepInfo = (step) => {
+    const steps = {
+      1: {
+        label: "Identity & Headshot",
+        description: "Complete your profile information",
+      },
+      2: {
+        label: "Document Upload",
+        description: "Upload required verification documents",
+      },
+      3: {
+        label: "Under Review",
+        description: "Documents being verified by our team",
+      },
+      4: { label: "Complete", description: "Verification process completed" },
+    };
+    return steps[step] || steps[1];
+  };
+
+  const getStatusConfig = (status) => {
     switch (status) {
       case "verified":
-        return (
-          <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-            <CheckCircle className="w-3 h-3 mr-1" />
-            Verified
-          </Badge>
-        );
+        return {
+          icon: CheckCircle,
+          color: "text-green-400",
+          bgColor: "bg-green-500/20",
+          borderColor: "border-green-500/30",
+          label: "Verified",
+          description: "Your account has been successfully verified",
+        };
       case "pending":
-        return (
-          <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
-            <Clock className="w-3 h-3 mr-1" />
-            Pending
-          </Badge>
-        );
+        return {
+          icon: Clock,
+          color: "text-yellow-400",
+          bgColor: "bg-yellow-500/20",
+          borderColor: "border-yellow-500/30",
+          label: "Under Review",
+          description: "Your documents are being reviewed by our team",
+        };
       case "rejected":
-        return (
-          <Badge className="bg-red-500/20 text-red-400 border-red-500/30">
-            <XCircle className="w-3 h-3 mr-1" />
-            Rejected
-          </Badge>
-        );
+        return {
+          icon: XCircle,
+          color: "text-red-400",
+          bgColor: "bg-red-500/20",
+          borderColor: "border-red-500/30",
+          label: "Rejected",
+          description:
+            "Some documents were rejected. Please restart verification.",
+        };
       default:
-        return (
-          <Badge className="bg-(--surface-2) text-(--muted-text) border-(--surface-2)">
-            <AlertCircle className="w-3 h-3 mr-1" />
-            Not Started
-          </Badge>
-        );
+        return {
+          icon: AlertCircle,
+          color: "text-[#B0AFAF]",
+          bgColor: "bg-[#343434]",
+          borderColor: "border-[#343434]",
+          label: "Unverified",
+          description: "Start the verification process to unlock all features",
+        };
     }
   };
 
-  const getDocumentTypeLabel = (type) => {
-    switch (type) {
-      case "passport":
-        return "Passport";
-      case "club_letter":
-        return "Club Letter";
-      case "consent":
-        return "Consent Form";
-      default:
-        return type;
-    }
-  };
+  const statusConfig = getStatusConfig(status);
 
   return (
-    <div className="space-y-6">
-      {/* Overall Verification Status */}
-      <Card className="bg-(--surface-1) border-(--surface-2)">
-        <CardHeader>
-          <CardTitle className="text-xl text-white flex items-center">
-            <Shield className="w-5 h-5 mr-2" />
-            Verification Status
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between">
+    <Card className="bg-[#262626] border-[#343434]">
+      <CardContent className="p-6">
+        <div className="flex items-start justify-between">
+          <div className="flex items-start space-x-4">
+            <div
+              className={`p-3 rounded-xl ${statusConfig.bgColor} ${statusConfig.borderColor} border`}
+            >
+              <statusConfig.icon className={`w-6 h-6 ${statusConfig.color}`} />
+            </div>
             <div>
-              <p className="text-(--muted-text)">Overall Status</p>
-              <div className="flex items-center space-x-3 mt-2">
-                {getStatusBadge(verificationStatus?.status || "not_started")}
-                <span className="text-white text-lg font-semibold">
-                  {verificationStatus?.status === "verified"
-                    ? "Fully Verified"
-                    : verificationStatus?.status === "pending"
-                    ? "Under Review"
-                    : verificationStatus?.status === "rejected"
-                    ? "Verification Required"
-                    : "Not Verified"}
+              <h3 className="text-white font-semibold text-lg">
+                {statusConfig.label}
+              </h3>
+              <p className="text-[#B0AFAF] mt-1">{statusConfig.description}</p>
+              <div className="flex items-center space-x-4 mt-3">
+                <Badge
+                  className={`${statusConfig.bgColor} ${statusConfig.color} ${statusConfig.borderColor} border`}
+                >
+                  Step {currentStep} of 4
+                </Badge>
+                <span className="text-sm text-[#B0AFAF]">
+                  {getStepInfo(currentStep).label}
                 </span>
               </div>
             </div>
-
-            {(!verificationStatus ||
-              verificationStatus?.status !== "verified") && (
-              <Button asChild>
-                <Link to="/verification">Start Verification</Link>
-              </Button>
-            )}
           </div>
 
-          {verificationStatus?.verificationProgress && (
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white">
-                  {verificationStatus.verificationProgress.identity}%
-                </div>
-                <p className="text-(--muted-text) text-sm">Identity</p>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white">
-                  {verificationStatus.verificationProgress.documents}%
-                </div>
-                <p className="text-(--muted-text) text-sm">Documents</p>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-white">
-                  {verificationStatus.verificationProgress.approval}%
-                </div>
-                <p className="text-(--muted-text) text-sm">Approval</p>
-              </div>
-            </div>
+          {status === "rejected" && (
+            <Button
+              onClick={onRestart}
+              disabled={loading}
+              className="bg-red-500 hover:bg-red-600 text-white"
+            >
+              {loading ? (
+                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+              ) : null}
+              Restart Verification
+            </Button>
           )}
-        </CardContent>
-      </Card>
-
-      {/* Document Verification Status */}
-      <Card className="bg-(--surface-1) border-(--surface-2)">
-        <CardHeader>
-          <CardTitle className="text-xl text-white flex items-center">
-            <FileText className="w-5 h-5 mr-2" />
-            Document Status
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {verifications && verifications.length > 0 ? (
-              verifications.map((doc) => (
-                <div
-                  key={doc.verification_id}
-                  className="flex items-center justify-between p-3 bg-(--surface-2) rounded-lg"
-                >
-                  <div className="flex items-center space-x-3">
-                    <FileText className="w-4 h-4 text-(--muted-text)" />
-                    <div>
-                      <p className="text-white font-medium">
-                        {getDocumentTypeLabel(doc.document_type)}
-                      </p>
-                      <p className="text-(--muted-text) text-sm">
-                        Uploaded {new Date(doc.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                  {getStatusBadge(doc.status)}
-                </div>
-              ))
-            ) : (
-              <div className="text-center py-6">
-                <FileText className="w-12 h-12 text-(--muted-text) mx-auto mb-3 opacity-50" />
-                <p className="text-(--muted-text)">
-                  No documents uploaded yet.
-                </p>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

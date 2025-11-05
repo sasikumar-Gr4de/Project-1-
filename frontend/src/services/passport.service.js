@@ -14,7 +14,7 @@ export const passportService = {
       headshot_url: headshotUrl,
     }),
 
-  // Verification
+  // Verification - FIXED: Added missing getVerificationStatus function
   getVerificationStatus: (playerId) =>
     api.get(`/passport/players/${playerId}/verifications`),
 
@@ -34,4 +34,7 @@ export const passportService = {
 
   reviewVerification: (verificationId, reviewData) =>
     api.post(`/verifications/${verificationId}/review`, reviewData),
+
+  restartVerification: (playerId) =>
+    api.post(`/passport/players/${playerId}/verifications/restart`),
 };

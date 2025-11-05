@@ -553,7 +553,7 @@ const VerificationReview = () => {
                 {/* Document Preview */}
                 <div className="space-y-4">
                   <h3 className="font-semibold text-white">Document Preview</h3>
-                  <div className="border-2 border-(--surface-2) rounded-lg bg-(--surface-1) aspect-video flex items-center justify-center">
+                  <div className="border-2 border-(--surface-2) rounded-lg bg-(--surface-1)">
                     {selectedVerification.file_url ? (
                       <div className="border-2 border-(--surface-2) rounded-lg bg-(--surface-1) aspect-video ">
                         <iframe

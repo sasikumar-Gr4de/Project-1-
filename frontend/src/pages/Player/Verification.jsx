@@ -25,14 +25,20 @@ import {
   Loader2,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { isEmpty } from "@/utils/helper.utils";
 
 const Verification = () => {
   const { user } = useAuthStore();
-  const { passport, getVerificationStatus } = usePassportStore();
+  const {
+    passport,
+    verificationStatus,
+    getVerificationStatus,
+    restartVerification,
+    isLoading,
+  } = usePassportStore();
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
-  const [verificationStatus, setVerificationStatus] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loadingStatus, setLoadingStatus] = useState(true);
 
   useEffect(() => {
     if (user?.id) {
@@ -42,26 +48,27 @@ const Verification = () => {
 
   const loadVerificationStatus = async () => {
     try {
-      setIsLoading(true);
+      setLoadingStatus(true);
       const { data: status } = await getVerificationStatus(user.id);
-      setVerificationStatus(status);
+
       console.log("Verification status:", status);
 
       // Determine current step based on verification progress
       if (status.currentStep) {
         setCurrentStep(status.currentStep);
       } else {
-        // Improved step logic
-        const badgeStatus = status.verificationBadge?.status;
-
+        // Simplified step logic - any document is sufficient
         if (!status.identity?.first_name || !status.identity?.headshot_url) {
           setCurrentStep(1);
-        } else if (!hasRequiredDocuments(status.verifications)) {
+        } else if (!hasAnyDocument(status.verifications)) {
           setCurrentStep(2);
-        } else if (badgeStatus === "pending") {
+        } else if (status.verificationBadge?.status === "pending") {
           setCurrentStep(3);
-        } else if (badgeStatus === "verified" || badgeStatus === "rejected") {
-          setCurrentStep(4); // Final step for both success and failure
+        } else if (
+          status.verificationBadge?.status === "verified" ||
+          status.verificationBadge?.status === "rejected"
+        ) {
+          setCurrentStep(4);
         } else {
           setCurrentStep(1);
         }
@@ -74,26 +81,44 @@ const Verification = () => {
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setLoadingStatus(false);
     }
   };
 
-  const hasRequiredDocuments = (verifications) => {
-    if (!verifications) return false;
-    const requiredDocs = ["passport", "club_letter"];
-    const uploadedDocs = verifications.filter((v) =>
-      requiredDocs.includes(v.document_type)
-    );
-    return uploadedDocs.length >= requiredDocs.length;
+  const hasAnyDocument = (verifications) => {
+    if (!verifications || !Array.isArray(verifications)) return false;
+
+    // Check if any document is uploaded and has file URL
+    return verifications.some((v) => v.file_url && !isEmpty(v.file_url));
   };
 
   const handleStepComplete = () => {
     loadVerificationStatus();
   };
 
-  const handleRestartVerification = () => {
-    setCurrentStep(1);
-    loadVerificationStatus();
+  const handleRestartVerification = async () => {
+    try {
+      setLoadingStatus(true);
+      await restartVerification(user.id);
+
+      // Refresh the verification status
+      await loadVerificationStatus();
+
+      toast({
+        title: "Success",
+        description: "Verification process restarted successfully",
+        variant: "success",
+      });
+    } catch (error) {
+      console.error("Failed to restart verification:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to restart verification",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingStatus(false);
+    }
   };
 
   const getFinalStepStatus = () => {
@@ -159,7 +184,7 @@ const Verification = () => {
     {
       id: 2,
       title: "Document Upload",
-      description: "Upload required verification documents",
+      description: "Upload any verification document",
       status:
         currentStep === 2
           ? "current"
@@ -169,7 +194,7 @@ const Verification = () => {
       content: (
         <VerificationStep
           title="Document Upload"
-          description="Upload your passport and club registration documents"
+          description="Upload any one document to verify your identity"
           status={
             currentStep === 2
               ? "current"
@@ -190,7 +215,7 @@ const Verification = () => {
     {
       id: 3,
       title: "Under Review",
-      description: "Your documents are being verified",
+      description: "Your document is being verified",
       status:
         currentStep === 3
           ? "current"
@@ -200,7 +225,7 @@ const Verification = () => {
       content: (
         <VerificationStep
           title="Under Review"
-          description="Your documents are being reviewed by our verification team"
+          description="Your document is being reviewed by our verification team"
           status={
             currentStep === 3
               ? "current"
@@ -221,7 +246,7 @@ const Verification = () => {
                   Under Review
                 </h3>
                 <p className="text-[#B0AFAF] max-w-md mx-auto">
-                  Your verification documents are being reviewed. This usually
+                  Your verification document is being reviewed. This usually
                   takes 1-2 business days.
                 </p>
               </div>
@@ -339,7 +364,7 @@ const Verification = () => {
                   </h3>
                   <p className="text-[#B0AFAF] max-w-md mx-auto">
                     {getFinalStepStatus() === "failed"
-                      ? "We encountered issues with your verification documents. Please review the requirements and try again."
+                      ? "We encountered issues with your verification document. Please review the requirements and try again."
                       : "Please complete the verification process to access all platform features."}
                   </p>
                 </div>
@@ -355,11 +380,11 @@ const Verification = () => {
                       <>
                         <li className="flex items-center space-x-2">
                           <AlertCircle className="w-4 h-4 text-red-400" />
-                          <span>Blurry or unclear document images</span>
+                          <span>Blurry or unclear document</span>
                         </li>
                         <li className="flex items-center space-x-2">
                           <AlertCircle className="w-4 h-4 text-red-400" />
-                          <span>Expired identification documents</span>
+                          <span>Expired identification document</span>
                         </li>
                         <li className="flex items-center space-x-2">
                           <AlertCircle className="w-4 h-4 text-red-400" />
@@ -380,7 +405,7 @@ const Verification = () => {
                         </li>
                         <li className="flex items-center space-x-2">
                           <CheckCircle className="w-4 h-4 text-blue-400" />
-                          <span>Upload required documents</span>
+                          <span>Upload a verification document</span>
                         </li>
                         <li className="flex items-center space-x-2">
                           <CheckCircle className="w-4 h-4 text-blue-400" />
@@ -393,12 +418,15 @@ const Verification = () => {
 
                 <Button
                   onClick={handleRestartVerification}
+                  disabled={loadingStatus}
                   className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold"
                 >
-                  <RotateCcw className="w-4 h-4 mr-2" />
-                  {getFinalStepStatus() === "failed"
-                    ? "Restart Verification"
-                    : "Start Verification"}
+                  {loadingStatus ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <RotateCcw className="w-4 h-4 mr-2" />
+                  )}
+                  {loadingStatus ? "Restarting..." : "Restart Verification"}
                 </Button>
               </div>
             )}
@@ -409,7 +437,7 @@ const Verification = () => {
   ];
 
   const getOverallStatus = () => {
-    if (isLoading)
+    if (loadingStatus)
       return { status: "loading", label: "Loading...", color: "gray" };
     if (!verificationStatus)
       return { status: "loading", label: "Loading...", color: "gray" };
@@ -421,14 +449,14 @@ const Verification = () => {
       return { status: "review", label: "Under Review", color: "yellow" };
     if (badge?.status === "rejected")
       return { status: "failed", label: "Verification Failed", color: "red" };
-    if (verificationStatus.identity?.first_name)
+    if (hasAnyDocument(verificationStatus.verifications))
       return { status: "documents", label: "Upload Documents", color: "blue" };
     return { status: "identity", label: "Complete Identity", color: "gray" };
   };
 
   const overallStatus = getOverallStatus();
 
-  if (isLoading) {
+  if (loadingStatus) {
     return (
       <div className="space-y-8">
         {/* Header with Loading */}
@@ -503,24 +531,26 @@ const Verification = () => {
       </div>
 
       {/* Step Progress */}
-      <Card className="bg-[#262626] border-[#343434]">
-        <CardHeader>
-          <CardTitle className="text-xl font-bold text-white">
-            Verification Steps
-          </CardTitle>
-          <CardDescription className="text-[#B0AFAF]">
-            Complete all steps to verify your player identity
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <StepLine
-            steps={steps}
-            currentStep={currentStep}
-            orientation="horizontal"
-            className="mb-8"
-          />
-        </CardContent>
-      </Card>
+      {currentStep <= 3 && (
+        <Card className="bg-[#262626] border-[#343434]">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold text-white">
+              Verification Steps
+            </CardTitle>
+            <CardDescription className="text-[#B0AFAF]">
+              Complete all steps to verify your player identity
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <StepLine
+              steps={steps}
+              currentStep={currentStep - 1}
+              orientation="horizontal"
+              className="mb-8"
+            />
+          </CardContent>
+        </Card>
+      )}
 
       {/* Current Step Content */}
       <div>

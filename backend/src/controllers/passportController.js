@@ -87,7 +87,6 @@ export const uploadVerificationDocument = async (req, res) => {
   }
 };
 
-// Keep existing metrics functions...
 export const ingestPlayerMetrics = async (req, res) => {
   try {
     const { player_id } = req.params;
@@ -119,5 +118,23 @@ export const getPlayerMetrics = async (req, res) => {
     res
       .status(500)
       .json(RESPONSES.SERVER_ERROR("Failed to fetch player metrics"));
+  }
+};
+
+export const restartVerification = async (req, res) => {
+  try {
+    const { player_id } = req.params;
+    const result = await passportService.restartVerificationProcess(player_id);
+
+    res.json(
+      RESPONSES.SUCCESS("Verification process restarted successfully", result)
+    );
+  } catch (error) {
+    console.error("Restart verification error:", error);
+    res
+      .status(400)
+      .json(
+        RESPONSES.BAD_REQUEST(error.message || "Failed to restart verification")
+      );
   }
 };
