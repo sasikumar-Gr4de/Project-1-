@@ -1,54 +1,56 @@
 import express from "express";
 import {
   getPlayerPassport,
-  updatePlayerIdentity,
+  createPlayerIdentity,
+  getVerificationStatus,
+  uploadHeadshot,
+  uploadVerificationDocument,
   ingestPlayerMetrics,
   getPlayerMetrics,
-  getMetricsSummary,
-  uploadVerificationDocument,
 } from "../controllers/passportController.js";
 import { authenticateToken, requireRole } from "../middleware/auth.js";
 import { validate } from "../middleware/validation.js";
 import {
   updateIdentitySchema,
-  ingestMetricsSchema,
+  uploadHeadshotSchema,
   uploadVerificationSchema,
+  ingestMetricsSchema,
 } from "../middleware/validation.js";
 
 const router = express.Router();
 
-// All routes require authentication
 router.use(authenticateToken);
 
-// Get player passport (player can see own, admin/coach can see any)
+// Passport routes
 router.get("/players/:player_id/passport", getPlayerPassport);
 
-// Update player identity (player can update own, admin can update any)
-router.patch(
+// Identity routes
+router.post(
   "/players/:player_id/identity",
   validate(updateIdentitySchema),
-  updatePlayerIdentity
+  createPlayerIdentity
+);
+router.patch(
+  "/players/:player_id/headshot",
+  validate(uploadHeadshotSchema),
+  uploadHeadshot
 );
 
-// Ingest metrics (admin/coach only)
+// Verification routes
+router.get("/players/:player_id/verifications", getVerificationStatus);
+router.post(
+  "/players/:player_id/verifications",
+  validate(uploadVerificationSchema),
+  uploadVerificationDocument
+);
+
+// Metrics routes
 router.post(
   "/players/:player_id/metrics",
   requireRole(["admin", "coach"]),
   validate(ingestMetricsSchema),
   ingestPlayerMetrics
 );
-
-// Get player metrics
 router.get("/players/:player_id/metrics", getPlayerMetrics);
-
-// Get metrics summary
-router.get("/players/:player_id/metrics/summary", getMetricsSummary);
-
-// Upload verification document (player can upload own)
-router.post(
-  "/players/:player_id/verifications",
-  validate(uploadVerificationSchema),
-  uploadVerificationDocument
-);
 
 export default router;

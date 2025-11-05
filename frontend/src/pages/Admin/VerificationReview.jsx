@@ -35,7 +35,8 @@ import {
 } from "lucide-react";
 
 const VerificationReview = () => {
-  const { fetchPendingVerifications } = usePassportStore();
+  const { fetchPendingVerifications, handleReviewVerification } =
+    usePassportStore();
   const { toast } = useToast();
   const [verifications, setVerifications] = useState([]);
   const [filteredVerifications, setFilteredVerifications] = useState([]);
@@ -60,14 +61,8 @@ const VerificationReview = () => {
     try {
       setIsLoading(true);
       // This would come from your admin service
-      const response = await fetchPendingVerifications();
-      console.log(response);
-
-      // if (data.success) {
-      //   setVerifications(data.data.items || []);
-      // } else {
-      //   throw new Error(data.message);
-      // }
+      const data = await fetchPendingVerifications();
+      setVerifications(data);
     } catch (error) {
       console.error("Failed to load verifications:", error);
       toast({
@@ -114,21 +109,10 @@ const VerificationReview = () => {
 
   const handleReview = async (verificationId, action) => {
     try {
-      const response = await fetch(
-        `/api/verifications/${verificationId}/review`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            action,
-            note: reviewNote,
-          }),
-        }
-      );
-
-      const data = await response.json();
+      const data = await handleReviewVerification(verificationId, {
+        action,
+        note: reviewNote,
+      });
 
       if (data.success) {
         toast({
@@ -571,11 +555,16 @@ const VerificationReview = () => {
                   <h3 className="font-semibold text-white">Document Preview</h3>
                   <div className="border-2 border-(--surface-2) rounded-lg bg-(--surface-1) aspect-video flex items-center justify-center">
                     {selectedVerification.file_url ? (
-                      <iframe
-                        src={selectedVerification.file_url}
-                        className="w-full h-full rounded-lg"
-                        title="Document preview"
-                      />
+                      <div className="border-2 border-(--surface-2) rounded-lg bg-(--surface-1) aspect-video ">
+                        <iframe
+                          src={`https://docs.google.com/gview?url=${encodeURIComponent(
+                            selectedVerification.file_url
+                          )}&embedded=true`}
+                          className="w-full h-full rounded-lg"
+                          title="Document preview"
+                          frameBorder="0"
+                        />
+                      </div>
                     ) : (
                       <div className="text-center">
                         <FileText className="w-16 h-16 text-(--muted-text) mx-auto mb-4 opacity-50" />

@@ -13,6 +13,19 @@ const ServerFileUpload = () => {
         <FileUpload
           accept="image/*"
           folder="server"
+          // maxSize={100 * 1024 * 1024}
+          // multiple={false}
+          uploadText="Upload to Server"
+          onUpload={onUploadHandler}
+        />
+      </div>
+      <div className="container mx-auto max-w-6xl m-6">
+        <FileUpload
+          accept="video/*"
+          folder="server"
+          maxSize={100 * 1024 * 1024}
+          // multiple={false}
+          uploadText="Upload to Server"
           onUpload={onUploadHandler}
         />
       </div>

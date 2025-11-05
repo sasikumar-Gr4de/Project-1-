@@ -111,7 +111,7 @@ const AppLoading = ({
         {/* Modern Loading Indicator */}
         <div className="space-y-6">
           {/* Animated Bars */}
-          <div className="flex justify-center space-x-1 h-8 items-end">
+          {/* <div className="flex justify-center space-x-1 h-8 items-end">
             {Array.from({ length: 5 }).map((_, index) => (
               <div
                 key={index}
@@ -129,7 +129,7 @@ const AppLoading = ({
                 }}
               />
             ))}
-          </div>
+          </div> */}
 
           {/* Loading Text */}
           <div className="space-y-4">

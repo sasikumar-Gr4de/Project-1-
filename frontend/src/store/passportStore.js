@@ -4,8 +4,6 @@ import { passportService } from "@/services/passport.service";
 export const usePassportStore = create((set, get) => ({
   // State
   passport: null,
-  metrics: [],
-  timeline: [],
   verificationStatus: null,
   isLoading: false,
   error: null,
@@ -15,7 +13,7 @@ export const usePassportStore = create((set, get) => ({
   setError: (error) => set({ error }),
   clearError: () => set({ error: null }),
 
-  // Get complete passport
+  // Passport
   fetchPlayerPassport: async (playerId) => {
     set({ isLoading: true, error: null });
     try {
@@ -34,7 +32,7 @@ export const usePassportStore = create((set, get) => ({
     }
   },
 
-  // Update identity
+  // Identity
   updatePlayerIdentity: async (playerId, identityData) => {
     set({ isLoading: true, error: null });
     try {
@@ -49,12 +47,13 @@ export const usePassportStore = create((set, get) => ({
         set({
           passport: {
             ...currentPassport,
-            identity: response.data,
+            identity: { ...currentPassport.identity, ...response.data },
           },
           isLoading: false,
         });
+      } else {
+        set({ isLoading: false });
       }
-
       return response.data;
     } catch (error) {
       set({
@@ -65,13 +64,12 @@ export const usePassportStore = create((set, get) => ({
     }
   },
 
-  // Upload verification document
-  uploadVerification: async (playerId, documentData) => {
+  uploadHeadshot: async (playerId, headshotUrl) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await passportService.uploadVerification(
+      const response = await passportService.uploadHeadshot(
         playerId,
-        documentData
+        headshotUrl
       );
 
       // Update local state
@@ -80,19 +78,59 @@ export const usePassportStore = create((set, get) => ({
         set({
           passport: {
             ...currentPassport,
-            verifications: [
-              ...(currentPassport.verifications || []),
-              response.data,
-            ],
-            verificationBadge: calculateVerificationBadge([
-              ...(currentPassport.verifications || []),
-              response.data,
-            ]),
+            identity: {
+              ...currentPassport.identity,
+              headshot_url: headshotUrl,
+            },
           },
           isLoading: false,
         });
+      } else {
+        set({ isLoading: false });
       }
+      return response.data;
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Failed to upload headshot",
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
 
+  // Verification
+  getVerificationStatus: async (playerId) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await passportService.getVerificationStatus(playerId);
+      set({
+        verificationStatus: response.data,
+        isLoading: false,
+      });
+      return response.data;
+    } catch (error) {
+      set({
+        error:
+          error.response?.data?.message ||
+          "Failed to fetch verification status",
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  uploadVerification: async (playerId, documentData) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await passportService.uploadVerification(
+        playerId,
+        documentData
+      );
+
+      // Refresh verification status to get updated state
+      await get().getVerificationStatus(playerId);
+
+      set({ isLoading: false });
       return response.data;
     } catch (error) {
       set({
@@ -103,25 +141,7 @@ export const usePassportStore = create((set, get) => ({
     }
   },
 
-  // Get metrics with date range
-  fetchPlayerMetrics: async (playerId, params = {}) => {
-    set({ isLoading: true, error: null });
-    try {
-      const response = await passportService.getPlayerMetrics(playerId, params);
-      set({
-        metrics: response.data,
-        isLoading: false,
-      });
-      return response.data;
-    } catch (error) {
-      set({
-        error: error.response?.data?.message || "Failed to fetch metrics",
-        isLoading: false,
-      });
-      throw error;
-    }
-  },
-
+  // Admin verification functions
   fetchPendingVerifications: async () => {
     set({ isLoading: true, error: null });
     try {
@@ -130,48 +150,55 @@ export const usePassportStore = create((set, get) => ({
       if (response.status !== 200) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      console.log(response);
+
       const data = response.data;
 
       if (data.success) {
-        set({ pendingVerifications: data.data.items || [], isLoading: false });
+        set({
+          pendingVerifications: data.data.items || [],
+          isLoading: false,
+        });
         return data.data.items;
       } else {
         throw new Error(data.message || "Failed to load verifications");
       }
     } catch (error) {
-      set({ error: error.response?.data?.message || "Failed to fetch pending verifications", isLoading: false });
+      set({
+        error:
+          error.response?.data?.message ||
+          "Failed to fetch pending verifications",
+        isLoading: false,
+      });
       throw error;
     }
   },
 
-  // Clear passport data
+  handleReviewVerification: async (verificationId, reviewData) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await passportService.reviewVerification(
+        verificationId,
+        reviewData
+      );
+
+      // Refresh pending verifications list
+      await get().fetchPendingVerifications();
+
+      set({ isLoading: false });
+      return response.data;
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Failed to review verification",
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
   clearPassport: () =>
     set({
       passport: null,
-      metrics: [],
-      timeline: [],
       verificationStatus: null,
+      pendingVerifications: null,
     }),
 }));
-
-// Helper function
-const calculateVerificationBadge = (verifications) => {
-  if (!verifications || verifications.length === 0) {
-    return { status: "unverified", label: "Unverified", color: "gray" };
-  }
-
-  const approvedDocs = verifications.filter((v) => v.status === "approved");
-  const pendingDocs = verifications.filter((v) => v.status === "pending");
-  const rejectedDocs = verifications.filter((v) => v.status === "rejected");
-
-  if (approvedDocs.length >= 2) {
-    return { status: "verified", label: "Verified", color: "green" };
-  } else if (rejectedDocs.length > 0) {
-    return { status: "rejected", label: "Documents Rejected", color: "red" };
-  } else if (pendingDocs.length > 0) {
-    return { status: "pending", label: "Under Review", color: "yellow" };
-  }
-
-  return { status: "unverified", label: "Unverified", color: "gray" };
-};

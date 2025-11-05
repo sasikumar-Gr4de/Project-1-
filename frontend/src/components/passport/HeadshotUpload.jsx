@@ -14,13 +14,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { User, CheckCircle, Upload, RotateCcw } from "lucide-react";
 
-const HeadshotUpload = ({ onComplete, currentStep }) => {
+const HeadshotUpload = ({ onComplete, currentHeadshot }) => {
   const { user } = useAuthStore();
-  const { updatePlayerIdentity, passport } = usePassportStore();
+  const { uploadHeadshot, passport } = usePassportStore();
   const { toast } = useToast();
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(
-    passport?.identity?.headshot_url || null
+    currentHeadshot || passport?.identity?.headshot_url || null
   );
 
   const handleHeadshotUpload = async (result) => {
@@ -37,10 +37,8 @@ const HeadshotUpload = ({ onComplete, currentStep }) => {
 
     setUploading(true);
     try {
-      // Update player identity with new headshot
-      await updatePlayerIdentity(user.id, {
-        headshot_url: result.url,
-      });
+      // Use the new uploadHeadshot method
+      await uploadHeadshot(user.id, result.url);
 
       setPreviewUrl(result.url);
 
@@ -52,7 +50,7 @@ const HeadshotUpload = ({ onComplete, currentStep }) => {
 
       // Notify parent component of completion
       if (onComplete) {
-        onComplete();
+        onComplete(result.url);
       }
     } catch (error) {
       console.error("Failed to update headshot:", error);
@@ -68,15 +66,16 @@ const HeadshotUpload = ({ onComplete, currentStep }) => {
 
   const handleRemoveHeadshot = async () => {
     try {
-      await updatePlayerIdentity(user.id, {
-        headshot_url: null,
-      });
+      await uploadHeadshot(user.id, null);
       setPreviewUrl(null);
       toast({
         title: "Success",
         description: "Headshot removed",
         variant: "success",
       });
+      if (onComplete) {
+        onComplete(null);
+      }
     } catch (error) {
       console.error("Failed to remove headshot:", error);
       toast({
@@ -135,7 +134,7 @@ const HeadshotUpload = ({ onComplete, currentStep }) => {
               <h4 className="font-semibold text-white mb-4">
                 Current Headshot
               </h4>
-              <div className="relative inline-block">
+              <div className="relative flex items-center justify-center mx-auto">
                 <img
                   src={previewUrl}
                   alt="Player headshot"
@@ -169,7 +168,7 @@ const HeadshotUpload = ({ onComplete, currentStep }) => {
               uploadText="Upload Headshot"
               className="border-2 border-dashed border-[#343434] hover:border-primary/50 rounded-xl p-8"
             >
-              {/* <div className="text-center space-y-3">
+              <div className="text-center space-y-3">
                 <div className="w-16 h-16 bg-[#1A1A1A] rounded-full flex items-center justify-center border-2 border-[#343434] mx-auto">
                   <User className="w-8 h-8 text-[#B0AFAF]" />
                 </div>
@@ -181,23 +180,9 @@ const HeadshotUpload = ({ onComplete, currentStep }) => {
                     JPG or PNG (Max 5MB)
                   </p>
                 </div>
-              </div> */}
+              </div>
             </FileUpload>
           )}
-
-          {/* Status */}
-          {/* <div className="flex items-center justify-between p-3 bg-[#1A1A1A] border border-[#343434] rounded-lg">
-            <span className="text-sm text-[#B0AFAF]">Verification Status</span>
-            <Badge
-              className={
-                previewUrl
-                  ? "bg-green-500/20 text-green-400 border-green-500/30"
-                  : "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
-              }
-            >
-              {previewUrl ? "Completed" : "Pending"}
-            </Badge>
-          </div> */}
         </div>
       </CardContent>
     </Card>

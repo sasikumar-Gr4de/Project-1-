@@ -2,80 +2,76 @@ import { supabase } from "../config/supabase.config.js";
 
 export const getPlayerPassport = async (playerId) => {
   try {
-    // Get player identity
-    const { data: identity, error: identityError } = await supabase
-      .from("player_identity")
-      .select("*")
-      .eq("player_id", playerId)
-      .single();
+    const [identity, passport, metrics, reports, media, verifications] =
+      await Promise.all([
+        // Get player identity
+        supabase
+          .from("player_identities")
+          .select("*")
+          .eq("player_id", playerId)
+          .single(),
+        // Get passport data
+        supabase
+          .from("player_passports")
+          .select("*")
+          .eq("player_id", playerId)
+          .single(),
+        // Get recent metrics (last 12 months)
+        supabase
+          .from("player_metrics")
+          .select("*")
+          .eq("player_id", playerId)
+          .gte(
+            "date",
+            new Date(new Date().setMonth(new Date().getMonth() - 12))
+              .toISOString()
+              .split("T")[0]
+          )
+          .order("date", { ascending: true }),
+        // Get reports
+        supabase
+          .from("player_reports")
+          .select("*")
+          .eq("player_id", playerId)
+          .order("period_start", { ascending: false }),
+        // Get media
+        supabase
+          .from("player_media")
+          .select("*")
+          .eq("player_id", playerId)
+          .order("created_at", { ascending: false }),
+        // Get verifications
+        supabase
+          .from("player_verifications")
+          .select("*")
+          .eq("player_id", playerId)
+          .order("created_at", { ascending: false }),
+      ]);
 
-    if (identityError && identityError.code !== "PGRST116") {
-      throw identityError;
-    }
+    // Handle errors
+    const errors = [
+      identity.error,
+      passport.error,
+      metrics.error,
+      reports.error,
+      media.error,
+      verifications.error,
+    ].filter((error) => error && error.code !== "PGRST116");
 
-    // Get passport data
-    const { data: passport, error: passportError } = await supabase
-      .from("player_passport")
-      .select("*")
-      .eq("player_id", playerId)
-      .single();
+    if (errors.length > 0) throw errors[0];
 
-    if (passportError && passportError.code !== "PGRST116") {
-      throw passportError;
-    }
-
-    // Get recent metrics (last 12 months)
-    const twelveMonthsAgo = new Date();
-    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
-
-    const { data: metrics, error: metricsError } = await supabase
-      .from("player_metrics")
-      .select("*")
-      .eq("player_id", playerId)
-      .gte("date", twelveMonthsAgo.toISOString().split("T")[0])
-      .order("date", { ascending: true });
-
-    if (metricsError) throw metricsError;
-
-    // Get reports
-    const { data: reports, error: reportsError } = await supabase
-      .from("player_reports")
-      .select("*")
-      .eq("player_id", playerId)
-      .order("period_start", { ascending: false });
-
-    if (reportsError) throw reportsError;
-
-    // Get media
-    const { data: media, error: mediaError } = await supabase
-      .from("player_media")
-      .select("*")
-      .eq("player_id", playerId)
-      .order("created_at", { ascending: false });
-
-    if (mediaError) throw mediaError;
-
-    // Get verification status
-    const { data: verifications, error: verificationsError } = await supabase
-      .from("player_verifications")
-      .select("*")
-      .eq("player_id", playerId)
-      .order("created_at", { ascending: false });
-
-    if (verificationsError) throw verificationsError;
-
-    // Calculate verification badge
-    const verificationBadge = calculateVerificationBadge(verifications);
+    const verificationBadge = calculateVerificationBadge(verifications.data);
+    const timeline = buildTimeline(metrics.data, reports.data);
 
     return {
-      identity: identity || {},
-      passport: passport || {},
-      metrics: metrics || [],
-      reports: reports || [],
-      media: media || [],
-      verifications: verifications || [],
+      identity: identity.data || {},
+      passport: passport.data || {},
+      metrics: metrics.data || [],
+      reports: reports.data || [],
+      media: media.data || [],
+      verifications: verifications.data || [],
       verificationBadge,
-      timeline: buildTimeline(metrics, reports),
+      timeline,
     };
   } catch (error) {
     console.error("Get player passport error:", error);
@@ -86,7 +82,7 @@ export const getPlayerPassport = async (playerId) => {
 export const createPlayerIdentity = async (playerId, identityData) => {
   try {
     const { data, error } = await supabase
-      .from("player_identity")
+      .from("player_identities")
       .upsert({
         player_id: playerId,
         ...identityData,
@@ -97,10 +93,12 @@ export const createPlayerIdentity = async (playerId, identityData) => {
 
     if (error) throw error;
 
-    // Log the action
+    // Start verification process
+    await startVerificationProcess(playerId);
+
     await createAuditLog(
       playerId,
-      "player_identity",
+      "player_identities",
       data.player_id,
       "create",
       {
@@ -115,89 +113,47 @@ export const createPlayerIdentity = async (playerId, identityData) => {
   }
 };
 
-export const updatePlayerIdentity = async (playerId, updates) => {
+export const getVerificationStatus = async (playerId) => {
   try {
-    const { data, error } = await supabase
-      .from("player_identity")
-      .update({
-        ...updates,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("player_id", playerId)
-      .select()
-      .single();
+    const [identity, verifications] = await Promise.all([
+      supabase
+        .from("player_identities")
+        .select("*")
+        .eq("player_id", playerId)
+        .single(),
+      supabase
+        .from("player_verifications")
+        .select("*")
+        .eq("player_id", playerId)
+        .order("created_at", { ascending: false }),
+    ]);
 
-    if (error) throw error;
+    const errors = [identity.error, verifications.error].filter(
+      (error) => error && error.code !== "PGRST116"
+    );
+    if (errors.length > 0) throw errors[0];
 
-    // Log the action
-    await createAuditLog(
-      playerId,
-      "player_identity",
-      data.player_id,
-      "update",
-      updates
+    const verificationBadge = calculateVerificationBadge(verifications.data);
+
+    const verificationProgress = calculateVerificationProgress(
+      identity.data,
+      verifications.data
     );
 
-    return data;
+    return {
+      identity: identity.data || {},
+      verifications: verifications.data || [],
+      verificationBadge,
+      verificationProgress,
+      currentStep: getCurrentVerificationStep(
+        identity.data,
+        verifications.data,
+        verificationBadge
+      ),
+    };
   } catch (error) {
-    console.error("Update player identity error:", error);
-    throw new Error("Failed to update player identity");
-  }
-};
-
-export const ingestPlayerMetrics = async (playerId, metricsData) => {
-  try {
-    const { data, error } = await supabase
-      .from("player_metrics")
-      .insert([
-        {
-          player_id: playerId,
-          ...metricsData,
-          created_at: new Date().toISOString(),
-        },
-      ])
-      .select()
-      .single();
-
-    if (error) throw error;
-
-    // Log the action
-    await createAuditLog(playerId, "player_metrics", data.metric_id, "create", {
-      match_id: metricsData.match_id,
-      date: metricsData.date,
-    });
-
-    return data;
-  } catch (error) {
-    console.error("Ingest player metrics error:", error);
-    throw new Error("Failed to ingest player metrics");
-  }
-};
-
-export const getPlayerMetrics = async (playerId, { from, to }) => {
-  try {
-    let query = supabase
-      .from("player_metrics")
-      .select("*")
-      .eq("player_id", playerId)
-      .order("date", { ascending: false });
-
-    if (from) {
-      query = query.gte("date", from);
-    }
-
-    if (to) {
-      query = query.lte("date", to);
-    }
-
-    const { data, error } = await query;
-
-    if (error) throw error;
-
-    return data || [];
-  } catch (error) {
-    console.error("Get player metrics error:", error);
-    throw new Error("Failed to fetch player metrics");
+    console.error("Get verification status error:", error);
+    throw new Error("Failed to fetch verification status");
   }
 };
 
@@ -218,7 +174,6 @@ export const uploadVerificationDocument = async (playerId, documentData) => {
 
     if (error) throw error;
 
-    // Log the action
     await createAuditLog(
       playerId,
       "player_verifications",
@@ -236,46 +191,102 @@ export const uploadVerificationDocument = async (playerId, documentData) => {
   }
 };
 
-export const reviewVerification = async (
-  verificationId,
-  adminId,
-  action,
-  note = ""
-) => {
+export const updateHeadshot = async (playerId, headshotUrl) => {
   try {
     const { data, error } = await supabase
-      .from("player_verifications")
-      .update({
-        status: action,
-        reviewed_by: adminId,
-        reviewed_at: new Date().toISOString(),
+      .from("player_identities")
+      .upsert({
+        player_id: playerId,
+        headshot_url: headshotUrl,
+        updated_at: new Date().toISOString(),
       })
-      .eq("verification_id", verificationId)
+      .eq("player_id", playerId)
       .select()
       .single();
 
     if (error) throw error;
 
-    // Log the action
-    await createAuditLog(
-      adminId,
-      "player_verifications",
-      verificationId,
-      "verify",
-      {
-        action,
-        note,
-      }
-    );
+    await createAuditLog(playerId, "player_identities", playerId, "update", {
+      headshot_updated: true,
+    });
 
     return data;
   } catch (error) {
-    console.error("Review verification error:", error);
-    throw new Error("Failed to review verification");
+    console.error("Update headshot error:", error);
+    throw new Error("Failed to update headshot");
   }
 };
 
 // Helper functions
+const startVerificationProcess = async (playerId) => {
+  try {
+    // Create initial verification record or update status
+    await supabase.from("verification_process").upsert({
+      player_id: playerId,
+      current_step: "identity",
+      status: "in_progress",
+      started_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error("Start verification process error:", error);
+  }
+};
+
+const calculateVerificationProgress = (identity, verifications) => {
+  const progress = {
+    identity: identity ? 100 : 0,
+    headshot: identity?.headshot_url ? 100 : 0,
+    documents: 0,
+    approval: 0,
+  };
+
+  // Calculate documents progress
+  const requiredDocs = ["passport", "club_letter"];
+  const uploadedDocs =
+    verifications?.filter((v) => requiredDocs.includes(v.document_type)) || [];
+  progress.documents = Math.round(
+    (uploadedDocs.length / requiredDocs.length) * 100
+  );
+
+  // Calculate approval progress
+  const approvedDocs =
+    verifications?.filter((v) => v.status === "approved") || [];
+  if (approvedDocs.length >= 2) {
+    progress.approval = 100;
+  } else if (verifications?.some((v) => v.status === "rejected")) {
+    progress.approval = 0;
+  } else if (verifications?.length > 0) {
+    progress.approval = 50; // Under review
+  }
+
+  return progress;
+};
+
+const getCurrentVerificationStep = (
+  identity,
+  verifications,
+  verificationBadge
+) => {
+  if (!identity) return 1;
+  if (!identity.headshot_url) return 1;
+
+  // Check document types and also url is not empty
+  const requiredDocs = ["passport", "club_letter"];
+  const uploadedDocs =
+    verifications?.filter(
+      (v) => requiredDocs.includes(v.document_type) && v.file_url
+    ) || [];
+  const hasRequiredDocs = uploadedDocs.length;
+
+  if (!hasRequiredDocs) return 2;
+  if (verificationBadge.status === "pending") return 3;
+  if (verificationBadge.status === "verified") return 4;
+  if (verificationBadge.status === "rejected") return 5;
+
+  return 2;
+};
+
 const calculateVerificationBadge = (verifications) => {
   if (!verifications || verifications.length === 0) {
     return { status: "unverified", label: "Unverified", color: "gray" };
@@ -285,8 +296,7 @@ const calculateVerificationBadge = (verifications) => {
   const pendingDocs = verifications.filter((v) => v.status === "pending");
   const rejectedDocs = verifications.filter((v) => v.status === "rejected");
 
-  if (approvedDocs.length >= 2) {
-    // At least 2 key documents approved
+  if (approvedDocs.length >= 1) {
     return { status: "verified", label: "Verified", color: "green" };
   } else if (rejectedDocs.length > 0) {
     return { status: "rejected", label: "Documents Rejected", color: "red" };
@@ -300,7 +310,6 @@ const calculateVerificationBadge = (verifications) => {
 const buildTimeline = (metrics, reports) => {
   const timeline = [];
 
-  // Add metrics to timeline
   metrics?.forEach((metric) => {
     timeline.push({
       type: "metric",
@@ -311,7 +320,6 @@ const buildTimeline = (metrics, reports) => {
     });
   });
 
-  // Add reports to timeline
   reports?.forEach((report) => {
     timeline.push({
       type: "report",
@@ -322,7 +330,6 @@ const buildTimeline = (metrics, reports) => {
     });
   });
 
-  // Sort by date (newest first)
   return timeline.sort((a, b) => new Date(b.date) - new Date(a.date));
 };
 

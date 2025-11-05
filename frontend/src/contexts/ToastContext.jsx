@@ -157,7 +157,7 @@ export const ToastProvider = ({ children }) => {
                 "0 10px 15px -3px rgba(18, 29, 23, 0.3), 0 4px 6px -2px rgba(18, 29, 23, 0.2)",
             }}
           >
-            <div className="flex items-start gap-3">
+            <div className="flex items-start gap-2">
               {/* Icon - Centered vertically */}
               <div className="shrink-0 flex items-center justify-center h-full rela shadow-white top-0">
                 {getIcon(toast.variant)}
@@ -169,7 +169,7 @@ export const ToastProvider = ({ children }) => {
                   {toast.title}
                 </div>
                 {toast.description && (
-                  <div className="text-sm mt-1 wrap-break-word text-gray-300">
+                  <div className="text-sm mt-1 text-gray-300 wrap-break-word">
                     {toast.description}
                   </div>
                 )}

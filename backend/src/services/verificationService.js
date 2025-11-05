@@ -38,10 +38,6 @@ export const getPendingVerifications = async (filters = {}) => {
   }
 };
 
-export const calculateFileHash = async (fileBuffer) => {
-  return crypto.createHash("sha256").update(fileBuffer).digest("hex");
-};
-
 export const getVerificationStats = async () => {
   try {
     const { data, error } = await supabase
@@ -52,9 +48,12 @@ export const getVerificationStats = async () => {
 
     const stats = {
       total: data.length,
-      pending: data.filter((v) => v.status === VERIFICATION_STATUS.PENDING).length,
-      approved: data.filter((v) => v.status === VERIFICATION_STATUS.APPROVED).length,
-      rejected: data.filter((v) => v.status === VERIFICATION_STATUS.REJECTED).length,
+      pending: data.filter((v) => v.status === VERIFICATION_STATUS.PENDING)
+        .length,
+      approved: data.filter((v) => v.status === VERIFICATION_STATUS.APPROVED)
+        .length,
+      rejected: data.filter((v) => v.status === VERIFICATION_STATUS.REJECTED)
+        .length,
       byType: {},
     };
 
@@ -77,4 +76,53 @@ export const getVerificationStats = async () => {
     console.error("Get verification stats error:", error);
     throw new Error("Failed to fetch verification stats");
   }
+};
+
+export const reviewVerification = async (
+  verificationId,
+  adminId,
+  action,
+  note
+) => {
+  try {
+    const { data, error } = await supabase
+      .from("player_verifications")
+      .update({
+        status: action,
+        reviewed_by: adminId,
+        review_note: note,
+        reviewed_at: new Date().toISOString(),
+      })
+      .eq("verification_id", verificationId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return data;
+  } catch (error) {
+    console.error("Review verification error:", error);
+    throw new Error("Failed to review verification");
+  }
+};
+
+export const getVerificationById = async (verificationId) => {
+  try {
+    const { data, error } = await supabase
+      .from("player_verifications")
+      .select("*")
+      .eq("id", verificationId)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    return data;
+  } catch (error) {
+    console.error("Get verification by ID error:", error);
+    throw new Error("Failed to fetch verification");
+  }
+};
+
+export const calculateFileHash = async (fileBuffer) => {
+  return crypto.createHash("sha256").update(fileBuffer).digest("hex");
 };

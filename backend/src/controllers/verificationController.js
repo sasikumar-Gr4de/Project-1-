@@ -1,5 +1,4 @@
 import * as verificationService from "../services/verificationService.js";
-import * as passportService from "../services/passportService.js";
 import { RESPONSES } from "../utils/messages.js";
 import { VERIFICATION_STATUS, PAGINATION } from "../utils/constants.js";
 
@@ -39,13 +38,17 @@ export const reviewVerification = async (req, res) => {
     const { action, note } = req.body;
     const adminId = req.user.id;
 
-    if (![VERIFICATION_STATUS.APPROVED, VERIFICATION_STATUS.REJECTED].includes(action)) {
+    if (
+      ![VERIFICATION_STATUS.APPROVED, VERIFICATION_STATUS.REJECTED].includes(
+        action
+      )
+    ) {
       return res
         .status(400)
         .json(RESPONSES.BAD_REQUEST("Action must be 'approved' or 'rejected'"));
     }
 
-    const verification = await passportService.reviewVerification(
+    const verification = await verificationService.reviewVerification(
       verification_id,
       adminId,
       action,

@@ -61,6 +61,7 @@ const DocumentUploadStep = ({ onComplete, currentStep }) => {
   ];
 
   const handleDocumentUpload = async (result) => {
+    result = result[0];
     if (!result.success || !selectedDocumentType) {
       toast({
         title: "Upload failed",
@@ -272,37 +273,13 @@ const DocumentUploadStep = ({ onComplete, currentStep }) => {
             {selectedDocumentType && (
               <FileUpload
                 onUpload={handleDocumentUpload}
-                acceptedTypes={[
-                  "application/pdf",
-                  "image/jpeg",
-                  "image/png",
-                  "image/jpg",
-                ]}
-                maxSize={10 * 1024 * 1024} // 10MB
+                accept="application/pdf,image/jpeg,image/png"
+                maxSize={100 * 1024 * 1024} // 10MB
                 folder="verifications"
                 uploading={uploading}
                 uploadText="Upload Document"
                 className="border-2 border-dashed border-[#343434] hover:border-primary/50 rounded-xl p-6"
-              >
-                <div className="text-center space-y-3">
-                  <div className="w-16 h-16 bg-[#1A1A1A] rounded-full flex items-center justify-center border-2 border-[#343434] mx-auto">
-                    <FileText className="w-8 h-8 text-[#B0AFAF]" />
-                  </div>
-                  <div>
-                    <p className="text-white font-medium">
-                      Upload{" "}
-                      {
-                        documentTypes.find(
-                          (d) => d.value === selectedDocumentType
-                        )?.label
-                      }
-                    </p>
-                    <p className="text-sm text-[#B0AFAF] mt-1">
-                      PDF, JPG, or PNG (Max 10MB)
-                    </p>
-                  </div>
-                </div>
-              </FileUpload>
+              ></FileUpload>
             )}
           </div>
 

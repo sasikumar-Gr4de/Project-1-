@@ -220,6 +220,12 @@ export const updateIdentitySchema = Joi.object({
   guardian_phone: commonPatterns.phone.optional(),
 }).min(1);
 
+export const uploadHeadshotSchema = {
+  body: Joi.object({
+    headshot_url: Joi.string().uri().required(),
+  }),
+};
+
 export const ingestMetricsSchema = Joi.object({
   match_id: commonPatterns.uuid.optional(),
   date: commonPatterns.date.required(),
