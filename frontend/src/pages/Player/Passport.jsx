@@ -8,9 +8,19 @@ import PerformanceTimeline from "@/components/passport/PerformanceTimeline";
 import ReportLibrary from "@/components/passport/ReportLibrary";
 import MetricsSummary from "@/components/passport/MetricsSummary";
 import MediaGallery from "@/components/passport/MediaGallery";
+import VerificationStatus from "@/components/passport/VerificationStatus";
+import IdentitySection from "@/components/passport/IdentitySection";
 import Tabs from "@/components/common/Tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { FileText, TrendingUp, BarChart3, Image, User } from "lucide-react";
+import {
+  FileText,
+  TrendingUp,
+  BarChart3,
+  Image,
+  User,
+  Shield,
+  IdCard,
+} from "lucide-react";
 
 const Passport = () => {
   const { playerId } = useParams();
@@ -31,6 +41,8 @@ const Passport = () => {
   const loadPassport = async () => {
     try {
       await fetchPlayerPassport(targetPlayerId);
+      console.log("Passport data loaded successfully");
+      console.log(passport);
     } catch (error) {
       toast({
         title: "Error",
@@ -42,6 +54,28 @@ const Passport = () => {
 
   // Define tabs for the custom Tabs component
   const passportTabs = [
+    {
+      id: "identity",
+      label: "Identity",
+      icon: IdCard,
+      content: (
+        <IdentitySection
+          identity={passport?.identity}
+          verifications={passport?.verifications}
+        />
+      ),
+    },
+    {
+      id: "verification",
+      label: "Verification",
+      icon: Shield,
+      content: (
+        <VerificationStatus
+          verificationStatus={passport?.verificationBadge}
+          verifications={passport?.verifications}
+        />
+      ),
+    },
     {
       id: "timeline",
       label: "Timeline",
@@ -82,6 +116,22 @@ const Passport = () => {
             <p className="text-(--muted-text) mt-2 font-['Orbitron'] animate-pulse bg-(--surface-1) rounded w-48 h-4"></p>
           </div>
         </div>
+
+        {/* Header Skeleton */}
+        <Card className="animate-pulse bg-(--surface-1) border-(--surface-2)">
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-4">
+              <div className="w-20 h-20 bg-(--surface-2) rounded-full"></div>
+              <div className="flex-1 space-y-2">
+                <div className="h-6 bg-(--surface-2) rounded w-1/3"></div>
+                <div className="h-4 bg-(--surface-2) rounded w-1/2"></div>
+                <div className="h-4 bg-(--surface-2) rounded w-2/3"></div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Tabs Skeleton */}
         <div className="space-y-6">
           {[...Array(3)].map((_, i) => (
             <Card
@@ -156,7 +206,11 @@ const Passport = () => {
       </div>
 
       {/* Passport Header */}
-      <PassportHeader passport={passport} player={user} />
+      <PassportHeader
+        passport={passport}
+        player={user}
+        targetPlayerId={targetPlayerId}
+      />
 
       {/* Main Content Tabs */}
       <Tabs

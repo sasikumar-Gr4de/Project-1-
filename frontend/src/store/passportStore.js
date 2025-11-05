@@ -17,7 +17,10 @@ export const usePassportStore = create((set, get) => ({
   fetchPlayerPassport: async (playerId) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await passportService.getPlayerPassport(playerId);
+      const { data: response } = await passportService.getPlayerPassport(
+        playerId
+      );
+      console.log(response.data);
       set({
         passport: response.data,
         isLoading: false,

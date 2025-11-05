@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { usePassportStore } from "@/store/passportStore";
 import { useToast } from "@/contexts/ToastContext";
@@ -21,8 +21,8 @@ import {
   Clock,
   AlertCircle,
   ArrowRight,
-  User,
   RotateCcw,
+  Loader2,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -32,7 +32,7 @@ const Verification = () => {
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
   const [verificationStatus, setVerificationStatus] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (user?.id) {
@@ -51,19 +51,17 @@ const Verification = () => {
       if (status.currentStep) {
         setCurrentStep(status.currentStep);
       } else {
-        // Fallback logic
-        if (!status.identity?.first_name) {
-          setCurrentStep(1);
-        } else if (!status.identity?.headshot_url) {
+        // Improved step logic
+        const badgeStatus = status.verificationBadge?.status;
+
+        if (!status.identity?.first_name || !status.identity?.headshot_url) {
           setCurrentStep(1);
         } else if (!hasRequiredDocuments(status.verifications)) {
           setCurrentStep(2);
-        } else if (status.verificationBadge?.status === "pending") {
+        } else if (badgeStatus === "pending") {
           setCurrentStep(3);
-        } else if (status.verificationBadge?.status === "verified") {
-          setCurrentStep(4);
-        } else if (status.verificationBadge?.status === "rejected") {
-          setCurrentStep(5);
+        } else if (badgeStatus === "verified" || badgeStatus === "rejected") {
+          setCurrentStep(4); // Final step for both success and failure
         } else {
           setCurrentStep(1);
         }
@@ -81,13 +79,11 @@ const Verification = () => {
   };
 
   const hasRequiredDocuments = (verifications) => {
-    console.log(verifications);
     if (!verifications) return false;
     const requiredDocs = ["passport", "club_letter"];
     const uploadedDocs = verifications.filter((v) =>
       requiredDocs.includes(v.document_type)
     );
-    console.log(uploadedDocs, requiredDocs);
     return uploadedDocs.length >= requiredDocs.length;
   };
 
@@ -98,6 +94,34 @@ const Verification = () => {
   const handleRestartVerification = () => {
     setCurrentStep(1);
     loadVerificationStatus();
+  };
+
+  const getFinalStepStatus = () => {
+    if (!verificationStatus) return "pending";
+
+    const badge = verificationStatus.verificationBadge;
+    if (badge?.status === "verified") return "completed";
+    if (badge?.status === "rejected") return "failed";
+    return "pending";
+  };
+
+  const getFinalStepIcon = () => {
+    const finalStatus = getFinalStepStatus();
+    return finalStatus === "completed" ? CheckCircle : AlertCircle;
+  };
+
+  const getFinalStepTitle = () => {
+    const finalStatus = getFinalStepStatus();
+    return finalStatus === "completed"
+      ? "Verification Complete"
+      : "Verification Required";
+  };
+
+  const getFinalStepDescription = () => {
+    const finalStatus = getFinalStepStatus();
+    return finalStatus === "completed"
+      ? "Your player identity has been successfully verified"
+      : "There was an issue with your verification. Please review and try again.";
   };
 
   const steps = [
@@ -243,132 +267,141 @@ const Verification = () => {
     },
     {
       id: 4,
-      title: "Verification Complete",
-      description: "Your account has been successfully verified",
-      status:
-        currentStep === 4
-          ? "current"
-          : currentStep > 4
-          ? "completed"
-          : "pending",
+      title: getFinalStepTitle(),
+      description: "Your verification result",
+      status: getFinalStepStatus(),
       content: (
         <VerificationStep
-          title="Verification Complete"
-          description="Your player identity has been successfully verified"
-          status="completed"
+          title={getFinalStepTitle()}
+          description={getFinalStepDescription()}
+          status={getFinalStepStatus()}
           stepNumber={4}
           isCurrent={currentStep === 4}
+          icon={getFinalStepIcon()}
         >
           <CardContent>
-            <div className="text-center space-y-6 py-8">
-              <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto">
-                <CheckCircle className="w-10 h-10 text-green-400" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold text-white mb-2">
-                  Account Verified
-                </h3>
-                <p className="text-[#B0AFAF] max-w-md mx-auto">
-                  Congratulations! Your player identity has been verified and
-                  you now have full access to all platform features.
-                </p>
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-2 max-w-md mx-auto">
-                <div className="bg-[#1A1A1A] border border-[#343434] rounded-xl p-4">
-                  <CheckCircle className="w-8 h-8 text-green-400 mx-auto mb-2" />
-                  <h4 className="font-semibold text-white text-sm">
-                    Full Access
-                  </h4>
-                  <p className="text-xs text-[#B0AFAF]">
-                    All platform features unlocked
+            {getFinalStepStatus() === "completed" ? (
+              // Verification Complete
+              <div className="text-center space-y-6 py-8">
+                <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto">
+                  <CheckCircle className="w-10 h-10 text-green-400" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-2">
+                    Account Verified
+                  </h3>
+                  <p className="text-[#B0AFAF] max-w-md mx-auto">
+                    Congratulations! Your player identity has been verified and
+                    you now have full access to all platform features.
                   </p>
                 </div>
-                <div className="bg-[#1A1A1A] border border-[#343434] rounded-xl p-4">
-                  <Shield className="w-8 h-8 text-primary mx-auto mb-2" />
-                  <h4 className="font-semibold text-white text-sm">
-                    Verified Badge
-                  </h4>
-                  <p className="text-xs text-[#B0AFAF]">
-                    Trusted player status
+
+                <div className="grid gap-4 md:grid-cols-2 max-w-md mx-auto">
+                  <div className="bg-[#1A1A1A] border border-[#343434] rounded-xl p-4">
+                    <CheckCircle className="w-8 h-8 text-green-400 mx-auto mb-2" />
+                    <h4 className="font-semibold text-white text-sm">
+                      Full Access
+                    </h4>
+                    <p className="text-xs text-[#B0AFAF]">
+                      All platform features unlocked
+                    </p>
+                  </div>
+                  <div className="bg-[#1A1A1A] border border-[#343434] rounded-xl p-4">
+                    <Shield className="w-8 h-8 text-primary mx-auto mb-2" />
+                    <h4 className="font-semibold text-white text-sm">
+                      Verified Badge
+                    </h4>
+                    <p className="text-xs text-[#B0AFAF]">
+                      Trusted player status
+                    </p>
+                  </div>
+                </div>
+
+                <Button
+                  asChild
+                  className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold"
+                >
+                  <Link to="/passport">
+                    View Your Passport
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Link>
+                </Button>
+              </div>
+            ) : (
+              // Verification Failed/Required
+              <div className="text-center space-y-6 py-8">
+                <div className="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto">
+                  <AlertCircle className="w-10 h-10 text-red-400" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-2">
+                    Verification Required
+                  </h3>
+                  <p className="text-[#B0AFAF] max-w-md mx-auto">
+                    {getFinalStepStatus() === "failed"
+                      ? "We encountered issues with your verification documents. Please review the requirements and try again."
+                      : "Please complete the verification process to access all platform features."}
                   </p>
                 </div>
-              </div>
 
-              <Button
-                asChild
-                className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold"
-              >
-                <Link to="/passport">
-                  View Your Passport
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Link>
-              </Button>
-            </div>
-          </CardContent>
-        </VerificationStep>
-      ),
-    },
-    {
-      id: 5,
-      title: "Verification Failed",
-      description: "Your verification needs attention",
-      status: currentStep === 5 ? "current" : "pending",
-      content: (
-        <VerificationStep
-          title="Verification Failed"
-          description="There was an issue with your verification. Please review and try again."
-          status="failed"
-          stepNumber={5}
-          isCurrent={currentStep === 5}
-        >
-          <CardContent>
-            <div className="text-center space-y-6 py-8">
-              <div className="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto">
-                <AlertCircle className="w-10 h-10 text-red-400" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold text-white mb-2">
-                  Verification Failed
-                </h3>
-                <p className="text-[#B0AFAF] max-w-md mx-auto">
-                  We encountered issues with your verification documents. Please
-                  review the requirements and try again.
-                </p>
-              </div>
+                <div className="bg-[#1A1A1A] border border-[#343434] rounded-xl p-4 max-w-md mx-auto text-left">
+                  <h4 className="font-semibold text-white mb-3">
+                    {getFinalStepStatus() === "failed"
+                      ? "Common Issues:"
+                      : "Next Steps:"}
+                  </h4>
+                  <ul className="space-y-2 text-sm text-[#B0AFAF]">
+                    {getFinalStepStatus() === "failed" ? (
+                      <>
+                        <li className="flex items-center space-x-2">
+                          <AlertCircle className="w-4 h-4 text-red-400" />
+                          <span>Blurry or unclear document images</span>
+                        </li>
+                        <li className="flex items-center space-x-2">
+                          <AlertCircle className="w-4 h-4 text-red-400" />
+                          <span>Expired identification documents</span>
+                        </li>
+                        <li className="flex items-center space-x-2">
+                          <AlertCircle className="w-4 h-4 text-red-400" />
+                          <span>Missing required information</span>
+                        </li>
+                        <li className="flex items-center space-x-2">
+                          <AlertCircle className="w-4 h-4 text-red-400" />
+                          <span>
+                            Document doesn't match identity information
+                          </span>
+                        </li>
+                      </>
+                    ) : (
+                      <>
+                        <li className="flex items-center space-x-2">
+                          <CheckCircle className="w-4 h-4 text-blue-400" />
+                          <span>Complete identity information</span>
+                        </li>
+                        <li className="flex items-center space-x-2">
+                          <CheckCircle className="w-4 h-4 text-blue-400" />
+                          <span>Upload required documents</span>
+                        </li>
+                        <li className="flex items-center space-x-2">
+                          <CheckCircle className="w-4 h-4 text-blue-400" />
+                          <span>Wait for admin approval</span>
+                        </li>
+                      </>
+                    )}
+                  </ul>
+                </div>
 
-              <div className="bg-[#1A1A1A] border border-[#343434] rounded-xl p-4 max-w-md mx-auto text-left">
-                <h4 className="font-semibold text-white mb-3">
-                  Common Issues:
-                </h4>
-                <ul className="space-y-2 text-sm text-[#B0AFAF]">
-                  <li className="flex items-center space-x-2">
-                    <AlertCircle className="w-4 h-4 text-red-400" />
-                    <span>Blurry or unclear document images</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <AlertCircle className="w-4 h-4 text-red-400" />
-                    <span>Expired identification documents</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <AlertCircle className="w-4 h-4 text-red-400" />
-                    <span>Missing required information</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <AlertCircle className="w-4 h-4 text-red-400" />
-                    <span>Document doesn't match identity information</span>
-                  </li>
-                </ul>
+                <Button
+                  onClick={handleRestartVerification}
+                  className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold"
+                >
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  {getFinalStepStatus() === "failed"
+                    ? "Restart Verification"
+                    : "Start Verification"}
+                </Button>
               </div>
-
-              <Button
-                onClick={handleRestartVerification}
-                className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold"
-              >
-                <RotateCcw className="w-4 h-4 mr-2" />
-                Restart Verification
-              </Button>
-            </div>
+            )}
           </CardContent>
         </VerificationStep>
       ),
@@ -376,6 +409,8 @@ const Verification = () => {
   ];
 
   const getOverallStatus = () => {
+    if (isLoading)
+      return { status: "loading", label: "Loading...", color: "gray" };
     if (!verificationStatus)
       return { status: "loading", label: "Loading...", color: "gray" };
 
@@ -392,6 +427,48 @@ const Verification = () => {
   };
 
   const overallStatus = getOverallStatus();
+
+  if (isLoading) {
+    return (
+      <div className="space-y-8">
+        {/* Header with Loading */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold font-['Orbitron'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
+              Player Verification
+            </h1>
+            <p className="text-[#B0AFAF] text-lg mt-2 font-['Orbitron']">
+              Complete your player identity verification
+            </p>
+          </div>
+          <Badge className="bg-[#343434] text-[#B0AFAF] border-[#343434]">
+            <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+            Loading...
+          </Badge>
+        </div>
+
+        {/* Loading Skeleton for Steps */}
+        <Card className="bg-[#262626] border-[#343434]">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold text-white">
+              Verification Steps
+            </CardTitle>
+            <CardDescription className="text-[#B0AFAF]">
+              Complete all steps to verify your player identity
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 text-primary animate-spin" />
+              <span className="ml-3 text-[#B0AFAF]">
+                Loading verification status...
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -438,7 +515,7 @@ const Verification = () => {
         <CardContent>
           <StepLine
             steps={steps}
-            currentStep={currentStep - 1}
+            currentStep={currentStep}
             orientation="horizontal"
             className="mb-8"
           />
