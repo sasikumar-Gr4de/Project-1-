@@ -96,3 +96,26 @@ export const getAllPlayerDataByPlayerId = async (
     },
   };
 };
+
+export const triggerAnalaysisModel = async (data) => {
+  // const result = await fetch(process.env.ANALYSIS_MODEL_URL + "/analyze", {
+  //   method: "POST",
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //   },
+  //   body: JSON.stringify({
+  //     ...data,
+  //   }),
+  // });
+  const result = { success: true }; // Mocked result for demonstration
+
+  if (!result.success) {
+    throw new Error("Failed to start analysis workflow");
+  }
+
+  // Change status to 'processing'
+  await changePlayerDataStatus(
+    data.player_data_id,
+    PLAYER_DATA_STATUS.PROCESSING
+  );
+};

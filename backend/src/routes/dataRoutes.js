@@ -3,6 +3,7 @@ import {
   createData,
   changeDataStatus,
   getDataByPlayerId,
+  getAnalysisCallback,
 } from "../controllers/dataController.js";
 import { authenticateToken } from "../middleware/auth.js";
 import { validate } from "../middleware/validation.js";
@@ -12,6 +13,9 @@ import {
 } from "../middleware/validation.js";
 
 const router = express.Router();
+
+// Analysis Callbacks - No authentication required
+router.use("/callbacks", getAnalysisCallback);
 
 router.use(authenticateToken);
 
