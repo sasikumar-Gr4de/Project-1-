@@ -148,7 +148,7 @@ const Dashboard = () => {
                     </span>
                   </div>
                   <span className="text-[#B0AFAF] text-sm">
-                    {value.toFixed(1)}%
+                    {value ? value.toFixed(1) : 0}%
                   </span>
                 </div>
                 <Progress value={value} className="h-2 bg-[#343434]" />
