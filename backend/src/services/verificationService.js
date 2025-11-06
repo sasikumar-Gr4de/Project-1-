@@ -17,12 +17,25 @@ export const getPendingVerifications = async (filters = {}) => {
         `,
         { count: "exact" }
       )
-      .eq("status", VERIFICATION_STATUS.PENDING)
       .order("created_at", { ascending: false });
 
+    // Apply status filter - if not "all", filter by specific status
+    if (filters.status && filters.status !== "all") {
+      query = query.eq("status", filters.status);
+    }
+
+    // Apply document type filter
     if (filters.document_type && filters.document_type !== "all") {
       query = query.eq("document_type", filters.document_type);
     }
+
+    // Apply pagination
+    const page = parseInt(filters.page) || 1;
+    const limit = parseInt(filters.limit) || 10;
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
+    query = query.range(from, to);
 
     const { data, error, count } = await query;
 
@@ -31,10 +44,13 @@ export const getPendingVerifications = async (filters = {}) => {
     return {
       items: data || [],
       total: count || 0,
+      page,
+      limit,
+      totalPages: Math.ceil((count || 0) / limit),
     };
   } catch (error) {
-    console.error("Get pending verifications error:", error);
-    throw new Error("Failed to fetch pending verifications");
+    console.error("Get verifications error:", error);
+    throw new Error("Failed to fetch verifications");
   }
 };
 

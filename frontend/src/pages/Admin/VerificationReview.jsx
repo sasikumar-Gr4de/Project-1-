@@ -1,7 +1,9 @@
+// VerificationReview.jsx - Updated with DataTable
 import { useState, useEffect } from "react";
 import { useToast } from "@/contexts/ToastContext";
 import { usePassportStore } from "@/store/passportStore";
 import AdminSection from "@/components/admin/AdminSection";
+import DataTable from "@/components/common/DataTable";
 import {
   Card,
   CardContent,
@@ -39,30 +41,41 @@ const VerificationReview = () => {
     usePassportStore();
   const { toast } = useToast();
   const [verifications, setVerifications] = useState([]);
-  const [filteredVerifications, setFilteredVerifications] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedVerification, setSelectedVerification] = useState(null);
   const [reviewNote, setReviewNote] = useState("");
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+  });
   const [filters, setFilters] = useState({
     search: "",
-    status: "pending",
+    status: "all",
     document_type: "all",
   });
 
   useEffect(() => {
     loadVerifications();
-  }, []);
-
-  useEffect(() => {
-    filterVerifications();
-  }, [verifications, filters]);
+  }, [filters, pagination.page, pagination.limit]);
 
   const loadVerifications = async () => {
     try {
       setIsLoading(true);
-      // This would come from your admin service
-      const data = await fetchPendingVerifications();
-      setVerifications(data);
+      const params = {
+        ...filters,
+        page: pagination.page,
+        limit: pagination.limit,
+      };
+
+      const data = await fetchPendingVerifications(params);
+      setVerifications(data.items || []);
+      setPagination((prev) => ({
+        ...prev,
+        total: data.total || 0,
+        totalPages: data.totalPages || 0,
+      }));
     } catch (error) {
       console.error("Failed to load verifications:", error);
       toast({
@@ -75,36 +88,9 @@ const VerificationReview = () => {
     }
   };
 
-  const filterVerifications = () => {
-    let filtered = verifications;
-
-    // Status filter
-    if (filters.status !== "all") {
-      filtered = filtered.filter((v) => v.status === filters.status);
-    }
-
-    // Document type filter
-    if (filters.document_type !== "all") {
-      filtered = filtered.filter(
-        (v) => v.document_type === filters.document_type
-      );
-    }
-
-    // Search filter
-    if (filters.search) {
-      const searchLower = filters.search.toLowerCase();
-      filtered = filtered.filter(
-        (v) =>
-          v.users?.player_name?.toLowerCase().includes(searchLower) ||
-          v.document_type?.toLowerCase().includes(searchLower)
-      );
-    }
-
-    setFilteredVerifications(filtered);
-  };
-
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
+    setPagination((prev) => ({ ...prev, page: 1 })); // Reset to first page when filters change
   };
 
   const handleReview = async (verificationId, action) => {
@@ -217,6 +203,91 @@ const VerificationReview = () => {
     });
   };
 
+  // DataTable columns configuration
+  const columns = [
+    {
+      header: "Player",
+      accessor: "users",
+      cell: ({ row }) => (
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 bg-linear-to-br from-primary to-(--accent-2) rounded-full flex items-center justify-center">
+            {row.users?.avatar_url ? (
+              <img
+                src={row.users.avatar_url}
+                alt={row.users.player_name}
+                className="w-10 h-10 rounded-full object-cover border-2 border-(--surface-0)"
+              />
+            ) : (
+              <User className="w-5 h-5 text-(--ink)" />
+            )}
+          </div>
+          <div>
+            <div className="font-medium text-white">
+              {row.users?.player_name || "Unknown Player"}
+            </div>
+            <div className="text-sm text-(--muted-text)">
+              {row.users?.email}
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      header: "Document Type",
+      accessor: "document_type",
+      cell: ({ row }) => getDocumentTypeBadge(row.document_type),
+    },
+    {
+      header: "Status",
+      accessor: "status",
+      cell: ({ row }) => getStatusBadge(row.status),
+    },
+    {
+      header: "Submitted",
+      accessor: "created_at",
+      cell: ({ row }) => formatDate(row.created_at),
+    },
+    {
+      header: "Reviewed At",
+      accessor: "reviewed_at",
+      cell: ({ row }) => (row.reviewed_at ? formatDate(row.reviewed_at) : "-"),
+    },
+  ];
+
+  // DataTable actions
+  const actions = ({ row }) => (
+    <div className="flex items-center space-x-2">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => setSelectedVerification(row)}
+        className="bg-(--surface-2) border-(--surface-2) text-foreground hover:bg-(--surface-3)"
+      >
+        <Eye className="w-4 h-4" />
+      </Button>
+
+      {row.status === "pending" && (
+        <>
+          <Button
+            size="sm"
+            onClick={() => handleReview(row.verification_id, "approved")}
+            className="bg-green-600 hover:bg-green-700 text-white h-8 w-8 p-0"
+          >
+            <CheckCircle className="w-4 h-4" />
+          </Button>
+          <Button
+            size="sm"
+            variant="destructive"
+            onClick={() => handleReview(row.verification_id, "rejected")}
+            className="h-8 w-8 p-0"
+          >
+            <XCircle className="w-4 h-4" />
+          </Button>
+        </>
+      )}
+    </div>
+  );
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -240,17 +311,13 @@ const VerificationReview = () => {
             />
             Refresh
           </Button>
-          {/* <Button className="bg-linear-to-r from-primary to-(--accent-2) text-(--ink) hover:from-[var(--accent-2)] hover:to-primary font-semibold">
-            <Shield className="w-4 h-4 mr-2" />
-            Verification Stats
-          </Button> */}
         </div>
       </div>
 
       {/* Filters */}
       <AdminSection
         title="Filters & Search"
-        description="Filter users by role, status, or search by name/email"
+        description="Filter verifications by status, document type, or search by player name"
         icon={Filter}
       >
         <div className="flex flex-col sm:flex-row gap-4">
@@ -300,13 +367,6 @@ const VerificationReview = () => {
               <SelectItem value="consent">Consent Form</SelectItem>
             </SelectContent>
           </Select>
-
-          {/* Results Count */}
-          {/* <div className="flex items-center justify-end">
-              <span className="text-sm text-(--muted-text)">
-                {filteredVerifications.length} documents
-              </span>
-            </div> */}
         </div>
       </AdminSection>
 
@@ -320,7 +380,9 @@ const VerificationReview = () => {
                   Pending Review
                 </p>
                 <p className="text-2xl font-bold text-white mt-1">
-                  {verifications.filter((v) => v.status === "pending").length}
+                  {pagination.total
+                    ? verifications.filter((v) => v.status === "pending").length
+                    : 0}
                 </p>
               </div>
               <div className="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center">
@@ -338,7 +400,10 @@ const VerificationReview = () => {
                   Approved
                 </p>
                 <p className="text-2xl font-bold text-white mt-1">
-                  {verifications.filter((v) => v.status === "approved").length}
+                  {pagination.total
+                    ? verifications.filter((v) => v.status === "approved")
+                        .length
+                    : 0}
                 </p>
               </div>
               <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
@@ -356,7 +421,10 @@ const VerificationReview = () => {
                   Rejected
                 </p>
                 <p className="text-2xl font-bold text-white mt-1">
-                  {verifications.filter((v) => v.status === "rejected").length}
+                  {pagination.total
+                    ? verifications.filter((v) => v.status === "rejected")
+                        .length
+                    : 0}
                 </p>
               </div>
               <div className="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center">
@@ -372,7 +440,7 @@ const VerificationReview = () => {
               <div>
                 <p className="text-sm font-medium text-(--muted-text)">Total</p>
                 <p className="text-2xl font-bold text-white mt-1">
-                  {verifications.length}
+                  {pagination.total}
                 </p>
               </div>
               <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center">
@@ -383,135 +451,27 @@ const VerificationReview = () => {
         </Card>
       </div>
 
-      {/* Verification List */}
-      <div className="grid gap-6">
-        {isLoading ? (
-          // Loading skeleton
-          [...Array(5)].map((_, i) => (
-            <Card
-              key={i}
-              className="animate-pulse bg-(--surface-1) border-(--surface-2)"
-            >
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-(--surface-2) rounded-full"></div>
-                  <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-(--surface-2) rounded w-1/4"></div>
-                    <div className="h-3 bg-(--surface-2) rounded w-1/2"></div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))
-        ) : filteredVerifications.length > 0 ? (
-          filteredVerifications.map((verification) => (
-            <Card
-              key={verification.verification_id}
-              className="bg-(--surface-1) border-(--surface-2) hover:border-primary/30 transition-all duration-300"
-            >
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    {/* Player Avatar */}
-                    <div className="w-12 h-12 bg-linear-to-br from-primary to-(--accent-2) rounded-full flex items-center justify-center shadow-lg">
-                      {verification.users?.avatar_url ? (
-                        <img
-                          src={verification.users.avatar_url}
-                          alt={verification.users.player_name}
-                          className="w-12 h-12 rounded-full object-cover border-2 border-(--surface-0)"
-                        />
-                      ) : (
-                        <User className="w-6 h-6 text-(--ink)" />
-                      )}
-                    </div>
+      {/* DataTable */}
+      <DataTable
+        data={verifications}
+        columns={columns}
+        actions={actions}
+        isLoading={isLoading}
+        pagination={{
+          page: pagination.page,
+          limit: pagination.limit,
+          total: pagination.total,
+          totalPages: pagination.totalPages,
+        }}
+        onPageChange={(page) => setPagination((prev) => ({ ...prev, page }))}
+        onPageSizeChange={(limit) =>
+          setPagination((prev) => ({ ...prev, limit, page: 1 }))
+        }
+        emptyStateTitle="No verifications found"
+        emptyStateDescription="No verification requests match your current filters."
+      />
 
-                    {/* Verification Info */}
-                    <div>
-                      <div className="flex items-center space-x-3">
-                        <h3 className="font-semibold text-white">
-                          {verification.users?.player_name || "Unknown Player"}
-                        </h3>
-                        {getStatusBadge(verification.status)}
-                        {getDocumentTypeBadge(verification.document_type)}
-                      </div>
-                      <div className="flex items-center space-x-4 text-sm text-(--muted-text) mt-1">
-                        <span>
-                          Submitted {formatDate(verification.created_at)}
-                        </span>
-                        <span>•</span>
-                        <span>Document: {verification.document_type}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setSelectedVerification(verification)}
-                      className="bg-(--surface-2) border-(--surface-2) text-foreground hover:bg-(--surface-3)"
-                    >
-                      <Eye className="w-4 h-4 mr-1" />
-                      Review
-                    </Button>
-
-                    {verification.status === "pending" && (
-                      <>
-                        <Button
-                          size="sm"
-                          onClick={() =>
-                            handleReview(
-                              verification.verification_id,
-                              "approved"
-                            )
-                          }
-                          className="bg-green-600 hover:bg-green-700 text-white"
-                        >
-                          <CheckCircle className="w-4 h-4 mr-1" />
-                          Approve
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() =>
-                            handleReview(
-                              verification.verification_id,
-                              "rejected"
-                            )
-                          }
-                        >
-                          <XCircle className="w-4 h-4 mr-1" />
-                          Reject
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))
-        ) : (
-          // Empty state
-          <Card className="bg-(--surface-1) border-(--surface-2)">
-            <CardContent className="p-12 text-center">
-              <Shield className="w-16 h-16 text-(--muted-text) mx-auto mb-4 opacity-50" />
-              <h3 className="text-lg font-semibold text-white mb-2">
-                {filters.status === "pending"
-                  ? "No pending verifications"
-                  : "No documents found"}
-              </h3>
-              <p className="text-(--muted-text)">
-                {filters.status === "pending"
-                  ? "All documents have been reviewed. Check back later for new submissions."
-                  : "Try adjusting your filters to see more results."}
-              </p>
-            </CardContent>
-          </Card>
-        )}
-      </div>
-
-      {/* Review Modal */}
+      {/* Review Modal (keep existing modal code) */}
       {selectedVerification && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <Card className="bg-(--surface-0) border-(--surface-2) max-w-4xl w-full max-h-[90vh] overflow-hidden">

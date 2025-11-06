@@ -1,78 +1,87 @@
-import React, { useState, useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+// MetricsSummary.jsx - Updated with Upwork-style metrics
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import {
-  Activity,
-  TrendingUp,
-  Zap,
-  Gauge,
-  Target,
-  Calendar,
-} from "lucide-react";
-import { passportService } from "@/services/passport.service";
+import { Star, TrendingUp, Target, Users, Clock, Edit } from "lucide-react";
 
-const MetricsSummary = ({ playerId }) => {
-  const [summary, setSummary] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [period, setPeriod] = useState("4weeks");
-
-  useEffect(() => {
-    fetchMetricsSummary();
-  }, [playerId, period]);
-
-  const fetchMetricsSummary = async () => {
-    try {
-      setIsLoading(true);
-      const response = await passportService.getMetricsSummary(
-        playerId,
-        period
-      );
-      setSummary(response.data);
-    } catch (error) {
-      console.error("Failed to fetch metrics summary:", error);
-    } finally {
-      setIsLoading(false);
-    }
+const MetricsSummary = ({
+  playerId,
+  isEditing = false,
+  onEditToggle,
+  detailed = false,
+}) => {
+  // Mock data - in real app, this would come from props or API
+  const metrics = {
+    overallScore: 87,
+    lastMatchScore: 92,
+    avgScore: 84,
+    totalMatches: 47,
+    trainingHours: 156,
+    goals: 23,
+    assists: 18,
+    manOfTheMatch: 8,
+    consistency: 94,
+    improvement: 12,
+    benchmarks: {
+      speed: 88,
+      endurance: 92,
+      technique: 85,
+      tactical: 79,
+    },
   };
 
-  const getPeriodLabel = () => {
-    switch (period) {
-      case "1week":
-        return "Last 7 Days";
-      case "4weeks":
-        return "Last 4 Weeks";
-      case "3months":
-        return "Last 3 Months";
-      case "1year":
-        return "Last 12 Months";
-      default:
-        return "Last 4 Weeks";
-    }
+  const getScoreColor = (score) => {
+    if (score >= 90) return "text-green-400";
+    if (score >= 80) return "text-blue-400";
+    if (score >= 70) return "text-yellow-400";
+    return "text-red-400";
   };
 
-  if (isLoading) {
+  const getScoreBadge = (score) => {
+    if (score >= 90)
+      return "bg-green-500/20 text-green-400 border-green-500/30";
+    if (score >= 80) return "bg-blue-500/20 text-blue-400 border-blue-500/30";
+    if (score >= 70)
+      return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
+    return "bg-red-500/20 text-red-400 border-red-500/30";
+  };
+
+  if (detailed) {
     return (
-      <Card className="bg-(--surface-1) border-(--surface-2)">
+      <Card className="bg-[#262626] border-[#343434]">
         <CardHeader>
-          <CardTitle className="text-xl font-bold text-white flex items-center">
-            <Activity className="w-5 h-5 mr-2 text-primary" />
-            Performance Metrics
+          <CardTitle className="text-white flex items-center justify-between">
+            <span>Detailed Performance Analytics</span>
+            {isEditing && (
+              <Button variant="outline" size="sm" onClick={onEditToggle}>
+                <Edit className="w-4 h-4 mr-1" />
+                Edit
+              </Button>
+            )}
           </CardTitle>
-          <CardDescription className="text-(--muted-text)">
-            Loading performance summary...
-          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="animate-pulse space-y-4">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-20 bg-(--surface-2) rounded-xl"></div>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {/* Detailed metrics grid */}
+            {Object.entries(metrics.benchmarks).map(([key, value]) => (
+              <div
+                key={key}
+                className="text-center p-4 bg-[#1A1A1A] rounded-lg border border-[#343434]"
+              >
+                <div className="text-2xl font-bold text-white mb-1">
+                  {value}
+                </div>
+                <div className="text-gray-400 text-sm capitalize">{key}</div>
+                <div className="w-full bg-[#343434] rounded-full h-2 mt-2">
+                  <div
+                    className={`h-2 rounded-full ${getScoreColor(value).replace(
+                      "text-",
+                      "bg-"
+                    )}`}
+                    style={{ width: `${value}%` }}
+                  ></div>
+                </div>
+              </div>
             ))}
           </div>
         </CardContent>
@@ -80,177 +89,115 @@ const MetricsSummary = ({ playerId }) => {
     );
   }
 
-  if (!summary) {
-    return (
-      <Card className="bg-(--surface-1) border-(--surface-2)">
-        <CardHeader>
-          <CardTitle className="text-xl font-bold text-white flex items-center">
-            <Activity className="w-5 h-5 mr-2 text-primary" />
-            Performance Metrics
-          </CardTitle>
-          <CardDescription className="text-(--muted-text)">
-            No metrics data available
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-12">
-            <Activity className="w-16 h-16 text-(--muted-text) mx-auto mb-4 opacity-50" />
-            <p className="text-(--muted-text) text-lg">No metrics data</p>
-            <p className="text-sm text-(--muted-text) mt-2">
-              Performance metrics will appear after match analysis
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
-    <Card className="bg-(--surface-1) border-(--surface-2)">
+    <Card className="bg-[#262626] border-[#343434]">
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-xl font-bold text-white flex items-center">
-              <Activity className="w-5 h-5 mr-2 text-primary" />
-              Performance Metrics
-            </CardTitle>
-            <CardDescription className="text-(--muted-text)">
-              {getPeriodLabel()} performance summary
-            </CardDescription>
-          </div>
-          <select
-            value={period}
-            onChange={(e) => setPeriod(e.target.value)}
-            className="bg-(--surface-0) border border-(--surface-2) text-foreground text-sm rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 px-3 py-2 transition-all duration-300"
-          >
-            <option value="1week">1 Week</option>
-            <option value="4weeks">4 Weeks</option>
-            <option value="3months">3 Months</option>
-            <option value="1year">1 Year</option>
-          </select>
-        </div>
+        <CardTitle className="text-white flex items-center justify-between">
+          <span>Performance Overview</span>
+          {isEditing && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onEditToggle}
+              className="bg-[#1A1A1A] border-[#343434] text-white hover:bg-[#343434]"
+            >
+              <Edit className="w-4 h-4 mr-1" />
+              Edit
+            </Button>
+          )}
+        </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {/* Total Matches */}
-          <div className="text-center p-6 border-2 border-(--surface-2) rounded-2xl bg-linear-to-br from-(--surface-0) to-(--surface-1) hover:border-primary/30 transition-all duration-300 group">
-            <div className="w-12 h-12 bg-linear-to-br from-[#60A5FA] to-[#3B82F6] rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300">
-              <Calendar className="w-6 h-6 text-white" />
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-6">
+          {/* Main Score - Like Upwork's "Job Success Score" */}
+          <div className="text-center p-4 bg-[#1A1A1A] rounded-lg border border-[#343434]">
+            <div className="flex items-center justify-center mb-2">
+              <Star className="w-5 h-5 text-yellow-400 mr-2" />
+              <span className="text-gray-400 text-sm">GR4DE Score</span>
             </div>
-            <div className="text-3xl font-bold text-white group-hover:text-[#60A5FA] transition-colors">
-              {summary.totalMatches}
+            <div
+              className={`text-3xl font-bold ${getScoreColor(
+                metrics.overallScore
+              )} mb-1`}
+            >
+              {metrics.overallScore}
             </div>
-            <div className="text-sm text-(--muted-text) mt-2">
-              Total Matches
+            <Badge className={getScoreBadge(metrics.overallScore)}>
+              {metrics.overallScore >= 90
+                ? "Elite"
+                : metrics.overallScore >= 80
+                ? "Excellent"
+                : "Good"}
+            </Badge>
+          </div>
+
+          {/* Last Match Performance */}
+          <div className="text-center p-4 bg-[#1A1A1A] rounded-lg border border-[#343434]">
+            <div className="flex items-center justify-center mb-2">
+              <TrendingUp className="w-5 h-5 text-green-400 mr-2" />
+              <span className="text-gray-400 text-sm">Last Match</span>
+            </div>
+            <div
+              className={`text-3xl font-bold ${getScoreColor(
+                metrics.lastMatchScore
+              )} mb-1`}
+            >
+              {metrics.lastMatchScore}
+            </div>
+            <div className="text-green-400 text-sm flex items-center justify-center">
+              <TrendingUp className="w-3 h-3 mr-1" />+
+              {metrics.lastMatchScore - metrics.avgScore}
             </div>
           </div>
 
-          {/* Average Score */}
-          <div className="text-center p-6 border-2 border-(--surface-2) rounded-2xl bg-linear-to-br from-(--surface-0) to-(--surface-1) hover:border-primary/30 transition-all duration-300 group">
-            <div className="w-12 h-12 bg-linear-to-br from-primary to-(--accent-2) rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300">
-              <Target className="w-6 h-6 text-(--ink)" />
+          {/* Total Experience */}
+          <div className="text-center p-4 bg-[#1A1A1A] rounded-lg border border-[#343434]">
+            <div className="flex items-center justify-center mb-2">
+              <Users className="w-5 h-5 text-blue-400 mr-2" />
+              <span className="text-gray-400 text-sm">Matches</span>
             </div>
-            <div className="text-3xl font-bold text-white group-hover:text-primary transition-colors">
-              {summary.avgScore}
+            <div className="text-3xl font-bold text-white mb-1">
+              {metrics.totalMatches}
             </div>
-            <div className="text-sm text-(--muted-text) mt-2">
-              Avg GR4DE Score
-            </div>
+            <div className="text-gray-400 text-sm">Total Played</div>
           </div>
 
-          {/* Average Minutes */}
-          <div className="text-center p-6 border-2 border-(--surface-2) rounded-2xl bg-linear-to-br from-(--surface-0) to-(--surface-1) hover:border-primary/30 transition-all duration-300 group">
-            <div className="w-12 h-12 bg-linear-to-br from-[#F59E0B] to-[#D97706] rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300">
-              <Gauge className="w-6 h-6 text-white" />
+          {/* Training Commitment */}
+          <div className="text-center p-4 bg-[#1A1A1A] rounded-lg border border-[#343434]">
+            <div className="flex items-center justify-center mb-2">
+              <Clock className="w-5 h-5 text-purple-400 mr-2" />
+              <span className="text-gray-400 text-sm">Training</span>
             </div>
-            <div className="text-3xl font-bold text-white group-hover:text-[#F59E0B] transition-colors">
-              {summary.avgMinutes}
+            <div className="text-3xl font-bold text-white mb-1">
+              {metrics.trainingHours}h
             </div>
-            <div className="text-sm text-(--muted-text) mt-2">Avg Minutes</div>
-          </div>
-
-          {/* Total Distance */}
-          <div className="text-center p-6 border-2 border-(--surface-2) rounded-2xl bg-linear-to-br from-(--surface-0) to-(--surface-1) hover:border-primary/30 transition-all duration-300 group">
-            <div className="w-12 h-12 bg-linear-to-br from-[#8B5CF6] to-[#7C3AED] rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300">
-              <Zap className="w-6 h-6 text-white" />
-            </div>
-            <div className="text-3xl font-bold text-white group-hover:text-[#8B5CF6] transition-colors">
-              {summary.totalDistance
-                ? `${(summary.totalDistance / 1000).toFixed(0)}km`
-                : "--"}
-            </div>
-            <div className="text-sm text-(--muted-text) mt-2">
-              Total Distance
-            </div>
+            <div className="text-gray-400 text-sm">This Season</div>
           </div>
         </div>
 
-        {/* Progress Indicators */}
-        <div className="grid gap-6 mt-6 md:grid-cols-2">
-          {/* Best Score */}
-          <div className="p-4 border-2 border-(--surface-2) rounded-xl bg-(--surface-0) hover:border-primary/30 transition-all duration-300">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-white">
-                Best GR4DE Score
-              </span>
-              <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                Peak Performance
-              </Badge>
-            </div>
-            <div className="text-2xl font-bold text-green-400">
-              {summary.bestScore}
-            </div>
-            <Progress
-              value={summary.bestScore}
-              className="h-2 bg-(--surface-2) rounded-full mt-2"
-            />
+        {/* Secondary Metrics */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-white">{metrics.goals}</div>
+            <div className="text-gray-400 text-sm">Goals</div>
           </div>
-
-          {/* Improvement */}
-          <div className="p-4 border-2 border-(--surface-2) rounded-xl bg-(--surface-0) hover:border-primary/30 transition-all duration-300">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-white">
-                Performance Trend
-              </span>
-              <div className="flex items-center space-x-1">
-                <TrendingUp
-                  className={`w-4 h-4 ${
-                    summary.improvement > 0
-                      ? "text-green-400"
-                      : summary.improvement < 0
-                      ? "text-red-400"
-                      : "text-(--muted-text)"
-                  }`}
-                />
-                <Badge
-                  className={
-                    summary.improvement > 0
-                      ? "bg-green-500/20 text-green-400 border-green-500/30"
-                      : summary.improvement < 0
-                      ? "bg-red-500/20 text-red-400 border-red-500/30"
-                      : "bg-(--surface-2) text-(--muted-text) border-(--surface-2)"
-                  }
-                >
-                  {summary.improvement > 0 ? "+" : ""}
-                  {summary.improvement}
-                </Badge>
-              </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-white">
+              {metrics.assists}
             </div>
-            <div
-              className={`text-2xl font-bold ${
-                summary.improvement > 0
-                  ? "text-green-400"
-                  : summary.improvement < 0
-                  ? "text-red-400"
-                  : "text-(--muted-text)"
-              }`}
-            >
-              {summary.improvement > 0 ? "+" : ""}
-              {summary.improvement} pts
+            <div className="text-gray-400 text-sm">Assists</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-white">
+              {metrics.manOfTheMatch}
             </div>
-            <div className="text-xs text-(--muted-text) mt-1">
-              Since period start
+            <div className="text-gray-400 text-sm">MOTM</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-white">
+              {metrics.consistency}%
             </div>
+            <div className="text-gray-400 text-sm">Consistency</div>
           </div>
         </div>
       </CardContent>

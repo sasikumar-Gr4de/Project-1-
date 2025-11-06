@@ -105,7 +105,7 @@ export const usePassportStore = create((set, get) => ({
     try {
       const response = await passportService.getVerificationStatus(playerId);
       set({
-        verificationStatus: response.data,
+        verificationStatus: response.data.data,
         isLoading: false,
       });
       return response.data;
@@ -143,10 +143,10 @@ export const usePassportStore = create((set, get) => ({
   },
 
   // Admin verification functions
-  fetchPendingVerifications: async () => {
+  fetchPendingVerifications: async (filters = {}) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await passportService.getPendingVerifications();
+      const response = await passportService.getPendingVerifications(filters);
 
       if (response.status !== 200) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -156,18 +156,16 @@ export const usePassportStore = create((set, get) => ({
 
       if (data.success) {
         set({
-          pendingVerifications: data.data.items || [],
+          pendingVerifications: data.data,
           isLoading: false,
         });
-        return data.data.items;
+        return data.data;
       } else {
         throw new Error(data.message || "Failed to load verifications");
       }
     } catch (error) {
       set({
-        error:
-          error.response?.data?.message ||
-          "Failed to fetch pending verifications",
+        error: error.response?.data?.message || "Failed to fetch verifications",
         isLoading: false,
       });
       throw error;

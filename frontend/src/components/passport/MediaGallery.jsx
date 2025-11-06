@@ -1,274 +1,247 @@
-// frontend/src/components/passport/MediaGallery.jsx
-import React, { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+// MediaGallery.jsx - Updated with Upwork-style portfolio
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Video,
-  Image,
-  Link as LinkIcon,
-  Plus,
-  Play,
-  ExternalLink,
-} from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Plus, X, Edit, Video, Image, Link, Play } from "lucide-react";
 
-const MediaGallery = ({ media }) => {
-  const [selectedMedia, setSelectedMedia] = useState(null);
+const MediaGallery = ({
+  media = [],
+  isEditing = false,
+  isOwnProfile = false,
+  fullView = false,
+}) => {
+  const [newMedia, setNewMedia] = useState({
+    title: "",
+    description: "",
+    url: "",
+    type: "image",
+  });
+
+  const defaultMedia = [
+    {
+      id: 1,
+      title: "Match Winning Goal",
+      description: "Last minute goal against rivals",
+      url: "https://amzn-gr4de-bucket.s3.eu-north-1.amazonaws.com/server1-1.mp4-1762355253325-xc2jquvnkcm",
+      type: "video",
+      thumbnail: "/api/placeholder/400/300",
+      date: "2024-11-15",
+    },
+    {
+      id: 2,
+      title: "Training Session Highlights",
+      description: "Technical drills and fitness training",
+      url: "/api/placeholder/400/300",
+      type: "image",
+      thumbnail: "/api/placeholder/400/300",
+      date: "2024-11-10",
+    },
+    {
+      id: 3,
+      title: "Skills Compilation",
+      description: "Best moments from recent matches",
+      url: "/api/placeholder/400/300",
+      type: "video",
+      thumbnail: "/api/placeholder/400/300",
+      date: "2024-11-05",
+    },
+  ];
+
+  const displayMedia = media.length > 0 ? media : defaultMedia;
 
   const getMediaIcon = (type) => {
     switch (type) {
       case "video":
-        return <Video className="w-5 h-5" />;
+        return Video;
       case "image":
-        return <Image className="w-5 h-5" />;
+        return Image;
       case "link":
-        return <LinkIcon className="w-5 h-5" />;
+        return Link;
       default:
-        return <LinkIcon className="w-5 h-5" />;
+        return Image;
     }
   };
 
-  const getMediaColor = (type) => {
-    switch (type) {
-      case "video":
-        return "bg-red-500/20 text-red-400 border-red-500/30";
-      case "image":
-        return "bg-blue-500/20 text-blue-400 border-blue-500/30";
-      case "link":
-        return "bg-green-500/20 text-green-400 border-green-500/30";
-      default:
-        return "bg-[var(--surface-2)] text-(--muted-text) border-(--surface-2)";
+  const handleAddMedia = () => {
+    if (newMedia.title && newMedia.url) {
+      // Add media logic here
+      setNewMedia({ title: "", description: "", url: "", type: "image" });
     }
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
+  const handleRemoveMedia = (mediaId) => {
+    // Remove media logic here
   };
 
-  const handleMediaClick = (mediaItem) => {
-    if (mediaItem.media_type === "link") {
-      window.open(mediaItem.url, "_blank");
-    } else {
-      setSelectedMedia(mediaItem);
-    }
-  };
-
-  if (!media || media.length === 0) {
+  if (fullView) {
     return (
-      <Card className="bg-(--surface-1) border-(--surface-2)">
+      <Card className="bg-[#262626] border-[#343434]">
         <CardHeader>
-          <CardTitle className="text-xl font-bold text-white flex items-center">
-            <Image className="w-5 h-5 mr-2 text-primary" />
-            Media & Highlights
+          <CardTitle className="text-white flex items-center justify-between">
+            <span>Media Portfolio</span>
+            {isOwnProfile && (
+              <Button
+                variant="outline"
+                className="bg-[#1A1A1A] border-[#343434] text-white hover:bg-[#343434]"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add Media
+              </Button>
+            )}
           </CardTitle>
-          <CardDescription className="text-(--muted-text)">
-            Your match highlights and media will appear here
-          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-12">
-            <Image className="w-16 h-16 text-(--muted-text) mx-auto mb-4 opacity-50" />
-            <p className="text-(--muted-text) text-lg">No media available</p>
-            <p className="text-sm text-(--muted-text) mt-2">
-              Match highlights and media will be added by your coaches
-            </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {displayMedia.map((item) => {
+              const MediaIcon = getMediaIcon(item.type);
+              return (
+                <div
+                  key={item.id}
+                  className="group relative bg-[#1A1A1A] border border-[#343434] rounded-lg overflow-hidden hover:border-primary/50 transition-all duration-300"
+                >
+                  {/* Media Thumbnail */}
+                  <div className="aspect-video relative bg-[#262626] overflow-hidden">
+                    <img
+                      src={item.thumbnail || item.url}
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                    />
+                    {item.type === "video" && (
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
+                          <Play className="w-6 h-6 text-[#0F0F0E]" />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Edit Overlay */}
+                    {isEditing && (
+                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleRemoveMedia(item.id)}
+                          className="w-8 h-8 p-0"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Media Info */}
+                  <div className="p-4">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <MediaIcon className="w-4 h-4 text-primary" />
+                      <h3 className="text-white font-medium text-sm truncate">
+                        {item.title}
+                      </h3>
+                    </div>
+                    <p className="text-gray-400 text-xs mb-2 line-clamp-2">
+                      {item.description}
+                    </p>
+                    <p className="text-gray-500 text-xs">
+                      {new Date(item.date).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
+
+          {displayMedia.length === 0 && (
+            <div className="text-center py-12">
+              <Image className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-white text-lg font-semibold mb-2">
+                No Media Yet
+              </h3>
+              <p className="text-gray-400 mb-6">
+                Showcase your best moments and achievements
+              </p>
+              {isOwnProfile && (
+                <Button className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Your First Media
+                </Button>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <>
-      <Card className="bg-(--surface-1) border-(--surface-2)">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-xl font-bold text-white flex items-center">
-                <Image className="w-5 h-5 mr-2 text-primary" />
-                Media & Highlights
-              </CardTitle>
-              <CardDescription className="text-(--muted-text)">
-                Match highlights, photos, and external media
-              </CardDescription>
-            </div>
-            <Button className="bg-linear-to-r from-primary to-(--accent-2) text-(--ink) hover:from-(--accent-2) hover:to-primary font-semibold">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Media
+    <Card className="bg-[#262626] border-[#343434]">
+      <CardHeader>
+        <CardTitle className="text-white flex items-center justify-between">
+          <span>Media Portfolio</span>
+          {isOwnProfile && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-[#1A1A1A] border-[#343434] text-white hover:bg-[#343434]"
+            >
+              <Plus className="w-4 h-4 mr-1" />
+              Add
+            </Button>
+          )}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {displayMedia.slice(0, 6).map((item) => {
+            const MediaIcon = getMediaIcon(item.type);
+            return (
+              <div
+                key={item.id}
+                className="group relative aspect-square bg-[#1A1A1A] border border-[#343434] rounded-lg overflow-hidden hover:border-primary/50 transition-all duration-300"
+              >
+                <img
+                  src={item.thumbnail || item.url}
+                  alt={item.title}
+                  className="w-full h-full object-cover"
+                />
+                {item.type === "video" && (
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                    <Play className="w-6 h-6 text-white" />
+                  </div>
+                )}
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
+                  <div className="flex items-center space-x-1">
+                    <MediaIcon className="w-3 h-3 text-primary" />
+                    <span className="text-white text-xs truncate">
+                      {item.title}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {displayMedia.length === 0 && (
+          <div className="text-center py-8">
+            <Image className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+            <p className="text-gray-400 text-sm">No media uploaded yet</p>
+          </div>
+        )}
+
+        {displayMedia.length > 6 && (
+          <div className="text-center mt-4">
+            <Button variant="outline" size="sm" asChild>
+              <a
+                href={`?tab=portfolio`}
+                className="text-primary hover:text-primary/80"
+              >
+                View All ({displayMedia.length})
+              </a>
             </Button>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {media.map((item, index) => (
-              <div
-                key={item.media_id}
-                className="group cursor-pointer"
-                onClick={() => handleMediaClick(item)}
-              >
-                <div className="border-2 border-(--surface-2) rounded-xl bg-(--surface-0) overflow-hidden hover:border-primary/30 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-primary/10">
-                  {/* Media Thumbnail */}
-                  <div className="aspect-video bg-(--surface-1) relative overflow-hidden">
-                    {item.media_type === "video" ? (
-                      <>
-                        <div className="w-full h-full bg-linear-to-br from-(--surface-0) to-(--surface-1) flex items-center justify-center">
-                          <Video className="w-12 h-12 text-(--muted-text) opacity-50" />
-                        </div>
-                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <div className="w-16 h-16 bg-primary/90 rounded-full flex items-center justify-center shadow-lg">
-                            <Play className="w-6 h-6 text-(--ink) ml-1" />
-                          </div>
-                        </div>
-                      </>
-                    ) : item.media_type === "image" ? (
-                      <img
-                        src={item.url}
-                        alt={item.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-linear-to-br from-(--surface-0) to-(--surface-1) flex items-center justify-center">
-                        <ExternalLink className="w-12 h-12 text-(--muted-text) opacity-50" />
-                      </div>
-                    )}
-
-                    {/* Media Type Badge */}
-                    <div className="absolute top-3 left-3">
-                      <Badge className={getMediaColor(item.media_type)}>
-                        <div className="flex items-center space-x-1">
-                          {getMediaIcon(item.media_type)}
-                          <span className="text-xs">
-                            {item.media_type.toUpperCase()}
-                          </span>
-                        </div>
-                      </Badge>
-                    </div>
-                  </div>
-
-                  {/* Media Info */}
-                  <div className="p-4">
-                    <h3 className="font-semibold text-white group-hover:text-primary transition-colors line-clamp-1">
-                      {item.title}
-                    </h3>
-                    {item.description && (
-                      <p className="text-sm text-(--muted-text) mt-1 line-clamp-2">
-                        {item.description}
-                      </p>
-                    )}
-                    <div className="flex items-center justify-between mt-3">
-                      <span className="text-xs text-(--muted-text)">
-                        {formatDate(item.created_at)}
-                      </span>
-                      {item.media_type === "link" && (
-                        <ExternalLink className="w-3 h-3 text-(--muted-text)" />
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Media Summary */}
-          <div className="mt-6 pt-6 border-t border-(--surface-2)">
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div>
-                <div className="text-2xl font-bold text-white">
-                  {media.filter((m) => m.media_type === "video").length}
-                </div>
-                <div className="text-sm text-(--muted-text)">Videos</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-white">
-                  {media.filter((m) => m.media_type === "image").length}
-                </div>
-                <div className="text-sm text-(--muted-text)">Images</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-white">
-                  {media.filter((m) => m.media_type === "link").length}
-                </div>
-                <div className="text-sm text-(--muted-text)">Links</div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Media Modal */}
-      {selectedMedia && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-(--surface-0) rounded-2xl border border-(--surface-2) max-w-4xl w-full max-h-[90vh] overflow-hidden">
-            <div className="p-4 border-b border-(--surface-2) flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-white">
-                {selectedMedia.title}
-              </h3>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setSelectedMedia(null)}
-                className="text-(--muted-text) hover:text-foreground"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </Button>
-            </div>
-            <div className="p-6 max-h-[calc(90vh-80px)] overflow-y-auto">
-              {selectedMedia.media_type === "video" ? (
-                <video
-                  src={selectedMedia.url}
-                  controls
-                  className="w-full rounded-lg"
-                />
-              ) : selectedMedia.media_type === "image" ? (
-                <img
-                  src={selectedMedia.url}
-                  alt={selectedMedia.title}
-                  className="w-full rounded-lg"
-                />
-              ) : (
-                <div className="text-center py-12">
-                  <ExternalLink className="w-16 h-16 text-primary mx-auto mb-4" />
-                  <p className="text-white text-lg mb-4">External Link</p>
-                  <Button
-                    onClick={() => window.open(selectedMedia.url, "_blank")}
-                    className="bg-linear-to-r from-primary to-(--accent-2) text-(--ink) hover:from-(--accent-2) hover:to-primary font-semibold"
-                  >
-                    Open Link
-                  </Button>
-                </div>
-              )}
-              {selectedMedia.description && (
-                <p className="text-(--muted-text) mt-4">
-                  {selectedMedia.description}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

@@ -123,7 +123,7 @@ const Verification = () => {
 
   const getFinalStepStatus = () => {
     if (!verificationStatus) return "pending";
-
+    console.log("Final verification status:", verificationStatus);
     const badge = verificationStatus.verificationBadge;
     if (badge?.status === "verified") return "completed";
     if (badge?.status === "rejected") return "failed";

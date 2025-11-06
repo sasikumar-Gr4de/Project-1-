@@ -73,7 +73,9 @@ const DocumentUploadStep = ({ onComplete, currentStep }) => {
   ];
 
   const handleDocumentUpload = async (result) => {
+    // window.console.log("Upload result:", result);
     const fileResult = result[0];
+    // console.log("File upload result:", result);
     if (!fileResult.success || !selectedDocumentType) {
       toast({
         title: "Upload failed",
@@ -84,7 +86,7 @@ const DocumentUploadStep = ({ onComplete, currentStep }) => {
     }
 
     // Validate file type (PDF only)
-    if (!fileResult.type.includes("pdf")) {
+    if (!fileResult.fileType.includes("pdf")) {
       toast({
         title: "Invalid file type",
         description: "Please upload PDF files only",

@@ -2,32 +2,31 @@ import * as verificationService from "../services/verificationService.js";
 import { RESPONSES } from "../utils/messages.js";
 import { VERIFICATION_STATUS, PAGINATION } from "../utils/constants.js";
 
-// Get pending verifications (admin only)
+// Get all verifications with filtering and pagination (admin only)
 export const getPendingVerifications = async (req, res) => {
   try {
     const {
-      document_type,
+      document_type = "all",
+      status = "all",
       page = PAGINATION.DEFAULT_PAGE,
       limit = PAGINATION.DEFAULT_LIMIT,
     } = req.query;
 
     const verifications = await verificationService.getPendingVerifications({
       document_type,
+      status,
       page: parseInt(page),
       limit: parseInt(limit),
     });
 
     res.json(
-      RESPONSES.SUCCESS(
-        "Pending verifications fetched successfully",
-        verifications
-      )
+      RESPONSES.SUCCESS("Verifications fetched successfully", verifications)
     );
   } catch (error) {
-    console.error("Get pending verifications error:", error);
+    console.error("Get verifications error:", error);
     res
       .status(500)
-      .json(RESPONSES.SERVER_ERROR("Failed to fetch pending verifications"));
+      .json(RESPONSES.SERVER_ERROR("Failed to fetch verifications"));
   }
 };
 

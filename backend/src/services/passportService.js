@@ -277,8 +277,9 @@ const getCurrentVerificationStep = (
   const hasAnyDocument = verifications?.some(
     (v) => v.status === "pending" && v.file_url && v.file_url.trim() !== ""
   );
+  console.log("Has any document:", hasAnyDocument);
 
-  if (!hasAnyDocument) {
+  if (hasAnyDocument) {
     return 2;
   }
 
@@ -305,10 +306,10 @@ const calculateVerificationBadge = (verifications) => {
 
   if (hasAnyApproved) {
     return { status: "verified", label: "Verified", color: "green" };
-  } else if (rejectedDocs.length > 0) {
-    return { status: "rejected", label: "Documents Rejected", color: "red" };
   } else if (pendingDocs.length > 0) {
     return { status: "pending", label: "Under Review", color: "yellow" };
+  } else if (rejectedDocs.length > 0) {
+    return { status: "rejected", label: "Documents Rejected", color: "red" };
   }
 
   return { status: "unverified", label: "Unverified", color: "gray" };
