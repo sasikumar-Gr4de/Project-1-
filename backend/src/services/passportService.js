@@ -279,7 +279,7 @@ const getCurrentVerificationStep = (
   );
   console.log("Has any document:", hasAnyDocument);
 
-  if (hasAnyDocument) {
+  if (!hasAnyDocument) {
     return 2;
   }
 

@@ -23,7 +23,8 @@ const ProtectedRoute = ({ children, requireOnboarding = false }) => {
 
   // Show loading spinner while checking authentication
   if (isChecking || !isInitialized) {
-    return <LoadingSpinner />;
+    // return <LoadingSpinner />;
+    return <></>;
   }
 
   // Clear invalid tokens
@@ -36,10 +37,10 @@ const ProtectedRoute = ({ children, requireOnboarding = false }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Check if user needs onboarding
+  // // Check if user needs onboarding
   const needsOnboarding = user && !user.player_name;
 
-  // If route requires onboarding but user doesn't need it, redirect to dashboard
+  // // If route requires onboarding but user doesn't need it, redirect to dashboard
   if (requireOnboarding && !needsOnboarding) {
     return <Navigate to="/dashboard" replace />;
   }
@@ -49,7 +50,7 @@ const ProtectedRoute = ({ children, requireOnboarding = false }) => {
     return <Navigate to="/onboarding" replace />;
   }
 
-  // If user doesn't need onboarding but is on onboarding page, redirect to dashboard
+  // // If user doesn't need onboarding but is on onboarding page, redirect to dashboard
   if (!needsOnboarding && location.pathname === "/onboarding") {
     return <Navigate to="/dashboard" replace />;
   }

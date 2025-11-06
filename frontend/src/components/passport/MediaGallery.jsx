@@ -208,7 +208,7 @@ const MediaGallery = ({
                     <Play className="w-6 h-6 text-white" />
                   </div>
                 )}
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
+                <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-2">
                   <div className="flex items-center space-x-1">
                     <MediaIcon className="w-3 h-3 text-primary" />
                     <span className="text-white text-xs truncate">
