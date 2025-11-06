@@ -23,10 +23,10 @@ router.post("/generate-presigned-url", async (req, res) => {
     // Clean filename and create key
     const cleanFileName = fileName.replace(/[^a-zA-Z0-9.-]/g, "_");
     const timestamp = Date.now();
-    const randomString = Math.random().toString(36).substring(2, 15);
+    // const randomString = Math.random().toString(36).substring(2, 15);
     const key = folder
-      ? `${folder}${cleanFileName}-${timestamp}-${randomString}`
-      : `${cleanFileName}-${timestamp}-${randomString}`;
+      ? `${folder}/${timestamp} - ${cleanFileName}`
+      : `${timestamp} - ${cleanFileName}`;
 
     // Generate presigned URL
     const presignedUrl = await generatePresignedUploadUrl(key, fileType, 3600);
