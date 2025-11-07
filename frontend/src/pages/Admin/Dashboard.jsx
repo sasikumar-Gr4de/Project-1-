@@ -156,14 +156,14 @@ const Dashboard = () => {
             ))}
           </div>
 
-          <div className="mt-6 p-4 bg-[#1A1A1A] rounded-lg border border-[#343434]">
+          {/* <div className="mt-6 p-4 bg-[#1A1A1A] rounded-lg border border-[#343434]">
             <div className="flex items-center justify-between text-sm">
               <span className="text-[#B0AFAF]">Average Processing Time</span>
               <span className="text-white font-medium">
                 {metrics?.avgProcessingTime || "15"} minutes
               </span>
             </div>
-          </div>
+          </div> */}
         </AdminSection>
 
         {/* Recent Queue Activity */}

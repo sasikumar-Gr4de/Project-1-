@@ -171,9 +171,8 @@ const AdminLayout = ({ children }) => {
               className="w-36 h-24 object-contain"
             />
             <div className="flex items-center space-x-2 mt-2">
-              <Shield className="w-4 h-4 text-primary" />
               <p className="text-sm text-primary font-['Orbitron'] font-bold">
-                ADMIN PANEL
+                The Game Read You Back
               </p>
             </div>
           </div>

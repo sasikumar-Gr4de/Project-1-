@@ -18,6 +18,10 @@ export const createData = async (req, res) => {
       await triggerAnalaysisModel({
         player_data_id: data.id,
         video_url: data.video_file,
+        jersey_home_color: data.jersey_home_color,
+        jersey_away_color: data.jersey_away_color,
+        jersey_number: data.jersey_number,
+        position: data.position,
         // gps_url: data.gps_file,
         callback_url: `${process.env.SERVER_URL}/api/data/callbacks`,
       });
@@ -74,21 +78,29 @@ export const getDataByPlayerId = async (req, res) => {
 
 export const getAnalysisCallback = async (req, res) => {
   try {
-    // currently mock data
-    //     {
-    //     "player_data_id": "server1-1",
-    //     "events": [
-    //         {
-    //             "annotated_video_url": "https://amzn-gr4de-bucket.s3.amazonaws.com/processed/server1-1/annotated.mp4",
-    //             "detections_csv_url": "https://amzn-gr4de-bucket.s3.amazonaws.com/processed/server1-1/detections.csv",
-    //             "events_csv_url": "https://amzn-gr4de-bucket.s3.amazonaws.com/processed/server1-1/events.csv"
-    //         }
-    //     ],
-    //     "status": "completed",
-    //     "error": ""
-    // }
+    const { player_data_id } = req.body;
+    const result = {
+      player_data_id: player_data_id,
+      events: [
+        {
+          annotated_video_url:
+            "https://amzn-gr4de-bucket.s3.amazonaws.com/processed/server1-1/annotated.mp4",
+          detections_csv_url:
+            "https://amzn-gr4de-bucket.s3.amazonaws.com/processed/server1-1/detections.csv",
+          events_csv_url:
+            "https://amzn-gr4de-bucket.s3.amazonaws.com/processed/server1-1/events.csv",
+        },
+      ],
+      status: "completed",
+      error: "",
+    };
 
-    // Placeholder for handling analysis callbacks
+    if (result.status === "completed") {
+      // Update player data with analysis results
+      // Load CSV From URL and Save to Supabase Storage (omitted for brevity)
+    } else if (result.status === "failed") {
+      await changePlayerDataStatus(player_data_id, "failed");
+    }
 
     res.json(RESPONSES.SUCCESS("Analysis callback received"));
   } catch (error) {
