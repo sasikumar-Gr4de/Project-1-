@@ -163,9 +163,11 @@ const PlayerLayout = ({ children }) => {
               alt="GR4DE Logo"
               className="w-36 h-24 object-contain"
             />
-            <p className="text-sm text-[#B0AFAF] mt-2 font-['Orbitron']">
-              The Game Reads you Back
-            </p>
+            <div className="flex items-center space-x-2 mt-2">
+              <p className="text-sm text-primary font-['Orbitron'] font-bold">
+                The Game Read You Back
+              </p>
+            </div>
           </div>
 
           {/* User Profile Mini Card */}
