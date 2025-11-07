@@ -99,30 +99,30 @@ const AdminLayout = ({ children }) => {
 
   // Mock notifications for admin
   const notifications = [
-    {
-      id: 1,
-      title: "System Alert",
-      message: "High queue volume detected",
-      time: "5 min ago",
-      read: false,
-      type: "warning",
-    },
-    {
-      id: 2,
-      title: "New User Registered",
-      message: "Player John Doe signed up",
-      time: "1 hour ago",
-      read: true,
-      type: "info",
-    },
-    {
-      id: 3,
-      title: "Report Processing Failed",
-      message: "3 reports failed to process",
-      time: "2 hours ago",
-      read: false,
-      type: "error",
-    },
+    // {
+    //   id: 1,
+    //   title: "System Alert",
+    //   message: "High queue volume detected",
+    //   time: "5 min ago",
+    //   read: false,
+    //   type: "warning",
+    // },
+    // {
+    //   id: 2,
+    //   title: "New User Registered",
+    //   message: "Player John Doe signed up",
+    //   time: "1 hour ago",
+    //   read: true,
+    //   type: "info",
+    // },
+    // {
+    //   id: 3,
+    //   title: "Report Processing Failed",
+    //   message: "3 reports failed to process",
+    //   time: "2 hours ago",
+    //   read: false,
+    //   type: "error",
+    // },
   ];
 
   const unreadCount = notifications.filter((n) => !n.read).length;

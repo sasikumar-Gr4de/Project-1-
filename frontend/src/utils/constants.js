@@ -118,11 +118,36 @@ export const SCORE_PILLARS = {
 // Navigation Items
 export const NAV_ITEMS = {
   PLAYER: [
-    { name: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
-    { name: "Upload Data", href: "/upload", icon: "Upload" },
-    { name: "My Reports", href: "/reports", icon: "FileText" },
-    { name: "Benchmarks", href: "/benchmarks", icon: "BarChart3" },
-    { name: "Profile", href: "/profile", icon: "User" },
+    {
+      name: "Dashboard",
+      href: "/dashboard",
+      icon: "LayoutDashboard",
+      description: "Overview of your performance",
+    },
+    {
+      name: "Upload Data",
+      href: "/upload",
+      icon: "Upload",
+      description: "Upload your match data",
+    },
+    {
+      name: "My Reports",
+      href: "/reports",
+      icon: "FileText",
+      description: "View your performance reports",
+    },
+    {
+      name: "Benchmarks",
+      href: "/benchmarks",
+      icon: "BarChart3",
+      description: "Compare with peers",
+    },
+    {
+      name: "Profile",
+      href: "/profile",
+      icon: "User",
+      description: "Manage your account settings",
+    },
     // {
     //   name: "Verification",
     //   href: "/verification",

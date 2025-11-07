@@ -277,7 +277,7 @@ const Upload = () => {
             <CardContent>
               <VideoUpload
                 onUpload={(result) => handleFileUpload("video", result)}
-                maxSize={100 * 1024 * 1024}
+                maxSize={10 * 1024 * 1024 * 1024}
                 folder="match-videos"
                 label="Select video file"
                 uploadText="Upload video"

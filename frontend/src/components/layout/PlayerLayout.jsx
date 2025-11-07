@@ -102,20 +102,20 @@ const PlayerLayout = ({ children }) => {
       time: "5 min ago",
       read: true,
     },
-    {
-      id: 2,
-      title: "New Benchmark Data",
-      message: "Updated peer comparisons for your position",
-      time: "1 hour ago",
-      read: true,
-    },
-    {
-      id: 3,
-      title: "Training Recommendations",
-      message: "New personalized exercises based on your performance",
-      time: "2 hours ago",
-      read: false,
-    },
+    // {
+    //   id: 2,
+    //   title: "New Benchmark Data",
+    //   message: "Updated peer comparisons for your position",
+    //   time: "1 hour ago",
+    //   read: true,
+    // },
+    // {
+    //   id: 3,
+    //   title: "Training Recommendations",
+    //   message: "New personalized exercises based on your performance",
+    //   time: "2 hours ago",
+    //   read: false,
+    // },
   ];
 
   const unreadCount = notifications.filter((n) => !n.read).length;

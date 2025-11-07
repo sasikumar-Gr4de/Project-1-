@@ -68,7 +68,7 @@ const FileUpload = ({
 
     // Validate file types
     const acceptedTypes = accept.split(",").map((type) => type.trim());
-    window.alert(acceptedTypes);
+    // window.alert(acceptedTypes);
     const invalidFiles = files.filter((file) => {
       return !acceptedTypes.some((type) => {
         if (type.startsWith(".")) {
