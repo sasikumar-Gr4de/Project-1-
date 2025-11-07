@@ -1,4 +1,3 @@
-// Profile.jsx - Fixed with consistent input and select box sizes
 import React, { useState, useEffect } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { useUserStore } from "@/store/userStore";
@@ -34,7 +33,8 @@ import {
   FileText,
   Crown,
   Clock,
-  User as UserIcon,
+  Mail,
+  Shield,
 } from "lucide-react";
 import {
   FOOTBALL_POSITIONS,
@@ -146,6 +146,26 @@ const Profile = () => {
     }
   };
 
+  const getTierBadgeColor = (tier) => {
+    switch (tier) {
+      case TIER_PLANS.ELITE:
+        return "bg-linear-to-r from-[#FFD700] to-[#FFA500] text-[#0F0F0E]";
+      case TIER_PLANS.PRO:
+        return "bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E]";
+      case TIER_PLANS.BASIC:
+        return "bg-linear-to-r from-[#60A5FA] to-[#3B82F6] text-white";
+      default:
+        return "bg-[#343434] text-white";
+    }
+  };
+
+  // Custom styles for consistent input and select sizing
+  const inputStyles =
+    "h-14 text-base bg-[#1A1A1A] border-2 border-[#343434] text-white placeholder:text-[#B0AFAF] rounded-xl focus:border-primary focus:ring-2 focus:ring-[#C1FF72]/20 transition-all duration-300 w-full";
+
+  const selectTriggerStyles =
+    "h-14 text-base bg-[#1A1A1A] border-2 border-[#343434] text-white rounded-xl focus:border-primary focus:ring-2 focus:ring-[#C1FF72]/20 transition-all duration-300 w-full [&>span]:flex [&>span]:items-center [&>span]:h-full";
+
   if (!user) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -158,26 +178,6 @@ const Profile = () => {
       </div>
     );
   }
-
-  const getTierBadgeColor = (tier) => {
-    switch (tier) {
-      case TIER_PLANS.ELITE:
-        return "bg-linear-to-r` from-[#FFD700] to-[#FFA500] text-purple";
-      case TIER_PLANS.PRO:
-        return "bg-linear-to-r` from-primary to-[#94D44A] text-blue";
-      case TIER_PLANS.BASIC:
-        return "bg-linear-to-r` from-[#60A5FA] to-[#3B82F6] text-green";
-      default:
-        return "bg-[#343434] text-white";
-    }
-  };
-
-  // Custom styles for consistent input and select sizing
-  const inputStyles =
-    "h-14 text-base bg-[#1A1A1A] border-2 border-[#343434] text-white placeholder:text-[#B0AFAF] rounded-xl focus:border-primary focus:ring-2 focus:ring-[#C1FF72]/20 transition-all duration-300  w-full";
-
-  const selectTriggerStyles =
-    "h-14 text-base bg-[#1A1A1A] border-2 border-[#343434] text-white rounded-xl focus:border-primary focus:ring-2 focus:ring-[#C1FF72]/20 transition-all duration-300  w-full [&>span]:flex [&>span]:items-center [&>span]:h-full";
 
   return (
     <div className="space-y-8">
@@ -194,7 +194,7 @@ const Profile = () => {
         {!isEditing ? (
           <Button
             onClick={() => setIsEditing(true)}
-            className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold rounded-xl px-6 py-3 h-12 shadow-lg hover:shadow-xl transition-all duration-300 "
+            className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold rounded-xl px-6 py-3 h-12 shadow-lg hover:shadow-xl transition-all duration-300"
           >
             <Edit3 className="w-5 h-5 mr-2" />
             Edit Profile
@@ -204,14 +204,14 @@ const Profile = () => {
             <Button
               variant="outline"
               onClick={handleCancel}
-              className="bg-[#262626] border-[#343434] text-white hover:bg-[#343434] hover:border-primary font-semibold rounded-xl px-6 py-3 h-12 transition-all duration-300 "
+              className="bg-[#262626] border-[#343434] text-white hover:bg-[#343434] hover:border-primary font-semibold rounded-xl px-6 py-3 h-12 transition-all duration-300"
             >
               Cancel
             </Button>
             <Button
               onClick={handleSave}
               disabled={isLoading}
-              className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold rounded-xl px-6 py-3 h-12 shadow-lg hover:shadow-xl transition-all duration-300  disabled:opacity-50"
+              className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold rounded-xl px-6 py-3 h-12 shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
             >
               <Save className="w-5 h-5 mr-2" />
               {isLoading ? "Saving..." : "Save Changes"}
@@ -220,18 +220,19 @@ const Profile = () => {
         )}
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-3">
-        {/* Left Column - Avatar & Account Info */}
-        <div className="space-y-8">
-          {/* Avatar Upload Card */}
+      <div className="grid gap-8 lg:grid-cols-4">
+        {/* Left Column - Profile Overview */}
+        <div className="lg:col-span-1 space-y-8">
+          {/* Profile Overview Card */}
           <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
             <CardHeader className="pb-4">
-              <CardTitle className="text-xl font-bold text-white  flex items-center">
-                <UserIcon className="w-5 h-5 mr-2 text-primary" />
-                Profile Picture
+              <CardTitle className="text-xl font-bold text-white flex items-center">
+                <User className="w-5 h-5 mr-2 text-primary" />
+                Profile Overview
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-6">
+              {/* Avatar */}
               <div className="flex flex-col items-center space-y-4">
                 <AvatarUpload
                   onUpload={handleAvatarUpdate}
@@ -241,89 +242,135 @@ const Profile = () => {
                   size="xl"
                 />
                 {!isEditing && (
-                  <p className="text-sm text-[#B0AFAF] text-center ">
+                  <p className="text-sm text-[#B0AFAF] text-center">
                     Click edit to change your profile picture
                   </p>
                 )}
               </div>
+
+              {/* Account Information */}
+              <div className="space-y-4 pt-4 border-t border-[#343434]">
+                {/* Plan Tier */}
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2 text-[#B0AFAF]">
+                    <Crown className="w-4 h-4" />
+                    <span className="text-sm font-medium">
+                      Subscription Plan
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Badge
+                      className={`${getTierBadgeColor(
+                        user.tier_plan
+                      )} font-semibold px-3 py-1`}
+                    >
+                      {user.tier_plan?.toUpperCase() || "BASIC"}
+                    </Badge>
+                    {user.tier_plan !== TIER_PLANS.ELITE && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-[#343434] border-[#343434] text-primary hover:bg-primary hover:text-[#0F0F0E] font-semibold text-xs"
+                        asChild
+                      >
+                        <a href="/subscription">Upgrade</a>
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Email */}
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2 text-[#B0AFAF]">
+                    <Mail className="w-4 h-4" />
+                    <span className="text-sm font-medium">Email</span>
+                  </div>
+                  <p className="text-white font-semibold text-sm truncate">
+                    {user.email || "--"}
+                  </p>
+                </div>
+
+                {/* Member Since */}
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2 text-[#B0AFAF]">
+                    <Clock className="w-4 h-4" />
+                    <span className="text-sm font-medium">Member Since</span>
+                  </div>
+                  <p className="text-white font-semibold text-sm">
+                    {user.created_at
+                      ? new Date(user.created_at).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                        })
+                      : "--"}
+                  </p>
+                </div>
+
+                {/* Security */}
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2 text-[#B0AFAF]">
+                    <Shield className="w-4 h-4" />
+                    <span className="text-sm font-medium">Account Status</span>
+                  </div>
+                  <Badge
+                    variant="outline"
+                    className="text-green-400 border-green-400"
+                  >
+                    Verified
+                  </Badge>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
-          {/* Account Info Card */}
+          {/* Quick Stats */}
           <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
             <CardHeader className="pb-4">
-              <CardTitle className="text-xl font-bold text-white  flex items-center">
-                <Crown className="w-5 h-5 mr-2 text-primary" />
-                Account Information
+              <CardTitle className="text-lg font-bold text-white flex items-center">
+                <TrendingUp className="w-5 h-5 mr-2 text-primary" />
+                Quick Stats
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Plan Tier */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-[#B0AFAF] ">
-                    Subscription Plan
-                  </span>
-                  <Badge
-                    className={`${getTierBadgeColor(
-                      user.tier_plan
-                    )} font-semibold  px-3 py-1`}
-                  >
-                    {user.tier_plan?.toUpperCase() || "BASIC"}
-                  </Badge>
-                </div>
-                {user.tier_plan !== TIER_PLANS.ELITE && (
-                  <Button
-                    variant="outline"
-                    className="w-full bg-[#343434] border-[#343434] text-primary hover:bg-primary hover:text-[#0F0F0E] font-semibold rounded-xl transition-all duration-300 "
-                    asChild
-                  >
-                    <a href="/subscription">Upgrade Plan</a>
-                  </Button>
-                )}
+            <CardContent className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-[#B0AFAF]">Reports</span>
+                <span className="text-white font-bold">
+                  {performanceStats.totalReports}
+                </span>
               </div>
-
-              {/* Member Since */}
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2 text-[#B0AFAF]">
-                  <Clock className="w-4 h-4" />
-                  <span className="text-sm font-medium ">Member Since</span>
-                </div>
-                <p className="text-white font-semibold ">
-                  {user.created_at
-                    ? new Date(user.created_at).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })
-                    : "--"}
-                </p>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-[#B0AFAF]">Avg. Score</span>
+                <span className="text-primary font-bold">
+                  {performanceStats.averageScore || "--"}
+                </span>
               </div>
-
-              {/* Role */}
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2 text-[#B0AFAF]">
-                  <User className="w-4 h-4" />
-                  <span className="text-sm font-medium ">Account Role</span>
-                </div>
-                <p className="text-white font-semibold  capitalize">
-                  {user.role || "Player"}
-                </p>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-[#B0AFAF]">Progress</span>
+                <span
+                  className={`font-bold ${
+                    performanceStats.progress > 0
+                      ? "text-primary"
+                      : "text-[#FF6B6B]"
+                  }`}
+                >
+                  {performanceStats.progress > 0 ? "+" : ""}
+                  {performanceStats.progress || 0}%
+                </span>
               </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Right Column - Profile Details & Performance */}
-        <div className="lg:col-span-2 space-y-8">
+        <div className="lg:col-span-3 space-y-8">
           {/* Personal Information Card */}
           <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
             <CardHeader className="pb-4">
-              <CardTitle className="text-xl font-bold text-white  flex items-center">
+              <CardTitle className="text-xl font-bold text-white flex items-center">
                 <User className="w-5 h-5 mr-2 text-primary" />
                 Personal Information
               </CardTitle>
-              <CardDescription className="text-[#B0AFAF] ">
+              <CardDescription className="text-[#B0AFAF]">
                 {isEditing
                   ? "Update your personal details and playing profile"
                   : "Your basic information and football profile"}
@@ -333,7 +380,7 @@ const Profile = () => {
               <div className="grid gap-6 md:grid-cols-2">
                 {/* Player Name */}
                 <div className="space-y-3">
-                  <label className="text-sm font-medium text-white ">
+                  <label className="text-sm font-medium text-white">
                     Full Name
                   </label>
                   {isEditing ? (
@@ -351,7 +398,7 @@ const Profile = () => {
                   ) : (
                     <div className="flex items-center space-x-3 p-4 bg-[#1A1A1A] border-2 border-[#343434] rounded-xl h-14">
                       <User className="h-5 w-5 text-primary" />
-                      <span className="text-white font-semibold ">
+                      <span className="text-white font-semibold">
                         {user.player_name || "Not set"}
                       </span>
                     </div>
@@ -360,7 +407,7 @@ const Profile = () => {
 
                 {/* Date of Birth */}
                 <div className="space-y-3">
-                  <label className="text-sm font-medium text-white ">
+                  <label className="text-sm font-medium text-white">
                     Date of Birth
                   </label>
                   {isEditing ? (
@@ -379,13 +426,13 @@ const Profile = () => {
                     <div className="flex items-center space-x-3 p-4 bg-[#1A1A1A] border-2 border-[#343434] rounded-xl h-14">
                       <Calendar className="h-5 w-5 text-primary" />
                       <div>
-                        <span className="text-white font-semibold  block">
+                        <span className="text-white font-semibold block">
                           {user.date_of_birth
                             ? new Date(user.date_of_birth).toLocaleDateString()
                             : "Not set"}
                         </span>
                         {user.date_of_birth && (
-                          <span className="text-[#B0AFAF] text-sm ">
+                          <span className="text-[#B0AFAF] text-sm">
                             {calculateAge(user.date_of_birth)} years old
                           </span>
                         )}
@@ -396,7 +443,7 @@ const Profile = () => {
 
                 {/* Position */}
                 <div className="space-y-3">
-                  <label className="text-sm font-medium text-white ">
+                  <label className="text-sm font-medium text-white">
                     Position
                   </label>
                   {isEditing ? (
@@ -413,7 +460,7 @@ const Profile = () => {
                         >
                           <SelectValue placeholder="Select position" />
                         </SelectTrigger>
-                        <SelectContent className="bg-[#262626] border-2 border-[#343434] text-white  shadow-xl">
+                        <SelectContent className="bg-[#262626] border-2 border-[#343434] text-white shadow-xl">
                           {FOOTBALL_POSITIONS.map((position) => (
                             <SelectItem
                               key={position}
@@ -429,7 +476,7 @@ const Profile = () => {
                   ) : (
                     <div className="flex items-center space-x-3 p-4 bg-[#1A1A1A] border-2 border-[#343434] rounded-xl h-14">
                       <Target className="h-5 w-5 text-primary" />
-                      <span className="text-white font-semibold ">
+                      <span className="text-white font-semibold">
                         {user.position || "Not set"}
                       </span>
                     </div>
@@ -438,7 +485,7 @@ const Profile = () => {
 
                 {/* Country */}
                 <div className="space-y-3">
-                  <label className="text-sm font-medium text-white ">
+                  <label className="text-sm font-medium text-white">
                     Country
                   </label>
                   {isEditing ? (
@@ -455,7 +502,7 @@ const Profile = () => {
                         >
                           <SelectValue placeholder="Select country" />
                         </SelectTrigger>
-                        <SelectContent className="bg-[#262626] border-2 border-[#343434] text-white  shadow-xl max-h-60">
+                        <SelectContent className="bg-[#262626] border-2 border-[#343434] text-white shadow-xl max-h-60">
                           {COUNTRIES.map((country) => (
                             <SelectItem
                               key={country}
@@ -471,7 +518,7 @@ const Profile = () => {
                   ) : (
                     <div className="flex items-center space-x-3 p-4 bg-[#1A1A1A] border-2 border-[#343434] rounded-xl h-14">
                       <MapPin className="h-5 w-5 text-primary" />
-                      <span className="text-white font-semibold ">
+                      <span className="text-white font-semibold">
                         {user.country || "Not set"}
                       </span>
                     </div>
@@ -480,7 +527,7 @@ const Profile = () => {
 
                 {/* Academy */}
                 <div className="space-y-3 md:col-span-2">
-                  <label className="text-sm font-medium text-white ">
+                  <label className="text-sm font-medium text-white">
                     Academy/Club
                   </label>
                   {isEditing ? (
@@ -497,7 +544,7 @@ const Profile = () => {
                         >
                           <SelectValue placeholder="Select academy/club" />
                         </SelectTrigger>
-                        <SelectContent className="bg-[#262626] border-2 border-[#343434] text-white  shadow-xl max-h-60">
+                        <SelectContent className="bg-[#262626] border-2 border-[#343434] text-white shadow-xl max-h-60">
                           {ACADEMIES.map((academy) => (
                             <SelectItem
                               key={academy}
@@ -513,7 +560,7 @@ const Profile = () => {
                   ) : (
                     <div className="flex items-center space-x-3 p-4 bg-[#1A1A1A] border-2 border-[#343434] rounded-xl h-14">
                       <Building className="h-5 w-5 text-primary" />
-                      <span className="text-white font-semibold ">
+                      <span className="text-white font-semibold">
                         {user.academy || "Not set"}
                       </span>
                     </div>
@@ -526,11 +573,11 @@ const Profile = () => {
           {/* Performance Overview Card */}
           <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
             <CardHeader className="pb-4">
-              <CardTitle className="text-xl font-bold text-white  flex items-center">
+              <CardTitle className="text-xl font-bold text-white flex items-center">
                 <TrendingUp className="w-5 h-5 mr-2 text-primary" />
                 Performance Overview
               </CardTitle>
-              <CardDescription className="text-[#B0AFAF] ">
+              <CardDescription className="text-[#B0AFAF]">
                 Your assessment history and performance trends
               </CardDescription>
             </CardHeader>
@@ -541,10 +588,10 @@ const Profile = () => {
                   <div className="w-12 h-12 bg-linear-to-br from-[#60A5FA] to-[#3B82F6] rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300">
                     <FileText className="w-6 h-6 text-white" />
                   </div>
-                  <div className="text-3xl font-bold text-white  group-hover:text-[#60A5FA] transition-colors">
+                  <div className="text-3xl font-bold text-white group-hover:text-[#60A5FA] transition-colors">
                     {performanceStats.totalReports}
                   </div>
-                  <div className="text-sm text-[#B0AFAF]  mt-2">
+                  <div className="text-sm text-[#B0AFAF] mt-2">
                     Total Reports
                   </div>
                 </div>
@@ -554,10 +601,10 @@ const Profile = () => {
                   <div className="w-12 h-12 bg-linear-to-br from-primary to-[#94D44A] rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300">
                     <Award className="w-6 h-6 text-[#0F0F0E]" />
                   </div>
-                  <div className="text-3xl font-bold text-white  group-hover:text-primary transition-colors">
+                  <div className="text-3xl font-bold text-white group-hover:text-primary transition-colors">
                     {performanceStats.averageScore || "--"}
                   </div>
-                  <div className="text-sm text-[#B0AFAF]  mt-2">
+                  <div className="text-sm text-[#B0AFAF] mt-2">
                     Average Score
                   </div>
                 </div>
@@ -568,7 +615,7 @@ const Profile = () => {
                     <TrendingUp className="w-6 h-6 text-white" />
                   </div>
                   <div
-                    className={`text-3xl font-bold  ${
+                    className={`text-3xl font-bold ${
                       performanceStats.progress > 0
                         ? "text-primary group-hover:text-primary"
                         : performanceStats.progress < 0
@@ -579,7 +626,7 @@ const Profile = () => {
                     {performanceStats.progress > 0 ? "+" : ""}
                     {performanceStats.progress || 0}%
                   </div>
-                  <div className="text-sm text-[#B0AFAF]  mt-2">
+                  <div className="text-sm text-[#B0AFAF] mt-2">
                     Overall Progress
                   </div>
                 </div>
@@ -588,9 +635,9 @@ const Profile = () => {
               {/* Progress Bar */}
               <div className="mt-6 space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-white ">Performance Trend</span>
+                  <span className="text-white">Performance Trend</span>
                   <span
-                    className={`font-bold  ${
+                    className={`font-bold ${
                       performanceStats.progress > 0
                         ? "text-primary"
                         : "text-[#FF6B6B]"
@@ -607,7 +654,7 @@ const Profile = () => {
                   )}
                   className="h-3 bg-[#343434] rounded-full"
                 />
-                <div className="flex justify-between text-xs text-[#B0AFAF] ">
+                <div className="flex justify-between text-xs text-[#B0AFAF]">
                   <span>Start</span>
                   <span>Current</span>
                 </div>

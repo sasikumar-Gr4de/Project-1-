@@ -188,7 +188,7 @@ const AvatarUpload = ({
             transition-all duration-200
             ${
               disabled
-                ? "border-gray-300 bg-gray-100 cursor-not-allowed opacity-50"
+                ? "border-gray-300 bg-gray-100 cursor-not-allowed opacity-80"
                 : isUploading
                 ? "border-blue-300 bg-blue-50 cursor-not-allowed"
                 : "border-muted-foreground/25 hover:border-primary hover:bg-accent/50 cursor-pointer"
