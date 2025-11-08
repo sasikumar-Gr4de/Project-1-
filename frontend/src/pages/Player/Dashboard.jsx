@@ -1,4 +1,3 @@
-// Dashboard.jsx - Updated with beautiful harmonized design
 import React, { useState, useEffect } from "react";
 import { useUserStore } from "@/store/userStore";
 import {
