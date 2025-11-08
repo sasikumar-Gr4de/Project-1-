@@ -197,7 +197,7 @@ const Upload = () => {
         </div>
       </div>
 
-      {/* Upload Result */}
+      {/* Upload Result
       {uploadResult && (
         <Card
           className={
@@ -232,7 +232,7 @@ const Upload = () => {
             </div>
           </CardContent>
         </Card>
-      )}
+      )} */}
 
       {/* Upload Progress */}
       {isUploading && (

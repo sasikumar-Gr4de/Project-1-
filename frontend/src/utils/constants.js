@@ -198,12 +198,12 @@ export const NAV_ITEMS = {
       icon: "Database",
       description: "Manage platform content",
     },
-    {
-      name: "Passport Manager",
-      href: "/admin/passports",
-      icon: "FileText",
-      description: "Manage player passports",
-    },
+    // {
+    //   name: "Passport Manager",
+    //   href: "/admin/passports",
+    //   icon: "FileText",
+    //   description: "Manage player passports",
+    // },
     {
       name: "Verification",
       href: "/admin/verifications",

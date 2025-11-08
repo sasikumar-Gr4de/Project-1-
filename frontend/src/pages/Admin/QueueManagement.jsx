@@ -41,7 +41,7 @@ const QueueManagement = () => {
               <img
                 src={row.users?.avatar_url}
                 alt={row.users?.player_name}
-                className="w-12 h-12 rounded-full object-cover border-2 border-(--surface-0)"
+                className="w-12 h-12 object-cover border-4 border-(--surface-0) rounded-xl bg-linear-to-br"
               />
             ) : (
               <User className="w-6 h-6 text-(--ink)" />
