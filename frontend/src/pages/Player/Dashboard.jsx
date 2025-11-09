@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useUserStore } from "@/store/userStore";
 import {
   Card,
@@ -18,9 +18,7 @@ import {
   Target,
   Award,
   Calendar,
-  Users,
   Activity,
-  Zap,
 } from "lucide-react";
 import { formatDate, getScoreColor, calculateAge } from "@/utils/helper.utils";
 
