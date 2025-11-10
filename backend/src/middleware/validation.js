@@ -266,6 +266,21 @@ export const reviewVerificationSchema = Joi.object({
   note: Joi.string().max(500).optional(),
 });
 
+// Upload schema for video + data processing
+export const uploadSchema = Joi.object({
+  video_url: commonPatterns.url.optional(),
+  gps_url: commonPatterns.url.optional(),
+  event_json: Joi.object().optional(),
+  match_date: commonPatterns.date.required(),
+  upload_source: Joi.string().max(50).default("web"),
+  metadata: Joi.object({
+    competition: Joi.string().max(200).optional(),
+    opponent: Joi.string().max(200).optional(),
+    location: Joi.string().max(200).optional(),
+    minutes: Joi.number().integer().min(0).max(120).optional(),
+  }).optional(),
+}).or("video_url", "gps_url"); // At least one of video or GPS data required
+
 // Export all API schemas
 export default {
   // Auth

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useUserStore } from "@/store/userStore";
 import {
   Card,
@@ -30,12 +30,15 @@ import {
   Shirt,
   MapPin,
   Palette,
+  Clock,
 } from "lucide-react";
-
+import { useToast } from "@/contexts/ToastContext";
 import { useDataStore } from "@/store/dataStore";
+import api from "@/services/base.api";
 
 const Upload = () => {
   const { fetchDashboard } = useUserStore();
+  const { showToast } = useToast();
   const [uploadData, setUploadData] = useState({
     match_date: "",
     jersey_number: "",
@@ -43,6 +46,10 @@ const Upload = () => {
     jersey_color: "",
     opponent_jersey_color: "",
     notes: "",
+    competition: "",
+    opponent: "",
+    location: "",
+    minutes: "",
   });
   const [files, setFiles] = useState({
     video: null,
@@ -50,7 +57,9 @@ const Upload = () => {
   });
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [uploadResult, setUploadResult] = useState(null);
+  const [queueId, setQueueId] = useState(null);
+  const [queueStatus, setQueueStatus] = useState(null);
+  const [pollingInterval, setPollingInterval] = useState(null);
 
   const { uploadPlayerData } = useDataStore();
 
@@ -64,11 +73,78 @@ const Upload = () => {
     }
   };
 
+  // Poll queue status
+  const pollQueueStatus = async (id) => {
+    try {
+      const response = await api.get(`/queue/${id}/status`);
+      const status = response.data.data;
+
+      setQueueStatus(status);
+
+      if (status.status === "completed") {
+        // Stop polling and show success
+        if (pollingInterval) {
+          clearInterval(pollingInterval);
+          setPollingInterval(null);
+        }
+
+        showToast("Your report is ready!", "success");
+        fetchDashboard(); // Refresh dashboard
+
+        // Reset form after success
+        setUploadData({
+          match_date: "",
+          jersey_number: "",
+          position: "",
+          jersey_color: "",
+          opponent_jersey_color: "",
+          notes: "",
+          competition: "",
+          opponent: "",
+          location: "",
+          minutes: "",
+        });
+        setFiles({ video: null, gps: null });
+        setQueueId(null);
+        setQueueStatus(null);
+      } else if (status.status === "failed") {
+        // Stop polling and show error
+        if (pollingInterval) {
+          clearInterval(pollingInterval);
+          setPollingInterval(null);
+        }
+
+        showToast("Analysis failed. Please try again.", "error");
+        setQueueId(null);
+        setQueueStatus(null);
+      }
+    } catch (error) {
+      console.error("Error polling queue status:", error);
+    }
+  };
+
+  // Start polling when queueId is set
+  useEffect(() => {
+    if (queueId && !pollingInterval) {
+      // Poll immediately, then every 10 seconds
+      pollQueueStatus(queueId);
+      const interval = setInterval(() => pollQueueStatus(queueId), 10000);
+      setPollingInterval(interval);
+    }
+
+    return () => {
+      if (pollingInterval) {
+        clearInterval(pollingInterval);
+        setPollingInterval(null);
+      }
+    };
+  }, [queueId]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!files.video || !uploadData.match_date) {
-      alert("Please provide video file and match date");
+      showToast("Please provide video file and match date", "error");
       return;
     }
 
@@ -76,21 +152,21 @@ const Upload = () => {
     setUploadProgress(0);
 
     try {
-      const formData = new FormData();
-      formData.append("user_id", "current");
-      formData.append("match_date", uploadData.match_date);
-      formData.append("jersey_number", uploadData.jersey_number || "");
-      formData.append("position", uploadData.position || "");
-      formData.append("jersey_color", uploadData.jersey_color || "");
-      formData.append(
-        "opponent_jersey_color",
-        uploadData.opponent_jersey_color || ""
-      );
-      formData.append("notes", uploadData.notes || "");
-      formData.append("video_url", files.video);
-      if (files.gps) {
-        formData.append("gps_url", files.gps);
-      }
+      const uploadPayload = {
+        video_url: files.video,
+        gps_url: files.gps || undefined,
+        event_json: undefined, // For future use
+        match_date: uploadData.match_date,
+        upload_source: "web",
+        metadata: {
+          competition: uploadData.competition || undefined,
+          opponent: uploadData.opponent || undefined,
+          location: uploadData.location || undefined,
+          minutes: uploadData.minutes
+            ? parseInt(uploadData.minutes)
+            : undefined,
+        },
+      };
 
       // Simulate progress
       const interval = setInterval(() => {
@@ -103,15 +179,17 @@ const Upload = () => {
         });
       }, 500);
 
-      const result = await uploadPlayerData(formData);
+      const response = await api.post("/upload", uploadPayload);
 
       clearInterval(interval);
       setUploadProgress(100);
 
-      if (result.success) {
-        setUploadResult({ success: true, data: result.data });
+      if (response.data.success) {
+        const { queue_id } = response.data.data;
+        setQueueId(queue_id);
+        showToast("Upload successful! Processing your data...", "success");
 
-        // Reset form
+        // Reset form fields but keep queue tracking
         setUploadData({
           match_date: "",
           jersey_number: "",
@@ -119,18 +197,18 @@ const Upload = () => {
           jersey_color: "",
           opponent_jersey_color: "",
           notes: "",
+          competition: "",
+          opponent: "",
+          location: "",
+          minutes: "",
         });
         setFiles({ video: null, gps: null });
-
-        // Refresh dashboard data
-        setTimeout(() => {
-          fetchDashboard();
-        }, 1000);
       } else {
-        setUploadResult({ success: false, error: result.message });
+        showToast(response.data.message || "Upload failed", "error");
       }
     } catch (error) {
-      setUploadResult({ success: false, error: error.message });
+      console.error("Upload error:", error);
+      showToast(error.response?.data?.message || "Upload failed", "error");
     } finally {
       setIsUploading(false);
       setTimeout(() => setUploadProgress(0), 2000);
@@ -197,42 +275,31 @@ const Upload = () => {
         </div>
       </div>
 
-      {/* Upload Result
-      {uploadResult && (
-        <Card
-          className={
-            uploadResult.success
-              ? "border-green-500/20 bg-green-500/10"
-              : "border-red-500/20 bg-red-500/10"
-          }
-        >
+      {/* Queue Status */}
+      {queueId && queueStatus && (
+        <Card className="border-blue-500/20 bg-blue-500/10">
           <CardContent className="p-4">
             <div className="flex items-center space-x-3">
-              {uploadResult.success ? (
-                <CheckCircle className="w-5 h-5 text-green-500" />
-              ) : (
-                <AlertCircle className="w-5 h-5 text-red-500" />
-              )}
-              <div>
-                <p
-                  className={
-                    uploadResult.success ? "text-green-400" : "text-red-400"
-                  }
-                >
-                  {uploadResult.success
-                    ? "Data uploaded successfully! Your report is being processed."
-                    : `Upload failed: ${uploadResult.error}`}
+              <Clock className="w-5 h-5 text-blue-500" />
+              <div className="flex-1">
+                <p className="text-blue-400">
+                  Processing your data... ({queueStatus.status})
                 </p>
-                {uploadResult.success && uploadResult.data?.queue_item && (
-                  <Badge className="mt-1 bg-green-500/20 text-green-400 border-green-500/30 ">
-                    Queue ID: {uploadResult.data.queue_item.id}
+                <div className="flex items-center space-x-2 mt-2">
+                  <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+                    Queue ID: {queueId}
                   </Badge>
-                )}
+                  {queueStatus.logs && (
+                    <span className="text-xs text-[#B0AFAF]">
+                      {queueStatus.logs}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           </CardContent>
         </Card>
-      )} */}
+      )}
 
       {/* Upload Progress */}
       {isUploading && (
@@ -336,6 +403,70 @@ const Upload = () => {
                     required
                   />
                 </div>
+              </div>
+
+              {/* Competition */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-white ">
+                  Competition
+                </label>
+                <Input
+                  type="text"
+                  placeholder="e.g., Premier League"
+                  value={uploadData.competition}
+                  onChange={(e) =>
+                    handleInputChange("competition", e.target.value)
+                  }
+                  className="h-11 bg-[#1A1A1A] border-[#343434] text-white placeholder:text-[#B0AFAF] focus:border-primary "
+                />
+              </div>
+
+              {/* Opponent */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-white ">
+                  Opponent
+                </label>
+                <Input
+                  type="text"
+                  placeholder="e.g., Manchester City"
+                  value={uploadData.opponent}
+                  onChange={(e) =>
+                    handleInputChange("opponent", e.target.value)
+                  }
+                  className="h-11 bg-[#1A1A1A] border-[#343434] text-white placeholder:text-[#B0AFAF] focus:border-primary "
+                />
+              </div>
+
+              {/* Location */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-white ">
+                  Location
+                </label>
+                <Input
+                  type="text"
+                  placeholder="e.g., Home, Away, Neutral"
+                  value={uploadData.location}
+                  onChange={(e) =>
+                    handleInputChange("location", e.target.value)
+                  }
+                  className="h-11 bg-[#1A1A1A] border-[#343434] text-white placeholder:text-[#B0AFAF] focus:border-primary "
+                />
+              </div>
+
+              {/* Minutes Played */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-white ">
+                  Minutes Played
+                </label>
+                <Input
+                  type="number"
+                  min="1"
+                  max="120"
+                  placeholder="e.g., 90"
+                  value={uploadData.minutes}
+                  onChange={(e) => handleInputChange("minutes", e.target.value)}
+                  className="h-11 bg-[#1A1A1A] border-[#343434] text-white placeholder:text-[#B0AFAF] focus:border-primary "
+                />
               </div>
 
               {/* Jersey Number and Position */}

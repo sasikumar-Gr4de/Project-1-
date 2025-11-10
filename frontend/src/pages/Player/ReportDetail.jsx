@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useUserStore } from "@/store/userStore";
 import {
   Card,
@@ -19,17 +19,22 @@ import {
   TrendingUp,
   BarChart3,
   FileText,
+  Activity,
+  Zap,
 } from "lucide-react";
 import {
   formatDate,
   getScoreColor,
   getPillarColor,
 } from "@/utils/helper.utils";
+import api from "@/services/base.api";
 
 const ReportDetail = () => {
   const { reportId } = useParams();
+  const navigate = useNavigate();
   const { currentReport, fetchReport, isLoading } = useUserStore();
   const [report, setReport] = useState(null);
+  const [reportData, setReportData] = useState(null);
 
   useEffect(() => {
     fetchReportData();
@@ -37,9 +42,22 @@ const ReportDetail = () => {
 
   const fetchReportData = async () => {
     try {
+      // Fetch report details from new API
+      const response = await api.get(`/reports/report/${reportId}`);
+      if (response.data.success) {
+        setReportData(response.data.data.report);
+      }
+
+      // Also try legacy fetch for compatibility
       await fetchReport(reportId);
     } catch (error) {
       console.error("Failed to fetch report:", error);
+      // Fallback to legacy method
+      try {
+        await fetchReport(reportId);
+      } catch (legacyError) {
+        console.error("Legacy fetch also failed:", legacyError);
+      }
     }
   };
 
@@ -50,8 +68,9 @@ const ReportDetail = () => {
   }, [currentReport]);
 
   const handleDownload = () => {
-    if (report?.pdf_url) {
-      window.open(report.pdf_url, "_blank");
+    const pdfUrl = reportData?.pdf_url || report?.pdf_url;
+    if (pdfUrl) {
+      window.open(pdfUrl, "_blank");
     }
   };
 
@@ -96,7 +115,10 @@ const ReportDetail = () => {
     );
   }
 
-  const { score_json, player_data, created_at } = report;
+  // Use new report data if available, fallback to legacy
+  const displayReport = reportData || report;
+  const { summary_json, created_at } = displayReport || {};
+  const score_json = summary_json || displayReport?.score_json || {};
 
   return (
     <div className="space-y-6">
@@ -134,16 +156,14 @@ const ReportDetail = () => {
             <div className="text-right">
               <div
                 className={`text-6xl font-bold ${getScoreColor(
-                  score_json.overall_score
+                  score_json.gr4de_score || score_json.overall_score
                 )}`}
               >
-                {score_json.overall_score}
+                {score_json.gr4de_score || score_json.overall_score}
               </div>
               <div className="flex items-center space-x-1 mt-2">
-                <TrendingUp className="w-4 h-4 text-green-500" />
-                <span className="text-sm text-green-500">
-                  +5 from last report
-                </span>
+                <Award className="w-4 h-4 text-primary" />
+                <span className="text-sm text-primary">GR4DE Score</span>
               </div>
             </div>
           </div>
@@ -153,29 +173,71 @@ const ReportDetail = () => {
       {/* Pillar Scores */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {Object.entries(score_json)
-          .filter(([key]) =>
-            ["technical", "tactical", "physical", "mental"].includes(key)
+          .filter(
+            ([key]) =>
+              [
+                "technical_score",
+                "tactical_score",
+                "physical_score",
+                "mental_score",
+              ].includes(key) ||
+              ["technical", "tactical", "physical", "mental"].includes(key)
           )
-          .map(([pillar, score]) => (
-            <Card key={pillar}>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium capitalize flex items-center space-x-2">
-                  <Target className="w-4 h-4" />
-                  <span>{pillar}</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className={`text-3xl font-bold ${getPillarColor(pillar)}`}>
-                  {score}
-                </div>
-                <Progress value={score} className="mt-2 h-2" />
-                <p className="text-xs text-muted-foreground mt-2">
-                  {getPillarDescription(pillar)}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
+          .map(([pillar, score]) => {
+            const pillarName = pillar.replace("_score", "");
+            return (
+              <Card key={pillar}>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium capitalize flex items-center space-x-2">
+                    <Target className="w-4 h-4" />
+                    <span>{pillarName}</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div
+                    className={`text-3xl font-bold ${getPillarColor(
+                      pillarName
+                    )}`}
+                  >
+                    {score}
+                  </div>
+                  <Progress value={score} className="mt-2 h-2" />
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {getPillarDescription(pillarName)}
+                  </p>
+                </CardContent>
+              </Card>
+            );
+          })}
       </div>
+
+      {/* Tempo Index */}
+      {score_json.tempo_index && (
+        <Card className="bg-linear-to-r from-blue-500/10 to-purple-500/10 border-blue-500/20">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-bold mb-2 flex items-center space-x-2">
+                  <Zap className="w-5 h-5 text-blue-500" />
+                  <span>Tempo Index</span>
+                </h3>
+                <p className="text-muted-foreground">
+                  Passing sequence efficiency and tempo control
+                </p>
+              </div>
+              <div className="text-right">
+                <div className="text-4xl font-bold text-blue-500">
+                  {score_json.tempo_index}
+                </div>
+                <div className="flex items-center space-x-1 mt-2">
+                  <Activity className="w-4 h-4 text-blue-500" />
+                  <span className="text-sm text-blue-500">Sequence Rate</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Detailed Breakdown */}
       <div className="grid gap-6 lg:grid-cols-2">
