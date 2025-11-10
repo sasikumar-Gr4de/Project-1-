@@ -28,60 +28,45 @@ router.get("/v1/features", async (req, res) => {
 
     // Get all modules
     const { data: allModules, error: modulesError } = await supabase
-      .from("modules")
-      .select("id, name, key, description");
+      .from("feature_modules")
+      .select("id, module_name, module_key, description");
 
     if (modulesError) throw modulesError;
 
     // Get plan modules for user's plan
     const { data: planModules, error: planError } = await supabase
-      .from("plan_modules")
-      .select(
-        `
-        module_id,
-        limit_value,
-        plans!inner(key)
-      `
-      )
-      .eq("plans.key", userPlan);
+      .from("plan_module_access")
+      .select("module_key")
+      .eq("plan", userPlan);
 
     if (planError) throw planError;
 
-    // Get role modules (force allow/deny)
-    const { data: roleModules, error: roleError } = await supabase
-      .from("role_modules")
-      .select("module_id, force_allow, force_deny")
-      .eq("role", role);
-
-    if (roleError) throw roleError;
+    // Get role modules (force allow/deny) - Note: role_modules table doesn't exist in new schema
+    // For now, admins get all access
+    const roleModules = role === "admin" ? [] : [];
 
     // Build features object
     const features = {};
 
     for (const module of allModules) {
-      // Check role-based permissions first
-      const roleModule = roleModules.find((rm) => rm.module_id === module.id);
-
-      if (roleModule?.force_deny) {
-        features[module.key] = { enabled: false, limit: 0 };
-        continue;
-      }
-
-      if (roleModule?.force_allow) {
-        features[module.key] = { enabled: true, limit: null };
+      // Admin role gets all access
+      if (role === "admin") {
+        features[module.module_key] = { enabled: true, limit: null };
         continue;
       }
 
       // Check plan-based permissions
-      const planModule = planModules.find((pm) => pm.module_id === module.id);
+      const planModule = planModules.find(
+        (pm) => pm.module_key === module.module_key
+      );
 
       if (planModule) {
-        features[module.key] = {
+        features[module.module_key] = {
           enabled: true,
-          limit: planModule.limit_value,
+          limit: null, // Unlimited for now, can be extended later
         };
       } else {
-        features[module.key] = { enabled: false, limit: 0 };
+        features[module.module_key] = { enabled: false, limit: 0 };
       }
     }
 

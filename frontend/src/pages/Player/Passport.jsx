@@ -53,7 +53,7 @@ const Passport = () => {
 
   const loadPassportData = async () => {
     try {
-      const response = await api.get("/v1/player/passport");
+      const response = await api.get("/passport/v1/player/passport");
       if (response.data.success) {
         setPassportData(response.data.data);
       }
@@ -66,7 +66,7 @@ const Passport = () => {
 
   const handleSave = async () => {
     try {
-      const response = await api.put("/v1/player/passport", formData);
+      const response = await api.put("/passport/v1/player/passport", formData);
       if (response.data.success) {
         await loadPassportData();
         setEditing(false);
@@ -78,7 +78,9 @@ const Passport = () => {
 
   const createShareLink = async () => {
     try {
-      const response = await api.post("/v1/player/passport/share/create");
+      const response = await api.post(
+        "/passport/v1/player/passport/share/create"
+      );
       if (response.data.success) {
         setShareLink(response.data.data);
       }
@@ -90,7 +92,7 @@ const Passport = () => {
   const revokeShareLink = async () => {
     if (!shareLink) return;
     try {
-      await api.post("/v1/player/passport/share/revoke", {
+      await api.post("/passport/v1/player/passport/share/revoke", {
         share_token: shareLink.share_token,
       });
       setShareLink(null);

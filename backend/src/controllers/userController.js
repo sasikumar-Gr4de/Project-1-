@@ -17,6 +17,11 @@ export const updateProfile = async (req, res) => {
     res.json(RESPONSES.SUCCESS(USER_MESSAGES.PROFILE_UPDATED, updatedProfile));
   } catch (error) {
     console.error("Update profile error:", error);
+
+    if (error.message?.includes("Player profile not found")) {
+      return res.status(404).json(RESPONSES.ERROR("Player profile not found"));
+    }
+
     res.status(500).json(RESPONSES.SERVER_ERROR(USER_MESSAGES.INTERNAL_ERROR));
   }
 };
@@ -33,6 +38,17 @@ export const getDashboard = async (req, res) => {
     );
   } catch (error) {
     console.error("Get dashboard error:", error);
+
+    if (error.message?.includes("Player profile not found")) {
+      return res
+        .status(404)
+        .json(
+          RESPONSES.ERROR(
+            "Player profile not found. Please complete your player profile."
+          )
+        );
+    }
+
     res
       .status(500)
       .json(RESPONSES.SERVER_ERROR("Failed to fetch dashboard data"));
@@ -54,6 +70,11 @@ export const getReports = async (req, res) => {
     res.json(RESPONSES.SUCCESS("Reports fetched successfully", reportsData));
   } catch (error) {
     console.error("Get reports error:", error);
+
+    if (error.message?.includes("Player profile not found")) {
+      return res.status(404).json(RESPONSES.ERROR("Player profile not found"));
+    }
+
     res.status(500).json(RESPONSES.SERVER_ERROR("Failed to fetch reports"));
   }
 };
@@ -69,6 +90,12 @@ export const getReport = async (req, res) => {
     res.json(RESPONSES.SUCCESS("Report fetched successfully", report));
   } catch (error) {
     console.error("Get report error:", error);
+
+    if (error.code === "PGRST116") {
+      // Record not found
+      return res.status(404).json(RESPONSES.ERROR("Report not found"));
+    }
+
     res.status(500).json(RESPONSES.SERVER_ERROR("Failed to fetch report"));
   }
 };

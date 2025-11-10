@@ -37,6 +37,44 @@ class UploadService {
     }
   }
 
+  // Create upload record and start processing
+  async createUpload(uploadData) {
+    try {
+      const response = await api.post(`${this.baseUrl}/v1/uploads`, uploadData);
+
+      if (response.status !== 200) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return response.data;
+    } catch (error) {
+      console.error("Error creating upload:", error);
+      return {
+        success: false,
+        error: error.message || "Failed to create upload",
+      };
+    }
+  }
+
+  // Get queue status
+  async getQueueStatus(queueId) {
+    try {
+      const response = await api.get(`/queue/v1/queue/${queueId}/status`);
+
+      if (response.status !== 200) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return response.data;
+    } catch (error) {
+      console.error("Error getting queue status:", error);
+      return {
+        success: false,
+        error: error.message || "Failed to get queue status",
+      };
+    }
+  }
+
   async uploadFile(file, folder = "", onProgress = null) {
     return new Promise(async (resolve, reject) => {
       try {

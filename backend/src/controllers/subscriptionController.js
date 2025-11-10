@@ -419,10 +419,10 @@ function mapPriceToPlan(priceId) {
   const priceMap = {
     [process.env.STRIPE_BASIC_PRICE_ID]: "basic",
     [process.env.STRIPE_PRO_PRICE_ID]: "pro",
-    [process.env.STRIPE_ELITE_PRICE_ID]: "elite",
+    [process.env.STRIPE_ELITE_PRICE_ID]: "pro", // Map elite to pro for now
   };
 
-  return priceMap[priceId] || "basic";
+  return priceMap[priceId] || "free";
 }
 
 function checkFeatureAccess(subscription, feature) {
@@ -431,19 +431,18 @@ function checkFeatureAccess(subscription, feature) {
   }
 
   const featureMatrix = {
-    basic: ["basic_reports", "email_support", "dashboard_basic"],
+    free: ["basic_dashboard"],
+    basic: ["basic_reports", "email_support", "dashboard_basic", "passport"],
     pro: [
       "basic_reports",
       "advanced_reports",
       "priority_support",
       "video_analysis",
       "dashboard_advanced",
-    ],
-    elite: [
-      "all_features",
-      "unlimited_reports",
-      "phone_support",
-      "dedicated_manager",
+      "passport",
+      "verification",
+      "benchmarks",
+      "admin_analytics",
     ],
   };
 

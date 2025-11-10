@@ -25,14 +25,13 @@ router.get("/v1/queue/:id/status", async (req, res) => {
         id,
         status,
         logs,
-        retries,
         started_at,
         completed_at,
         created_at,
+        player_data_id,
         player_data!inner(
           id,
-          player_id,
-          players!inner(user_id)
+          player_id
         )
       `
       )
@@ -51,7 +50,7 @@ router.get("/v1/queue/:id/status", async (req, res) => {
     // Check ownership (users can only see their own queue items, admins can see all)
     if (
       role !== USER_ROLES.ADMIN &&
-      queueItem.player_data.players.user_id !== userId
+      queueItem.player_data.player_id !== userId
     ) {
       return res.status(403).json(RESPONSES.FORBIDDEN("Access denied"));
     }
@@ -61,7 +60,6 @@ router.get("/v1/queue/:id/status", async (req, res) => {
         queue_id: queueItem.id,
         status: queueItem.status,
         logs: queueItem.logs,
-        retries: queueItem.retries,
         started_at: queueItem.started_at,
         completed_at: queueItem.completed_at,
         created_at: queueItem.created_at,
@@ -107,21 +105,20 @@ router.post(
           );
       }
 
-      if (queueItem.retries >= (queueItem.max_retries || 3)) {
+      if ((queueItem.last_retry_at || 0) >= (queueItem.max_retries || 3)) {
         return res
           .status(400)
           .json(RESPONSES.BAD_REQUEST("Maximum retry attempts exceeded"));
       }
 
       // Reset queue item for retry with exponential backoff
-      const retryCount = queueItem.retries + 1;
+      const retryCount = (queueItem.last_retry_at || 0) + 1;
       const backoffDelay = Math.min(1000 * Math.pow(2, retryCount), 300000); // Max 5 minutes
 
       const { data: updatedItem, error: updateError } = await supabase
         .from("processing_queue")
         .update({
           status: QUEUE_STATUS.PENDING,
-          retries: retryCount,
           logs: `Retry ${retryCount} scheduled at ${new Date(
             Date.now() + backoffDelay
           ).toISOString()}`,
@@ -152,8 +149,8 @@ router.post(
             job_id: id,
             player_data_id: playerData.id,
             player_id: playerData.player_id,
-            video_url: playerData.video_url,
-            gps_url: playerData.gps_url,
+            video_url: playerData.file_url, // Updated field name
+            gps_url: playerData.file_url, // Updated field name
             event_json_url: null,
             match_metadata: {},
           });
@@ -174,7 +171,6 @@ router.post(
         RESPONSES.SUCCESS("Queue item queued for retry", {
           queue_id: updatedItem.id,
           status: updatedItem.status,
-          retries: updatedItem.retries,
           next_retry_at: new Date(Date.now() + backoffDelay).toISOString(),
         })
       );

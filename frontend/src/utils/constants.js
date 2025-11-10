@@ -154,12 +154,12 @@ export const NAV_ITEMS = {
     //   icon: "Shield",
     //   description: "Verify your identity",
     // },
-    // {
-    //   name: "Passport",
-    //   href: "/passport",
-    //   icon: "FileText",
-    //   description: "Digital player passport",
-    // },
+    {
+      name: "Passport",
+      href: "/passport",
+      icon: "FileText",
+      description: "Digital player passport",
+    },
   ],
   ADMIN: [
     {

@@ -95,6 +95,7 @@ export const handleModelCallback = async (jobId, results) => {
 
     // Write audit log
     await supabase.from("audit_logs").insert({
+      actor_id: playerData.player_id,
       entity: "processing_queue",
       entity_id: jobId,
       action: "completed",
@@ -103,6 +104,7 @@ export const handleModelCallback = async (jobId, results) => {
         completed_at: new Date().toISOString(),
         report_id: report.report_id,
       },
+      created_at: new Date().toISOString(),
     });
 
     // Create alerts for notifications
@@ -154,7 +156,7 @@ async function storeAnalysisResults(playerDataId, results) {
   await supabase.from("player_metrics").insert({
     player_id: playerData.player_id,
     match_id: playerDataId, // Using player_data_id as match_id for now
-    date: playerData.match_date,
+    date: playerData.match_date || new Date().toISOString().split("T")[0],
     competition: results.match_metadata?.competition || "Unknown",
     minutes: results.match_metadata?.minutes || 90,
     gps_summary: results.gps_summary || {},
@@ -163,6 +165,7 @@ async function storeAnalysisResults(playerDataId, results) {
     benchmarks: benchmark_comparison || {},
     source: "model_server",
     raw_file_url: results.raw_file_url || null,
+    created_at: new Date().toISOString(),
   });
 
   // Insert tempo_player_match
@@ -172,8 +175,10 @@ async function storeAnalysisResults(playerDataId, results) {
       match_id: playerDataId,
       tempo_index: tempo_results.tempo_index || 0,
       avg_pass_speed: tempo_results.avg_pass_speed || 0,
-      touch_time: tempo_results.touch_time || 0,
-      seq_rate: tempo_results.seq_rate || 0,
+      touch_to_pass: tempo_results.touch_to_pass || 0,
+      sequences_per_min: tempo_results.sequences_per_min || 0,
+      execution_accuracy: tempo_results.execution_accuracy || 0,
+      created_at: new Date().toISOString(),
     });
   }
 
@@ -182,7 +187,8 @@ async function storeAnalysisResults(playerDataId, results) {
     const tempoEvents = event_array.map((event) => ({
       player_id: playerData.player_id,
       match_id: playerDataId,
-      event_data: event,
+      event: event,
+      created_at: new Date().toISOString(),
     }));
 
     if (tempoEvents.length > 0) {
@@ -217,8 +223,9 @@ async function storeAnalysisResults(playerDataId, results) {
   const reportData = {
     player_id: playerData.player_id,
     report_type: "match_analysis",
-    period_start: playerData.match_date,
-    period_end: playerData.match_date,
+    period_start:
+      playerData.match_date || new Date().toISOString().split("T")[0],
+    period_end: playerData.match_date || new Date().toISOString().split("T")[0],
     summary_json: {
       gr4de_score: scoring_metrics?.overall_score || 0,
       tempo_index: tempo_results?.tempo_index || 0,
@@ -230,9 +237,7 @@ async function storeAnalysisResults(playerDataId, results) {
       benchmarks: benchmark_comparison || {},
     },
     pdf_url: pdfUrl,
-    processing_queue_id: jobId,
-    gr4de_score: scoring_metrics?.overall_score || 0,
-    tempo_index: tempo_results?.tempo_index || 0,
+    created_at: new Date().toISOString(),
   };
 
   const { data: report, error: reportError } = await supabase
@@ -248,30 +253,31 @@ async function storeAnalysisResults(playerDataId, results) {
  * Create notification alerts
  */
 async function createNotificationAlerts(playerDataId, results) {
-  // Get user info
+  // Get user info directly from users table
   const { data: playerData, error: dataError } = await supabase
     .from("player_data")
-    .select(
-      `
-      player_id,
-      players!inner(user_id),
-      players.users!inner(email)
-    `
-    )
+    .select("player_id")
     .eq("id", playerDataId)
     .single();
 
   if (dataError) throw dataError;
 
-  const userId = playerData.players.user_id;
-  const userEmail = playerData.players.users.email;
+  const userId = playerData.player_id;
+
+  // Get user email
+  const { data: user, error: userError } = await supabase
+    .from("users")
+    .select("email, phone")
+    .eq("id", userId)
+    .single();
+
+  if (userError) throw userError;
 
   // Create email alert
   await supabase.from("alerts").insert({
     user_id: userId,
-    player_id: playerData.player_id,
     type: "email",
-    channel: userEmail,
+    status: "pending",
     subject: "Your GR4DE Report is Ready!",
     message: `Your performance analysis report is now available. GR4DE Score: ${
       results.scoring_metrics?.overall_score || "N/A"
@@ -279,30 +285,29 @@ async function createNotificationAlerts(playerDataId, results) {
     metadata: {
       report_type: "match_analysis",
       gr4de_score: results.scoring_metrics?.overall_score || 0,
-      report_id: report.report_id,
+      report_id: report?.report_id,
       pdf_url: pdfUrl,
     },
-    processing_queue_id: jobId,
-    report_id: report.report_id,
+    created_at: new Date().toISOString(),
   });
 
-  // Create WhatsApp alert (placeholder - no actual sending logic)
-  await supabase.from("alerts").insert({
-    user_id: userId,
-    player_id: playerData.player_id,
-    type: "whatsapp",
-    channel: "whatsapp", // Placeholder
-    subject: "Report Ready",
-    message: `Your GR4DE report is ready! Score: ${
-      results.scoring_metrics?.overall_score || "N/A"
-    }`,
-    metadata: {
-      report_type: "match_analysis",
-      gr4de_score: results.scoring_metrics?.overall_score || 0,
-      report_id: report.report_id,
-      pdf_url: pdfUrl,
-    },
-    processing_queue_id: jobId,
-    report_id: report.report_id,
-  });
+  // Create WhatsApp alert if phone exists
+  if (user.phone) {
+    await supabase.from("alerts").insert({
+      user_id: userId,
+      type: "whatsapp",
+      status: "pending",
+      subject: "Report Ready",
+      message: `Your GR4DE report is ready! Score: ${
+        results.scoring_metrics?.overall_score || "N/A"
+      }`,
+      metadata: {
+        report_type: "match_analysis",
+        gr4de_score: results.scoring_metrics?.overall_score || 0,
+        report_id: report?.report_id,
+        pdf_url: pdfUrl,
+      },
+      created_at: new Date().toISOString(),
+    });
+  }
 }

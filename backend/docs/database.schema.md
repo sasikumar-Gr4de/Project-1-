@@ -1,269 +1,337 @@
 ```sql
--- ROLE ENUM
-DO $$ BEGIN
-  CREATE TYPE user_role AS ENUM ('player', 'coach', 'admin');
-EXCEPTION WHEN duplicate_object THEN null;
-END $$;
+-- =========================================
+-- USERS (Players, Coaches, Admins)
+-- =========================================
+create table if not exists public.users (
+  id uuid primary key default gen_random_uuid(),
 
-ALTER TABLE users
-  ADD COLUMN IF NOT EXISTS role user_role DEFAULT 'player',
-  ADD COLUMN IF NOT EXISTS tier_plan TEXT DEFAULT 'free',
-  ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT NULL,
-  ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'active',
-  ADD COLUMN IF NOT EXISTS avatar_url TEXT NULL;
+  -- Identity
+  role text not null default 'player'
+    check (role in ('player','coach','admin')),
+  player_name text,
+  date_of_birth date,
+  position text,
+  academy text,
+  country text,
+  avatar_url text,
 
-create table public.subscriptions (
-  id uuid not null default extensions.uuid_generate_v4 (),
-  user_id uuid not null,
-  stripe_subscription_id text null,
-  stripe_customer_id text null,
-  plan_type text not null,
-  status text not null,
-  current_period_start timestamp with time zone null,
-  current_period_end timestamp with time zone null,
-  created_at timestamp with time zone null default now(),
-  updated_at timestamp with time zone null default now(),
-  constraint subscriptions_pkey primary key (id),
-  constraint subscriptions_stripe_subscription_id_key unique (stripe_subscription_id),
-  constraint subscriptions_user_id_fkey foreign KEY (user_id) references users (id),
-  constraint subscriptions_plan_type_check check (
-    (
-      plan_type = any (array['basic'::text, 'pro'::text, 'elite'::text])
-    )
-  ),
-  constraint subscriptions_status_check check (
-    (
-      status = any (
-        array[
-          'active'::text,
-          'canceled'::text,
-          'past_due'::text,
-          'unpaid'::text
-        ]
-      )
-    )
-  )
-) TABLESPACE pg_default;
+  -- Contact/Auth
+  email varchar,
+  phone varchar,
 
-CREATE TABLE IF NOT EXISTS players (
-  player_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid NULL REFERENCES users(id) ON DELETE SET NULL,
-  status TEXT DEFAULT 'active',
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
+  -- Stripe
+  stripe_customer_id text,
+  tier_plan text not null default 'free'
+    check (tier_plan in ('free','basic','pro')),
+  status text,
+
+  -- Meta
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
 );
 
-CREATE TABLE IF NOT EXISTS player_identity (
-  player_id uuid PRIMARY KEY REFERENCES players(player_id) ON DELETE CASCADE,
-  first_name TEXT,
-  last_name TEXT,
-  dob DATE,
-  nationality TEXT,
-  height_cm INT,
-  weight_kg INT,
-  preferred_foot TEXT CHECK (preferred_foot IN ('left','right','both')),
-  positions TEXT[],
-  headshot_url TEXT,
-  guardian_name TEXT,
-  guardian_email TEXT,
-  guardian_phone TEXT,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
+-- =========================================
+-- AUTH OTP (Email / WhatsApp Login)
+-- =========================================
+create table if not exists public.auth_otp (
+  id uuid primary key default gen_random_uuid(),
+  email text,
+  phone text,
+  otp text not null,
+  expires_at timestamptz not null,
+  used boolean default false,
+  created_at timestamptz default now()
 );
 
-CREATE TABLE IF NOT EXISTS player_passport (
-  passport_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  player_id uuid REFERENCES players(player_id) ON DELETE CASCADE,
-  current_club TEXT,
-  season TEXT,
-  squad_level TEXT,
-  shirt_number TEXT,
-  notes TEXT,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
+create index if not exists idx_auth_otp_email on public.auth_otp(email);
+create index if not exists idx_auth_otp_phone on public.auth_otp(phone);
+create index if not exists idx_auth_otp_expires on public.auth_otp(expires_at);
+
+
+-- =========================================
+-- PLAYER IDENTITIES (Digital Passport)
+-- =========================================
+create table if not exists public.player_identity (
+  player_id uuid primary key references public.users(id) on delete cascade,
+  first_name text,
+  last_name text,
+  dob date,
+  nationality text,
+  height_cm int,
+  weight_kg int,
+  preferred_foot text check (preferred_foot in ('left','right','both')),
+  positions text[],
+  headshot_url text,
+  guardian_name text,
+  guardian_email text,
+  guardian_phone text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
 );
 
-CREATE TABLE IF NOT EXISTS player_data (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  player_id uuid REFERENCES players(player_id) ON DELETE CASCADE,
-  video_url TEXT NULL,
-  gps_url TEXT NULL,
-  event_json jsonb NULL,
-  match_date DATE,
-  upload_source TEXT,
-  created_at timestamptz DEFAULT now()
+create table if not exists public.player_passport (
+  passport_id uuid primary key default gen_random_uuid(),
+  player_id uuid references public.users(id) on delete cascade,
+  current_club text,
+  season text,
+  squad_level text,
+  shirt_number text,
+  notes text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
 );
 
-CREATE TABLE IF NOT EXISTS processing_queue (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  player_data_id uuid REFERENCES player_data(id) ON DELETE CASCADE,
-  status TEXT CHECK (status IN ('pending','processing','completed','failed')) DEFAULT 'pending',
-  logs TEXT,
-  retries INT DEFAULT 0,
-  started_at timestamptz NULL,
-  completed_at timestamptz NULL,
-  created_at timestamptz DEFAULT now()
+
+-- =========================================
+-- PLAYER VERIFICATION DOCUMENTS
+-- =========================================
+create table if not exists public.player_verifications (
+  verification_id uuid primary key default gen_random_uuid(),
+  player_id uuid references public.users(id) on delete cascade,
+  document_type text check (document_type in ('passport','club_letter','consent')),
+  file_url text,
+  status text default 'pending' check (status in ('pending','approved','rejected')),
+  reviewed_by uuid references public.users(id),
+  reviewed_at timestamptz,
+  hash_sha256 text,
+  created_at timestamptz default now()
 );
 
-CREATE TABLE IF NOT EXISTS player_metrics (
-  metric_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  player_id uuid REFERENCES players(player_id) ON DELETE CASCADE,
+
+create table if not exists public.player_metrics (
+  metric_id uuid primary key default gen_random_uuid(),
+  player_id uuid references public.users(id) on delete cascade,
   match_id uuid,
-  date DATE,
-  competition TEXT,
-  minutes INT,
+  date date,
+  competition text,
+  minutes int,
   gps_summary jsonb,
   event_summary jsonb,
-  gr4de_score NUMERIC,
+  gr4de_score numeric,
   benchmarks jsonb,
-  source TEXT,
-  raw_file_url TEXT,
-  created_at timestamptz DEFAULT now()
+  source text,
+  raw_file_url text,
+  created_at timestamptz default now()
 );
 
-CREATE INDEX IF NOT EXISTS idx_player_metrics_player_date
-  ON player_metrics (player_id, date DESC);
+create index if not exists idx_player_metrics_player_date
+on public.player_metrics (player_id, date desc);
 
-CREATE TABLE IF NOT EXISTS player_reports (
-  report_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  player_id uuid REFERENCES players(player_id) ON DELETE CASCADE,
-  report_type TEXT,
-  period_start DATE,
-  period_end DATE,
-  summary_json jsonb,
-  pdf_url TEXT,
-  created_at timestamptz DEFAULT now(),
-  CONSTRAINT unique_report_period UNIQUE (player_id, period_start, period_end, report_type)
-);
-
-CREATE TABLE IF NOT EXISTS player_media (
-  media_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  player_id uuid REFERENCES players(player_id) ON DELETE CASCADE,
-  media_type TEXT CHECK (media_type IN ('video','image','link')),
-  title TEXT,
-  description TEXT,
-  url TEXT,
-  created_at timestamptz DEFAULT now()
-);
-
-CREATE TABLE IF NOT EXISTS player_verifications (
-  verification_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  player_id uuid REFERENCES players(player_id) ON DELETE CASCADE,
-  document_type TEXT CHECK (document_type IN ('passport','club_letter','consent')),
-  file_url TEXT,
-  status TEXT CHECK (status IN ('pending','approved','rejected')) DEFAULT 'pending',
-  reviewed_by uuid REFERENCES users(id),
-  reviewed_at timestamptz,
-  hash_sha256 TEXT,
-  review_note TEXT,
-  created_at timestamptz DEFAULT now()
-);
-
-CREATE TABLE IF NOT EXISTS tempo_benchmarks (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  level TEXT,
-  position TEXT,
-  avg_pass_speed NUMERIC,
-  touch_time NUMERIC,
-  sequences_per_min NUMERIC
-);
-
-CREATE TABLE IF NOT EXISTS tempo_events (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  player_id uuid REFERENCES players(player_id),
-  match_id uuid,
-  event_data jsonb,
-  created_at timestamptz DEFAULT now()
-);
-
-CREATE TABLE IF NOT EXISTS tempo_player_match (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  player_id uuid REFERENCES players(player_id),
-  match_id uuid,
-  tempo_index NUMERIC,
-  avg_pass_speed NUMERIC,
-  touch_time NUMERIC,
-  seq_rate NUMERIC,
-  created_at timestamptz DEFAULT now()
-);
-
-CREATE TABLE IF NOT EXISTS tempo_match (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  match_id uuid,
-  team_tempo NUMERIC,
-  accuracy NUMERIC,
-  created_at timestamptz DEFAULT now()
-);
-
-CREATE TABLE IF NOT EXISTS modules (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name TEXT NOT NULL,
-  key TEXT UNIQUE NOT NULL,
-  description TEXT,
-  created_at timestamptz DEFAULT now()
-);
-
-CREATE TABLE IF NOT EXISTS plans (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  key TEXT UNIQUE NOT NULL,
-  name TEXT NOT NULL,
-  price NUMERIC DEFAULT 0,
-  tier INT NOT NULL,
-  created_at timestamptz DEFAULT now()
-);
-
-CREATE TABLE IF NOT EXISTS plan_modules (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  plan_id uuid REFERENCES plans(id) ON DELETE CASCADE,
-  module_id uuid REFERENCES modules(id) ON DELETE CASCADE,
-  limit_value INT NULL,
-  UNIQUE (plan_id, module_id)
-);
-
-CREATE TABLE IF NOT EXISTS role_modules (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  role user_role NOT NULL,
-  module_id uuid REFERENCES modules(id) ON DELETE CASCADE,
-  force_allow BOOLEAN DEFAULT FALSE,
-  force_deny BOOLEAN DEFAULT FALSE,
-  UNIQUE (role, module_id)
-);
-
-CREATE TABLE IF NOT EXISTS user_usage (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid REFERENCES users(id),
-  module_key TEXT NOT NULL,
-  used_count INT DEFAULT 0,
-  period_start timestamptz NOT NULL,
-  period_end timestamptz NOT NULL,
-  created_at timestamptz DEFAULT now(),
-  UNIQUE (user_id, module_key, period_start, period_end)
-);
-
-CREATE TABLE IF NOT EXISTS alerts (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid REFERENCES users(id),
-  player_id uuid REFERENCES players(player_id),
-  type TEXT CHECK (type IN ('email','whatsapp')),
-  channel TEXT,
-  subject TEXT,
-  message TEXT,
-  metadata jsonb,
-  status TEXT CHECK (status IN ('pending','sent','failed')) DEFAULT 'pending',
-  sent_at timestamptz NULL,
-  error TEXT NULL,
-  created_at timestamptz DEFAULT now()
-);
-
-CREATE TABLE IF NOT EXISTS audit_logs (
-  log_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  actor_id uuid REFERENCES users(id),
-  entity TEXT,
+create table if not exists public.audit_logs (
+  log_id uuid primary key default gen_random_uuid(),
+  actor_id uuid references public.users(id),
+  entity text,
   entity_id uuid,
-  action TEXT,
+  action text,
   diff_json jsonb,
-  created_at timestamptz DEFAULT now()
+  created_at timestamptz default now()
 );
+
+
+-- =========================================
+-- USER SUBSCRIPTIONS (Stripe)
+-- =========================================
+create table if not exists public.subscriptions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.users(id) on delete cascade,
+
+  stripe_subscription_id text unique,
+  stripe_customer_id text,
+
+  plan_type text not null check(plan_type in ('free','basic','pro')),
+  status text not null check(status in ('active','canceled','past_due','unpaid')),
+
+  current_period_start timestamptz,
+  current_period_end timestamptz,
+
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+-- =========================================
+-- FEATURE MODULES (Premium Feature Flags)
+-- =========================================
+create table if not exists public.feature_modules (
+  id serial primary key,
+  module_key text unique,
+  module_name text,
+  description text
+);
+
+-- =========================================
+-- PLAN-MODULE ACCESS MATRIX
+-- =========================================
+create table if not exists public.plan_module_access (
+  plan text references public.users(tier_plan) on delete cascade,
+  module_key text references public.feature_modules(module_key),
+  primary key(plan, module_key)
+);
+
+create table if not exists public.player_reports (
+  report_id uuid primary key default gen_random_uuid(),
+  player_id uuid references public.users(id) on delete cascade,
+  report_type text,
+  period_start date,
+  period_end date,
+  summary_json jsonb,
+  pdf_url text,
+  created_at timestamptz default now(),
+  unique(player_id, period_start, period_end, report_type)
+);
+
+create table if not exists public.player_media (
+  media_id uuid primary key default gen_random_uuid(),
+  player_id uuid references public.users(id) on delete cascade,
+  media_type text check (media_type in ('video','image','link')),
+  title text,
+  description text,
+  url text,
+  created_at timestamptz default now()
+);
+
+
+-- =========================================
+-- PLAYER RAW UPLOADS
+-- =========================================
+create table if not exists public.player_data (
+  id uuid primary key default gen_random_uuid(),
+  player_id uuid references public.users(id) on delete cascade,
+  match_id text,
+  file_url text,
+  file_type text check (file_type in ('video','gps','csv')),
+  status text default 'uploaded' check(status in ('uploaded','parsed','failed')),
+  metadata jsonb,
+  created_at timestamptz default now()
+);
+
+
+create table if not exists public.events (
+  id uuid primary key default gen_random_uuid(),
+  player_data_id uuid references public.player_data(id) on delete cascade,
+  player_id uuid references public.users(id),
+  event jsonb,
+  created_at timestamptz default now()
+);
+
+create table if not exists public.gps_data (
+  id uuid primary key default gen_random_uuid(),
+  player_data_id uuid references public.player_data(id) on delete cascade,
+  player_id uuid references public.users(id),
+  metric jsonb,
+  created_at timestamptz default now()
+);
+
+-- =========================================
+-- PROCESSING QUEUE (Scoring Pipeline)
+-- =========================================
+create table if not exists public.processing_queue (
+  id uuid primary key default gen_random_uuid(),
+  player_data_id uuid references public.player_data(id),
+  status text default 'pending'
+    check(status in ('pending','processing','completed','failed')),
+  logs text,
+  started_at timestamptz,
+  completed_at timestamptz,
+  created_at timestamptz default now()
+);
+
+create table if not exists public.scores (
+  id uuid primary key default gen_random_uuid(),
+  player_id uuid references public.users(id),
+  player_data_id uuid references public.player_data(id),
+  score_json jsonb,
+  overall_score int,
+  technical numeric,
+  tactical numeric,
+  physical numeric,
+  mental numeric,
+  growth_bonus numeric,
+  created_at timestamptz default now()
+);
+
+create table if not exists public.reports (
+  id uuid primary key default gen_random_uuid(),
+  player_id uuid references public.users(id),
+  player_data_id uuid references public.player_data(id),
+  pdf_url text,
+  score_json jsonb,
+  overall_score int check (overall_score between 0 and 100),
+  status text default 'generated'
+    check(status in ('generating','generated','failed')),
+  created_at timestamptz default now()
+);
+
+create table if not exists public.benchmarks (
+  id uuid primary key default gen_random_uuid(),
+  position text,
+  metric text,
+  mean_value numeric,
+  std_dev numeric,
+  percentile_10 numeric,
+  percentile_50 numeric,
+  percentile_90 numeric,
+  updated_at timestamptz default now()
+);
+
+create table if not exists public.trajectories (
+  player_id uuid primary key references public.users(id),
+  trend_slope numeric,
+  velocity numeric,
+  stability numeric,
+  updated_at timestamptz default now()
+);
+
+create table if not exists public.tempo_events (
+  id uuid primary key default gen_random_uuid(),
+  player_id uuid references public.users(id),
+  match_id uuid,
+  event jsonb,
+  created_at timestamptz default now()
+);
+
+create table if not exists public.tempo_player_match (
+  id uuid primary key default gen_random_uuid(),
+  player_id uuid references public.users(id),
+  match_id uuid,
+  tempo_index numeric,
+  avg_pass_speed numeric,
+  touch_to_pass numeric,
+  sequences_per_min numeric,
+  execution_accuracy numeric,
+  created_at timestamptz default now()
+);
+
+create table if not exists public.tempo_benchmarks (
+  id uuid primary key default gen_random_uuid(),
+  position text,
+  age_group text,
+  metric text,
+  mean numeric,
+  std_dev numeric,
+  created_at timestamptz default now()
+);
+
+create table if not exists public.alerts (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references public.users(id),
+  type text check(type in ('email','whatsapp')),
+  status text default 'pending',
+  subject text,
+  message text,
+  metadata jsonb,
+  created_at timestamptz default now()
+);
+
+create table if not exists public.passport_public_links (
+  id uuid primary key default gen_random_uuid(),
+  player_id uuid references public.users(id),
+  token text unique not null,
+  expires_at timestamptz,
+  is_active boolean default true,
+  created_at timestamptz default now()
+);
+
+
 
 ```
 

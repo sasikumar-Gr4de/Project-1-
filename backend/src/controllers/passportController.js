@@ -1,6 +1,45 @@
 import * as passportService from "../services/passportService.js";
 import { RESPONSES } from "../utils/messages.js";
 
+// Add missing controller functions
+export const createPlayerPassport = async (req, res) => {
+  try {
+    const { player_id } = req.params;
+    const passportData = req.body;
+    const passport = await passportService.createPlayerPassport(
+      player_id,
+      passportData
+    );
+    res.json(
+      RESPONSES.SUCCESS("Player passport created successfully", passport)
+    );
+  } catch (error) {
+    console.error("Create player passport error:", error);
+    res
+      .status(500)
+      .json(RESPONSES.SERVER_ERROR("Failed to create player passport"));
+  }
+};
+
+export const updatePlayerPassport = async (req, res) => {
+  try {
+    const { player_id } = req.params;
+    const passportData = req.body;
+    const passport = await passportService.updatePlayerPassport(
+      player_id,
+      passportData
+    );
+    res.json(
+      RESPONSES.SUCCESS("Player passport updated successfully", passport)
+    );
+  } catch (error) {
+    console.error("Update player passport error:", error);
+    res
+      .status(500)
+      .json(RESPONSES.SERVER_ERROR("Failed to update player passport"));
+  }
+};
+
 export const getPlayerPassport = async (req, res) => {
   try {
     const { player_id } = req.params;

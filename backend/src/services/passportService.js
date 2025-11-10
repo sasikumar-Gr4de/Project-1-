@@ -1,16 +1,48 @@
 import { supabase } from "../config/supabase.config.js";
 
+// Add missing service functions
+export const createPlayerPassport = async (playerId, passportData) => {
+  const { data, error } = await supabase
+    .from("player_passport")
+    .insert({
+      player_id: playerId,
+      ...passportData,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
+export const updatePlayerPassport = async (playerId, passportData) => {
+  const { data, error } = await supabase
+    .from("player_passport")
+    .update({
+      ...passportData,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("player_id", playerId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
 export const getPlayerPassport = async (playerId) => {
   try {
     const [identity, passport, metrics, reports, media, verifications] =
       await Promise.all([
         supabase
-          .from("player_identities")
+          .from("player_identity")
           .select("*")
           .eq("player_id", playerId)
           .single(),
         supabase
-          .from("player_passports")
+          .from("player_passport")
           .select("*")
           .eq("player_id", playerId)
           .single(),
@@ -75,7 +107,7 @@ export const getPlayerPassport = async (playerId) => {
 export const createPlayerIdentity = async (playerId, identityData) => {
   try {
     const { data, error } = await supabase
-      .from("player_identities")
+      .from("player_identity")
       .upsert({
         player_id: playerId,
         ...identityData,
@@ -90,7 +122,7 @@ export const createPlayerIdentity = async (playerId, identityData) => {
 
     await createAuditLog(
       playerId,
-      "player_identities",
+      "player_identity",
       data.player_id,
       "create",
       {
@@ -109,7 +141,7 @@ export const getVerificationStatus = async (playerId) => {
   try {
     const [identity, verifications] = await Promise.all([
       supabase
-        .from("player_identities")
+        .from("player_identity")
         .select("*")
         .eq("player_id", playerId)
         .single(),
@@ -192,19 +224,18 @@ export const uploadVerificationDocument = async (playerId, documentData) => {
 export const updateHeadshot = async (playerId, headshotUrl) => {
   try {
     const { data, error } = await supabase
-      .from("player_identities")
+      .from("player_identity")
       .upsert({
         player_id: playerId,
         headshot_url: headshotUrl,
         updated_at: new Date().toISOString(),
       })
-      .eq("player_id", playerId)
       .select()
       .single();
 
     if (error) throw error;
 
-    await createAuditLog(playerId, "player_identities", playerId, "update", {
+    await createAuditLog(playerId, "player_identity", playerId, "update", {
       headshot_updated: true,
     });
 
@@ -362,7 +393,7 @@ export const restartVerificationProcess = async (playerId) => {
   try {
     // Delete player identity
     const { error: deleteIdentityError } = await supabase
-      .from("player_identities")
+      .from("player_identity")
       .delete()
       .eq("player_id", playerId);
 
@@ -373,18 +404,6 @@ export const restartVerificationProcess = async (playerId) => {
       .from("player_verifications")
       .select("*")
       .eq("player_id", playerId);
-
-    // // Reset verification process
-    // const { error: processError } = await supabase
-    //   .from("verification_process")
-    //   .update({
-    //     current_step: "identity",
-    //     status: "in_progress",
-    //     updated_at: new Date().toISOString(),
-    //   })
-    //   .eq("player_id", playerId);
-
-    // if (processError) throw processError;
 
     await createAuditLog(
       playerId,

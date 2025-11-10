@@ -9,6 +9,7 @@ const userAPI = {
   getReports: (page = 1, limit = 10) =>
     api.get(`/users/reports?page=${page}&limit=${limit}`),
   getReport: (reportId) => api.get(`/users/reports/${reportId}`),
+  getFeatures: () => api.get("/features"),
 };
 
 export const useUserStore = create((set, get) => ({
@@ -17,6 +18,7 @@ export const useUserStore = create((set, get) => ({
   reports: [],
   currentReport: null,
   subscription: null,
+  features: null,
   pagination: {
     page: 1,
     pageSize: 10,
@@ -78,6 +80,33 @@ export const useUserStore = create((set, get) => ({
       console.error("Failed to check feature access:", error);
       return { hasAccess: false, reason: "Error checking access" };
     }
+  },
+
+  // Get features
+  fetchFeatures: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await userAPI.getFeatures();
+      if (response.data.success) {
+        set({
+          features: response.data.data.features,
+          isLoading: false,
+        });
+        return response.data.data.features;
+      }
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Failed to fetch features",
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  // Check if feature is enabled
+  hasFeature: (featureKey) => {
+    const features = get().features;
+    return features?.[featureKey]?.enabled || false;
   },
 
   // Get Dashboard Data
@@ -165,6 +194,8 @@ export const useUserStore = create((set, get) => ({
       dashboardData: null,
       reports: [],
       currentReport: null,
+      subscription: null,
+      features: null,
       pagination: {
         page: 1,
         pageSize: 10,

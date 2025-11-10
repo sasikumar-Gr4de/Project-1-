@@ -2,24 +2,23 @@ import api from "@/services/base.api";
 
 export const passportService = {
   // Passport
-  getPlayerPassport: (playerId) =>
-    api.get(`/passport/players/${playerId}/passport`),
+  getPlayerPassport: () => api.get(`/passport/v1/player/passport`),
 
-  // Identity
-  updatePlayerIdentity: (playerId, identityData) =>
-    api.post(`/passport/players/${playerId}/identity`, identityData),
+  updatePlayerPassport: (data) => api.put(`/passport/v1/player/passport`, data),
 
-  uploadHeadshot: (playerId, headshotUrl) =>
-    api.patch(`/passport/players/${playerId}/headshot`, {
-      headshot_url: headshotUrl,
-    }),
+  uploadPassportFiles: (data) =>
+    api.post(`/passport/v1/player/passport/files`, data),
 
-  // Verification - FIXED: Added missing getVerificationStatus function
-  getVerificationStatus: (playerId) =>
-    api.get(`/passport/players/${playerId}/verifications`),
+  getVerificationStatus: () => api.get(`/passport/v1/player/passport/status`),
 
-  uploadVerification: (playerId, documentData) =>
-    api.post(`/passport/players/${playerId}/verifications`, documentData),
+  createShareLink: (data) =>
+    api.post(`/passport/v1/player/passport/share/create`, data),
+
+  revokeShareLink: (data) =>
+    api.post(`/passport/v1/player/passport/share/revoke`, data),
+
+  getPublicPassport: (token) =>
+    api.get(`/passport/v1/player/passport/public/${token}`),
 
   // Metrics
   ingestPlayerMetrics: (playerId, metricsData) =>
@@ -35,6 +34,6 @@ export const passportService = {
   reviewVerification: (verificationId, reviewData) =>
     api.post(`/verifications/${verificationId}/review`, reviewData),
 
-  restartVerification: (playerId) =>
-    api.post(`/passport/players/${playerId}/verifications/restart`),
+  restartVerification: () =>
+    api.post(`/passport/v1/player/verifications/restart`),
 };

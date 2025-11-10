@@ -1,6 +1,17 @@
 import { create } from "zustand";
 import { passportService } from "@/services/passport.service";
 
+// Passport API methods
+const passportAPI = {
+  getPassport: () => passportService.getPlayerPassport(),
+  updatePassport: (data) => passportService.updatePlayerPassport(data),
+  uploadFiles: (data) => passportService.uploadPassportFiles(data),
+  getStatus: () => passportService.getVerificationStatus(),
+  createShareLink: (data) => passportService.createShareLink(data),
+  revokeShareLink: (data) => passportService.revokeShareLink(data),
+  getPublicPassport: (token) => passportService.getPublicPassport(token),
+};
+
 export const usePassportStore = create((set, get) => ({
   // State
   passport: null,
@@ -8,6 +19,7 @@ export const usePassportStore = create((set, get) => ({
   isLoading: false,
   error: null,
   pendingVerifications: null,
+  shareLink: null,
 
   // Actions
   setLoading: (loading) => set({ isLoading: loading }),
@@ -15,10 +27,10 @@ export const usePassportStore = create((set, get) => ({
   clearError: () => set({ error: null }),
 
   // Passport
-  fetchPlayerPassport: async (playerId) => {
+  fetchPlayerPassport: async () => {
     set({ isLoading: true, error: null });
     try {
-      const response = await passportService.getPlayerPassport(playerId);
+      const response = await passportAPI.getPassport();
       set({
         passport: response.data,
         isLoading: false,
@@ -34,13 +46,12 @@ export const usePassportStore = create((set, get) => ({
   },
 
   // Identity
-  updatePlayerIdentity: async (playerId, identityData) => {
+  updatePlayerIdentity: async (identityData) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await passportService.updatePlayerIdentity(
-        playerId,
-        identityData
-      );
+      const response = await passportAPI.updatePassport({
+        identity: identityData,
+      });
 
       // Update local state
       const currentPassport = get().passport;
@@ -48,7 +59,7 @@ export const usePassportStore = create((set, get) => ({
         set({
           passport: {
             ...currentPassport,
-            identity: { ...currentPassport.identity, ...response.data },
+            identity: { ...currentPassport.identity, ...identityData },
           },
           isLoading: false,
         });
@@ -65,13 +76,13 @@ export const usePassportStore = create((set, get) => ({
     }
   },
 
-  uploadHeadshot: async (playerId, headshotUrl) => {
+  uploadHeadshot: async (headshotUrl) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await passportService.uploadHeadshot(
-        playerId,
-        headshotUrl
-      );
+      const response = await passportAPI.uploadFiles({
+        file_url: headshotUrl,
+        file_type: "headshot",
+      });
 
       // Update local state
       const currentPassport = get().passport;
@@ -99,13 +110,13 @@ export const usePassportStore = create((set, get) => ({
     }
   },
 
-  // Verification - FIXED: Added missing getVerificationStatus function
-  getVerificationStatus: async (playerId) => {
+  // Verification
+  getVerificationStatus: async () => {
     set({ isLoading: true, error: null });
     try {
-      const response = await passportService.getVerificationStatus(playerId);
+      const response = await passportAPI.getStatus();
       set({
-        verificationStatus: response.data.data,
+        verificationStatus: response.data,
         isLoading: false,
       });
       return response.data;
@@ -120,16 +131,17 @@ export const usePassportStore = create((set, get) => ({
     }
   },
 
-  uploadVerification: async (playerId, documentData) => {
+  uploadVerification: async (documentData) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await passportService.uploadVerification(
-        playerId,
-        documentData
-      );
+      const response = await passportAPI.uploadFiles({
+        file_url: documentData.file_url,
+        file_type: "document",
+        document_type: documentData.document_type,
+      });
 
       // Refresh verification status to get updated state
-      await get().getVerificationStatus(playerId);
+      await get().getVerificationStatus();
 
       set({ isLoading: false });
       return response.data;
@@ -194,17 +206,59 @@ export const usePassportStore = create((set, get) => ({
     }
   },
 
+  // Share link management
+  createShareLink: async (expiresInDays = 30) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await passportAPI.createShareLink({
+        expires_in_days: expiresInDays,
+      });
+      set({
+        shareLink: response.data,
+        isLoading: false,
+      });
+      return response.data;
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Failed to create share link",
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  revokeShareLink: async (shareToken) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await passportAPI.revokeShareLink({
+        share_token: shareToken,
+      });
+      set({
+        shareLink: null,
+        isLoading: false,
+      });
+      return response.data;
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Failed to revoke share link",
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
   clearPassport: () =>
     set({
       passport: null,
       verificationStatus: null,
       pendingVerifications: null,
+      shareLink: null,
     }),
 
-  restartVerification: async (playerId) => {
+  restartVerification: async () => {
     set({ isLoading: true, error: null });
     try {
-      const response = await passportService.restartVerification(playerId);
+      const response = await passportService.restartVerification();
 
       if (response.status !== 200) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -214,7 +268,7 @@ export const usePassportStore = create((set, get) => ({
 
       if (data.success) {
         // Refresh verification status to get updated state
-        await get().getVerificationStatus(playerId);
+        await get().getVerificationStatus();
 
         set({ isLoading: false });
         return data.data;

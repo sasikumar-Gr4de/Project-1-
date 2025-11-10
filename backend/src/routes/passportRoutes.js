@@ -3,11 +3,19 @@ import { authenticateToken, requireRole } from "../middleware/auth.js";
 import { supabase } from "../config/supabase.config.js";
 import { RESPONSES } from "../utils/messages.js";
 import crypto from "crypto";
+import {
+  createPlayerPassport,
+  updatePlayerPassport,
+} from "../controllers/passportController.js";
 
 const router = express.Router();
 
 // All passport routes require authentication
 router.use(authenticateToken);
+
+// Passport CRUD routes
+router.post("/:player_id/passport", createPlayerPassport);
+router.put("/:player_id/passport", updatePlayerPassport);
 
 /**
  * Get player's passport data
@@ -16,27 +24,25 @@ router.get("/v1/player/passport", async (req, res) => {
   try {
     const { id: userId } = req.user;
 
-    // Get player record
-    const { data: player, error: playerError } = await supabase
-      .from("players")
-      .select("player_id, status, passport_status")
-      .eq("user_id", userId)
+    // Get user record directly
+    const { data: user, error: userError } = await supabase
+      .from("users")
+      .select("id, tier_plan")
+      .eq("id", userId)
       .single();
 
-    if (playerError) {
-      if (playerError.code === "PGRST116") {
-        return res
-          .status(404)
-          .json(RESPONSES.NOT_FOUND("Player profile not found"));
+    if (userError) {
+      if (userError.code === "PGRST116") {
+        return res.status(404).json(RESPONSES.NOT_FOUND("User not found"));
       }
-      throw playerError;
+      throw userError;
     }
 
     // Get identity information
     const { data: identity, error: identityError } = await supabase
       .from("player_identity")
       .select("*")
-      .eq("player_id", player.player_id)
+      .eq("player_id", userId)
       .single();
 
     if (identityError && identityError.code !== "PGRST116") {
@@ -47,7 +53,7 @@ router.get("/v1/player/passport", async (req, res) => {
     const { data: passport, error: passportError } = await supabase
       .from("player_passport")
       .select("*")
-      .eq("player_id", player.player_id)
+      .eq("player_id", userId)
       .single();
 
     if (passportError && passportError.code !== "PGRST116") {
@@ -58,7 +64,7 @@ router.get("/v1/player/passport", async (req, res) => {
     const { data: verifications, error: verificationsError } = await supabase
       .from("player_verifications")
       .select("*")
-      .eq("player_id", player.player_id)
+      .eq("player_id", userId)
       .order("created_at", { ascending: false });
 
     if (verificationsError) throw verificationsError;
@@ -67,7 +73,7 @@ router.get("/v1/player/passport", async (req, res) => {
     const { data: reports, error: reportsError } = await supabase
       .from("player_reports")
       .select("report_id, report_type, summary_json, pdf_url, created_at")
-      .eq("player_id", player.player_id)
+      .eq("player_id", userId)
       .order("created_at", { ascending: false })
       .limit(10);
 
@@ -77,7 +83,7 @@ router.get("/v1/player/passport", async (req, res) => {
     const { data: metrics, error: metricsError } = await supabase
       .from("player_metrics")
       .select("gr4de_score, date, competition, benchmarks")
-      .eq("player_id", player.player_id)
+      .eq("player_id", userId)
       .order("date", { ascending: false })
       .limit(5);
 
@@ -86,29 +92,23 @@ router.get("/v1/player/passport", async (req, res) => {
     // Get tempo data
     const { data: tempoData, error: tempoError } = await supabase
       .from("tempo_player_match")
-      .select("tempo_index, avg_pass_speed, touch_time, seq_rate, created_at")
-      .eq("player_id", player.player_id)
+      .select(
+        "tempo_index, avg_pass_speed, touch_to_pass, sequences_per_min, execution_accuracy, created_at"
+      )
+      .eq("player_id", userId)
       .order("created_at", { ascending: false })
       .limit(5);
 
     if (tempoError) throw tempoError;
-
-    // Check subscription tier for feature gating
-    const { data: user, error: userError } = await supabase
-      .from("users")
-      .select("tier_plan")
-      .eq("id", userId)
-      .single();
-
-    if (userError) throw userError;
 
     const tier = user.tier_plan || "free";
 
     res.json(
       RESPONSES.SUCCESS("Passport data retrieved", {
         player: {
-          ...player,
+          id: userId,
           tier,
+          passport_status: passport?.status || "draft",
         },
         identity: identity || null,
         passport: passport || null,
@@ -134,16 +134,7 @@ router.put("/v1/player/passport", async (req, res) => {
     const { id: userId } = req.user;
     const { passport: passportData, identity: identityData } = req.body;
 
-    // Get player record
-    const { data: player, error: playerError } = await supabase
-      .from("players")
-      .select("player_id")
-      .eq("user_id", userId)
-      .single();
-
-    if (playerError) throw playerError;
-
-    const playerId = player.player_id;
+    const playerId = userId;
 
     // Update identity if provided
     if (identityData) {
@@ -215,10 +206,12 @@ router.put("/v1/player/passport", async (req, res) => {
       ).data;
 
     if (hasIdentity && hasPassport) {
-      await supabase
-        .from("players")
-        .update({ passport_status: "pending_review" })
-        .eq("player_id", playerId);
+      // Ensure passport exists and update status
+      await supabase.from("player_passport").upsert({
+        player_id: playerId,
+        status: "pending_review",
+        updated_at: new Date().toISOString(),
+      });
     }
 
     res.json(RESPONSES.SUCCESS("Passport updated successfully"));
@@ -236,16 +229,7 @@ router.post("/v1/player/passport/files", async (req, res) => {
     const { id: userId } = req.user;
     const { file_url, file_type, document_type } = req.body;
 
-    // Get player record
-    const { data: player, error: playerError } = await supabase
-      .from("players")
-      .select("player_id")
-      .eq("user_id", userId)
-      .single();
-
-    if (playerError) throw playerError;
-
-    const playerId = player.player_id;
+    const playerId = userId;
 
     if (file_type === "headshot") {
       // Update headshot in identity
@@ -277,20 +261,11 @@ router.get("/v1/player/passport/status", async (req, res) => {
   try {
     const { id: userId } = req.user;
 
-    // Get player record
-    const { data: player, error: playerError } = await supabase
-      .from("players")
-      .select("player_id, passport_status")
-      .eq("user_id", userId)
-      .single();
-
-    if (playerError) throw playerError;
-
-    // Get verification counts
+    // Get verification counts directly using userId as player_id
     const { data: verifications, error: verificationsError } = await supabase
       .from("player_verifications")
       .select("status, verification_badge")
-      .eq("player_id", player.player_id);
+      .eq("player_id", userId);
 
     if (verificationsError) throw verificationsError;
 
@@ -307,9 +282,18 @@ router.get("/v1/player/passport/status", async (req, res) => {
       ),
     };
 
+    // Get passport status from player_passport table
+    const { data: passport, error: passportError } = await supabase
+      .from("player_passport")
+      .select("status")
+      .eq("player_id", userId)
+      .maybeSingle();
+
+    if (passportError) throw passportError;
+
     res.json(
       RESPONSES.SUCCESS("Passport status retrieved", {
-        passport_status: player.passport_status,
+        passport_status: passport?.status || "draft",
         verification_stats: verificationStats,
       })
     );
@@ -329,15 +313,6 @@ router.post("/v1/player/passport/share/create", async (req, res) => {
     const { id: userId } = req.user;
     const { expires_in_days = 30 } = req.body;
 
-    // Get player record
-    const { data: player, error: playerError } = await supabase
-      .from("players")
-      .select("player_id")
-      .eq("user_id", userId)
-      .single();
-
-    if (playerError) throw playerError;
-
     // Generate secure token
     const shareToken = crypto.randomBytes(32).toString("hex");
     const expiresAt = new Date();
@@ -345,12 +320,13 @@ router.post("/v1/player/passport/share/create", async (req, res) => {
 
     // Create share record
     const { data: share, error: shareError } = await supabase
-      .from("player_passport_shares")
+      .from("passport_public_links")
       .insert({
-        player_id: player.player_id,
-        share_token: shareToken,
+        player_id: userId,
+        token: shareToken,
         expires_at: expiresAt.toISOString(),
-        created_by: userId,
+        is_active: true,
+        created_at: new Date().toISOString(),
       })
       .select()
       .single();
@@ -378,25 +354,14 @@ router.post("/v1/player/passport/share/revoke", async (req, res) => {
     const { id: userId } = req.user;
     const { share_token } = req.body;
 
-    // Get player record
-    const { data: player, error: playerError } = await supabase
-      .from("players")
-      .select("player_id")
-      .eq("user_id", userId)
-      .single();
-
-    if (playerError) throw playerError;
-
     // Revoke share
     const { data: share, error: shareError } = await supabase
-      .from("player_passport_shares")
+      .from("passport_public_links")
       .update({
         is_active: false,
-        revoked_at: new Date().toISOString(),
-        revoked_by: userId,
       })
-      .eq("share_token", share_token)
-      .eq("player_id", player.player_id)
+      .eq("token", share_token)
+      .eq("player_id", userId)
       .select()
       .single();
 
@@ -425,19 +390,9 @@ router.get("/v1/player/passport/public/:token", async (req, res) => {
 
     // Validate share token
     const { data: share, error: shareError } = await supabase
-      .from("player_passport_shares")
-      .select(
-        `
-        player_id,
-        expires_at,
-        is_active,
-        players!inner(
-          player_id,
-          passport_status
-        )
-      `
-      )
-      .eq("share_token", token)
+      .from("passport_public_links")
+      .select("player_id, expires_at, is_active")
+      .eq("token", token)
       .single();
 
     if (shareError) {
@@ -532,9 +487,15 @@ router.get("/v1/player/passport/public/:token", async (req, res) => {
     const publicData = {
       identity: identity
         ? {
-            ...identity,
+            first_name: identity.first_name,
+            last_name: identity.last_name,
             age, // Show age instead of DOB
-            dob: undefined, // Remove DOB
+            nationality: identity.nationality,
+            height_cm: identity.height_cm,
+            weight_kg: identity.weight_kg,
+            preferred_foot: identity.preferred_foot,
+            positions: identity.positions,
+            headshot_url: identity.headshot_url,
           }
         : null,
       passport: passport || null,
@@ -636,8 +597,8 @@ router.post(
 
         if (hasPassport && hasClubLetter) {
           await supabase
-            .from("players")
-            .update({ passport_status: "verified" })
+            .from("player_passport")
+            .update({ status: "verified" })
             .eq("player_id", playerId);
         }
       }

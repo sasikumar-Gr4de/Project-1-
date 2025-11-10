@@ -76,7 +76,7 @@ const Upload = () => {
   // Poll queue status
   const pollQueueStatus = async (id) => {
     try {
-      const response = await api.get(`/queue/${id}/status`);
+      const response = await api.get(`/queue/v1/queue/${id}/status`);
       const status = response.data.data;
 
       setQueueStatus(status);
@@ -179,7 +179,7 @@ const Upload = () => {
         });
       }, 500);
 
-      const response = await api.post("/upload", uploadPayload);
+      const response = await api.post("/upload/v1/uploads", uploadPayload);
 
       clearInterval(interval);
       setUploadProgress(100);

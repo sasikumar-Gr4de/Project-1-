@@ -18,37 +18,17 @@ export const createUpload = async (req, res) => {
       metadata = {},
     } = req.body;
 
-    // Get or create player record
-    let { data: player, error: playerError } = await supabase
-      .from("players")
-      .select("player_id")
-      .eq("user_id", userId)
-      .single();
-
-    if (playerError && playerError.code === "PGRST116") {
-      // Player doesn't exist, create one
-      const { data: newPlayer, error: createError } = await supabase
-        .from("players")
-        .insert({ user_id: userId })
-        .select("player_id")
-        .single();
-
-      if (createError) throw createError;
-      player = newPlayer;
-    } else if (playerError) {
-      throw playerError;
-    }
-
-    // Insert player_data record
+    // Insert player_data record directly using userId as player_id
     const { data: playerData, error: dataError } = await supabase
       .from("player_data")
       .insert({
-        player_id: player.player_id,
+        player_id: userId,
         video_url,
         gps_url,
-        event_json,
-        match_date,
-        upload_source,
+        file_type: video_url ? "video" : gps_url ? "gps" : "csv",
+        status: "uploaded",
+        metadata,
+        created_at: new Date().toISOString(),
       })
       .select()
       .single();
@@ -62,6 +42,7 @@ export const createUpload = async (req, res) => {
         player_data_id: playerData.id,
         status: QUEUE_STATUS.PENDING,
         idempotency_key: `upload_${playerData.id}_${Date.now()}`,
+        created_at: new Date().toISOString(),
       })
       .select()
       .single();
@@ -72,7 +53,7 @@ export const createUpload = async (req, res) => {
     callModelServer({
       job_id: queueItem.id,
       player_data_id: playerData.id,
-      player_id: player.player_id,
+      player_id: userId,
       video_url,
       gps_url,
       event_json_url: null, // For now, event_json is stored directly
