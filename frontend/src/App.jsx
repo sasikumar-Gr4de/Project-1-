@@ -46,6 +46,7 @@ import SubscriptionSuccess from "@/pages/Subscription/SubscriptionSuccess";
 import Unauthorized from "@/pages/Error/Unauthorized";
 import NotFoundPage from "@/pages/Error/NotFoundPage";
 import AppLoading from "@/components/common/AppLoading";
+import PublicPassport from "@/pages/Public/PublicPassport";
 
 import { ToastProvider } from "@/contexts/ToastContext";
 
@@ -75,6 +76,7 @@ function App() {
           {/* Public Routes */}
           <Route path="/" element={<Landing />} />
           <Route path="/server-upload" element={<ServerFileUpload />} />
+          <Route path="/passport/public/:token" element={<PublicPassport />} />
           <Route
             path="/login"
             element={

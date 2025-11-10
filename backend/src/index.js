@@ -11,6 +11,7 @@ import uploadRoutes from "./routes/uploadRoutes.js";
 import dataRoutes from "./routes/dataRoutes.js";
 import passportRoutes from "./routes/passportRoutes.js";
 import verficationRoutes from "./routes/verificationRoutes.js";
+import passportRoutesV1 from "./routes/passportRoutes.js";
 import queueRoutes from "./routes/queueRoutes.js";
 import featuresRoutes from "./routes/featuresRoutes.js";
 
@@ -54,6 +55,7 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api/data", dataRoutes);
 app.use("/api/passport", passportRoutes);
 app.use("/api/verifications", verficationRoutes);
+app.use("/api", passportRoutesV1);
 app.use("/api/queue", queueRoutes);
 app.use("/api/features", featuresRoutes);
 

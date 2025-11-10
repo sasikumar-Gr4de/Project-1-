@@ -4,6 +4,39 @@ ALTER TABLE subscriptions ADD CONSTRAINT subscriptions_plan_type_check CHECK (
   plan_type = ANY (ARRAY['free'::text, 'basic'::text, 'pro'::text])
 );
 
+-- Create player_passport_shares table for public sharing
+CREATE TABLE IF NOT EXISTS player_passport_shares (
+  share_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  player_id uuid REFERENCES players(player_id) ON DELETE CASCADE,
+  share_token TEXT UNIQUE NOT NULL,
+  expires_at timestamptz NOT NULL,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_by uuid REFERENCES users(id),
+  created_at timestamptz DEFAULT now(),
+  revoked_at timestamptz NULL,
+  revoked_by uuid REFERENCES users(id)
+);
+
+-- Add indexes for performance
+CREATE INDEX IF NOT EXISTS idx_player_passport_shares_token ON player_passport_shares(share_token);
+CREATE INDEX IF NOT EXISTS idx_player_passport_shares_player ON player_passport_shares(player_id);
+CREATE INDEX IF NOT EXISTS idx_player_passport_shares_active ON player_passport_shares(is_active, expires_at);
+
+-- Add verification workflow columns to player_verifications
+ALTER TABLE player_verifications
+  ADD COLUMN IF NOT EXISTS verification_badge TEXT CHECK (verification_badge IN ('identity_verified', 'club_verified')),
+  ADD COLUMN IF NOT EXISTS badge_granted_at timestamptz NULL,
+  ADD COLUMN IF NOT EXISTS badge_expires_at timestamptz NULL;
+
+-- Add passport status tracking
+ALTER TABLE players
+  ADD COLUMN IF NOT EXISTS passport_status TEXT DEFAULT 'draft' CHECK (passport_status IN ('draft', 'pending_review', 'verified', 'rejected'));
+
+-- Add guardian consent tracking for minors
+ALTER TABLE player_identity
+  ADD COLUMN IF NOT EXISTS guardian_consent_given BOOLEAN DEFAULT FALSE,
+  ADD COLUMN IF NOT EXISTS consent_date DATE NULL;
+
 -- Add missing columns to processing_queue for idempotency and retry logic
 ALTER TABLE processing_queue
   ADD COLUMN IF NOT EXISTS idempotency_key TEXT UNIQUE,
