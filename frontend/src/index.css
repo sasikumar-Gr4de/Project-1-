@@ -25,7 +25,9 @@
   
   --color-secondary: #9ae619;
   --color-secondary-foreground: #16191f;
-  
+
+  --color-placeholder: #B0AFAF;
+
   /* Semantic colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);

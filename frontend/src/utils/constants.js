@@ -40,19 +40,80 @@ export const REPORT_STATUS = {
   FAILED: "failed",
 };
 
-// Football Positions
 export const FOOTBALL_POSITIONS = [
-  "Goalkeeper",
-  "Center Back",
-  "Full Back",
-  "Wing Back",
-  "Defensive Midfielder",
-  "Central Midfielder",
-  "Attacking Midfielder",
-  "Winger",
-  "Striker",
-  "Forward",
+  // Goalkeeper
+  "GK",
+
+  // Defenders
+  "CB",
+  "LB",
+  "RB",
+  "LWB",
+  "RWB",
+  "SW",
+
+  // Midfielders
+  "CDM",
+  "CM",
+  "CAM",
+  "LM",
+  "RM",
+  "LW",
+  "RW",
+
+  // Forwards
+  "CF",
+  "ST",
+  "SS",
 ];
+
+export const JERSEY_COLORS = [
+  "Red",
+  "Blue",
+  "White",
+  "Black",
+  "Green",
+  "Yellow",
+  "Orange",
+  "Purple",
+  "Pink",
+  "Gray",
+  "Navy",
+  "Royal Blue",
+  "Sky Blue",
+  "Maroon",
+  "Burgundy",
+  "Teal",
+  "Gold",
+  "Silver",
+];
+
+export const POSITION_DESCRIPTIONS = {
+  GK: "Goalkeeper",
+  CB: "Center Back",
+  LB: "Left Back",
+  RB: "Right Back",
+  LWB: "Left Wing Back",
+  RWB: "Right Wing Back",
+  SW: "Sweeper",
+  CDM: "Defensive Midfielder",
+  CM: "Central Midfielder",
+  CAM: "Attacking Midfielder",
+  LM: "Left Midfielder",
+  RM: "Right Midfielder",
+  LW: "Left Winger",
+  RW: "Right Winger",
+  CF: "Center Forward",
+  ST: "Striker",
+  SS: "Second Striker",
+};
+
+export const POSITION_CATEGORIES = {
+  Goalkeeper: ["GK"],
+  Defender: ["CB", "LB", "RB", "LWB", "RWB", "SW"],
+  Midfielder: ["CDM", "CM", "CAM", "LM", "RM"],
+  Forward: ["LW", "RW", "CF", "ST", "SS"],
+};
 
 // Age Groups
 export const AGE_GROUPS = [

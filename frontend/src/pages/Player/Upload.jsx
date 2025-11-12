@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useUserStore } from "@/store/userStore";
 import {
   Card,
@@ -25,8 +25,6 @@ import {
   Video,
   FileText,
   Calendar,
-  CheckCircle,
-  AlertCircle,
   Shirt,
   MapPin,
   Palette,
@@ -34,6 +32,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/contexts/ToastContext";
 import { useDataStore } from "@/store/dataStore";
+import { FOOTBALL_POSITIONS, JERSEY_COLORS } from "@/utils/constants";
 import api from "@/services/base.api";
 
 const Upload = () => {
@@ -225,42 +224,6 @@ const Upload = () => {
     uploadData.opponent_jersey_color;
   uploadData.position && !isUploading;
 
-  // Position options
-  const positionOptions = [
-    "Goalkeeper",
-    "Center Back",
-    "Full Back",
-    "Wing Back",
-    "Defensive Midfielder",
-    "Central Midfielder",
-    "Attacking Midfielder",
-    "Winger",
-    "Striker",
-    "Forward",
-  ];
-
-  // Jersey color options
-  const jerseyColors = [
-    "Red",
-    "Blue",
-    "White",
-    "Black",
-    "Green",
-    "Yellow",
-    "Orange",
-    "Purple",
-    "Pink",
-    "Gray",
-    "Navy",
-    "Royal Blue",
-    "Sky Blue",
-    "Maroon",
-    "Burgundy",
-    "Teal",
-    "Gold",
-    "Silver",
-  ];
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -269,7 +232,7 @@ const Upload = () => {
           <h1 className="text-4xl font-bold font-['Orbitron'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
             Upload Match Data
           </h1>
-          <p className="text-[#B0AFAF] text-lg mt-2 font-['Orbitron']">
+          <p className="text-placeholder text-lg mt-2 font-['Orbitron']">
             Upload your match video and GPS data for performance analysis
           </p>
         </div>
@@ -290,7 +253,7 @@ const Upload = () => {
                     Queue ID: {queueId}
                   </Badge>
                   {queueStatus.logs && (
-                    <span className="text-xs text-[#B0AFAF]">
+                    <span className="text-xs text-placeholder">
                       {queueStatus.logs}
                     </span>
                   )}
@@ -310,7 +273,7 @@ const Upload = () => {
                 <span className="text-sm font-medium text-white ">
                   Processing upload...
                 </span>
-                <span className="text-sm text-[#B0AFAF] ">
+                <span className="text-sm text-placeholder ">
                   {uploadProgress}%
                 </span>
               </div>
@@ -318,7 +281,7 @@ const Upload = () => {
                 value={uploadProgress}
                 className="w-full bg-[#343434]"
               />
-              <p className="text-xs text-[#B0AFAF] ">
+              <p className="text-xs text-placeholder ">
                 Please don't close this window while your data is being
                 processed.
               </p>
@@ -337,7 +300,7 @@ const Upload = () => {
                 <Video className="w-5 h-5 text-primary" />
                 <span>Match Video</span>
               </CardTitle>
-              <CardDescription className="text-[#B0AFAF] ">
+              <CardDescription className="text-placeholder ">
                 Upload your match video footage (MP4, MOV, AVI up to 100MB)
               </CardDescription>
             </CardHeader>
@@ -359,7 +322,7 @@ const Upload = () => {
                 <FileText className="w-5 h-5 text-primary" />
                 <span>GPS Data (Optional)</span>
               </CardTitle>
-              <CardDescription className="text-[#B0AFAF] ">
+              <CardDescription className="text-placeholder ">
                 Upload GPS tracking data in CSV or JSON format
               </CardDescription>
             </CardHeader>
@@ -374,6 +337,74 @@ const Upload = () => {
               />
             </CardContent>
           </Card>
+          {/* Upload Status */}
+          <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
+            <CardHeader>
+              <CardTitle className="text-white ">Upload Status</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-white ">Video File</span>
+                {files.video ? (
+                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30 ">
+                    Uploaded
+                  </Badge>
+                ) : (
+                  <Badge
+                    variant="outline"
+                    className="bg-[#343434] text-placeholder border-[#343434] "
+                  >
+                    Required
+                  </Badge>
+                )}
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-white ">GPS Data</span>
+                {files.gps ? (
+                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30 ">
+                    Uploaded
+                  </Badge>
+                ) : (
+                  <Badge
+                    variant="outline"
+                    className="bg-[#343434] text-placeholder border-[#343434] "
+                  >
+                    Optional
+                  </Badge>
+                )}
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-white ">Match Details</span>
+                {uploadData.match_date ? (
+                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30 ">
+                    Complete
+                  </Badge>
+                ) : (
+                  <Badge
+                    variant="outline"
+                    className="bg-[#343434] text-placeholder border-[#343434] "
+                  >
+                    Required
+                  </Badge>
+                )}
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-white ">Player Info</span>
+                {uploadData.jersey_number || uploadData.position ? (
+                  <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 ">
+                    Added
+                  </Badge>
+                ) : (
+                  <Badge
+                    variant="outline"
+                    className="bg-[#343434] text-placeholder border-[#343434] "
+                  >
+                    Optional
+                  </Badge>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Right Column - Match Details */}
@@ -381,7 +412,7 @@ const Upload = () => {
           <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
             <CardHeader>
               <CardTitle className="text-white ">Match Details</CardTitle>
-              <CardDescription className="text-[#B0AFAF] ">
+              <CardDescription className="text-placeholder ">
                 Provide information about the match and your participation
               </CardDescription>
             </CardHeader>
@@ -392,14 +423,14 @@ const Upload = () => {
                   Match Date *
                 </label>
                 <div className="relative">
-                  <Calendar className="absolute left-3 top-3 h-4 w-4 text-[#B0AFAF]" />
+                  <Calendar className="absolute left-3 top-3 h-4 w-4 text-placeholder" />
                   <Input
                     type="date"
                     value={uploadData.match_date}
                     onChange={(e) =>
                       handleInputChange("match_date", e.target.value)
                     }
-                    className="pl-10 h-11 bg-[#1A1A1A] border-[#343434] text-white placeholder:text-[#B0AFAF] focus:border-primary "
+                    className="pl-10 h-11 bg-[#1A1A1A] border-[#343434] text-white placeholder:text-placeholder focus:border-primary "
                     required
                   />
                 </div>
@@ -417,7 +448,7 @@ const Upload = () => {
                   onChange={(e) =>
                     handleInputChange("competition", e.target.value)
                   }
-                  className="h-11 bg-[#1A1A1A] border-[#343434] text-white placeholder:text-[#B0AFAF] focus:border-primary "
+                  className="h-11 bg-[#1A1A1A] border-[#343434] text-white placeholder:text-placeholder focus:border-primary "
                 />
               </div>
 
@@ -433,7 +464,7 @@ const Upload = () => {
                   onChange={(e) =>
                     handleInputChange("opponent", e.target.value)
                   }
-                  className="h-11 bg-[#1A1A1A] border-[#343434] text-white placeholder:text-[#B0AFAF] focus:border-primary "
+                  className="h-11 bg-[#1A1A1A] border-[#343434] text-white placeholder:text-placeholder focus:border-primary "
                 />
               </div>
 
@@ -449,7 +480,7 @@ const Upload = () => {
                   onChange={(e) =>
                     handleInputChange("location", e.target.value)
                   }
-                  className="h-11 bg-[#1A1A1A] border-[#343434] text-white placeholder:text-[#B0AFAF] focus:border-primary "
+                  className="h-11 bg-[#1A1A1A] border-[#343434] text-white placeholder:text-placeholder focus:border-primary "
                 />
               </div>
 
@@ -465,58 +496,34 @@ const Upload = () => {
                   placeholder="e.g., 90"
                   value={uploadData.minutes}
                   onChange={(e) => handleInputChange("minutes", e.target.value)}
-                  className="h-11 bg-[#1A1A1A] border-[#343434] text-white placeholder:text-[#B0AFAF] focus:border-primary "
+                  className="h-11 bg-[#1A1A1A] border-[#343434] text-white placeholder:text-placeholder focus:border-primary "
                 />
               </div>
 
               {/* Jersey Number and Position */}
-              <div className="grid grid-cols-2 gap-4">
-                {/* Jersey Number */}
+              <div className="space-y-4">
+                {/* Position - Full width on mobile */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-white ">
-                    Jersey Number
-                  </label>
-                  <div className="relative">
-                    <Shirt className="absolute left-3 top-3 h-4 w-4 text-[#B0AFAF]" />
-                    <Input
-                      type="number"
-                      min="1"
-                      max="99"
-                      placeholder="e.g., 7"
-                      value={uploadData.jersey_number}
-                      onChange={(e) =>
-                        handleInputChange("jersey_number", e.target.value)
-                      }
-                      className="pl-10 h-11 bg-[#1A1A1A] border-[#343434] text-white placeholder:text-[#B0AFAF] focus:border-primary "
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Jersey Colors */}
-              <div className="grid grid-cols-3 gap-4">
-                {/* Position */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white ">
+                  <label className="text-sm font-medium text-white">
                     Position
                   </label>
                   <div className="relative">
-                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-[#B0AFAF] z-10" />
+                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-placeholder z-10" />
                     <Select
                       value={uploadData.position}
                       onValueChange={(value) =>
                         handleInputChange("position", value)
                       }
                     >
-                      <SelectTrigger className="pl-10 h-11 bg-[#1A1A1A] border-[#343434] text-white focus:border-primary ">
+                      <SelectTrigger className="pl-10 h-11 bg-[#1A1A1A] border-[#343434] text-white focus:border-primary w-full">
                         <SelectValue placeholder="Select position" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#262626] border-[#343434] text-white ">
-                        {positionOptions.map((position) => (
+                      <SelectContent className="bg-[#262626] border-[#343434] text-white w-full">
+                        {FOOTBALL_POSITIONS.map((position) => (
                           <SelectItem
                             key={position}
                             value={position}
-                            className=""
+                            className="w-full"
                           >
                             {position}
                           </SelectItem>
@@ -526,81 +533,92 @@ const Upload = () => {
                   </div>
                 </div>
 
-                {/* Your Jersey Color */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white ">
-                    Your Jersey Color
-                  </label>
-                  <div className="relative">
-                    <Palette className="absolute left-3 top-3 h-4 w-4 text-[#B0AFAF] z-10" />
-                    <Select
-                      value={uploadData.jersey_color}
-                      onValueChange={(value) =>
-                        handleInputChange("jersey_color", value)
-                      }
-                    >
-                      <SelectTrigger className="pl-10 h-11 bg-[#1A1A1A] border-[#343434] text-white focus:border-primary ">
-                        <SelectValue placeholder="Select color" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#262626] border-[#343434] text-white  max-h-60">
-                        {jerseyColors.map((color) => (
-                          <SelectItem key={color} value={color} className="">
-                            <div className="flex items-center space-x-2">
-                              <div
-                                className="w-4 h-4 rounded border border-[#343434]"
-                                style={{
-                                  backgroundColor: color.toLowerCase(),
-                                  borderColor:
-                                    color.toLowerCase() === "white"
-                                      ? "#343434"
-                                      : "transparent",
-                                }}
-                              />
-                              <span>{color}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                {/* Jersey Colors - Side by side on larger screens */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Your Jersey Color */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-white">
+                      Your Jersey Color
+                    </label>
+                    <div className="relative">
+                      <Palette className="absolute left-3 top-3 h-4 w-4 text-placeholder z-10" />
+                      <Select
+                        value={uploadData.jersey_color}
+                        onValueChange={(value) =>
+                          handleInputChange("jersey_color", value)
+                        }
+                      >
+                        <SelectTrigger className="pl-10 h-11 bg-[#1A1A1A] border-[#343434] text-white focus:border-primary w-full">
+                          <SelectValue placeholder="Select color" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#262626] border-[#343434] text-white max-h-60 w-full">
+                          {JERSEY_COLORS.map((color) => (
+                            <SelectItem
+                              key={color}
+                              value={color}
+                              className="w-full"
+                            >
+                              <div className="flex items-center space-x-2 w-full">
+                                <div
+                                  className="w-4 h-4 rounded border border-[#343434] shrink-0"
+                                  style={{
+                                    backgroundColor: color.toLowerCase(),
+                                    borderColor:
+                                      color.toLowerCase() === "white"
+                                        ? "#343434"
+                                        : "transparent",
+                                  }}
+                                />
+                                <span className="truncate">{color}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                </div>
 
-                {/* Opponent Jersey Color */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-white ">
-                    Opponent Jersey Color
-                  </label>
-                  <div className="relative">
-                    <Palette className="absolute left-3 top-3 h-4 w-4 text-[#B0AFAF] z-10" />
-                    <Select
-                      value={uploadData.opponent_jersey_color}
-                      onValueChange={(value) =>
-                        handleInputChange("opponent_jersey_color", value)
-                      }
-                    >
-                      <SelectTrigger className="pl-10 h-11 bg-[#1A1A1A] border-[#343434] text-white focus:border-primary ">
-                        <SelectValue placeholder="Select color" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#262626] border-[#343434] text-white  max-h-60">
-                        {jerseyColors.map((color) => (
-                          <SelectItem key={color} value={color} className="">
-                            <div className="flex items-center space-x-2">
-                              <div
-                                className="w-4 h-4 rounded border border-[#343434]"
-                                style={{
-                                  backgroundColor: color.toLowerCase(),
-                                  borderColor:
-                                    color.toLowerCase() === "white"
-                                      ? "#343434"
-                                      : "transparent",
-                                }}
-                              />
-                              <span>{color}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  {/* Opponent Jersey Color */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-white">
+                      Opponent Jersey Color
+                    </label>
+                    <div className="relative">
+                      <Palette className="absolute left-3 top-3 h-4 w-4 text-placeholder z-10" />
+                      <Select
+                        value={uploadData.opponent_jersey_color}
+                        onValueChange={(value) =>
+                          handleInputChange("opponent_jersey_color", value)
+                        }
+                      >
+                        <SelectTrigger className="pl-10 h-11 bg-[#1A1A1A] border-[#343434] text-white focus:border-primary w-full">
+                          <SelectValue placeholder="Select color" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#262626] border-[#343434] text-white max-h-60 w-full">
+                          {JERSEY_COLORS.map((color) => (
+                            <SelectItem
+                              key={color}
+                              value={color}
+                              className="w-full"
+                            >
+                              <div className="flex items-center space-x-2 w-full">
+                                <div
+                                  className="w-4 h-4 rounded border border-[#343434] shrink-0"
+                                  style={{
+                                    backgroundColor: color.toLowerCase(),
+                                    borderColor:
+                                      color.toLowerCase() === "white"
+                                        ? "#343434"
+                                        : "transparent",
+                                  }}
+                                />
+                                <span className="truncate">{color}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -615,7 +633,7 @@ const Upload = () => {
                   value={uploadData.notes}
                   onChange={(e) => handleInputChange("notes", e.target.value)}
                   rows={4}
-                  className="bg-[#1A1A1A] border-[#343434] text-white placeholder:text-[#B0AFAF] focus:border-primary "
+                  className="bg-[#1A1A1A] border-[#343434] text-white placeholder:text-placeholder focus:border-primary "
                 />
               </div>
 
@@ -624,7 +642,7 @@ const Upload = () => {
                 <h4 className="text-sm font-medium text-white ">
                   Upload Requirements
                 </h4>
-                <ul className="text-sm text-[#B0AFAF] space-y-1 ">
+                <ul className="text-sm text-placeholder space-y-1 ">
                   <li>• Video must be clear and show full gameplay</li>
                   <li>• Minimum video length: 15 minutes</li>
                   <li>• Maximum video size: 100MB</li>
@@ -643,7 +661,7 @@ const Upload = () => {
               <Button
                 type="submit"
                 disabled={!canSubmit}
-                className="w-full h-11 bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold disabled:bg-[#343434] disabled:text-[#B0AFAF] transition-all duration-300 "
+                className="w-full h-11 bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold disabled:bg-[#343434] disabled:text-placeholder transition-all duration-300 "
                 size="lg"
               >
                 {isUploading ? (
@@ -655,75 +673,6 @@ const Upload = () => {
                   "Submit for Analysis"
                 )}
               </Button>
-            </CardContent>
-          </Card>
-
-          {/* Upload Status */}
-          <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
-            <CardHeader>
-              <CardTitle className="text-white ">Upload Status</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-white ">Video File</span>
-                {files.video ? (
-                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30 ">
-                    Uploaded
-                  </Badge>
-                ) : (
-                  <Badge
-                    variant="outline"
-                    className="bg-[#343434] text-[#B0AFAF] border-[#343434] "
-                  >
-                    Required
-                  </Badge>
-                )}
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-white ">GPS Data</span>
-                {files.gps ? (
-                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30 ">
-                    Uploaded
-                  </Badge>
-                ) : (
-                  <Badge
-                    variant="outline"
-                    className="bg-[#343434] text-[#B0AFAF] border-[#343434] "
-                  >
-                    Optional
-                  </Badge>
-                )}
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-white ">Match Details</span>
-                {uploadData.match_date ? (
-                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30 ">
-                    Complete
-                  </Badge>
-                ) : (
-                  <Badge
-                    variant="outline"
-                    className="bg-[#343434] text-[#B0AFAF] border-[#343434] "
-                  >
-                    Required
-                  </Badge>
-                )}
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-white ">Player Info</span>
-                {uploadData.jersey_number || uploadData.position ? (
-                  <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 ">
-                    Added
-                  </Badge>
-                ) : (
-                  <Badge
-                    variant="outline"
-                    className="bg-[#343434] text-[#B0AFAF] border-[#343434] "
-                  >
-                    Optional
-                  </Badge>
-                )}
-              </div>
             </CardContent>
           </Card>
         </div>
