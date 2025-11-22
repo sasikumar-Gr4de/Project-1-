@@ -183,7 +183,7 @@ const DataTable = ({
                 {actions && (
                   <th className="h-15 px-3 text-left align-middle font-semibold text-white whitespace-nowrap text-sm uppercase tracking-wide w-20 rounded-tr-xl">
                     <div className="flex items-center space-x-2">
-                      <span className="text-sm whitespace-nowrap text-[#B0AFAF]">
+                      <span className="text-sm whitespace-nowrap text-placeholder">
                         Items per page
                       </span>
                       <Select disabled value={itemsPerPage.toString()}>
@@ -266,7 +266,7 @@ const DataTable = ({
         {emptyStateTitle}
       </h4>
 
-      <p className="text-[#B0AFAF] max-w-md mb-6 text-sm ">
+      <p className="text-placeholder max-w-md mb-6 text-sm ">
         {searchTerm
           ? "No records match your search criteria. Try adjusting your search terms."
           : emptyStateDescription}
@@ -288,12 +288,12 @@ const DataTable = ({
   const EmptySearchState = () => (
     <div className="flex flex-col items-center justify-center py-12 px-4 text-center bg-[#262626] rounded-xl border border-[#343434] min-h-[200px]">
       <div className="w-14 h-14 bg-[#343434] rounded-full flex items-center justify-center mb-4">
-        <Search className="w-6 h-6 text-[#B0AFAF]" />
+        <Search className="w-6 h-6 text-placeholder" />
       </div>
       <h4 className="text-md font-semibold text-white mb-2 ">
         No results found
       </h4>
-      <p className="text-[#B0AFAF] mb-4 text-sm ">
+      <p className="text-placeholder mb-4 text-sm ">
         No records match "
         <span className="font-medium text-white">"{searchTerm}"</span>
       </p>
@@ -362,7 +362,7 @@ const DataTable = ({
                     {actions && (
                       <th className="h-15 px-3 text-left align-middle font-semibold text-white whitespace-nowrap text-sm uppercase tracking-wide w-20 rounded-tr-xl ">
                         <div className="flex items-center space-x-2 order-2 sm:order-1">
-                          <span className="text-sm whitespace-nowrap text-[#B0AFAF] ">
+                          <span className="text-sm whitespace-nowrap text-placeholder ">
                             Items per page
                           </span>
                           <Select
@@ -452,7 +452,7 @@ const DataTable = ({
                         key={colIndex}
                         className="flex justify-between items-start"
                       >
-                        <span className="text-xs font-medium text-[#B0AFAF] uppercase tracking-wide ">
+                        <span className="text-xs font-medium text-placeholder uppercase tracking-wide ">
                           {column.header}:
                         </span>
                         <div className="text-right max-w-[60%]">
@@ -486,7 +486,7 @@ const DataTable = ({
                             key={colIndex}
                             className="flex justify-between items-start"
                           >
-                            <span className="text-xs font-medium text-[#B0AFAF] uppercase tracking-wide ">
+                            <span className="text-xs font-medium text-placeholder uppercase tracking-wide ">
                               {column.header}:
                             </span>
                             <div className="text-right max-w-[60%]">
@@ -536,7 +536,7 @@ const DataTable = ({
       {!isLoading && displayTotal > 0 && (
         <div className="flex flex-col sm:flex-row items-center justify-end gap-4 p-4 border-[#343434] bg-[#262626] rounded-xl">
           {/* Results info */}
-          <div className="text-sm text-[#B0AFAF] ">
+          <div className="text-sm text-placeholder ">
             <span className="font-medium text-white">
               {(currentPage - 1) * itemsPerPage + 1}
             </span>{" "}
@@ -584,7 +584,7 @@ const DataTable = ({
                 disabled={page === "..."}
                 className={
                   page === "..."
-                    ? "h-8 w-8 p-0 border-0 cursor-default text-[#B0AFAF] bg-transparent "
+                    ? "h-8 w-8 p-0 border-0 cursor-default text-placeholder bg-transparent "
                     : `h-8 w-8 p-0 min-w-8  ${
                         currentPage === page
                           ? "bg-primary text-[#0F0F0E] border-primary"

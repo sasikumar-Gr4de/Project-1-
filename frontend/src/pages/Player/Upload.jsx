@@ -215,7 +215,6 @@ const Upload = () => {
   };
 
   // Check all required fields
-
   const canSubmit =
     files.video &&
     uploadData.match_date &&
@@ -232,7 +231,7 @@ const Upload = () => {
           <h1 className="text-4xl font-bold font-['Orbitron'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
             Upload Match Data
           </h1>
-          <p className="text-placeholder text-lg mt-2 font-['Orbitron']">
+          <p className="text-(--muted-text) text-lg mt-2 font-['Orbitron']">
             Upload your match video and GPS data for performance analysis
           </p>
         </div>
@@ -253,7 +252,7 @@ const Upload = () => {
                     Queue ID: {queueId}
                   </Badge>
                   {queueStatus.logs && (
-                    <span className="text-xs text-placeholder">
+                    <span className="text-xs text-(--muted-text)">
                       {queueStatus.logs}
                     </span>
                   )}
@@ -266,22 +265,22 @@ const Upload = () => {
 
       {/* Upload Progress */}
       {isUploading && (
-        <Card className="bg-[#262626] border-[#343434]">
+        <Card className="bg-(--surface-1) border-(--surface-2)">
           <CardContent className="p-6">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-white ">
                   Processing upload...
                 </span>
-                <span className="text-sm text-placeholder ">
+                <span className="text-sm text-(--muted-text) ">
                   {uploadProgress}%
                 </span>
               </div>
               <Progress
                 value={uploadProgress}
-                className="w-full bg-[#343434]"
+                className="w-full bg-(--surface-2)"
               />
-              <p className="text-xs text-placeholder ">
+              <p className="text-xs text-(--muted-text) ">
                 Please don't close this window while your data is being
                 processed.
               </p>
@@ -294,13 +293,13 @@ const Upload = () => {
         {/* Left Column - File Uploads */}
         <div className="space-y-6">
           {/* Video Upload */}
-          <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
+          <Card className="bg-(--surface-1) border-(--surface-2) hover:border-primary/30 transition-all duration-300">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2 text-white ">
                 <Video className="w-5 h-5 text-primary" />
                 <span>Match Video</span>
               </CardTitle>
-              <CardDescription className="text-placeholder ">
+              <CardDescription className="text-(--muted-text) ">
                 Upload your match video footage (MP4, MOV, AVI up to 100MB)
               </CardDescription>
             </CardHeader>
@@ -316,13 +315,13 @@ const Upload = () => {
           </Card>
 
           {/* GPS Data Upload */}
-          <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
+          <Card className="bg-(--surface-1) border-(--surface-2) hover:border-primary/30 transition-all duration-300">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2 text-white ">
                 <FileText className="w-5 h-5 text-primary" />
                 <span>GPS Data (Optional)</span>
               </CardTitle>
-              <CardDescription className="text-placeholder ">
+              <CardDescription className="text-(--muted-text) ">
                 Upload GPS tracking data in CSV or JSON format
               </CardDescription>
             </CardHeader>
@@ -338,7 +337,7 @@ const Upload = () => {
             </CardContent>
           </Card>
           {/* Upload Status */}
-          <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
+          <Card className="bg-(--surface-1) border-(--surface-2) hover:border-primary/30 transition-all duration-300">
             <CardHeader>
               <CardTitle className="text-white ">Upload Status</CardTitle>
             </CardHeader>
@@ -352,7 +351,7 @@ const Upload = () => {
                 ) : (
                   <Badge
                     variant="outline"
-                    className="bg-[#343434] text-placeholder border-[#343434] "
+                    className="bg-(--surface-2) text-(--muted-text) border-(--surface-2) "
                   >
                     Required
                   </Badge>
@@ -367,7 +366,7 @@ const Upload = () => {
                 ) : (
                   <Badge
                     variant="outline"
-                    className="bg-[#343434] text-placeholder border-[#343434] "
+                    className="bg-(--surface-2) text-(--muted-text) border-(--surface-2) "
                   >
                     Optional
                   </Badge>
@@ -382,7 +381,7 @@ const Upload = () => {
                 ) : (
                   <Badge
                     variant="outline"
-                    className="bg-[#343434] text-placeholder border-[#343434] "
+                    className="bg-(--surface-2) text-(--muted-text) border-(--surface-2) "
                   >
                     Required
                   </Badge>
@@ -397,7 +396,7 @@ const Upload = () => {
                 ) : (
                   <Badge
                     variant="outline"
-                    className="bg-[#343434] text-placeholder border-[#343434] "
+                    className="bg-(--surface-2) text-(--muted-text) border-(--surface-2) "
                   >
                     Optional
                   </Badge>
@@ -409,10 +408,10 @@ const Upload = () => {
 
         {/* Right Column - Match Details */}
         <div className="space-y-6">
-          <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
+          <Card className="bg-(--surface-1) border-(--surface-2) hover:border-primary/30 transition-all duration-300">
             <CardHeader>
               <CardTitle className="text-white ">Match Details</CardTitle>
-              <CardDescription className="text-placeholder ">
+              <CardDescription className="text-(--muted-text) ">
                 Provide information about the match and your participation
               </CardDescription>
             </CardHeader>
@@ -423,14 +422,14 @@ const Upload = () => {
                   Match Date *
                 </label>
                 <div className="relative">
-                  <Calendar className="absolute left-3 top-3 h-4 w-4 text-placeholder" />
+                  <Calendar className="absolute left-3 top-3 h-4 w-4 text-(--muted-text)" />
                   <Input
                     type="date"
                     value={uploadData.match_date}
                     onChange={(e) =>
                       handleInputChange("match_date", e.target.value)
                     }
-                    className="pl-10 h-11 bg-[#1A1A1A] border-[#343434] text-white placeholder:text-placeholder focus:border-primary "
+                    className="pl-10 h-11 bg-(--surface-0) border-(--surface-2) text-white placeholder:text-(--muted-text) focus:border-primary "
                     required
                   />
                 </div>
@@ -448,7 +447,7 @@ const Upload = () => {
                   onChange={(e) =>
                     handleInputChange("competition", e.target.value)
                   }
-                  className="h-11 bg-[#1A1A1A] border-[#343434] text-white placeholder:text-placeholder focus:border-primary "
+                  className="h-11 bg-(--surface-0) border-(--surface-2) text-white placeholder:text-(--muted-text) focus:border-primary "
                 />
               </div>
 
@@ -464,7 +463,7 @@ const Upload = () => {
                   onChange={(e) =>
                     handleInputChange("opponent", e.target.value)
                   }
-                  className="h-11 bg-[#1A1A1A] border-[#343434] text-white placeholder:text-placeholder focus:border-primary "
+                  className="h-11 bg-(--surface-0) border-(--surface-2) text-white placeholder:text-(--muted-text) focus:border-primary "
                 />
               </div>
 
@@ -480,7 +479,7 @@ const Upload = () => {
                   onChange={(e) =>
                     handleInputChange("location", e.target.value)
                   }
-                  className="h-11 bg-[#1A1A1A] border-[#343434] text-white placeholder:text-placeholder focus:border-primary "
+                  className="h-11 bg-(--surface-0) border-(--surface-2) text-white placeholder:text-(--muted-text) focus:border-primary "
                 />
               </div>
 
@@ -496,7 +495,7 @@ const Upload = () => {
                   placeholder="e.g., 90"
                   value={uploadData.minutes}
                   onChange={(e) => handleInputChange("minutes", e.target.value)}
-                  className="h-11 bg-[#1A1A1A] border-[#343434] text-white placeholder:text-placeholder focus:border-primary "
+                  className="h-11 bg-(--surface-0) border-(--surface-2) text-white placeholder:text-(--muted-text) focus:border-primary "
                 />
               </div>
 
@@ -505,20 +504,20 @@ const Upload = () => {
                 {/* Position - Full width on mobile */}
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-white">
-                    Position
+                    Position *
                   </label>
                   <div className="relative">
-                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-placeholder z-10" />
+                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-(--muted-text) z-10" />
                     <Select
                       value={uploadData.position}
                       onValueChange={(value) =>
                         handleInputChange("position", value)
                       }
                     >
-                      <SelectTrigger className="pl-10 h-11 bg-[#1A1A1A] border-[#343434] text-white focus:border-primary w-full">
+                      <SelectTrigger className="pl-10 h-11 bg-(--surface-0) border-(--surface-2) text-white focus:border-primary w-full">
                         <SelectValue placeholder="Select position" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#262626] border-[#343434] text-white w-full">
+                      <SelectContent className="bg-(--surface-1) border-(--surface-2) text-white w-full">
                         {FOOTBALL_POSITIONS.map((position) => (
                           <SelectItem
                             key={position}
@@ -538,20 +537,20 @@ const Upload = () => {
                   {/* Your Jersey Color */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-white">
-                      Your Jersey Color
+                      Your Jersey Color *
                     </label>
                     <div className="relative">
-                      <Palette className="absolute left-3 top-3 h-4 w-4 text-placeholder z-10" />
+                      <Palette className="absolute left-3 top-3 h-4 w-4 text-(--muted-text) z-10" />
                       <Select
                         value={uploadData.jersey_color}
                         onValueChange={(value) =>
                           handleInputChange("jersey_color", value)
                         }
                       >
-                        <SelectTrigger className="pl-10 h-11 bg-[#1A1A1A] border-[#343434] text-white focus:border-primary w-full">
+                        <SelectTrigger className="pl-10 h-11 bg-(--surface-0) border-(--surface-2) text-white focus:border-primary w-full">
                           <SelectValue placeholder="Select color" />
                         </SelectTrigger>
-                        <SelectContent className="bg-[#262626] border-[#343434] text-white max-h-60 w-full">
+                        <SelectContent className="bg-(--surface-1) border-(--surface-2) text-white max-h-60 w-full">
                           {JERSEY_COLORS.map((color) => (
                             <SelectItem
                               key={color}
@@ -560,12 +559,12 @@ const Upload = () => {
                             >
                               <div className="flex items-center space-x-2 w-full">
                                 <div
-                                  className="w-4 h-4 rounded border border-[#343434] shrink-0"
+                                  className="w-4 h-4 rounded border border-(--surface-2) shrink-0"
                                   style={{
                                     backgroundColor: color.toLowerCase(),
                                     borderColor:
                                       color.toLowerCase() === "white"
-                                        ? "#343434"
+                                        ? "var(--surface-2)"
                                         : "transparent",
                                   }}
                                 />
@@ -581,20 +580,20 @@ const Upload = () => {
                   {/* Opponent Jersey Color */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-white">
-                      Opponent Jersey Color
+                      Opponent Jersey Color *
                     </label>
                     <div className="relative">
-                      <Palette className="absolute left-3 top-3 h-4 w-4 text-placeholder z-10" />
+                      <Palette className="absolute left-3 top-3 h-4 w-4 text-(--muted-text) z-10" />
                       <Select
                         value={uploadData.opponent_jersey_color}
                         onValueChange={(value) =>
                           handleInputChange("opponent_jersey_color", value)
                         }
                       >
-                        <SelectTrigger className="pl-10 h-11 bg-[#1A1A1A] border-[#343434] text-white focus:border-primary w-full">
+                        <SelectTrigger className="pl-10 h-11 bg-(--surface-0) border-(--surface-2) text-white focus:border-primary w-full">
                           <SelectValue placeholder="Select color" />
                         </SelectTrigger>
-                        <SelectContent className="bg-[#262626] border-[#343434] text-white max-h-60 w-full">
+                        <SelectContent className="bg-(--surface-1) border-(--surface-2) text-white max-h-60 w-full">
                           {JERSEY_COLORS.map((color) => (
                             <SelectItem
                               key={color}
@@ -603,12 +602,12 @@ const Upload = () => {
                             >
                               <div className="flex items-center space-x-2 w-full">
                                 <div
-                                  className="w-4 h-4 rounded border border-[#343434] shrink-0"
+                                  className="w-4 h-4 rounded border border-(--surface-2) shrink-0"
                                   style={{
                                     backgroundColor: color.toLowerCase(),
                                     borderColor:
                                       color.toLowerCase() === "white"
-                                        ? "#343434"
+                                        ? "var(--surface-2)"
                                         : "transparent",
                                   }}
                                 />
@@ -626,23 +625,23 @@ const Upload = () => {
               {/* Notes */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-white ">
-                  Additional Notes
+                  Additional Notes (Optional)
                 </label>
                 <Textarea
                   placeholder="Any additional context about the match, conditions, specific moments to analyze, or tactical information..."
                   value={uploadData.notes}
                   onChange={(e) => handleInputChange("notes", e.target.value)}
                   rows={4}
-                  className="bg-[#1A1A1A] border-[#343434] text-white placeholder:text-placeholder focus:border-primary "
+                  className="bg-(--surface-0) border-(--surface-2) text-white placeholder:text-(--muted-text) focus:border-primary "
                 />
               </div>
 
               {/* Requirements */}
-              <div className="rounded-lg bg-[#1A1A1A] p-4 space-y-2 border border-[#343434]">
+              <div className="rounded-lg bg-(--surface-0) p-4 space-y-2 border border-(--surface-2)">
                 <h4 className="text-sm font-medium text-white ">
                   Upload Requirements
                 </h4>
-                <ul className="text-sm text-placeholder space-y-1 ">
+                <ul className="text-sm text-(--muted-text) space-y-1 ">
                   <li>• Video must be clear and show full gameplay</li>
                   <li>• Minimum video length: 15 minutes</li>
                   <li>• Maximum video size: 100MB</li>
@@ -661,12 +660,12 @@ const Upload = () => {
               <Button
                 type="submit"
                 disabled={!canSubmit}
-                className="w-full h-11 bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold disabled:bg-[#343434] disabled:text-placeholder transition-all duration-300 "
+                className="w-full h-11 bg-linear-to-r from-primary to-(--accent-2) text-(--ink) hover:from-(--accent-2) hover:to-primary font-semibold disabled:bg-(--surface-2) disabled:text-(--ink) transition-all duration-300 "
                 size="lg"
               >
                 {isUploading ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#0F0F0E] mr-2"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-(--ink) mr-2"></div>
                     Processing...
                   </>
                 ) : (

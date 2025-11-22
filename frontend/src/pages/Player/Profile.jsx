@@ -149,29 +149,29 @@ const Profile = () => {
   const getTierBadgeColor = (tier) => {
     switch (tier) {
       case TIER_PLANS.ELITE:
-        return "bg-linear-to-r from-[#FFD700] to-[#FFA500] text-[#0F0F0E]";
+        return "bg-linear-to-r from-(--color-orange-light) to-(--color-orange) text-(--ink)";
       case TIER_PLANS.PRO:
-        return "bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E]";
+        return "bg-linear-to-r from-primary to-secondary text-(--ink)";
       case TIER_PLANS.BASIC:
-        return "bg-linear-to-r from-[#60A5FA] to-[#3B82F6] text-white";
+        return "bg-linear-to-r from-(--color-blue-light) to-(--color-blue) text-white";
       default:
-        return "bg-[#343434] text-white";
+        return "bg-(--surface-2) text-white";
     }
   };
 
   // Custom styles for consistent input and select sizing
   const inputStyles =
-    "h-14 text-base bg-[#1A1A1A] border-2 border-[#343434] text-white placeholder:text-placeholder rounded-xl focus:border-primary focus:ring-2 focus:ring-[#C1FF72]/20 transition-all duration-300 w-full";
+    "h-14 text-base bg-(--surface-0) border-2 border-(--surface-2) text-white placeholder:text-(--muted-text) rounded-xl focus:border-primary focus:ring-2 focus:ring-[var(--primary)]/20 transition-all duration-300 w-full";
 
   const selectTriggerStyles =
-    "h-14 text-base bg-[#1A1A1A] border-2 border-[#343434] text-white rounded-xl focus:border-primary focus:ring-2 focus:ring-[#C1FF72]/20 transition-all duration-300 w-full [&>span]:flex [&>span]:items-center [&>span]:h-full";
+    "h-14 text-base bg-(--surface-0) border-2 border-(--surface-2) text-white rounded-xl focus:border-primary focus:ring-2 focus:ring-[var(--primary)]/20 transition-all duration-300 w-full [&>span]:flex [&>span]:items-center [&>span]:h-full";
 
   if (!user) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-placeholder font-['Orbitron'] text-lg">
+          <p className="mt-4 text-(--muted-text) font-['Orbitron'] text-lg">
             Loading profile...
           </p>
         </div>
@@ -187,14 +187,14 @@ const Profile = () => {
           <h1 className="text-4xl font-bold font-['Orbitron'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
             Player Profile
           </h1>
-          <p className="text-placeholder text-lg mt-2 font-['Orbitron']">
+          <p className="text-(--muted-text) text-lg mt-2 font-['Orbitron']">
             Manage your personal information and performance preferences
           </p>
         </div>
         {!isEditing ? (
           <Button
             onClick={() => setIsEditing(true)}
-            className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold rounded-xl px-6 py-3 h-12 shadow-lg hover:shadow-xl transition-all duration-300"
+            className="bg-linear-to-r from-primary to-(--accent-2) text-(--ink) hover:from-(--accent-2) hover:to-primary font-semibold rounded-xl px-6 py-3 h-12 shadow-lg hover:shadow-xl transition-all duration-300"
           >
             <Edit3 className="w-5 h-5 mr-2" />
             Edit Profile
@@ -204,14 +204,14 @@ const Profile = () => {
             <Button
               variant="outline"
               onClick={handleCancel}
-              className="bg-[#262626] border-[#343434] text-white hover:bg-[#343434] hover:border-primary font-semibold rounded-xl px-6 py-3 h-12 transition-all duration-300"
+              className="bg-(--surface-1) border-(--surface-2) text-white hover:bg-(--surface-2) hover:border-primary font-semibold rounded-xl px-6 py-3 h-12 transition-all duration-300"
             >
               Cancel
             </Button>
             <Button
               onClick={handleSave}
               disabled={isLoading}
-              className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold rounded-xl px-6 py-3 h-12 shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
+              className="bg-linear-to-r from-primary to-(--accent-2) text-(--ink) hover:from-(--accent-2) hover:to-primary font-semibold rounded-xl px-6 py-3 h-12 shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
             >
               <Save className="w-5 h-5 mr-2" />
               {isLoading ? "Saving..." : "Save Changes"}
@@ -224,7 +224,7 @@ const Profile = () => {
         {/* Left Column - Profile Overview */}
         <div className="lg:col-span-1 space-y-8">
           {/* Profile Overview Card */}
-          <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
+          <Card className="bg-(--surface-1) border-(--surface-2) hover:border-primary/30 transition-all duration-300">
             <CardHeader className="pb-4">
               <CardTitle className="text-xl font-bold text-white flex items-center">
                 <User className="w-5 h-5 mr-2 text-primary" />
@@ -242,17 +242,17 @@ const Profile = () => {
                   size="xl"
                 />
                 {!isEditing && (
-                  <p className="text-sm text-placeholder text-center">
+                  <p className="text-sm text-(--muted-text) text-center">
                     Click edit to change your profile picture
                   </p>
                 )}
               </div>
 
               {/* Account Information */}
-              <div className="space-y-4 pt-4 border-t border-[#343434]">
+              <div className="space-y-4 pt-4 border-t border-(--surface-2)">
                 {/* Plan Tier */}
                 <div className="space-y-2">
-                  <div className="flex items-center space-x-2 text-placeholder">
+                  <div className="flex items-center space-x-2 text-(--muted-text)">
                     <Crown className="w-4 h-4" />
                     <span className="text-sm font-medium">
                       Subscription Plan
@@ -270,7 +270,7 @@ const Profile = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="bg-[#343434] border-[#343434] text-primary hover:bg-primary hover:text-[#0F0F0E] font-semibold text-xs"
+                        className="bg-(--surface-2) border-(--surface-2) text-primary hover:bg-primary hover:text-(--ink) font-semibold text-xs"
                         asChild
                       >
                         <a href="/subscription">Upgrade</a>
@@ -281,7 +281,7 @@ const Profile = () => {
 
                 {/* Email */}
                 <div className="space-y-2">
-                  <div className="flex items-center space-x-2 text-placeholder">
+                  <div className="flex items-center space-x-2 text-(--muted-text)">
                     <Mail className="w-4 h-4" />
                     <span className="text-sm font-medium">Email</span>
                   </div>
@@ -292,32 +292,35 @@ const Profile = () => {
 
                 {/* Member Since */}
                 <div className="space-y-2">
-                  <div className="flex items-center space-x-2 text-placeholder">
+                  <div className="flex items-center space-x-2 text-(--muted-text)">
                     <Clock className="w-4 h-4" />
                     <span className="text-sm font-medium">Member Since</span>
+                    <p className="text-white font-semibold text-sm">
+                      {user.created_at
+                        ? new Date(user.created_at).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "short",
+                            }
+                          )
+                        : "--"}
+                      &nbsp;&nbsp;
+                      <Badge
+                        variant="outline"
+                        className="ml-2 text-green-400 border-green-400"
+                      >
+                        Verified
+                      </Badge>
+                    </p>
                   </div>
-                  <p className="text-white font-semibold text-sm">
-                    {user.created_at
-                      ? new Date(user.created_at).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "short",
-                        })
-                      : "--"}
-                    &nbsp;
-                    <Badge
-                      variant="outline"
-                      className="text-green-400 border-green-400"
-                    >
-                      Verified
-                    </Badge>
-                  </p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Quick Stats */}
-          <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
+          <Card className="bg-(--surface-1) border-(--surface-2) hover:border-primary/30 transition-all duration-300">
             <CardHeader className="pb-4">
               <CardTitle className="text-lg font-bold text-white flex items-center">
                 <TrendingUp className="w-5 h-5 mr-2 text-primary" />
@@ -326,24 +329,24 @@ const Profile = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-placeholder">Reports</span>
+                <span className="text-sm text-(--muted-text)">Reports</span>
                 <span className="text-white font-bold">
                   {performanceStats.totalReports}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-placeholder">Avg. Score</span>
+                <span className="text-sm text-(--muted-text)">Avg. Score</span>
                 <span className="text-primary font-bold">
                   {performanceStats.averageScore || "--"}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-placeholder">Progress</span>
+                <span className="text-sm text-(--muted-text)">Progress</span>
                 <span
                   className={`font-bold ${
                     performanceStats.progress > 0
                       ? "text-primary"
-                      : "text-[#FF6B6B]"
+                      : "text-(--color-orange-light)"
                   }`}
                 >
                   {performanceStats.progress > 0 ? "+" : ""}
@@ -357,13 +360,13 @@ const Profile = () => {
         {/* Right Column - Profile Details & Performance */}
         <div className="lg:col-span-3 space-y-8">
           {/* Personal Information Card */}
-          <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
+          <Card className="bg-(--surface-1) border-(--surface-2) hover:border-primary/30 transition-all duration-300">
             <CardHeader className="pb-4">
               <CardTitle className="text-xl font-bold text-white flex items-center">
                 <User className="w-5 h-5 mr-2 text-primary" />
                 Personal Information
               </CardTitle>
-              <CardDescription className="text-placeholder">
+              <CardDescription className="text-(--muted-text)">
                 {isEditing
                   ? "Update your personal details and playing profile"
                   : "Your basic information and football profile"}
@@ -378,7 +381,7 @@ const Profile = () => {
                   </label>
                   {isEditing ? (
                     <div className="relative">
-                      <User className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-placeholder z-10" />
+                      <User className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-(--muted-text) z-10" />
                       <Input
                         value={formData.player_name || ""}
                         onChange={(e) =>
@@ -389,7 +392,7 @@ const Profile = () => {
                       />
                     </div>
                   ) : (
-                    <div className="flex items-center space-x-3 p-4 bg-[#1A1A1A] border-2 border-[#343434] rounded-xl h-14">
+                    <div className="flex items-center space-x-3 p-4 bg-(--surface-0) border-2 border-(--surface-2) rounded-xl h-14">
                       <User className="h-5 w-5 text-primary" />
                       <span className="text-white font-semibold">
                         {user.player_name || "Not set"}
@@ -405,7 +408,7 @@ const Profile = () => {
                   </label>
                   {isEditing ? (
                     <div className="relative">
-                      <Calendar className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-placeholder z-10" />
+                      <Calendar className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-(--muted-text) z-10" />
                       <Input
                         type="date"
                         value={formData.date_of_birth || ""}
@@ -416,19 +419,20 @@ const Profile = () => {
                       />
                     </div>
                   ) : (
-                    <div className="flex items-center space-x-3 p-4 bg-[#1A1A1A] border-2 border-[#343434] rounded-xl h-14">
+                    <div className="flex items-center space-x-3 p-4 bg-(--surface-0) border-2 border-(--surface-2) rounded-xl h-14">
                       <Calendar className="h-5 w-5 text-primary" />
                       <div>
                         <span className="text-white font-semibold block">
                           {user.date_of_birth
                             ? new Date(user.date_of_birth).toLocaleDateString()
                             : "Not set"}
+                          &nbsp;
+                          {user.date_of_birth && (
+                            <span className="text-(--muted-text) text-sm">
+                              {calculateAge(user.date_of_birth)} years old
+                            </span>
+                          )}
                         </span>
-                        {user.date_of_birth && (
-                          <span className="text-placeholder text-sm">
-                            {calculateAge(user.date_of_birth)} years old
-                          </span>
-                        )}
                       </div>
                     </div>
                   )}
@@ -441,7 +445,7 @@ const Profile = () => {
                   </label>
                   {isEditing ? (
                     <div className="relative">
-                      <Target className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-placeholder z-10" />
+                      <Target className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-(--muted-text) z-10" />
                       <Select
                         value={formData.position || ""}
                         onValueChange={(value) =>
@@ -453,12 +457,12 @@ const Profile = () => {
                         >
                           <SelectValue placeholder="Select position" />
                         </SelectTrigger>
-                        <SelectContent className="bg-[#262626] border-2 border-[#343434] text-white shadow-xl">
+                        <SelectContent className="bg-(--surface-1) border-2 border-(--surface-2) text-white shadow-xl max-h-60">
                           {FOOTBALL_POSITIONS.map((position) => (
                             <SelectItem
                               key={position}
                               value={position}
-                              className="focus:bg-[#343434] focus:text-primary py-3 text-base"
+                              className="focus:bg-(--surface-2) focus:text-primary py-3 text-base"
                             >
                               {position}
                             </SelectItem>
@@ -467,7 +471,7 @@ const Profile = () => {
                       </Select>
                     </div>
                   ) : (
-                    <div className="flex items-center space-x-3 p-4 bg-[#1A1A1A] border-2 border-[#343434] rounded-xl h-14">
+                    <div className="flex items-center space-x-3 p-4 bg-(--surface-0) border-2 border-(--surface-2) rounded-xl h-14">
                       <Target className="h-5 w-5 text-primary" />
                       <span className="text-white font-semibold">
                         {user.position || "Not set"}
@@ -483,7 +487,7 @@ const Profile = () => {
                   </label>
                   {isEditing ? (
                     <div className="relative">
-                      <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-placeholder z-10" />
+                      <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-(--muted-text) z-10" />
                       <Select
                         value={formData.country || ""}
                         onValueChange={(value) =>
@@ -495,12 +499,12 @@ const Profile = () => {
                         >
                           <SelectValue placeholder="Select country" />
                         </SelectTrigger>
-                        <SelectContent className="bg-[#262626] border-2 border-[#343434] text-white shadow-xl max-h-60">
+                        <SelectContent className="bg-(--surface-1) border-2 border-(--surface-2) text-white shadow-xl max-h-60">
                           {COUNTRIES.map((country) => (
                             <SelectItem
                               key={country}
                               value={country}
-                              className="focus:bg-[#343434] focus:text-primary py-3 text-base"
+                              className="focus:bg-(--surface-2) focus:text-primary py-3 text-base"
                             >
                               {country}
                             </SelectItem>
@@ -509,7 +513,7 @@ const Profile = () => {
                       </Select>
                     </div>
                   ) : (
-                    <div className="flex items-center space-x-3 p-4 bg-[#1A1A1A] border-2 border-[#343434] rounded-xl h-14">
+                    <div className="flex items-center space-x-3 p-4 bg-(--surface-0) border-2 border-(--surface-2) rounded-xl h-14">
                       <MapPin className="h-5 w-5 text-primary" />
                       <span className="text-white font-semibold">
                         {user.country || "Not set"}
@@ -525,7 +529,7 @@ const Profile = () => {
                   </label>
                   {isEditing ? (
                     <div className="relative">
-                      <Building className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-placeholder z-10" />
+                      <Building className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-(--muted-text) z-10" />
                       <Select
                         value={formData.academy || ""}
                         onValueChange={(value) =>
@@ -537,12 +541,12 @@ const Profile = () => {
                         >
                           <SelectValue placeholder="Select academy/club" />
                         </SelectTrigger>
-                        <SelectContent className="bg-[#262626] border-2 border-[#343434] text-white shadow-xl max-h-60">
+                        <SelectContent className="bg-(--surface-1) border-2 border-(--surface-2) text-white shadow-xl max-h-60">
                           {ACADEMIES.map((academy) => (
                             <SelectItem
                               key={academy}
                               value={academy}
-                              className="focus:bg-[#343434] focus:text-primary py-3 text-base"
+                              className="focus:bg-(--surface-2) focus:text-primary py-3 text-base"
                             >
                               {academy}
                             </SelectItem>
@@ -551,7 +555,7 @@ const Profile = () => {
                       </Select>
                     </div>
                   ) : (
-                    <div className="flex items-center space-x-3 p-4 bg-[#1A1A1A] border-2 border-[#343434] rounded-xl h-14">
+                    <div className="flex items-center space-x-3 p-4 bg-(--surface-0) border-2 border-(--surface-2) rounded-xl h-14">
                       <Building className="h-5 w-5 text-primary" />
                       <span className="text-white font-semibold">
                         {user.academy || "Not set"}
@@ -564,47 +568,47 @@ const Profile = () => {
           </Card>
 
           {/* Performance Overview Card */}
-          <Card className="bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300">
+          <Card className="bg-(--surface-1) border-(--surface-2) hover:border-primary/30 transition-all duration-300">
             <CardHeader className="pb-4">
               <CardTitle className="text-xl font-bold text-white flex items-center">
                 <TrendingUp className="w-5 h-5 mr-2 text-primary" />
                 Performance Overview
               </CardTitle>
-              <CardDescription className="text-placeholder">
+              <CardDescription className="text-(--muted-text)">
                 Your assessment history and performance trends
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid gap-6 md:grid-cols-3">
                 {/* Total Reports */}
-                <div className="text-center p-6 border-2 border-[#343434] rounded-2xl bg-linear-to-br from-[#1A1A1A] to-[#262626] hover:border-primary/30 transition-all duration-300 group">
-                  <div className="w-12 h-12 bg-linear-to-br from-[#60A5FA] to-[#3B82F6] rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <div className="text-center p-6 border-2 border-(--surface-2) rounded-2xl bg-linear-to-br from-(--surface-0) to-(--surface-1) hover:border-primary/30 transition-all duration-300 group">
+                  <div className="w-12 h-12 bg-linear-to-br from-(--color-blue-light) to-(--color-blue) rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300">
                     <FileText className="w-6 h-6 text-white" />
                   </div>
-                  <div className="text-3xl font-bold text-white group-hover:text-[#60A5FA] transition-colors">
+                  <div className="text-3xl font-bold text-white group-hover:text-(--color-blue-light) transition-colors">
                     {performanceStats.totalReports}
                   </div>
-                  <div className="text-sm text-placeholder mt-2">
+                  <div className="text-sm text-(--muted-text) mt-2">
                     Total Reports
                   </div>
                 </div>
 
                 {/* Average Score */}
-                <div className="text-center p-6 border-2 border-[#343434] rounded-2xl bg-linear-to-br from-[#1A1A1A] to-[#262626] hover:border-primary/30 transition-all duration-300 group">
-                  <div className="w-12 h-12 bg-linear-to-br from-primary to-[#94D44A] rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                    <Award className="w-6 h-6 text-[#0F0F0E]" />
+                <div className="text-center p-6 border-2 border-(--surface-2) rounded-2xl bg-linear-to-br from-(--surface-0) to-(--surface-1) hover:border-primary/30 transition-all duration-300 group">
+                  <div className="w-12 h-12 bg-linear-to-br from-primary to-(--accent-2) rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <Award className="w-6 h-6 text-(--ink)" />
                   </div>
                   <div className="text-3xl font-bold text-white group-hover:text-primary transition-colors">
                     {performanceStats.averageScore || "--"}
                   </div>
-                  <div className="text-sm text-placeholder mt-2">
+                  <div className="text-sm text-(--muted-text) mt-2">
                     Average Score
                   </div>
                 </div>
 
                 {/* Progress */}
-                <div className="text-center p-6 border-2 border-[#343434] rounded-2xl bg-linear-to-br from-[#1A1A1A] to-[#262626] hover:border-primary/30 transition-all duration-300 group">
-                  <div className="w-12 h-12 bg-linear-to-br from-[#F59E0B] to-[#D97706] rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <div className="text-center p-6 border-2 border-(--surface-2) rounded-2xl bg-linear-to-br from-(--surface-0) to-(--surface-1) hover:border-primary/30 transition-all duration-300 group">
+                  <div className="w-12 h-12 bg-linear-to-br from-(--color-orange-light) to-(--color-orange) rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300">
                     <TrendingUp className="w-6 h-6 text-white" />
                   </div>
                   <div
@@ -612,14 +616,14 @@ const Profile = () => {
                       performanceStats.progress > 0
                         ? "text-primary group-hover:text-primary"
                         : performanceStats.progress < 0
-                        ? "text-[#FF6B6B] group-hover:text-[#FF6B6B]"
-                        : "text-white group-hover:text-[#F59E0B]"
+                        ? "text-(--color-orange-light) group-hover:text-(--color-orange-light)"
+                        : "text-white group-hover:text-(--color-orange-light)"
                     } transition-colors`}
                   >
                     {performanceStats.progress > 0 ? "+" : ""}
                     {performanceStats.progress || 0}%
                   </div>
-                  <div className="text-sm text-placeholder mt-2">
+                  <div className="text-sm text-(--muted-text) mt-2">
                     Overall Progress
                   </div>
                 </div>
@@ -633,7 +637,7 @@ const Profile = () => {
                     className={`font-bold ${
                       performanceStats.progress > 0
                         ? "text-primary"
-                        : "text-[#FF6B6B]"
+                        : "text-(--color-orange-light)"
                     }`}
                   >
                     {performanceStats.progress > 0 ? "+" : ""}
@@ -641,13 +645,10 @@ const Profile = () => {
                   </span>
                 </div>
                 <Progress
-                  value={Math.max(
-                    0,
-                    Math.min(100, 50 + performanceStats.progress)
-                  )}
-                  className="h-3 bg-[#343434] rounded-full"
+                  value={Math.max(0, Math.min(100, performanceStats.progress))}
+                  className="h-3 bg-(--surface-2) rounded-full"
                 />
-                <div className="flex justify-between text-xs text-placeholder">
+                <div className="flex justify-between text-xs text-(--muted-text)">
                   <span>Start</span>
                   <span>Current</span>
                 </div>

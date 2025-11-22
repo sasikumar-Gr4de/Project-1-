@@ -1,13 +1,7 @@
 // Reports.jsx - Updated to use DataTable component
 import React, { useState, useEffect } from "react";
 import { useUserStore } from "@/store/userStore";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -22,6 +16,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import DataTable from "@/components/common/DataTable";
+import StatsCard from "@/components/common/StatsCard";
 
 const Reports = () => {
   const { dashboardData, fetchDashboard, isLoading } = useUserStore();
@@ -46,10 +41,10 @@ const Reports = () => {
   }, [dashboardData]);
 
   const getScoreColor = (score) => {
-    if (score >= 90) return "from-primary to-[#94D44A]";
-    if (score >= 80) return "from-[#60A5FA] to-[#3B82F6]";
-    if (score >= 70) return "from-[#F59E0B] to-[#D97706]";
-    return "from-[#EF4444] to-[#DC2626]";
+    if (score >= 90) return "from-primary to-(--accent-2)";
+    if (score >= 80) return "from-(--color-blue-light) to-(--color-blue)";
+
+    return "from-(--color-orange-light) to-(--color-orange)";
   };
 
   const getScoreBadgeVariant = (score) => {
@@ -77,7 +72,7 @@ const Reports = () => {
           <h3 className="text-lg font-semibold text-white group-hover:text-primary transition-colors duration-200">
             {row.title || `Performance Assessment`}
           </h3>
-          <div className="flex items-center space-x-4 text-sm text-[#B0AFAF]">
+          <div className="flex items-center space-x-4 text-sm text-(--muted-text)">
             <div className="flex items-center space-x-1">
               <Calendar className="w-4 h-4" />
               <span>
@@ -127,7 +122,7 @@ const Reports = () => {
                   <span className="text-white font-medium capitalize">
                     {category.replace("_", " ")}
                   </span>
-                  <span className="text-[#B0AFAF]">{score}/100</span>
+                  <span className="text-(--muted-text)">{score}/100</span>
                 </div>
                 <Progress
                   value={score}
@@ -147,7 +142,7 @@ const Reports = () => {
       asChild
       variant="outline"
       size="sm"
-      className="border-[#343434] bg-[#262626] text-white hover:bg-[#343434] hover:text-white"
+      className="border-(--surface-2) bg-(--surface-1) text-white hover:bg-(--surface-2) hover:text-white"
     >
       <Link to={`/reports/${row.id}`}>
         <Eye className="w-4 h-4 mr-2" />
@@ -158,7 +153,7 @@ const Reports = () => {
       key="export"
       variant="outline"
       size="sm"
-      className="border-[#343434] bg-[#262626] text-white hover:bg-[#343434] hover:text-white"
+      className="border-(--surface-2) bg-(--surface-1) text-white hover:bg-(--surface-2) hover:text-white"
     >
       <Download className="w-4 h-4 mr-2" />
       Export
@@ -173,7 +168,7 @@ const Reports = () => {
             <h1 className="text-4xl font-bold font-['Orbitron'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent animate-pulse">
               Performance Reports
             </h1>
-            <p className="text-[#B0AFAF] text-lg mt-2 font-['Orbitron'] animate-pulse">
+            <p className="text-(--muted-text) text-lg mt-2 font-['Orbitron'] animate-pulse">
               Loading your reports...
             </p>
           </div>
@@ -182,13 +177,13 @@ const Reports = () => {
           {[...Array(3)].map((_, i) => (
             <Card
               key={i}
-              className="animate-pulse bg-[#262626] border-[#343434]"
+              className="animate-pulse bg-(--surface-1) border-(--surface-2)"
             >
               <CardContent className="p-6">
-                <div className="h-6 bg-[#343434] rounded w-1/4 mb-4"></div>
+                <div className="h-6 bg-(--surface-2) rounded w-1/4 mb-4"></div>
                 <div className="space-y-3">
-                  <div className="h-4 bg-[#343434] rounded w-full"></div>
-                  <div className="h-4 bg-[#343434] rounded w-3/4"></div>
+                  <div className="h-4 bg-(--surface-2) rounded w-full"></div>
+                  <div className="h-4 bg-(--surface-2) rounded w-3/4"></div>
                 </div>
               </CardContent>
             </Card>
@@ -206,7 +201,7 @@ const Reports = () => {
           <h1 className="text-4xl font-bold font-['Orbitron'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
             Performance Reports
           </h1>
-          <p className="text-[#B0AFAF] text-lg mt-2 font-['Orbitron']">
+          <p className="text-(--muted-text) text-lg mt-2 font-['Orbitron']">
             Track your progress and analyze performance trends
           </p>
         </div>
@@ -214,89 +209,56 @@ const Reports = () => {
 
       {/* Stats Overview */}
       <div className="grid gap-6 lg:grid-cols-4">
-        <Card className="bg-[#262626] border-[#343434]">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="text-sm font-medium text-white">
-              Total Reports
-            </CardTitle>
-            <div className="w-10 h-10 bg-linear-to-br from-[#60A5FA] to-[#3B82F6] rounded-xl flex items-center justify-center shadow-lg">
-              <FileText className="h-5 w-5 text-white" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">
-              {reports.length}
-            </div>
-            <p className="text-xs text-[#B0AFAF] mt-2">All time assessments</p>
-          </CardContent>
-        </Card>
+        <StatsCard
+          title="Total Reports"
+          value={reports.length}
+          description="All time assessments"
+          icon={FileText}
+          gradient="from-[var(--color-blue-light)] to-[var(--color-blue)]"
+          valueColor="text-white"
+          className="text-sm"
+        />
 
-        <Card className="bg-[#262626] border-[#343434]">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="text-sm font-medium text-white">
-              Average Score
-            </CardTitle>
-            <div className="w-10 h-10 bg-linear-to-br from-primary to-[#94D44A] rounded-xl flex items-center justify-center shadow-lg">
-              <Target className="h-5 w-5 text-[#0F0F0E]" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primary">
-              {reports.length > 0
-                ? Math.round(
-                    reports.reduce(
-                      (acc, report) => acc + report.overall_score,
-                      0
-                    ) / reports.length
-                  )
-                : 0}
-            </div>
-            <p className="text-xs text-[#B0AFAF] mt-2">Overall performance</p>
-          </CardContent>
-        </Card>
+        <StatsCard
+          title="Average Score"
+          value={
+            reports.length > 0
+              ? Math.round(
+                  reports.reduce(
+                    (acc, report) => acc + report.overall_score,
+                    0
+                  ) / reports.length
+                )
+              : 0
+          }
+          description="Overall performance"
+          icon={Target}
+          gradient="from-primary to-secondary"
+          valueColor="text-primary"
+          className="text-sm"
+        />
 
-        <Card className="bg-[#262626] border-[#343434]">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="text-sm font-medium text-white">
-              Trend
-            </CardTitle>
-            <div className="w-10 h-10 bg-linear-to-br from-[#F59E0B] to-[#D97706] rounded-xl flex items-center justify-center shadow-lg">
-              <TrendingUp className="h-5 w-5 text-white" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-[#F59E0B]">+8%</div>
-            <p className="text-xs text-[#B0AFAF] mt-2">Since last quarter</p>
-          </CardContent>
-        </Card>
+        <StatsCard
+          title="Average Score"
+          value="+8%"
+          description="Since last quarter"
+          icon={TrendingUp}
+          gradient="from-[var(--color-orange-light)] to-[var(--color-orange)]"
+          valueColor="text-(--color-orange-light)"
+          className="text-sm"
+        />
 
-        <Card className="bg-[#262626] border-[#343434]">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle className="text-sm font-medium text-white">
-              Percentile
-            </CardTitle>
-            <div className="w-10 h-10 bg-linear-to-br from-[#8B5CF6] to-[#7C3AED] rounded-xl flex items-center justify-center shadow-lg">
-              <Users className="h-5 w-5 text-white" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-[#8B5CF6]">Top 25%</div>
-            <p className="text-xs text-[#B0AFAF] mt-2">Among peers</p>
-          </CardContent>
-        </Card>
+        <StatsCard
+          title="Percentile"
+          value=" Top 25%"
+          description="Among peers"
+          icon={Users}
+          gradient="from-[var(--color-purple-light)] to-[var(--color-purple)]"
+          valueColor="text-[var(--color-blue-light)]"
+          className="text-sm"
+        />
       </div>
 
-      {/* Reports Table using DataTable component */}
-      {/* <Card className="bg-[#262626] border-[#343434]">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-white">
-            Recent Assessments
-          </CardTitle>
-          <CardDescription className="text-[#B0AFAF] text-lg">
-            Your latest performance evaluations and reports
-          </CardDescription>
-        </CardHeader>
-        <CardContent> */}
       <DataTable
         data={reports}
         columns={reportColumns}
@@ -306,8 +268,6 @@ const Reports = () => {
         emptyStateDescription="Your performance reports will appear here once assessments are completed."
         searchable={false}
       />
-      {/* </CardContent>
-      </Card> */}
     </div>
   );
 };
