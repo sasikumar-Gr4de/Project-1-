@@ -161,7 +161,7 @@ const Profile = () => {
 
   // Custom styles for consistent input and select sizing
   const inputStyles =
-    "h-14 text-base bg-[#1A1A1A] border-2 border-[#343434] text-white placeholder:text-[#B0AFAF] rounded-xl focus:border-primary focus:ring-2 focus:ring-[#C1FF72]/20 transition-all duration-300 w-full";
+    "h-14 text-base bg-[#1A1A1A] border-2 border-[#343434] text-white placeholder:text-placeholder rounded-xl focus:border-primary focus:ring-2 focus:ring-[#C1FF72]/20 transition-all duration-300 w-full";
 
   const selectTriggerStyles =
     "h-14 text-base bg-[#1A1A1A] border-2 border-[#343434] text-white rounded-xl focus:border-primary focus:ring-2 focus:ring-[#C1FF72]/20 transition-all duration-300 w-full [&>span]:flex [&>span]:items-center [&>span]:h-full";
@@ -171,7 +171,7 @@ const Profile = () => {
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-[#B0AFAF] font-['Orbitron'] text-lg">
+          <p className="mt-4 text-placeholder font-['Orbitron'] text-lg">
             Loading profile...
           </p>
         </div>
@@ -187,7 +187,7 @@ const Profile = () => {
           <h1 className="text-4xl font-bold font-['Orbitron'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
             Player Profile
           </h1>
-          <p className="text-[#B0AFAF] text-lg mt-2 font-['Orbitron']">
+          <p className="text-placeholder text-lg mt-2 font-['Orbitron']">
             Manage your personal information and performance preferences
           </p>
         </div>
@@ -242,7 +242,7 @@ const Profile = () => {
                   size="xl"
                 />
                 {!isEditing && (
-                  <p className="text-sm text-[#B0AFAF] text-center">
+                  <p className="text-sm text-placeholder text-center">
                     Click edit to change your profile picture
                   </p>
                 )}
@@ -252,7 +252,7 @@ const Profile = () => {
               <div className="space-y-4 pt-4 border-t border-[#343434]">
                 {/* Plan Tier */}
                 <div className="space-y-2">
-                  <div className="flex items-center space-x-2 text-[#B0AFAF]">
+                  <div className="flex items-center space-x-2 text-placeholder">
                     <Crown className="w-4 h-4" />
                     <span className="text-sm font-medium">
                       Subscription Plan
@@ -281,7 +281,7 @@ const Profile = () => {
 
                 {/* Email */}
                 <div className="space-y-2">
-                  <div className="flex items-center space-x-2 text-[#B0AFAF]">
+                  <div className="flex items-center space-x-2 text-placeholder">
                     <Mail className="w-4 h-4" />
                     <span className="text-sm font-medium">Email</span>
                   </div>
@@ -292,7 +292,7 @@ const Profile = () => {
 
                 {/* Member Since */}
                 <div className="space-y-2">
-                  <div className="flex items-center space-x-2 text-[#B0AFAF]">
+                  <div className="flex items-center space-x-2 text-placeholder">
                     <Clock className="w-4 h-4" />
                     <span className="text-sm font-medium">Member Since</span>
                   </div>
@@ -303,21 +303,14 @@ const Profile = () => {
                           month: "short",
                         })
                       : "--"}
+                    &nbsp;
+                    <Badge
+                      variant="outline"
+                      className="text-green-400 border-green-400"
+                    >
+                      Verified
+                    </Badge>
                   </p>
-                </div>
-
-                {/* Security */}
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2 text-[#B0AFAF]">
-                    <Shield className="w-4 h-4" />
-                    <span className="text-sm font-medium">Account Status</span>
-                  </div>
-                  <Badge
-                    variant="outline"
-                    className="text-green-400 border-green-400"
-                  >
-                    Verified
-                  </Badge>
                 </div>
               </div>
             </CardContent>
@@ -333,19 +326,19 @@ const Profile = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-[#B0AFAF]">Reports</span>
+                <span className="text-sm text-placeholder">Reports</span>
                 <span className="text-white font-bold">
                   {performanceStats.totalReports}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-[#B0AFAF]">Avg. Score</span>
+                <span className="text-sm text-placeholder">Avg. Score</span>
                 <span className="text-primary font-bold">
                   {performanceStats.averageScore || "--"}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-[#B0AFAF]">Progress</span>
+                <span className="text-sm text-placeholder">Progress</span>
                 <span
                   className={`font-bold ${
                     performanceStats.progress > 0
@@ -370,7 +363,7 @@ const Profile = () => {
                 <User className="w-5 h-5 mr-2 text-primary" />
                 Personal Information
               </CardTitle>
-              <CardDescription className="text-[#B0AFAF]">
+              <CardDescription className="text-placeholder">
                 {isEditing
                   ? "Update your personal details and playing profile"
                   : "Your basic information and football profile"}
@@ -385,7 +378,7 @@ const Profile = () => {
                   </label>
                   {isEditing ? (
                     <div className="relative">
-                      <User className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#B0AFAF] z-10" />
+                      <User className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-placeholder z-10" />
                       <Input
                         value={formData.player_name || ""}
                         onChange={(e) =>
@@ -412,7 +405,7 @@ const Profile = () => {
                   </label>
                   {isEditing ? (
                     <div className="relative">
-                      <Calendar className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#B0AFAF] z-10" />
+                      <Calendar className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-placeholder z-10" />
                       <Input
                         type="date"
                         value={formData.date_of_birth || ""}
@@ -432,7 +425,7 @@ const Profile = () => {
                             : "Not set"}
                         </span>
                         {user.date_of_birth && (
-                          <span className="text-[#B0AFAF] text-sm">
+                          <span className="text-placeholder text-sm">
                             {calculateAge(user.date_of_birth)} years old
                           </span>
                         )}
@@ -448,7 +441,7 @@ const Profile = () => {
                   </label>
                   {isEditing ? (
                     <div className="relative">
-                      <Target className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#B0AFAF] z-10" />
+                      <Target className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-placeholder z-10" />
                       <Select
                         value={formData.position || ""}
                         onValueChange={(value) =>
@@ -490,7 +483,7 @@ const Profile = () => {
                   </label>
                   {isEditing ? (
                     <div className="relative">
-                      <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#B0AFAF] z-10" />
+                      <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-placeholder z-10" />
                       <Select
                         value={formData.country || ""}
                         onValueChange={(value) =>
@@ -532,7 +525,7 @@ const Profile = () => {
                   </label>
                   {isEditing ? (
                     <div className="relative">
-                      <Building className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#B0AFAF] z-10" />
+                      <Building className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-placeholder z-10" />
                       <Select
                         value={formData.academy || ""}
                         onValueChange={(value) =>
@@ -577,7 +570,7 @@ const Profile = () => {
                 <TrendingUp className="w-5 h-5 mr-2 text-primary" />
                 Performance Overview
               </CardTitle>
-              <CardDescription className="text-[#B0AFAF]">
+              <CardDescription className="text-placeholder">
                 Your assessment history and performance trends
               </CardDescription>
             </CardHeader>
@@ -591,7 +584,7 @@ const Profile = () => {
                   <div className="text-3xl font-bold text-white group-hover:text-[#60A5FA] transition-colors">
                     {performanceStats.totalReports}
                   </div>
-                  <div className="text-sm text-[#B0AFAF] mt-2">
+                  <div className="text-sm text-placeholder mt-2">
                     Total Reports
                   </div>
                 </div>
@@ -604,7 +597,7 @@ const Profile = () => {
                   <div className="text-3xl font-bold text-white group-hover:text-primary transition-colors">
                     {performanceStats.averageScore || "--"}
                   </div>
-                  <div className="text-sm text-[#B0AFAF] mt-2">
+                  <div className="text-sm text-placeholder mt-2">
                     Average Score
                   </div>
                 </div>
@@ -626,7 +619,7 @@ const Profile = () => {
                     {performanceStats.progress > 0 ? "+" : ""}
                     {performanceStats.progress || 0}%
                   </div>
-                  <div className="text-sm text-[#B0AFAF] mt-2">
+                  <div className="text-sm text-placeholder mt-2">
                     Overall Progress
                   </div>
                 </div>
@@ -654,7 +647,7 @@ const Profile = () => {
                   )}
                   className="h-3 bg-[#343434] rounded-full"
                 />
-                <div className="flex justify-between text-xs text-[#B0AFAF]">
+                <div className="flex justify-between text-xs text-placeholder">
                   <span>Start</span>
                   <span>Current</span>
                 </div>

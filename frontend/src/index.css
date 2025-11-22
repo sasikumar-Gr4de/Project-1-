@@ -43,9 +43,8 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-}
 
-/* Update your index.css with lighter dark theme */
+}
 
 :root {
   --radius: 0.5rem;
@@ -80,6 +79,14 @@
   --border: #3a3f47;
   --input: #24272d;
   --ring: #C1FF72;
+
+  --color-blue-light: #60A5FA;
+  --color-blue: #3B82F6;
+  --color-purple-light: #8B5CF6;
+  --color-purple: #7C3AED;
+  --color-orange-light: #F59E0B;
+  --color-orange: #D97706;
+  --color-accent-secondary: #94D44A;
 }
 
 .dark {
@@ -103,12 +110,24 @@
   --ring: #C1FF72;
   /* Mirror semantic tokens for dark */
   --surface-0: #1a1a1a;
-  --surface-1: #262626;
+  --surface-1: #232323;
   --surface-2: #343434;
   --surface-3: #4a4a4a;
   --muted-text: #b0afaf;
   --ink: #0f0f0e;
   --accent-2: #94d44a;
+
+  --color-gray-dark: #333333;
+  --color-gray-darker: #444444;
+  --color-blue-light: #60A5FA;
+  --color-blue: #3B82F6;
+  --color-purple-light: #8B5CF6;
+  --color-purple: #7C3AED;
+  --color-orange-light: #F59E0B;
+  --color-orange: #D97706;
+  --color-accent-secondary: #94D44A;
+  --color-surface-3: #343434;
+  --color-surface-4: #262626;
 }
 
 @layer base {

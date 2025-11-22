@@ -150,7 +150,7 @@ const PlayerLayout = ({ children }) => {
               variant="ghost"
               size="icon"
               onClick={closeMobileMenu}
-              className="h-10 w-10 text-[#B0AFAF] hover:text-white hover:bg-[#343434]"
+              className="h-10 w-10 text-placeholder hover:text-white hover:bg-[#343434]"
             >
               <X className="w-5 h-5" />
             </Button>
@@ -222,7 +222,7 @@ const PlayerLayout = ({ children }) => {
                         "w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-300 mr-3 shadow-md",
                         isActive
                           ? "bg-linear-to-br from-primary to-[#94D44A] text-[#0F0F0E] shadow-lg shadow-primary/25"
-                          : "bg-[#262626] text-[#B0AFAF] group-hover:bg-[#343434] group-hover:text-primary"
+                          : "bg-[#262626] text-placeholder group-hover:bg-[#343434] group-hover:text-primary"
                       )}
                     >
                       <IconComponent className="w-4 h-4" />
@@ -246,7 +246,7 @@ const PlayerLayout = ({ children }) => {
                             "text-xs mt-1 transition-colors duration-300",
                             isActive
                               ? "text-primary/70"
-                              : "text-[#B0AFAF] group-hover:text-primary/70"
+                              : "text-placeholder group-hover:text-primary/70"
                           )}
                         >
                           {item.description}
@@ -285,7 +285,7 @@ const PlayerLayout = ({ children }) => {
                 {navigation.find((item) => isActiveRoute(item.href))?.name ||
                   "Dashboard"}
               </h1>
-              <p className="text-[#B0AFAF] text-xs lg:text-sm mt-1 font-['Orbitron']">
+              <p className="text-placeholder text-xs lg:text-sm mt-1 font-['Orbitron']">
                 {navigation.find((item) => isActiveRoute(item.href))
                   ?.description || "Performance overview and insights"}
               </p>
@@ -326,11 +326,11 @@ const PlayerLayout = ({ children }) => {
                               <h4 className="font-semibold text-white text-xs lg:text-sm flex-1  group-hover:text-primary transition-colors">
                                 {notification.title}
                               </h4>
-                              <p className="text-xs text-[#B0AFAF] mt-1 ">
+                              <p className="text-xs text-placeholder mt-1 ">
                                 {notification.message}
                               </p>
                             </div>
-                            <span className="text-xs text-[#B0AFAF] whitespace-nowrap  bg-[#343434] px-2 py-1 rounded-full">
+                            <span className="text-xs text-placeholder whitespace-nowrap  bg-[#343434] px-2 py-1 rounded-full">
                               {notification.time}
                             </span>
                           </div>
@@ -373,7 +373,7 @@ const PlayerLayout = ({ children }) => {
                   </div>
                   <ChevronDown
                     className={cn(
-                      "w-3 h-3 lg:w-4 lg:h-4 text-[#B0AFAF] transition-transform duration-300",
+                      "w-3 h-3 lg:w-4 lg:h-4 text-placeholder transition-transform duration-300",
                       userMenuOpen && "rotate-180 text-primary"
                     )}
                   />
@@ -385,16 +385,16 @@ const PlayerLayout = ({ children }) => {
                       <p className="text-white font-semibold text-sm truncate ">
                         {user?.player_name || "User"}
                       </p>
-                      <p className="text-[#B0AFAF] text-xs mt-1 truncate ">
+                      <p className="text-placeholder text-xs mt-1 truncate ">
                         {user?.email}
                       </p>
                     </div>
                     <div className="p-1 lg:p-2">
-                      <button className="flex items-center space-x-2 w-full px-2 lg:px-3 py-2 lg:py-3 text-xs lg:text-sm text-[#B0AFAF] hover:text-white hover:bg-[#343434] rounded-lg lg:rounded-xl transition-all duration-300 ">
+                      <button className="flex items-center space-x-2 w-full px-2 lg:px-3 py-2 lg:py-3 text-xs lg:text-sm text-placeholder hover:text-white hover:bg-[#343434] rounded-lg lg:rounded-xl transition-all duration-300 ">
                         <User className="w-3 h-3 lg:w-4 lg:h-4" />
                         <span>View Profile</span>
                       </button>
-                      <button className="flex items-center space-x-2 w-full px-2 lg:px-3 py-2 lg:py-3 text-xs lg:text-sm text-[#B0AFAF] hover:text-white hover:bg-[#343434] rounded-lg lg:rounded-xl transition-all duration-300 ">
+                      <button className="flex items-center space-x-2 w-full px-2 lg:px-3 py-2 lg:py-3 text-xs lg:text-sm text-placeholder hover:text-white hover:bg-[#343434] rounded-lg lg:rounded-xl transition-all duration-300 ">
                         <Settings className="w-3 h-3 lg:w-4 lg:h-4" />
                         <span>Settings</span>
                       </button>

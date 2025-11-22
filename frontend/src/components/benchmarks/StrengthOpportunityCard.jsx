@@ -1,5 +1,3 @@
-// src/components/ui/StrengthOpportunityCard.jsx
-import React from "react";
 import {
   Card,
   CardContent,
@@ -7,7 +5,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 
 const StrengthOpportunityCard = ({
   title,
@@ -16,7 +13,7 @@ const StrengthOpportunityCard = ({
   icon: Icon,
   gradient = "from-primary to-[#94D44A]",
   badgeClass = "bg-primary text-[#0F0F0E]",
-  type = "strength",
+  // type = "strength",
 }) => {
   return (
     <Card className="bg-[#262626] border-[#343434]">
@@ -37,7 +34,7 @@ const StrengthOpportunityCard = ({
         {items.map((item, index) => (
           <div
             key={index}
-            className="flex items-start space-x-4 p-4 bg-[#1A1A1A] rounded-xl border border-[#343434]"
+            className="flex items-center space-x-4 p-4 bg-black/60 rounded-xl border border-[#343434]"
           >
             <div
               className={`w-12 h-12 bg-linear-to-br ${
@@ -46,18 +43,20 @@ const StrengthOpportunityCard = ({
             >
               <item.icon className="w-6 h-6 text-white" />
             </div>
-            <div className="flex-1">
-              <div className="flex items-center justify-between">
+            <div className="flex-1 flex items-center justify-between">
+              <div className="flex-1">
                 <h4 className="font-semibold text-white">{item.title}</h4>
-                <Badge
-                  className={`${item.badgeClass || badgeClass} font-medium`}
-                >
-                  {item.improvement}
-                </Badge>
+                <p className="text-sm text-placeholder mt-1">
+                  {item.description}
+                </p>
               </div>
-              <p className="text-sm text-placeholder mt-1">
-                {item.description}
-              </p>
+              <div
+                className={`${
+                  item.badgeClass || badgeClass
+                } font-bold font-['Orbitron'] ml-4 text-2xl`}
+              >
+                {item.improvement}
+              </div>
             </div>
           </div>
         ))}
