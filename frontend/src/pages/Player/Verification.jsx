@@ -245,7 +245,7 @@ const Verification = () => {
                 <h3 className="text-2xl font-bold text-white mb-2">
                   Under Review
                 </h3>
-                <p className="text-[#B0AFAF] max-w-md mx-auto">
+                <p className="text-placeholder max-w-md mx-auto">
                   Your verification document is being reviewed. This usually
                   takes 1-2 business days.
                 </p>
@@ -270,7 +270,7 @@ const Verification = () => {
 
               <div className="bg-[#1A1A1A] border border-[#343434] rounded-xl p-4 max-w-md mx-auto">
                 <h4 className="font-semibold text-white mb-3">What's Next?</h4>
-                <ul className="space-y-2 text-sm text-[#B0AFAF] text-left">
+                <ul className="space-y-2 text-sm text-placeholder text-left">
                   <li className="flex items-center space-x-2">
                     <Clock className="w-4 h-4 text-yellow-400" />
                     <span>Document verification in progress</span>
@@ -315,7 +315,7 @@ const Verification = () => {
                   <h3 className="text-2xl font-bold text-white mb-2">
                     Account Verified
                   </h3>
-                  <p className="text-[#B0AFAF] max-w-md mx-auto">
+                  <p className="text-placeholder max-w-md mx-auto">
                     Congratulations! Your player identity has been verified and
                     you now have full access to all platform features.
                   </p>
@@ -327,7 +327,7 @@ const Verification = () => {
                     <h4 className="font-semibold text-white text-sm">
                       Full Access
                     </h4>
-                    <p className="text-xs text-[#B0AFAF]">
+                    <p className="text-xs text-placeholder">
                       All platform features unlocked
                     </p>
                   </div>
@@ -336,7 +336,7 @@ const Verification = () => {
                     <h4 className="font-semibold text-white text-sm">
                       Verified Badge
                     </h4>
-                    <p className="text-xs text-[#B0AFAF]">
+                    <p className="text-xs text-placeholder">
                       Trusted player status
                     </p>
                   </div>
@@ -362,7 +362,7 @@ const Verification = () => {
                   <h3 className="text-2xl font-bold text-white mb-2">
                     Verification Required
                   </h3>
-                  <p className="text-[#B0AFAF] max-w-md mx-auto">
+                  <p className="text-placeholder max-w-md mx-auto">
                     {getFinalStepStatus() === "failed"
                       ? "We encountered issues with your verification document. Please review the requirements and try again."
                       : "Please complete the verification process to access all platform features."}
@@ -375,7 +375,7 @@ const Verification = () => {
                       ? "Common Issues:"
                       : "Next Steps:"}
                   </h4>
-                  <ul className="space-y-2 text-sm text-[#B0AFAF]">
+                  <ul className="space-y-2 text-sm text-placeholder">
                     {getFinalStepStatus() === "failed" ? (
                       <>
                         <li className="flex items-center space-x-2">
@@ -465,11 +465,11 @@ const Verification = () => {
             <h1 className="text-4xl font-bold font-['Orbitron'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
               Player Verification
             </h1>
-            <p className="text-[#B0AFAF] text-lg mt-2 font-['Orbitron']">
+            <p className="text-placeholder text-lg mt-2 font-['Orbitron']">
               Complete your player identity verification
             </p>
           </div>
-          <Badge className="bg-[#343434] text-[#B0AFAF] border-[#343434]">
+          <Badge className="bg-[#343434] text-placeholder border-[#343434]">
             <Loader2 className="w-3 h-3 mr-1 animate-spin" />
             Loading...
           </Badge>
@@ -481,14 +481,14 @@ const Verification = () => {
             <CardTitle className="text-xl font-bold text-white">
               Verification Steps
             </CardTitle>
-            <CardDescription className="text-[#B0AFAF]">
+            <CardDescription className="text-placeholder">
               Complete all steps to verify your player identity
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-center py-12">
               <Loader2 className="w-8 h-8 text-primary animate-spin" />
-              <span className="ml-3 text-[#B0AFAF]">
+              <span className="ml-3 text-placeholder">
                 Loading verification status...
               </span>
             </div>
@@ -506,7 +506,7 @@ const Verification = () => {
           <h1 className="text-4xl font-bold font-['Orbitron'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
             Player Verification
           </h1>
-          <p className="text-[#B0AFAF] text-lg mt-2 font-['Orbitron']">
+          <p className="text-placeholder text-lg mt-2 font-['Orbitron']">
             Complete your player identity verification
           </p>
         </div>
@@ -521,7 +521,7 @@ const Verification = () => {
               ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
               : overallStatus.color === "red"
               ? "bg-red-500/20 text-red-400 border-red-500/30"
-              : "bg-[#343434] text-[#B0AFAF] border-[#343434]"
+              : "bg-[#343434] text-placeholder border-[#343434]"
           }
         `}
         >
@@ -537,7 +537,7 @@ const Verification = () => {
             <CardTitle className="text-xl font-bold text-white">
               Verification Steps
             </CardTitle>
-            <CardDescription className="text-[#B0AFAF]">
+            <CardDescription className="text-placeholder">
               Complete all steps to verify your player identity
             </CardDescription>
           </CardHeader>
