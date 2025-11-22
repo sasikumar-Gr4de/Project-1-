@@ -11,7 +11,7 @@ const StatsCard = ({
 }) => {
   return (
     <Card
-      className={`bg-[#262626] border-[#343434] hover:border-primary/30 transition-all duration-300 ${className}`}
+      className={`bg-(--surface-1) border-(--surface-2) hover:border-primary/30 transition-all duration-300 ${className}`}
     >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 ">
         <CardTitle className="text-sm font-medium text-white">
@@ -25,7 +25,7 @@ const StatsCard = ({
       </CardHeader>
       <CardContent>
         <div className={`text-4xl font-bold font-['Orbitron'] ${valueColor} `}>
-          {value ? value : "__"}
+          {value ? value : "--"}
         </div>
         <p className="text-xs text-placeholder mt-2">
           {description ? description : "No data available"}

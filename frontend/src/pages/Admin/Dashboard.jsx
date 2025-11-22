@@ -73,7 +73,7 @@ const Dashboard = () => {
           <h1 className="text-4xl font-bold font-['Orbitron'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
             Admin Dashboard
           </h1>
-          <p className="text-[#B0AFAF] text-lg mt-2 font-['Orbitron']">
+          <p className="text-placeholder text-lg mt-2 font-['Orbitron']">
             System overview and performance metrics
             {lastUpdated && (
               <span className="text-sm ml-2">
