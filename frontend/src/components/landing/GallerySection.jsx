@@ -40,7 +40,7 @@ const GallerySection = ({ content }) => {
           <h2 className="text-3xl font-bold font-['Orbitron'] mb-4 bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
             {content?.gallerySection?.heading || "GR4DE In Action"}
           </h2>
-          <p className="text-[#B0AFAF] max-w-2xl mx-auto font-['Orbitron']">
+          <p className="text-placeholder max-w-2xl mx-auto font-['Orbitron']">
             {content?.gallerySection?.subheading ||
               "See how clubs and academies are transforming talent assessment with our platform"}
           </p>
@@ -50,7 +50,7 @@ const GallerySection = ({ content }) => {
           {galleryImages.map((image) => (
             <div
               key={`gallery-image-${image.title}`}
-              className="group bg-[#262626] border border-[#343434] rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105 hover:border-primary/30"
+              className="group bg-[#262626] rounded-b-4xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105 hover:border-primary/30"
             >
               <div className="aspect-square overflow-hidden relative">
                 <img
@@ -65,7 +65,7 @@ const GallerySection = ({ content }) => {
                 <h3 className="font-semibold text-lg mb-2 text-white group-hover:text-primary transition-colors">
                   {image.title}
                 </h3>
-                <p className="text-sm text-[#B0AFAF] group-hover:text-white/80 transition-colors">
+                <p className="text-sm text-placeholder group-hover:text-white/80 transition-colors">
                   {image.description}
                 </p>
               </div>
@@ -74,8 +74,8 @@ const GallerySection = ({ content }) => {
         </div>
 
         {/* Additional Gallery Info */}
-        <div className="text-center mt-12">
-          <div className="inline-flex items-center justify-center space-x-8 text-sm text-[#B0AFAF]">
+        {/* <div className="text-center mt-12">
+          <div className="inline-flex items-center justify-center space-x-8 text-sm text-placeholder">
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-primary rounded-full"></div>
               <span>Used by 100+ clubs worldwide</span>
@@ -89,7 +89,7 @@ const GallerySection = ({ content }) => {
               <span>98% customer satisfaction</span>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </section>
   );

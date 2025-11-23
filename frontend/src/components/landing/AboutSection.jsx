@@ -1,4 +1,11 @@
-import { Target, Trophy } from "lucide-react";
+import {
+  ChartColumnDecreasing,
+  Goal,
+  Shield,
+  Target,
+  Trophy,
+  Users2,
+} from "lucide-react";
 
 const AboutSection = ({ content }) => {
   const defaultContent = {
@@ -23,30 +30,30 @@ const AboutSection = ({ content }) => {
             <h2 className="text-3xl font-bold font-['Orbitron'] mb-6 bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
               {sectionContent.heading}
             </h2>
-            <p className="text-lg text-[#B0AFAF] mb-8 font-['Orbitron']">
+            <p className="text-lg text-placeholder mb-8 font-['Orbitron']">
               {sectionContent.description}
             </p>
 
             <div className="space-y-6">
               <div className="flex items-start space-x-4">
-                <Target className="h-6 w-6 text-primary mt-1 shrink-0" />
+                <Goal className="h-10 w-10 text-primary mt-1 shrink-0 mr-3 " />
                 <div>
                   <h3 className="text-xl font-semibold text-white mb-2">
                     {sectionContent.goalTitle}
                   </h3>
-                  <p className="text-[#B0AFAF]">
+                  <p className="text-placeholder">
                     {sectionContent.goalDescription}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start space-x-4">
-                <Trophy className="h-6 w-6 text-primary mt-1 shrink-0" />
+                <Trophy className="h-10 w-10 text-primary mt-1 shrink-0 mr-3" />
                 <div>
                   <h3 className="text-xl font-semibold text-white mb-2">
                     {sectionContent.missionTitle}
                   </h3>
-                  <p className="text-[#B0AFAF]">
+                  <p className="text-placeholder">
                     {sectionContent.missionDescription}
                   </p>
                 </div>
@@ -55,76 +62,45 @@ const AboutSection = ({ content }) => {
           </div>
 
           <div className="grid grid-cols-2 gap-6">
-            <div className="bg-[#262626] border border-[#343434] rounded-xl p-6 hover:border-primary/30 transition-all duration-300 group">
-              <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center mb-4 group-hover:bg-primary/30 transition-colors">
-                <Target className="h-6 w-6 text-primary" />
-              </div>
+            <div className="bg-(--surface-1) rounded-xl p-6 hover:border-primary/30 transition-all duration-300 group">
+              <ChartColumnDecreasing className="text-primary h-15 w-15 py-2" />
               <h3 className="text-xl font-semibold text-white mb-2">
-                Precision Scoring
+                Data Analytics
               </h3>
-              <p className="text-[#B0AFAF] text-sm">
-                Objective performance metrics based on elite football benchmarks
+              <p className="text-placeholder text-sm">
+                Comprehensive match data analytics with advanced metrics.
               </p>
             </div>
 
-            <div className="bg-[#262626] border border-[#343434] rounded-xl p-6 hover:border-primary/30 transition-all duration-300 group">
-              <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center mb-4 group-hover:bg-primary/30 transition-colors">
-                <Trophy className="h-6 w-6 text-primary" />
-              </div>
+            <div className="bg-(--surface-1) rounded-xl p-6 hover:border-primary/30 transition-all duration-300 group">
+              <Target className="text-primary h-15 w-15 py-2" />
               <h3 className="text-xl font-semibold text-white mb-2">
                 Talent Development
               </h3>
-              <p className="text-[#B0AFAF] text-sm">
-                Identify and nurture promising players with data-driven insights
+              <p className="text-placeholder text-sm">
+                Machine learning algorithms for accurate performance scroing.
               </p>
             </div>
 
-            <div className="bg-[#262626] border border-[#343434] rounded-xl p-6 hover:border-primary/30 transition-all duration-300 group">
-              <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center mb-4 group-hover:bg-primary/30 transition-colors">
-                <svg
-                  className="h-6 w-6 text-primary"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                  />
-                </svg>
-              </div>
+            <div className="bg-(--surface-1) rounded-xl p-6 hover:border-primary/30 transition-all duration-300 group">
+              <Shield className="text-primary h-15 w-15 py-2" />
+
+              {/* </div> */}
               <h3 className="text-xl font-semibold text-white mb-2">
-                Progress Tracking
+                Elite Benchmarks
               </h3>
-              <p className="text-[#B0AFAF] text-sm">
-                Monitor player development over time with comprehensive
-                analytics
+              <p className="text-placeholder text-sm">
+                Compare against professional standards and bechmarks
               </p>
             </div>
 
-            <div className="bg-[#262626] border border-[#343434] rounded-xl p-6 hover:border-primary/30 transition-all duration-300 group">
-              <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center mb-4 group-hover:bg-primary/30 transition-colors">
-                <svg
-                  className="h-6 w-6 text-primary"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                  />
-                </svg>
-              </div>
+            <div className="bg-(--surface-1) rounded-xl p-6 hover:border-primary/30 transition-all duration-300 group">
+              <Users2 className="text-primary h-15 w-15 py-2" />
               <h3 className="text-xl font-semibold text-white mb-2">
-                Benchmark Analysis
+                Talent Discovery
               </h3>
-              <p className="text-[#B0AFAF] text-sm">
-                Compare players against professional standards and peer groups
+              <p className="text-placeholder text-sm">
+                Modify and develop promising young football talent.
               </p>
             </div>
           </div>

@@ -147,7 +147,7 @@ const Dashboard = () => {
                       {metrics?.queue?.[status] || 0} jobs
                     </span>
                   </div>
-                  <span className="text-[#B0AFAF] text-sm">
+                  <span className="text-placeholder text-sm">
                     {value ? value.toFixed(1) : 0}%
                   </span>
                 </div>
@@ -158,7 +158,7 @@ const Dashboard = () => {
 
           {/* <div className="mt-6 p-4 bg-[#1A1A1A] rounded-lg border border-[#343434]">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-[#B0AFAF]">Average Processing Time</span>
+              <span className="text-placeholder">Average Processing Time</span>
               <span className="text-white font-medium">
                 {metrics?.avgProcessingTime || "15"} minutes
               </span>
@@ -197,28 +197,28 @@ const Dashboard = () => {
             <div className="text-2xl font-bold text-primary">
               {metrics?.uptime || "99.9"}%
             </div>
-            <div className="text-xs text-[#B0AFAF] mt-1">Uptime</div>
+            <div className="text-xs text-placeholder mt-1">Uptime</div>
           </div>
 
           <div className="text-center p-4 bg-[#1A1A1A] rounded-lg border border-[#343434]">
             <div className="text-2xl font-bold text-[#10B981]">
               {metrics?.storageUsed || "2.1"}GB
             </div>
-            <div className="text-xs text-[#B0AFAF] mt-1">Storage Used</div>
+            <div className="text-xs text-placeholder mt-1">Storage Used</div>
           </div>
 
           <div className="text-center p-4 bg-[#1A1A1A] rounded-lg border border-[#343434]">
             <div className="text-2xl font-bold text-[#F59E0B]">
               {queue.items?.length || 0}
             </div>
-            <div className="text-xs text-[#B0AFAF] mt-1">Active Jobs</div>
+            <div className="text-xs text-placeholder mt-1">Active Jobs</div>
           </div>
 
           <div className="text-center p-4 bg-[#1A1A1A] rounded-lg border border-[#343434]">
             <div className="text-2xl font-bold text-[#60A5FA]">
               {metrics?.successRate || "98.2"}%
             </div>
-            <div className="text-xs text-[#B0AFAF] mt-1">Success Rate</div>
+            <div className="text-xs text-placeholder mt-1">Success Rate</div>
           </div>
         </div>
       </AdminSection>

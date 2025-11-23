@@ -121,14 +121,14 @@ const PlayerLayout = ({ children }) => {
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
-    <div className="min-h-screen bg-[#0F0F0E] flex layout-container">
+    <div className="min-h-screen bg-(--surface-0) flex layout-container">
       {/* Mobile menu button */}
       <div className="lg:hidden fixed top-4 left-4 z-50">
         <Button
           variant="outline"
           size="icon"
           onClick={toggleMobileMenu}
-          className="bg-[#1A1A1A] border-[#343434] h-12 w-12 hover:bg-[#262626] hover:border-primary transition-all duration-300 shadow-lg"
+          className="bg-(--surface-0) border-(--surface-2) h-12 w-12 hover:bg-(--surface-1) hover:border-primary transition-all duration-300 shadow-lg"
         >
           <Menu className="w-5 h-5 text-primary" />
         </Button>
@@ -137,7 +137,7 @@ const PlayerLayout = ({ children }) => {
       {/* Sidebar - Fixed with proper responsive behavior */}
       <div
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-80 bg-[#1A1A1A] transform transition-all duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 border-r border-[#343434]",
+          "fixed inset-y-0 left-0 z-40 w-80 bg-(--surface-0) transform transition-all duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 border-r border-(--surface-2)",
           mobileMenuOpen
             ? "translate-x-0 shadow-2xl"
             : "-translate-x-full lg:translate-x-0"
@@ -145,19 +145,19 @@ const PlayerLayout = ({ children }) => {
       >
         <div className="flex flex-col h-full">
           {/* Mobile Close Button */}
-          <div className="lg:hidden flex justify-end p-4 border-b border-[#343434]">
+          <div className="lg:hidden flex justify-end p-4 border-b border-(--surface-2)">
             <Button
               variant="ghost"
               size="icon"
               onClick={closeMobileMenu}
-              className="h-10 w-10 text-placeholder hover:text-white hover:bg-[#343434]"
+              className="h-10 w-10 text-(--muted-text) hover:text-white hover:bg-(--surface-2)"
             >
               <X className="w-5 h-5" />
             </Button>
           </div>
 
           {/* Logo Section */}
-          <div className="flex flex-col items-center p-6 pb-4 shrink-0 border-b border-[#343434]">
+          <div className="flex flex-col items-center p-6 pb-4 shrink-0 border-b border-(--surface-2)">
             <img
               src="https://amzn-gr4de-bucket.s3.eu-north-1.amazonaws.com/serverfavicon-flat.png-1761828572874-cz3vcaezhrb"
               alt="GR4DE Logo"
@@ -171,17 +171,17 @@ const PlayerLayout = ({ children }) => {
           </div>
 
           {/* User Profile Mini Card */}
-          <div className="px-4 py-3 border-b border-[#343434]">
-            <div className="flex items-center space-x-3 p-3 bg-[#262626] rounded-xl border border-[#343434]">
-              <div className="w-10 h-10 bg-linear-to-br from-primary to-[#94D44A] rounded-full flex items-center justify-center shadow-lg">
+          <div className="px-4 py-3 border-b border-(--surface-2)">
+            <div className="flex items-center space-x-3 p-3 bg-(--surface-1) rounded-xl border border-(--surface-2)">
+              <div className="w-10 h-10 bg-linear-to-br from-primary to-(--accent-2) rounded-full flex items-center justify-center shadow-lg">
                 {user?.avatar_url ? (
                   <img
                     src={user.avatar_url}
                     alt="Profile"
-                    className="w-10 h-10 rounded-full object-cover border-2 border-[#1A1A1A]"
+                    className="w-10 h-10 rounded-full object-cover border-2 border-(--surface-0)"
                   />
                 ) : (
-                  <span className="text-[#0F0F0E] text-sm font-bold ">
+                  <span className="text-(--ink) text-sm font-bold ">
                     {user?.player_name?.charAt(0)?.toUpperCase() || "U"}
                   </span>
                 )}
@@ -210,9 +210,9 @@ const PlayerLayout = ({ children }) => {
                     onClick={(e) => handleNavigation(item.href, e)}
                     className={cn(
                       "flex items-center w-full px-3 py-3 transition-all duration-300 group text-left rounded-xl border-2",
-                      "hover:border-primary/30 hover:bg-[#262626] hover:shadow-lg",
+                      "hover:border-primary/30 hover:bg-(--surface-1) hover:shadow-lg",
                       isActive
-                        ? "bg-linear-to-r from-primary/10 to-[#94D44A]/5 border-primary shadow-lg shadow-primary/10"
+                        ? "bg-linear-to-r from-primary/10 to-(--accent-2)/5 border-primary shadow-lg shadow-primary/10"
                         : "border-transparent bg-transparent"
                     )}
                   >
@@ -221,8 +221,8 @@ const PlayerLayout = ({ children }) => {
                       className={cn(
                         "w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-300 mr-3 shadow-md",
                         isActive
-                          ? "bg-linear-to-br from-primary to-[#94D44A] text-[#0F0F0E] shadow-lg shadow-primary/25"
-                          : "bg-[#262626] text-placeholder group-hover:bg-[#343434] group-hover:text-primary"
+                          ? "bg-linear-to-br from-primary to-(--accent-2) text-(--ink) shadow-lg shadow-primary/25"
+                          : "bg-(--surface-1) text-(--muted-text) group-hover:bg-(--surface-2) group-hover:text-primary"
                       )}
                     >
                       <IconComponent className="w-4 h-4" />
@@ -246,7 +246,7 @@ const PlayerLayout = ({ children }) => {
                             "text-xs mt-1 transition-colors duration-300",
                             isActive
                               ? "text-primary/70"
-                              : "text-placeholder group-hover:text-primary/70"
+                              : "text-(--muted-text) group-hover:text-primary/70"
                           )}
                         >
                           {item.description}
@@ -274,9 +274,9 @@ const PlayerLayout = ({ children }) => {
         )}
       >
         {/* Header */}
-        <header className="sticky top-0 z-30 bg-[#1A1A1A] h-16 lg:h-20 shrink-0 border-b border-[#343434] backdrop-blur-sm sticky-header">
+        <header className="sticky top-0 z-30 bg-(--surface-0) h-16 lg:h-20 shrink-0 border-b border-(--surface-2) backdrop-blur-sm sticky-header">
           {/* Gradient Accent Line */}
-          <div className="absolute bottom-0 left-0 w-full h-0.5 bg-linear-to-r from-primary to-[#94D44A] shadow-lg shadow-primary/20" />
+          <div className="absolute bottom-0 left-0 w-full h-0.5 bg-linear-to-r from-primary to-(--accent-2) shadow-lg shadow-primary/20" />
 
           <div className="flex items-center justify-between h-full px-4 lg:px-6">
             {/* Page Title - Adjusted for mobile */}
@@ -285,7 +285,7 @@ const PlayerLayout = ({ children }) => {
                 {navigation.find((item) => isActiveRoute(item.href))?.name ||
                   "Dashboard"}
               </h1>
-              <p className="text-placeholder text-xs lg:text-sm mt-1 font-['Orbitron']">
+              <p className="text-(--muted-text) text-xs lg:text-sm mt-1 font-['Orbitron']">
                 {navigation.find((item) => isActiveRoute(item.href))
                   ?.description || "Performance overview and insights"}
               </p>
@@ -299,24 +299,24 @@ const PlayerLayout = ({ children }) => {
                   variant="ghost"
                   size="icon"
                   onClick={() => setNotificationsOpen(!notificationsOpen)}
-                  className="relative h-10 w-10 lg:h-12 lg:w-12 bg-[#262626] rounded-xl border border-[#343434] hover:bg-[#343434] hover:border-primary/30 transition-all duration-300 shadow-sm"
+                  className="relative h-10 w-10 lg:h-12 lg:w-12 bg-(--surface-1) rounded-xl border border-(--surface-2) hover:bg-(--surface-2) hover:border-primary/30 transition-all duration-300 shadow-sm"
                 >
                   <Bell className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
                   {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-4 w-4 lg:h-5 lg:w-5 rounded-full bg-linear-to-br from-[#FF6B6B] to-[#EE5A52] text-[8px] lg:text-[10px] font-bold text-white flex items-center justify-center border-2 border-[#1A1A1A] shadow-lg">
+                    <span className="absolute -top-1 -right-1 h-4 w-4 lg:h-5 lg:w-5 rounded-full bg-linear-to-br from-[#FF6B6B] to-[#EE5A52] text-[8px] lg:text-[10px] font-bold text-white flex items-center justify-center border-2 border-(--surface-0) shadow-lg">
                       {unreadCount}
                     </span>
                   )}
                 </Button>
 
                 {notificationsOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-80 lg:w-96 bg-[#262626] border border-[#343434] rounded-xl lg:rounded-2xl shadow-2xl z-50 backdrop-blur-sm">
+                  <div className="absolute right-0 top-full mt-2 w-80 lg:w-96 bg-(--surface-1) border border-(--surface-2) rounded-xl lg:rounded-2xl shadow-2xl z-50 backdrop-blur-sm">
                     <div className="max-h-64 lg:max-h-80 overflow-y-auto">
                       {notifications.map((notification) => (
                         <div
                           key={notification.id}
                           className={cn(
-                            "p-3 lg:p-4 border-b border-[#343434] last:border-b-0 hover:bg-[#343434] cursor-pointer transition-all duration-300 group",
+                            "p-3 lg:p-4 border-b border-(--surface-2) last:border-b-0 hover:bg-(--surface-2) cursor-pointer transition-all duration-300 group",
                             !notification.read &&
                               "bg-primary/5 border-l-4 border-l-primary"
                           )}
@@ -326,11 +326,11 @@ const PlayerLayout = ({ children }) => {
                               <h4 className="font-semibold text-white text-xs lg:text-sm flex-1  group-hover:text-primary transition-colors">
                                 {notification.title}
                               </h4>
-                              <p className="text-xs text-placeholder mt-1 ">
+                              <p className="text-xs text-(--muted-text) mt-1 ">
                                 {notification.message}
                               </p>
                             </div>
-                            <span className="text-xs text-placeholder whitespace-nowrap  bg-[#343434] px-2 py-1 rounded-full">
+                            <span className="text-xs text-(--muted-text) whitespace-nowrap bg-(--surface-2) px-2 py-1 rounded-full">
                               {notification.time}
                             </span>
                           </div>
@@ -345,19 +345,19 @@ const PlayerLayout = ({ children }) => {
               <div className="relative user-menu">
                 <Button
                   variant="ghost"
-                  className="flex items-center space-x-2 lg:space-x-3 p-1 lg:p-2 h-auto hover:bg-[#262626] rounded-xl border border-[#343434] transition-all duration-300"
+                  className="flex items-center space-x-2 lg:space-x-3 p-1 lg:p-2 h-auto hover:bg-(--surface-1) rounded-xl border border-(--surface-2) transition-all duration-300"
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                 >
                   <div className="flex items-center space-x-2 lg:space-x-3">
-                    <div className="w-8 h-8 lg:w-10 lg:h-10 bg-linear-to-br from-primary to-[#94D44A] rounded-full flex items-center justify-center shadow-lg">
+                    <div className="w-8 h-8 lg:w-10 lg:h-10 bg-linear-to-br from-primary to-(--accent-2) rounded-full flex items-center justify-center shadow-lg">
                       {user?.avatar_url ? (
                         <img
                           src={user.avatar_url}
                           alt="Profile"
-                          className="w-8 h-8 lg:w-10 lg:h-10 rounded-full object-cover border-2 border-[#1A1A1A]"
+                          className="w-8 h-8 lg:w-10 lg:h-10 rounded-full object-cover border-2 border-(--surface-0)"
                         />
                       ) : (
-                        <span className="text-[#0F0F0E] text-xs lg:text-sm font-bold ">
+                        <span className="text-(--ink) text-xs lg:text-sm font-bold ">
                           {user?.player_name?.charAt(0)?.toUpperCase() || "U"}
                         </span>
                       )}
@@ -373,36 +373,36 @@ const PlayerLayout = ({ children }) => {
                   </div>
                   <ChevronDown
                     className={cn(
-                      "w-3 h-3 lg:w-4 lg:h-4 text-placeholder transition-transform duration-300",
+                      "w-3 h-3 lg:w-4 lg:h-4 text-(--muted-text) transition-transform duration-300",
                       userMenuOpen && "rotate-180 text-primary"
                     )}
                   />
                 </Button>
 
                 {userMenuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-56 lg:w-64 bg-[#262626] border border-[#343434] rounded-xl lg:rounded-2xl shadow-2xl z-50 backdrop-blur-sm">
-                    <div className="p-3 lg:p-4 border-b border-[#343434]">
+                  <div className="absolute right-0 top-full mt-2 w-56 lg:w-64 bg-(--surface-1) border border-(--surface-2) rounded-xl lg:rounded-2xl shadow-2xl z-50 backdrop-blur-sm">
+                    <div className="p-3 lg:p-4 border-b border-(--surface-2)">
                       <p className="text-white font-semibold text-sm truncate ">
                         {user?.player_name || "User"}
                       </p>
-                      <p className="text-placeholder text-xs mt-1 truncate ">
+                      <p className="text-(--muted-text) text-xs mt-1 truncate ">
                         {user?.email}
                       </p>
                     </div>
                     <div className="p-1 lg:p-2">
-                      <button className="flex items-center space-x-2 w-full px-2 lg:px-3 py-2 lg:py-3 text-xs lg:text-sm text-placeholder hover:text-white hover:bg-[#343434] rounded-lg lg:rounded-xl transition-all duration-300 ">
+                      <button className="flex items-center space-x-2 w-full px-2 lg:px-3 py-2 lg:py-3 text-xs lg:text-sm text-(--muted-text) hover:text-white hover:bg-(--surface-2) rounded-lg lg:rounded-xl transition-all duration-300 ">
                         <User className="w-3 h-3 lg:w-4 lg:h-4" />
                         <span>View Profile</span>
                       </button>
-                      <button className="flex items-center space-x-2 w-full px-2 lg:px-3 py-2 lg:py-3 text-xs lg:text-sm text-placeholder hover:text-white hover:bg-[#343434] rounded-lg lg:rounded-xl transition-all duration-300 ">
+                      <button className="flex items-center space-x-2 w-full px-2 lg:px-3 py-2 lg:py-3 text-xs lg:text-sm text-(--muted-text) hover:text-white hover:bg-(--surface-2) rounded-lg lg:rounded-xl transition-all duration-300 ">
                         <Settings className="w-3 h-3 lg:w-4 lg:h-4" />
                         <span>Settings</span>
                       </button>
                     </div>
-                    <div className="p-1 lg:p-2 border-t border-[#343434]">
+                    <div className="p-1 lg:p-2 border-t border-(--surface-2)">
                       <button
                         onClick={handleLogout}
-                        className="flex items-center space-x-2 w-full px-2 lg:px-3 py-2 lg:py-3 text-xs lg:text-sm text-[#FF6B6B] hover:bg-[#FF6B6B]/10 rounded-lg lg:rounded-xl transition-all duration-300 "
+                        className="flex items-center space-x-2 w-full px-2 lg:px-3 py-2 lg:py-3 text-xs lg:text-sm text-red-500 hover:bg-[#FF6B6B]/10 rounded-lg lg:rounded-xl transition-all duration-300 "
                       >
                         <LogOut className="w-3 h-3 lg:w-4 lg:h-4" />
                         <span>Sign out</span>
@@ -416,7 +416,7 @@ const PlayerLayout = ({ children }) => {
         </header>
 
         {/* Scrollable Content Area */}
-        <main className="flex-1 overflow-auto bg-[#0F0F0E] scrollable-content">
+        <main className="flex-1 overflow-auto bg-(--surface-0) scrollable-content">
           <div className="p-4 sm:p-6 lg:p-8 min-h-full">{children}</div>
         </main>
       </div>

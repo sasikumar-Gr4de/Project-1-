@@ -172,7 +172,7 @@ const Benchmarks = () => {
           {[...Array(3)].map((_, i) => (
             <Card
               key={i}
-              className="animate-pulse bg-[#262626] border(--surface-1)"
+              className="animate-pulse bg-(--surface-2) border(--surface-1)"
             >
               <CardContent className="p-4">
                 <div className="h-5 bg-(--surface-1) rounded w-1/4 mb-3"></div>

@@ -21,7 +21,7 @@ const CTASection = ({ content }) => {
         <h2 className="text-3xl lg:text-4xl font-bold font-['Orbitron'] mb-6 bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
           {sectionContent.heading}
         </h2>
-        <p className="text-xl text-[#B0AFAF] mb-8 max-w-2xl mx-auto font-['Orbitron']">
+        <p className="text-xl text-placeholder mb-8 max-w-2xl mx-auto font-['Orbitron']">
           {sectionContent.subheading}
         </p>
 
@@ -32,36 +32,14 @@ const CTASection = ({ content }) => {
             </Button>
           </Link>
 
-          <Link to="/login">
+          {/* <Link to="/login">
             <Button
               variant="outline"
               className="border-primary text-primary hover:bg-primary/10 font-semibold rounded-xl px-8 py-4 text-lg h-14"
             >
               Schedule a Demo
             </Button>
-          </Link>
-        </div>
-
-        {/* Trust Indicators */}
-        <div className="mt-12 pt-8 border-t border-[#343434]">
-          <p className="text-[#B0AFAF] text-sm mb-6 font-['Orbitron']">
-            Trusted by leading football organizations
-          </p>
-          <div className="flex flex-wrap justify-center items-center gap-8 opacity-60">
-            {/* Placeholder for club logos - replace with actual logos */}
-            <div className="text-[#B0AFAF] text-sm font-['Orbitron']">
-              ACADEMY FC
-            </div>
-            <div className="text-[#B0AFAF] text-sm font-['Orbitron']">
-              ELITE SPORTS
-            </div>
-            <div className="text-[#B0AFAF] text-sm font-['Orbitron']">
-              FUTURE STARS
-            </div>
-            <div className="text-[#B0AFAF] text-sm font-['Orbitron']">
-              PRO YOUTH
-            </div>
-          </div>
+          </Link> */}
         </div>
       </div>
     </section>

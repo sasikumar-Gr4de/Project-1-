@@ -48,10 +48,10 @@ const Landing = () => {
   }
 
   return (
-    <div className="landing-page bg-[#0F0F0E] text-white">
+    <div className="landing-page bg-secondary-foreground text-white">
       <div className="min-h-screen">
         {/* Navigation */}
-        <nav className="sticky top-0 z-50 bg-[#262626]/80 backdrop-blur-md border-b border-[#343434]">
+        <nav className="sticky top-0 z-50 bg-(--surface-1)/80 backdrop-blur-md border-b border-(--surface-2)">
           <div className="mx-auto px-4 py-4">
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-3">
@@ -62,35 +62,8 @@ const Landing = () => {
                 />
               </div>
 
-              <div className="hidden md:flex items-center space-x-8">
-                <a
-                  href="#features"
-                  className="text-[#B0AFAF] hover:text-white transition-colors font-['Orbitron']"
-                >
-                  Features
-                </a>
-                <a
-                  href="#how-it-works"
-                  className="text-[#B0AFAF] hover:text-white transition-colors font-['Orbitron']"
-                >
-                  How It Works
-                </a>
-                {/* <a
-                  href="#pricing"
-                  className="text-[#B0AFAF] hover:text-white transition-colors font-['Orbitron']"
-                >
-                  Pricing
-                </a> */}
-                <a
-                  href="#about"
-                  className="text-[#B0AFAF] hover:text-white transition-colors font-['Orbitron']"
-                >
-                  About
-                </a>
-              </div>
-
               <Link to="/login">
-                <Button className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold rounded-xl px-6 py-3 h-12 shadow-lg hover:shadow-xl transition-all duration-300">
+                <Button className="bg-linear-to-r from-primary to-secondary text-(--surface-0) hover:from-secondary hover:to-primary font-semibold rounded-xl px-6 py-3 h-12 shadow-lg hover:shadow-xl transition-all duration-300">
                   Get Started
                 </Button>
               </Link>
@@ -104,14 +77,8 @@ const Landing = () => {
         {/* About Section */}
         <AboutSection content={content} />
 
-        {/* Features Section */}
-        <FeaturesSection content={content} />
-
         {/* How It Works Section */}
         <HowItWorksSection content={content} />
-
-        {/* Testimonials Section */}
-        <TestimonialsSection content={content} />
 
         {/* Gallery Section */}
         <GallerySection content={content} />
@@ -132,16 +99,16 @@ const Landing = () => {
                   alt="GR4DE Logo"
                   className="w-24 h-14 object-contain"
                 />
-                <p className="text-sm text-[#B0AFAF] mt-2 font-['Orbitron']">
+                <p className="text-sm text-placeholder mt-2 font-['Orbitron']">
                   The Game Reads you Back
                 </p>
               </div>
 
               <div className="text-center md:text-right">
-                <p className="text-[#B0AFAF] font-['Orbitron']">
+                <p className="text-placeholder font-['Orbitron']">
                   AI-Powered Football Performance Analytics
                 </p>
-                <p className="text-sm text-[#B0AFAF] mt-2 font-['Orbitron']">
+                <p className="text-sm text-placeholder mt-2 font-['Orbitron']">
                   © 2025 GR4DE. All rights reserved.
                 </p>
               </div>

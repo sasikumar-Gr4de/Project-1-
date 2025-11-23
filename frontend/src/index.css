@@ -11,7 +11,7 @@
   
   /* Updated Color Palette - Bright Neon Green Theme */
   --color-primary: #C1FF72;
-  --color-primary-foreground: #16191f;
+  --color-primary-foreground: #0F0F0E;
   --color-primary-50: #f7ffed;
   --color-primary-100: #e8ffcc;
   --color-primary-200: #d4ff9e;
@@ -24,7 +24,7 @@
   --color-primary-900: #213205;
   
   --color-secondary: #9ae619;
-  --color-secondary-foreground: #16191f;
+  --color-secondary-foreground: #0F0F0E;
 
   --color-placeholder: #B0AFAF;
 
@@ -65,11 +65,11 @@
   
   /* Primary - Bright Neon Green */
   --primary: #C1FF72;
-  --primary-foreground: #1a1d21;
+  --primary-foreground: #0F0F0E;
   
   /* Secondary - Vibrant Green */
   --secondary: #9ae619;
-  --secondary-foreground: #1a1d21;
+  --secondary-foreground: #0F0F0E;
   
   --muted: #3a3f47;
   --muted-foreground: #94a3b8;
@@ -97,9 +97,9 @@
   --popover: #24272d;
   --popover-foreground: #e2e8f0;
   --primary: #C1FF72;
-  --primary-foreground: #1a1d21;
+  --primary-foreground: #0F0F0E;
   --secondary: #9ae619;
-  --secondary-foreground: #1a1d21;
+  --secondary-foreground: #0F0F0E;
   --muted: #3a3f47;
   --muted-foreground: #94a3b8;
   --accent: #3a3f47;
