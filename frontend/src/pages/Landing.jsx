@@ -6,12 +6,7 @@ import { sanityService } from "@/services/sanity.service";
 // Import components
 import HeroSection from "@/components/landing/HeroSection";
 import HowItWorksSection from "@/components/landing/HowItWorksSection";
-import TestimonialsSection from "@/components/landing/TestimonialsSection";
-// import PricingSection from "@/components/landing/PricingSection";
-
-// Import existing sections (to be updated with CMS)
 import AboutSection from "@/components/landing/AboutSection";
-import FeaturesSection from "@/components/landing/FeaturesSection";
 import GallerySection from "@/components/landing/GallerySection";
 import CTASection from "@/components/landing/CTASection";
 
@@ -82,9 +77,6 @@ const Landing = () => {
 
         {/* Gallery Section */}
         <GallerySection content={content} />
-
-        {/* Pricing Section */}
-        {/* <PricingSection content={content} /> */}
 
         {/* CTA Section */}
         <CTASection content={content} />
