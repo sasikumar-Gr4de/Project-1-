@@ -25,7 +25,6 @@ import {
   Video,
   FileText,
   Calendar,
-  Shirt,
   MapPin,
   Palette,
   Clock,
@@ -37,7 +36,7 @@ import api from "@/services/base.api";
 
 const Upload = () => {
   const { fetchDashboard } = useUserStore();
-  const { showToast } = useToast();
+  const { toast } = useToast();
   const [uploadData, setUploadData] = useState({
     match_date: "",
     jersey_number: "",
@@ -87,7 +86,11 @@ const Upload = () => {
           setPollingInterval(null);
         }
 
-        showToast("Your report is ready!", "success");
+        toast({
+          title: "Success",
+          description: "Your report is ready!",
+          variant: "success",
+        });
         fetchDashboard(); // Refresh dashboard
 
         // Reset form after success
@@ -113,7 +116,12 @@ const Upload = () => {
           setPollingInterval(null);
         }
 
-        showToast("Analysis failed. Please try again.", "error");
+        toast({
+          title: "Error",
+          description: "Analysis failed. Please try again.",
+          variant: "error",
+        });
+
         setQueueId(null);
         setQueueStatus(null);
       }
@@ -142,8 +150,19 @@ const Upload = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!files.video || !uploadData.match_date) {
-      showToast("Please provide video file and match date", "error");
+    if (
+      !files.video ||
+      !uploadData.match_date ||
+      !uploadData.jersey_number ||
+      !uploadData.position ||
+      !uploadData.jersey_color ||
+      !uploadData.opponent_jersey_color
+    ) {
+      toast({
+        title: "Error",
+        description: "Please provide video file and required fields",
+        variant: "error",
+      });
       return;
     }
 
@@ -154,9 +173,8 @@ const Upload = () => {
       const uploadPayload = {
         video_url: files.video,
         gps_url: files.gps || undefined,
-        event_json: undefined, // For future use
         match_date: uploadData.match_date,
-        upload_source: "web",
+        upload_source: "gr4de",
         metadata: {
           competition: uploadData.competition || undefined,
           opponent: uploadData.opponent || undefined,
@@ -164,8 +182,15 @@ const Upload = () => {
           minutes: uploadData.minutes
             ? parseInt(uploadData.minutes)
             : undefined,
+          notes: uploadData.notes || undefined, // Note singular in backend
+          postion: uploadData.position || undefined, // Typo in backend
+          jersey_number: uploadData.jersey_number || undefined, // Keep as number
+          jersey_color: uploadData.jersey_color || undefined, // Keep as is
+          opponent_jersey_color: uploadData.opponent_jersey_color || undefined, // Keep as is
         },
       };
+
+      const response = await uploadPlayerData(uploadPayload);
 
       // Simulate progress
       const interval = setInterval(() => {
@@ -178,21 +203,24 @@ const Upload = () => {
         });
       }, 500);
 
-      const response = await api.post("/upload/v1/uploads", uploadPayload);
-
       clearInterval(interval);
       setUploadProgress(100);
 
       if (response.data.success) {
         const { queue_id } = response.data.data;
         setQueueId(queue_id);
-        showToast("Upload successful! Processing your data...", "success");
+
+        toast({
+          title: "Success",
+          description: "Upload successful! Processing your data...",
+          variant: "success",
+        });
 
         // Reset form fields but keep queue tracking
         setUploadData({
           match_date: "",
-          jersey_number: "",
           position: "",
+          jersey_number: "",
           jersey_color: "",
           opponent_jersey_color: "",
           notes: "",
@@ -203,11 +231,19 @@ const Upload = () => {
         });
         setFiles({ video: null, gps: null });
       } else {
-        showToast(response.data.message || "Upload failed", "error");
+        toast({
+          title: "Error",
+          description: response.data.message || "Upload failed",
+          variant: "error",
+        });
       }
     } catch (error) {
-      console.error("Upload error:", error);
-      showToast(error.response?.data?.message || "Upload failed", "error");
+      console.log(error);
+      toast({
+        title: "Error",
+        description: response.data.message || "Upload failed",
+        variant: "error",
+      });
     } finally {
       setIsUploading(false);
       setTimeout(() => setUploadProgress(0), 2000);
@@ -220,8 +256,9 @@ const Upload = () => {
     uploadData.match_date &&
     uploadData.jersey_number &&
     uploadData.jersey_color &&
-    uploadData.opponent_jersey_color;
-  uploadData.position && !isUploading;
+    uploadData.opponent_jersey_color &&
+    uploadData.position &&
+    !isUploading;
 
   return (
     <div className="space-y-6">
@@ -389,7 +426,7 @@ const Upload = () => {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-white ">Player Info</span>
-                {uploadData.jersey_number || uploadData.position ? (
+                {uploadData.jersey_number && uploadData.position ? (
                   <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 ">
                     Added
                   </Badge>
@@ -500,7 +537,7 @@ const Upload = () => {
               </div>
 
               {/* Jersey Number and Position */}
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Position - Full width on mobile */}
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-white">
@@ -531,93 +568,108 @@ const Upload = () => {
                     </Select>
                   </div>
                 </div>
+                {/* Jersey Number */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-white ">
+                    Jersey Number
+                  </label>
+                  <Input
+                    type="text"
+                    placeholder="e.g., 7"
+                    value={uploadData.jersey_number}
+                    onChange={(e) =>
+                      handleInputChange("jersey_number", e.target.value)
+                    }
+                    className="h-11 bg-(--surface-0) border-(--surface-2) text-white placeholder:text-(--muted-text) focus:border-primary "
+                  />
+                </div>
+              </div>
 
-                {/* Jersey Colors - Side by side on larger screens */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Your Jersey Color */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-white">
-                      Your Jersey Color *
-                    </label>
-                    <div className="relative">
-                      <Palette className="absolute left-3 top-3 h-4 w-4 text-(--muted-text) z-10" />
-                      <Select
-                        value={uploadData.jersey_color}
-                        onValueChange={(value) =>
-                          handleInputChange("jersey_color", value)
-                        }
-                      >
-                        <SelectTrigger className="pl-10 h-11 bg-(--surface-0) border-(--surface-2) text-white focus:border-primary w-full">
-                          <SelectValue placeholder="Select color" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-(--surface-1) border-(--surface-2) text-white max-h-60 w-full">
-                          {JERSEY_COLORS.map((color) => (
-                            <SelectItem
-                              key={color}
-                              value={color}
-                              className="w-full"
-                            >
-                              <div className="flex items-center space-x-2 w-full">
-                                <div
-                                  className="w-4 h-4 rounded border border-(--surface-2) shrink-0"
-                                  style={{
-                                    backgroundColor: color.toLowerCase(),
-                                    borderColor:
-                                      color.toLowerCase() === "white"
-                                        ? "var(--surface-2)"
-                                        : "transparent",
-                                  }}
-                                />
-                                <span className="truncate">{color}</span>
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+              {/* Jersey Colors - Side by side on larger screens */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Your Jersey Color */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-white">
+                    Your Jersey Color *
+                  </label>
+                  <div className="relative">
+                    <Palette className="absolute left-3 top-3 h-4 w-4 text-(--muted-text) z-10" />
+                    <Select
+                      value={uploadData.jersey_color}
+                      onValueChange={(value) =>
+                        handleInputChange("jersey_color", value)
+                      }
+                    >
+                      <SelectTrigger className="pl-10 h-11 bg-(--surface-0) border-(--surface-2) text-white focus:border-primary w-full">
+                        <SelectValue placeholder="Select color" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-(--surface-1) border-(--surface-2) text-white max-h-60 w-full">
+                        {JERSEY_COLORS.map((color) => (
+                          <SelectItem
+                            key={color}
+                            value={color}
+                            className="w-full"
+                          >
+                            <div className="flex items-center space-x-2 w-full">
+                              <div
+                                className="w-4 h-4 rounded border border-(--surface-2) shrink-0"
+                                style={{
+                                  backgroundColor: color.toLowerCase(),
+                                  borderColor:
+                                    color.toLowerCase() === "white"
+                                      ? "var(--surface-2)"
+                                      : "transparent",
+                                }}
+                              />
+                              <span className="truncate">{color}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
+                </div>
 
-                  {/* Opponent Jersey Color */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-white">
-                      Opponent Jersey Color *
-                    </label>
-                    <div className="relative">
-                      <Palette className="absolute left-3 top-3 h-4 w-4 text-(--muted-text) z-10" />
-                      <Select
-                        value={uploadData.opponent_jersey_color}
-                        onValueChange={(value) =>
-                          handleInputChange("opponent_jersey_color", value)
-                        }
-                      >
-                        <SelectTrigger className="pl-10 h-11 bg-(--surface-0) border-(--surface-2) text-white focus:border-primary w-full">
-                          <SelectValue placeholder="Select color" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-(--surface-1) border-(--surface-2) text-white max-h-60 w-full">
-                          {JERSEY_COLORS.map((color) => (
-                            <SelectItem
-                              key={color}
-                              value={color}
-                              className="w-full"
-                            >
-                              <div className="flex items-center space-x-2 w-full">
-                                <div
-                                  className="w-4 h-4 rounded border border-(--surface-2) shrink-0"
-                                  style={{
-                                    backgroundColor: color.toLowerCase(),
-                                    borderColor:
-                                      color.toLowerCase() === "white"
-                                        ? "var(--surface-2)"
-                                        : "transparent",
-                                  }}
-                                />
-                                <span className="truncate">{color}</span>
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                {/* Opponent Jersey Color */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-white">
+                    Opponent Jersey Color *
+                  </label>
+                  <div className="relative">
+                    <Palette className="absolute left-3 top-3 h-4 w-4 text-(--muted-text) z-10" />
+                    <Select
+                      value={uploadData.opponent_jersey_color}
+                      onValueChange={(value) =>
+                        handleInputChange("opponent_jersey_color", value)
+                      }
+                    >
+                      <SelectTrigger className="pl-10 h-11 bg-(--surface-0) border-(--surface-2) text-white focus:border-primary w-full">
+                        <SelectValue placeholder="Select color" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-(--surface-1) border-(--surface-2) text-white max-h-60 w-full">
+                        {JERSEY_COLORS.map((color) => (
+                          <SelectItem
+                            key={color}
+                            value={color}
+                            className="w-full"
+                          >
+                            <div className="flex items-center space-x-2 w-full">
+                              <div
+                                className="w-4 h-4 rounded border border-(--surface-2) shrink-0"
+                                style={{
+                                  backgroundColor: color.toLowerCase(),
+                                  borderColor:
+                                    color.toLowerCase() === "white"
+                                      ? "var(--surface-2)"
+                                      : "transparent",
+                                }}
+                              />
+                              <span className="truncate">{color}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               </div>

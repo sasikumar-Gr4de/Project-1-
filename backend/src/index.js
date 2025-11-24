@@ -48,16 +48,17 @@ app.use(
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/data", dataRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
+
 app.use("/api/upload", uploadRoutes);
-app.use("/api/data", dataRoutes);
 app.use("/api/passport", passportRoutes);
 app.use("/api/verifications", verficationRoutes);
-app.use("/api", passportRoutesV1);
 app.use("/api/queue", queueRoutes);
 app.use("/api/features", featuresRoutes);
+app.use("/api", passportRoutesV1);
 
 app.get("/api", (req, res) => {
   res.json({ success: true, message: "API is running" });

@@ -188,15 +188,9 @@ export const validateApiFile = (req, res, next) => {
 
 export const createDataSchema = Joi.object({
   match_date: commonPatterns.date.required(),
-  jersey_number: Joi.number().integer().min(1).max(99).required(),
-  position: Joi.string()
-    .valid(...FOOTBALL_POSITIONS)
-    .required(),
-  jersey_color: Joi.string().max(50).required(),
-  opponent_jersey_color: Joi.string().max(50).required(),
-  notes: commonPatterns.text.optional(),
-  video: commonPatterns.url.optional(),
-  gps: Joi.object().optional(),
+  video_url: commonPatterns.url.required(),
+  gps_url: Joi.object().optional(),
+  metadata: Joi.object().optional(),
 });
 
 export const changeDataStatusSchema = Joi.object({

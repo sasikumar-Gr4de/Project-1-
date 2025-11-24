@@ -18,11 +18,8 @@ export const createData = async (req, res) => {
       await triggerAnalaysisModel({
         player_data_id: data.id,
         video_url: data.video_file,
-        jersey_home_color: data.jersey_home_color,
-        jersey_away_color: data.jersey_away_color,
-        jersey_number: data.jersey_number,
-        position: data.position,
-        // gps_url: data.gps_file,
+        gps_url: data.gps_file,
+        metadata: data.metadata,
         callback_url: `${process.env.SERVER_URL}/api/data/callbacks`,
       });
     } catch (analysisError) {

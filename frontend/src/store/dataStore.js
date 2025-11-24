@@ -3,8 +3,6 @@ import api from "@/services/base.api.js";
 
 const playerDataAPI = {
   uploadPlayerData: (data) => api.post("/data", data),
-  changePlayerDataStatus: (dataId, status) =>
-    api.post(`/data/${dataId}`, { status }),
 };
 
 export const useDataStore = create((set, get) => ({
@@ -14,7 +12,8 @@ export const useDataStore = create((set, get) => ({
       const response = await playerDataAPI.uploadPlayerData(data);
       if (response.data.success) {
         set({ isLoading: false });
-        return response.data;
+        console.log("Upload response data:", response.data);
+        return response;
       }
     } catch (error) {
       set({

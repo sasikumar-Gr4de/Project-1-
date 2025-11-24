@@ -156,7 +156,7 @@ const DocumentUploadStep = ({ onComplete, currentStep }) => {
       case "rejected":
         return <XCircle className="w-5 h-5 text-red-400" />;
       default:
-        return <FileText className="w-5 h-5 text-[#B0AFAF]" />;
+        return <FileText className="w-5 h-5 text-placeholder" />;
     }
   };
 
@@ -182,7 +182,7 @@ const DocumentUploadStep = ({ onComplete, currentStep }) => {
         );
       default:
         return (
-          <Badge className="bg-[#343434] text-[#B0AFAF] border-[#343434]">
+          <Badge className="bg-[#343434] text-placeholder border-[#343434]">
             Not Uploaded
           </Badge>
         );
@@ -210,7 +210,7 @@ const DocumentUploadStep = ({ onComplete, currentStep }) => {
                   variant="ghost"
                   size="sm"
                   onClick={() => setPreviewDocument(null)}
-                  className="text-[#B0AFAF] hover:text-white"
+                  className="text-placeholder hover:text-white"
                 >
                   Close Preview
                 </Button>
@@ -272,7 +272,7 @@ const DocumentUploadStep = ({ onComplete, currentStep }) => {
                         <div className="flex items-center justify-between w-full">
                           <div>
                             <div className="font-medium">{docType.label}</div>
-                            <div className="text-sm text-[#B0AFAF]">
+                            <div className="text-sm text-placeholder">
                               {docType.description}
                             </div>
                           </div>
@@ -302,13 +302,13 @@ const DocumentUploadStep = ({ onComplete, currentStep }) => {
                 >
                   <div className="text-center space-y-3">
                     <div className="w-16 h-16 bg-[#1A1A1A] rounded-full flex items-center justify-center border-2 border-[#343434] mx-auto">
-                      <FileText className="w-8 h-8 text-[#B0AFAF]" />
+                      <FileText className="w-8 h-8 text-placeholder" />
                     </div>
                     <div>
                       <p className="text-white font-medium">
                         Upload PDF Document
                       </p>
-                      <p className="text-sm text-[#B0AFAF] mt-1">
+                      <p className="text-sm text-placeholder mt-1">
                         PDF files only (Max 10MB)
                       </p>
                     </div>
@@ -320,7 +320,7 @@ const DocumentUploadStep = ({ onComplete, currentStep }) => {
                   <h5 className="font-medium text-white text-sm mb-2">
                     Upload Requirements:
                   </h5>
-                  <ul className="text-xs text-[#B0AFAF] space-y-1">
+                  <ul className="text-xs text-placeholder space-y-1">
                     <li>• File must be in PDF format</li>
                     <li>• Maximum file size: 10MB</li>
                     <li>• Ensure document is clear and readable</li>
@@ -351,10 +351,10 @@ const DocumentUploadStep = ({ onComplete, currentStep }) => {
                           {docType.label}
                         </span>
                       </div>
-                      <p className="text-sm text-[#B0AFAF] mt-1">
+                      <p className="text-sm text-placeholder mt-1">
                         {docType.description}
                       </p>
-                      <p className="text-xs text-[#B0AFAF] mt-1">
+                      <p className="text-xs text-placeholder mt-1">
                         {docType.help}
                       </p>
                     </div>
@@ -394,7 +394,7 @@ const DocumentUploadStep = ({ onComplete, currentStep }) => {
                           </h4>
                           {getStatusBadge(doc.status)}
                         </div>
-                        <p className="text-xs text-[#B0AFAF] truncate">
+                        <p className="text-xs text-placeholder truncate">
                           Uploaded{" "}
                           {new Date(doc.created_at).toLocaleDateString()}
                         </p>
@@ -427,7 +427,7 @@ const DocumentUploadStep = ({ onComplete, currentStep }) => {
           {/* Progress Status */}
           <div className="flex items-center justify-between p-4 bg-[#1A1A1A] border border-[#343434] rounded-lg">
             <div className="flex items-center space-x-2">
-              <span className="text-sm text-[#B0AFAF]">
+              <span className="text-sm text-placeholder">
                 Verification Progress
               </span>
               {hasAnyDocument() && (

@@ -46,7 +46,6 @@ export const sendOtp = async (req, res) => {
       RESPONSES.SUCCESS(AUTH_MESSAGES.OTP_SENT, {
         channel: email ? "email" : "whatsapp",
         expires_in: `${OTP_CONFIG.EXPIRY_MINUTES} minutes`,
-        // Development only - never expose OTP in production
         ...(process.env.NODE_ENV === "development" && { otp }),
       })
     );
@@ -279,7 +278,9 @@ const sendEmailOtp = async (email, otp) => {
 
 const sendWhatsAppOtp = async (phone, otp) => {
   console.log("OTP for WhatsApp:", otp, "to:", phone);
+
   // Implement Twilio WhatsApp integration here
+
   // await twilioClient.messages.create({
   //   body: `Your GR4DE verification code is: ${otp}. This code expires in 5 minutes.`,
   //   from: process.env.TWILIO_WHATSAPP_FROM,

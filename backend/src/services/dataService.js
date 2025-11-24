@@ -2,30 +2,17 @@ import { supabase } from "../config/supabase.config.js";
 import { PLAYER_DATA_STATUS } from "../utils/constants.js";
 
 export const createPlayerData = async (userId, playerData) => {
-  const {
-    match_date,
-    jersey_number,
-    position,
-    jersey_color,
-    opponent_jersey_color,
-    notes,
-    video_url,
-    gps_url,
-  } = playerData;
+  const { match_date, video_url, gps_url, metadata } = playerData;
 
   const { data, error } = await supabase
     .from("player_data")
     .insert([
       {
-        match_date,
-        jersey_number,
-        jersey_home_color: jersey_color,
-        jersey_away_color: opponent_jersey_color,
-        notes,
-        video_file: video_url,
-        gps_file: gps_url,
         player_id: userId,
-        position,
+        video_url: video_url,
+        gps_url: gps_url,
+        match_date: match_date,
+        metadata,
         status: PLAYER_DATA_STATUS.UPLOADED, // Set initial status to "uploaded"
       },
     ])

@@ -13,11 +13,9 @@ import {
 } from "../middleware/validation.js";
 import { handleModelCallback } from "../services/modelService.js";
 import { supabase } from "../config/supabase.config.js";
-import { QUEUE_STATUS } from "../utils/constants.js";
 
 const router = express.Router();
 
-// Analysis Callbacks - No authentication required for model server callbacks
 router.post("/callbacks", async (req, res) => {
   try {
     const { job_id, status, ...results } = req.body;
@@ -43,14 +41,10 @@ router.post("/callbacks", async (req, res) => {
   }
 });
 
-// Legacy callback route for backwards compatibility
 router.use("/callbacks", getAnalysisCallback);
-
 router.use(authenticateToken);
 
 router.get("/", getDataByPlayerId);
-
-// Protected routes
 router.post("/", validate(createDataSchema), createData);
 router.post("/:dataId", validate(changeDataStatusSchema), changeDataStatus);
 
