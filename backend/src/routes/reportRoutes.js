@@ -14,7 +14,7 @@ router.use(authenticateToken);
 /**
  * Get reports for a specific player
  */
-router.get("/v1/reports/:playerId", async (req, res) => {
+router.get("/reports/:playerId", async (req, res) => {
   try {
     const { playerId } = req.params;
     const { id: userId, role } = req.user;
@@ -86,7 +86,7 @@ router.get("/v1/reports/:playerId", async (req, res) => {
 /**
  * Get single report by ID
  */
-router.get("/v1/report/:reportId", async (req, res) => {
+router.get("/report/:reportId", async (req, res) => {
   try {
     const { reportId } = req.params;
     const { id: userId, role } = req.user;

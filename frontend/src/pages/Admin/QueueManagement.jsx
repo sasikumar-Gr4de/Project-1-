@@ -51,7 +51,7 @@ const QueueManagement = () => {
             <div className="font-medium text-white">
               {row.users?.player_name || "Unknown Player"}
             </div>
-            <div className="text-xs text-[#B0AFAF]">{row.users?.email}</div>
+            <div className="text-xs text-placeholder">{row.users?.email}</div>
           </div>
         </div>
       ),
@@ -83,7 +83,7 @@ const QueueManagement = () => {
       accessorKey: "created_at",
       header: "Submitted",
       cell: ({ row }) => (
-        <span className="text-[#B0AFAF] text-sm">
+        <span className="text-placeholder text-sm">
           {new Date(row?.created_at).toLocaleDateString()}
         </span>
       ),
@@ -94,9 +94,10 @@ const QueueManagement = () => {
       cell: ({ row }) => (
         <div className="flex items-center space-x-2">
           <Button
-            variant="outline"
+            // variant="outline"
             size="sm"
-            className="h-8 px-3 bg-[#60A5FA]/10 text-[#60A5FA] border-[#60A5FA]/20 hover:bg-[#60A5FA]/20"
+            className="bg-[#60A5FA]/10 hover:bg-[#60A5FA]/20 text-white  border-[#60A5FA]/20 h-8 px-3"
+            // className="h-8 px-3 bg-[#60A5FA]/10 text-[#60A5FA] border-[#60A5FA]/20 hover:bg-[#60A5FA]/20"
           >
             <Eye className="w-3 h-3 mr-1" />
             View
@@ -104,19 +105,20 @@ const QueueManagement = () => {
           {row.status === "failed" && (
             <Button
               variant="outline"
-              size="sm"
               onClick={() => retryJob(row.id)}
-              className="h-8 px-3 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
+              className="bg-[#60A5FA]/10 hover:bg-[#60A5FA]/20 text-primary  border-[#60A5FA]/20 h-8 px-3"
+              // className="h-8 px-3 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
             >
               <Play className="w-3 h-3 mr-1" />
               Retry
             </Button>
           )}
           <Button
-            variant="outline"
+            // variant="outline"
             size="sm"
             onClick={() => deleteJob(row.id)}
             className="h-8 px-3 bg-[#EF4444]/10 text-[#EF4444] border-[#EF4444]/20 hover:bg-[#EF4444]/20"
+            // className="h-8 px-3 bg-[#EF4444]/10 text-[#EF4444] border-[#EF4444]/20 hover:bg-[#EF4444]/20"
           >
             <Trash2 className="w-3 h-3 mr-1" />
             Delete
@@ -133,7 +135,7 @@ const QueueManagement = () => {
           <h1 className="text-4xl font-bold font-['Orbitron'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
             Queue Management
           </h1>
-          <p className="text-[#B0AFAF] mt-2 font-['Orbitron']">
+          <p className="text-placeholder mt-2 font-['Orbitron']">
             Monitor and manage data processing jobs
           </p>
         </div>

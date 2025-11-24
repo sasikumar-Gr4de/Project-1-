@@ -1,33 +1,35 @@
-/* App.css - Updated for proper scrollable layout */
+/* App.css - Fixed for scrollable landing page with hidden scrollbar */
+html{
+  scrollbar-width:none;
+}
 #root {
   user-select: none;
-  height: 100vh;
-  overflow: hidden;
+  /* Remove height: 100vh and overflow: hidden for landing page to work */
 }
 
 /* Reset default body styles */
 html, body {
   margin: 0;
   padding: 0;
-  height: 100%;
-  overflow: hidden;
+  /* Remove height: 100% and overflow: hidden for scrolling to work */
+  overflow: auto; /* Allow scrolling */
 }
 
 /* Landing Page specific styles */
 .landing-page {
   overflow-y: auto !important;
-  height: 100vh;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  min-height: 100vh; /* Changed from height: 100vh to min-height: 100vh */
+  scrollbar-width: none; /* Firefox - hide scrollbar */
+  -ms-overflow-style: none; /* Internet Explorer 10+ - hide scrollbar */
 }
 
 .landing-page::-webkit-scrollbar {
-  display: none; /* WebKit */
+  display: none; /* WebKit - hide scrollbar */
 }
 
 .subscription-page {
   overflow-y: auto !important;
-  height: 100vh;
+  min-height: 100vh;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* Internet Explorer 10+ */
 }
@@ -44,7 +46,6 @@ html, body {
   scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
 }
 
-/* Webkit browsers (Chrome, Safari, Edge) */
 .scrollable-content::-webkit-scrollbar {
   width: 6px;
 }
@@ -104,11 +105,6 @@ html, body {
   .scrollable-content {
     -ms-overflow-style: -ms-autohiding-scrollbar;
   }
-}
-
-/* Hide scrollbar for the main body but allow sub-elements */
-body {
-  overflow: hidden;
 }
 
 /* Allow scrolling in sub-elements that need it */
@@ -192,3 +188,49 @@ body {
 .font-Orbitron{
   font-family: 'Orbitron';
 }
+
+.landing-page{
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-image: url('https://amzn-gr4de-bucket.s3.eu-north-1.amazonaws.com/server/1763986630482 - Bacground_image_of_GR4DE_Landing_Page.png');
+  background-position: center center;
+  min-height: 100vh;
+  /* Ensure smooth scrolling */
+  scroll-behavior: smooth;
+  
+}
+
+/* Additional scrollbar hiding for all browsers */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* Custom Chrome Scrollbar Styles */
+.landing-page::-webkit-scrollbar {
+  width: 8px;
+}
+
+.landing-page::-webkit-scrollbar-track {
+  background: rgba(15, 15, 14, 0.1); /* Match your dark theme */
+  border-radius: 4px;
+}
+
+.landing-page::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #3B82F6, #94D44A); /* Your brand colors */
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.landing-page::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #2563EB, #65A30D); /* Darker on hover */
+}
+
+.landing-page::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(to bottom, #1D4ED8, #4D7C0F); /* Even darker when active */
+}
+

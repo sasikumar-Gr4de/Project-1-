@@ -14,7 +14,7 @@ const HeroSection = ({ content }) => {
   if (!content) return null;
 
   return (
-    <section className="py-20 px-4">
+    <section className="py-20 px-4 bg-(--surface-0)">
       <div className="mx-auto max-w-6xl">
         <div
           className={`flex flex-col lg:flex-row items-center justify-between transition-all duration-700 ${

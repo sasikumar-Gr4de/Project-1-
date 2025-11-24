@@ -93,8 +93,6 @@ function App() {
             element={<SubscriptionSuccess />}
           />
           <Route path="/unauthorized" element={<Unauthorized />} />
-
-          {/* Onboarding Route - Special handling */}
           <Route
             path="/onboarding"
             element={
@@ -103,8 +101,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
-          {/* Player Routes */}
           <Route
             path="/*"
             element={
@@ -119,7 +115,6 @@ function App() {
             }
           />
 
-          {/* Admin Routes */}
           <Route
             path="/admin/*"
             element={
@@ -134,7 +129,6 @@ function App() {
             }
           />
 
-          {/* Fallback Routes */}
           <Route path="/404" element={<NotFoundPage />} />
           <Route
             path="*"

@@ -181,9 +181,7 @@ export const ToastProvider = ({ children }) => {
                 className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center 
                          hover:bg-white/20 transition-colors duration-200 
                          text-gray-300 hover:text-white ml-1"
-              >
-                ×
-              </button>
+              ></button>
             </div>
 
             {/* Progress Bar */}
@@ -201,8 +199,7 @@ export const ToastProvider = ({ children }) => {
             width: 0%;
           }
         }
-      `}</style>{" "}
-      */
+      `}</style>
     </ToastContext.Provider>
   );
 };

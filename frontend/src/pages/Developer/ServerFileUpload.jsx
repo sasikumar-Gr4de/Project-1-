@@ -20,7 +20,7 @@ const ServerFileUpload = () => {
         <FileUpload
           accept="image/*"
           folder="server"
-          // maxSize={100 * 1024 * 1024}
+          maxSize={100 * 1024 * 1024}
           // multiple={false}
           uploadText="Upload to Server"
           onUpload={onUploadHandler}

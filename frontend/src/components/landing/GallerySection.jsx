@@ -34,7 +34,7 @@ const GallerySection = ({ content }) => {
   // const galleryImages = defaultImages;
 
   return (
-    <section className="py-16 px-4 bg-[#1A1A1A]">
+    <section className="py-16 px-4 ">
       <div className="mx-auto max-w-6xl">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold font-['Orbitron'] mb-4 bg-linear-to-r from-white to-primary bg-clip-text text-transparent">

@@ -807,45 +807,45 @@ const ContentManager = () => {
         </AdminSection>
       ),
     },
-    {
-      id: "pricing",
-      label: "Pricing",
-      content: (
-        <AdminSection
-          title="Pricing Section"
-          description="Subscription plans and pricing"
-          icon={FileText}
-        >
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2 text-white">
-                Heading
-              </label>
-              <Input
-                value={content?.pricingSection?.heading || ""}
-                onChange={(e) =>
-                  updateField("pricingSection.heading", e.target.value)
-                }
-                className="bg-[#1A1A1A] border-[#343434] text-white"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2 text-white">
-                Subheading
-              </label>
-              <Textarea
-                value={content?.pricingSection?.subheading || ""}
-                onChange={(e) =>
-                  updateField("pricingSection.subheading", e.target.value)
-                }
-                rows={2}
-                className="bg-[#1A1A1A] border-[#343434] text-white"
-              />
-            </div>
-          </div>
-        </AdminSection>
-      ),
-    },
+    // {
+    //   id: "pricing",
+    //   label: "Pricing",
+    //   content: (
+    //     <AdminSection
+    //       title="Pricing Section"
+    //       description="Subscription plans and pricing"
+    //       icon={FileText}
+    //     >
+    //       <div className="space-y-4">
+    //         <div>
+    //           <label className="block text-sm font-medium mb-2 text-white">
+    //             Heading
+    //           </label>
+    //           <Input
+    //             value={content?.pricingSection?.heading || ""}
+    //             onChange={(e) =>
+    //               updateField("pricingSection.heading", e.target.value)
+    //             }
+    //             className="bg-[#1A1A1A] border-[#343434] text-white"
+    //           />
+    //         </div>
+    //         <div>
+    //           <label className="block text-sm font-medium mb-2 text-white">
+    //             Subheading
+    //           </label>
+    //           <Textarea
+    //             value={content?.pricingSection?.subheading || ""}
+    //             onChange={(e) =>
+    //               updateField("pricingSection.subheading", e.target.value)
+    //             }
+    //             rows={2}
+    //             className="bg-[#1A1A1A] border-[#343434] text-white"
+    //           />
+    //         </div>
+    //       </div>
+    //     </AdminSection>
+    //   ),
+    // },
     {
       id: "gallery",
       label: "Gallery",
@@ -986,19 +986,13 @@ const ContentManager = () => {
 
   if (!content) {
     return (
-      <div className="min-h-screen p-8">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4 text-white">
-            No Content Found
-          </h1>
-          <Button
-            onClick={handleReset}
-            className="bg-primary text-[#0F0F0E] hover:bg-primary/90"
-          >
-            Initialize Default Content
-          </Button>
-        </div>
-      </div>
+      <LoadingSpinner
+        type="pulse"
+        size="lg"
+        text="Loading data..."
+        centered={true}
+        color="primary"
+      />
     );
   }
 
@@ -1011,7 +1005,7 @@ const ContentManager = () => {
             Content Manager
           </h1>
           <p className="text-[#B0AFAF] mt-2 font-['Orbitron']">
-            Manage landing page content and structure            
+            Manage landing page content and structure
           </p>
         </div>
 
@@ -1024,14 +1018,14 @@ const ContentManager = () => {
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
-          <Button
+          {/* <Button
             variant="outline"
             onClick={handleReset}
             className="bg-[#1A1A1A] border-[#343434] text-white hover:bg-[#262626]"
           >
             <RefreshCw className="h-4 w-4 mr-2" />
             Reset
-          </Button>
+          </Button> */}
           <Button
             variant="outline"
             onClick={() => window.open("/", "_blank")}
@@ -1064,7 +1058,7 @@ const ContentManager = () => {
             responsive={true}
           />
         </CardContent>
-      </Card>     
+      </Card>
     </div>
   );
 };

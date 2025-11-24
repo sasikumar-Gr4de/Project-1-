@@ -23,7 +23,7 @@ const AboutSection = ({ content }) => {
   const sectionContent = content?.aboutSection || defaultContent;
 
   return (
-    <section id="about" className="py-16 px-4 bg-[#1A1A1A]">
+    <section id="about" className="py-16 px-4 bg-transparent">
       <div className="mx-auto max-w-6xl">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>

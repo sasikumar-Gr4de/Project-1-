@@ -13,7 +13,7 @@ export const getSystemMetrics = async () => {
 
     // Get total reports
     const { count: totalReports, error: reportsError } = await supabase
-      .from("reports")
+      .from("player_reports")
       .select("*", { count: "exact", head: true });
 
     if (reportsError) throw reportsError;
@@ -38,7 +38,7 @@ export const getSystemMetrics = async () => {
 
     // Get reports this week
     const { count: reportsThisWeek, error: reportsWeekError } = await supabase
-      .from("reports")
+      .from("player_reports")
       .select("*", { count: "exact", head: true })
       .gte("created_at", weekAgo.toISOString());
 
@@ -276,22 +276,22 @@ export const getReports = async ({
   sortOrder = "desc",
 }) => {
   try {
-    let query = supabase.from("reports").select(
+    let query = supabase.from("player_reports").select(
       `
-          *,
-          users:player_id (
-            player_name,
-            email,
-            position,
-            avatar_url
-          ),
-          player_data:player_data_id (
-            match_date,
-            video_file,
-            jersey_number,
-            position
-          )
-        `,
+        *,
+        users:player_id (
+          player_name,
+          email,
+          position,
+          avatar_url
+        ),
+        player_data:player_data_id (
+          match_date,
+          video_url,
+          gps_url,
+          metadata
+        )
+      `,
       { count: "exact" }
     );
 
@@ -315,7 +315,7 @@ export const getReports = async ({
     if (dateTo) {
       query = query.lte("created_at", dateTo);
     }
-
+    console.log(query);
     // Apply sorting
     query = query.order(sortBy, { ascending: sortOrder === "asc" });
 
@@ -344,7 +344,7 @@ export const getReports = async ({
 export const deleteReport = async (reportId) => {
   try {
     const { error } = await supabase
-      .from("reports")
+      .from("player_reports")
       .delete()
       .eq("id", reportId);
 
@@ -360,7 +360,7 @@ export const deleteReport = async (reportId) => {
 export const regenerateReport = async (reportId) => {
   try {
     const { data, error } = await supabase
-      .from("reports")
+      .from("player_reports")
       .update({
         status: "generating",
         updated_at: new Date().toISOString(),
@@ -410,7 +410,7 @@ export const getSystemAnalytics = async (dateRange = "7d") => {
 
     // Get report generations over time
     const { data: reportGenerations, error: reportsError } = await supabase
-      .from("reports")
+      .from("player_reports")
       .select("created_at, status")
       .gte("created_at", startDate.toISOString())
       .lte("created_at", endDate.toISOString())
