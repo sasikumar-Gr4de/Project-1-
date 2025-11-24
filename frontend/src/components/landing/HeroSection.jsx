@@ -34,9 +34,6 @@ const HeroSection = ({ content }) => {
 
           <div className="lg:w-1/2 flex justify-center">
             <div className="relative w-full max-w-lg">
-              <div className="absolute -top-6 -right-6 w-72 h-72 bg-primary/10 rounded-full blur-3xl"></div>
-              <div className="absolute -bottom-6 -left-6 w-72 h-72 bg-[#94D44A]/10 rounded-full blur-3xl"></div>
-
               <div className="relative bg-(--surface-2) rounded-2xl p-8 shadow-2xl overflow-visible">
                 <div className="space-y-6 overflow-visible">
                   {/* Performance Score Card */}
