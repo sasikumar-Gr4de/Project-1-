@@ -61,9 +61,9 @@ const HowItWorksSection = ({ content }) => {
                   <h3 className="text-xl font-semibold text-white shrink-0 px-5">
                     {step.title}
                   </h3>
-                  <h2 className="text-[160px] lg:text-[180px] text-transparent bg-clip-text font-extrabold bg-linear-to-b from-primary-400 to-(--surface-2) leading-none absolute right-0 top-16 transform -translate-y-1/1 font-['Orbitron']">
+                  <h1 className="text-[160px] lg:text-[180px] text-transparent bg-clip-text font-extrabold bg-linear-to-b from-primary-400 to-(--surface-2) leading-none absolute right-0 top-16 transform -translate-y-1/1 font-['Orbitron']">
                     {step.stepNumber}
-                  </h2>
+                  </h1>
                 </div>
 
                 <p className="text-placeholder leading-relaxed mt-4 text-left p-5">

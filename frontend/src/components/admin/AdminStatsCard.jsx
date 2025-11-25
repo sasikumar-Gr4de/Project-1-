@@ -55,7 +55,7 @@ const AdminStatsCard = ({
                 </span>
               )}
             </div>
-            {subtitle && <p className="text-xs text-[#B0AFAF]">{subtitle}</p>}
+            {subtitle && <p className="text-xs text-placeholder">{subtitle}</p>}
           </div>
           {Icon && (
             <div

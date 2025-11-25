@@ -435,7 +435,7 @@ const ContentManager = () => {
                     </div>
                     <div className="space-y-3">
                       <div>
-                        <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
+                        <label className="block text-sm font-medium mb-1 text-placeholder">
                           Title
                         </label>
                         <Input
@@ -454,7 +454,7 @@ const ContentManager = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
+                        <label className="block text-sm font-medium mb-1 text-placeholder">
                           Description
                         </label>
                         <Textarea
@@ -474,7 +474,7 @@ const ContentManager = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
+                        <label className="block text-sm font-medium mb-1 text-placeholder">
                           Icon Name
                         </label>
                         <Input
@@ -572,7 +572,7 @@ const ContentManager = () => {
                     </div>
                     <div className="space-y-3">
                       <div>
-                        <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
+                        <label className="block text-sm font-medium mb-1 text-placeholder">
                           Step Number
                         </label>
                         <Input
@@ -588,7 +588,7 @@ const ContentManager = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
+                        <label className="block text-sm font-medium mb-1 text-placeholder">
                           Title
                         </label>
                         <Input
@@ -604,7 +604,7 @@ const ContentManager = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
+                        <label className="block text-sm font-medium mb-1 text-placeholder">
                           Description
                         </label>
                         <Textarea
@@ -621,7 +621,7 @@ const ContentManager = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
+                        <label className="block text-sm font-medium mb-1 text-placeholder">
                           Icon Name
                         </label>
                         <Input
@@ -720,7 +720,7 @@ const ContentManager = () => {
                       <div className="space-y-3">
                         <div className="grid grid-cols-2 gap-3">
                           <div>
-                            <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
+                            <label className="block text-sm font-medium mb-1 text-placeholder">
                               Name
                             </label>
                             <Input
@@ -739,7 +739,7 @@ const ContentManager = () => {
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
+                            <label className="block text-sm font-medium mb-1 text-placeholder">
                               Role
                             </label>
                             <Input
@@ -759,7 +759,7 @@ const ContentManager = () => {
                           </div>
                         </div>
                         <div>
-                          <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
+                          <label className="block text-sm font-medium mb-1 text-placeholder">
                             Club
                           </label>
                           <Input
@@ -778,7 +778,7 @@ const ContentManager = () => {
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
+                          <label className="block text-sm font-medium mb-1 text-placeholder">
                             Content
                           </label>
                           <Textarea
@@ -913,7 +913,7 @@ const ContentManager = () => {
                     </div>
                     <div className="space-y-3">
                       <div>
-                        <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
+                        <label className="block text-sm font-medium mb-1 text-placeholder">
                           Title
                         </label>
                         <Input
@@ -929,7 +929,7 @@ const ContentManager = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
+                        <label className="block text-sm font-medium mb-1 text-placeholder">
                           Description
                         </label>
                         <Textarea
@@ -946,7 +946,7 @@ const ContentManager = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-1 text-[#B0AFAF]">
+                        <label className="block text-sm font-medium mb-1 text-placeholder">
                           Image Upload
                         </label>
                         <div className="flex items-center gap-2">
@@ -1004,7 +1004,7 @@ const ContentManager = () => {
           <h1 className="text-4xl font-bold font-['Orbitron'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
             Content Manager
           </h1>
-          <p className="text-[#B0AFAF] mt-2 font-['Orbitron']">
+          <p className="text-placeholder mt-2 font-['Orbitron']">
             Manage landing page content and structure
           </p>
         </div>

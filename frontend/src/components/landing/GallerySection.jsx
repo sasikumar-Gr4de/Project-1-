@@ -29,9 +29,7 @@ const GallerySection = ({ content }) => {
       description: "Identifying and nurturing young football talent",
     },
   ];
-  console.log(content.gallerySection);
   const galleryImages = content?.gallerySection?.images || defaultImages;
-  // const galleryImages = defaultImages;
 
   return (
     <section className="py-16 px-4 ">
@@ -72,24 +70,6 @@ const GallerySection = ({ content }) => {
             </div>
           ))}
         </div>
-
-        {/* Additional Gallery Info */}
-        {/* <div className="text-center mt-12">
-          <div className="inline-flex items-center justify-center space-x-8 text-sm text-placeholder">
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-primary rounded-full"></div>
-              <span>Used by 100+ clubs worldwide</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-primary rounded-full"></div>
-              <span>10,000+ players analyzed</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-primary rounded-full"></div>
-              <span>98% customer satisfaction</span>
-            </div>
-          </div>
-        </div> */}
       </div>
     </section>
   );
