@@ -85,7 +85,7 @@ const SystemAnalytics = () => {
           <h1 className="text-4xl font-bold font-['Orbitron'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
             System Analytics
           </h1>
-          <p className="text-[#B0AFAF] mt-2 font-['Orbitron']">
+          <p className="text-placeholder mt-2 font-['Orbitron']">
             Platform performance and usage insights
           </p>
         </div>
@@ -133,7 +133,7 @@ const SystemAnalytics = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-[#B0AFAF]">
+                  <p className="text-sm font-medium text-placeholder">
                     User Registrations
                   </p>
                   <p className="text-3xl font-bold text-white mt-2">
@@ -151,7 +151,7 @@ const SystemAnalytics = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-[#B0AFAF]">
+                  <p className="text-sm font-medium text-placeholder">
                     Data Uploads
                   </p>
                   <p className="text-3xl font-bold text-white mt-2">
@@ -169,7 +169,7 @@ const SystemAnalytics = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-[#B0AFAF]">
+                  <p className="text-sm font-medium text-placeholder">
                     Reports Generated
                   </p>
                   <p className="text-3xl font-bold text-white mt-2">
@@ -187,7 +187,7 @@ const SystemAnalytics = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-[#B0AFAF]">
+                  <p className="text-sm font-medium text-placeholder">
                     Success Rate
                   </p>
                   <p className="text-3xl font-bold text-white mt-2">
@@ -212,11 +212,11 @@ const SystemAnalytics = () => {
         >
           <div className="h-64 flex items-center justify-center bg-[#1A1A1A] rounded-lg border border-[#343434]">
             <div className="text-center">
-              <BarChart3 className="w-12 h-12 text-[#B0AFAF] mx-auto mb-4" />
-              <p className="text-[#B0AFAF]">
+              <BarChart3 className="w-12 h-12 text-placeholder mx-auto mb-4" />
+              <p className="text-placeholder">
                 User registration chart visualization
               </p>
-              <p className="text-sm text-[#B0AFAF] mt-2">
+              <p className="text-sm text-placeholder mt-2">
                 {formatNumber(analytics?.userRegistrations.length || 0)}{" "}
                 registrations in period
               </p>
@@ -231,11 +231,11 @@ const SystemAnalytics = () => {
         >
           <div className="h-64 flex items-center justify-center bg-[#1A1A1A] rounded-lg border border-[#343434]">
             <div className="text-center">
-              <BarChart3 className="w-12 h-12 text-[#B0AFAF] mx-auto mb-4" />
-              <p className="text-[#B0AFAF]">
+              <BarChart3 className="w-12 h-12 text-placeholder mx-auto mb-4" />
+              <p className="text-placeholder">
                 Report generation chart visualization
               </p>
-              <p className="text-sm text-[#B0AFAF] mt-2">
+              <p className="text-sm text-placeholder mt-2">
                 {formatNumber(analytics?.reportGenerations.length || 0)} reports
                 generated
               </p>
@@ -256,7 +256,7 @@ const SystemAnalytics = () => {
             <div className="text-2xl font-bold text-white">
               {formatNumber(stats.userRegistrations)}
             </div>
-            <div className="text-sm text-[#B0AFAF] mt-1">New Users</div>
+            <div className="text-sm text-placeholder mt-1">New Users</div>
           </div>
 
           <div className="text-center p-6 bg-[#1A1A1A] rounded-lg border border-[#343434]">
@@ -264,7 +264,7 @@ const SystemAnalytics = () => {
             <div className="text-2xl font-bold text-white">
               {formatNumber(stats.dataUploads)}
             </div>
-            <div className="text-sm text-[#B0AFAF] mt-1">Data Uploads</div>
+            <div className="text-sm text-placeholder mt-1">Data Uploads</div>
           </div>
 
           <div className="text-center p-6 bg-[#1A1A1A] rounded-lg border border-[#343434]">
@@ -272,7 +272,7 @@ const SystemAnalytics = () => {
             <div className="text-2xl font-bold text-white">
               {formatNumber(stats.reportGenerations)}
             </div>
-            <div className="text-sm text-[#B0AFAF] mt-1">Reports</div>
+            <div className="text-sm text-placeholder mt-1">Reports</div>
           </div>
         </div>
       </AdminSection>

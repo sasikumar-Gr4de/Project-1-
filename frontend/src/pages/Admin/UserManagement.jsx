@@ -74,7 +74,7 @@ const UserManagement = () => {
             <div className="font-medium text-white">
               {row.player_name || "Unknown User"}
             </div>
-            <div className="text-xs text-[#B0AFAF]">{row.email}</div>
+            <div className="text-xs text-placeholder">{row.email}</div>
           </div>
         </div>
       ),
@@ -102,7 +102,7 @@ const UserManagement = () => {
       accessorKey: "created_at",
       header: "Joined",
       cell: ({ row }) => (
-        <span className="text-[#B0AFAF] text-sm">
+        <span className="text-placeholder text-sm">
           {new Date(row.created_at).toLocaleDateString()}
         </span>
       ),
@@ -160,7 +160,7 @@ const UserManagement = () => {
           <h1 className="text-4xl font-bold font-['Orbitron'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
             User Management
           </h1>
-          <p className="text-[#B0AFAF] mt-2 font-['Orbitron']">
+          <p className="text-placeholder mt-2 font-['Orbitron']">
             Manage player accounts and permissions
           </p>
         </div>
@@ -183,7 +183,7 @@ const UserManagement = () => {
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#B0AFAF] w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-placeholder w-4 h-4" />
               <input
                 type="text"
                 placeholder="Search users by name or email..."
@@ -195,7 +195,7 @@ const UserManagement = () => {
                     page: 1,
                   }))
                 }
-                className="w-full pl-10 pr-4 py-2 bg-[#1A1A1A] border border-[#343434] rounded-lg text-white placeholder-[#B0AFAF] focus:outline-none focus:border-primary transition-colors"
+                className="w-full pl-10 pr-4 py-2 bg-[#1A1A1A] border border-[#343434] rounded-lg text-white placeholder-placeholder focus:outline-none focus:border-primary transition-colors"
               />
             </div>
           </div>
