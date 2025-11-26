@@ -19,9 +19,9 @@ This document defines the JSON structure that the **ML Server must send to the b
   "timestamp": "2025-11-24T15:30:00Z",
   "processing_time_ms": 12450,
   "data": {
-    "job_id": "uuid",
-    "player_data_id": "uuid",
-    "player_id": "uuid",
+    "job_id": "uuid", !important
+    "player_data_id": "uuid", !important
+    "player_id": "uuid", !important
     "match_metadata": { ... },
     "scoring_metrics": {
       "gr4de_score": 85.0,
@@ -99,6 +99,7 @@ This document defines the JSON structure that the **ML Server must send to the b
 ```
 
 **Key Metrics for Striker:**
+
 - Touches in final third / penalty box
 - Shots inside/outside box (on target, off target, goals)
 - Headers (on target, off target, goals)
@@ -143,6 +144,7 @@ This document defines the JSON structure that the **ML Server must send to the b
 ```
 
 **Key Metrics for Midfielder:**
+
 - Forward/lateral pass accuracy
 - Progressive passes & carries
 - Match tempo control
@@ -185,6 +187,7 @@ This document defines the JSON structure that the **ML Server must send to the b
 ```
 
 **Key Metrics for Defender:**
+
 - Crucial/successful/unsuccessful tackles
 - Simple interceptions & clearances
 - Blocks & shots intercepted
@@ -226,6 +229,7 @@ This document defines the JSON structure that the **ML Server must send to the b
 ```
 
 **Key Metrics for Goalkeeper:**
+
 - Simple/brilliant/key saves
 - Save percentage
 - Goals conceded
@@ -269,13 +273,13 @@ This document defines the JSON structure that the **ML Server must send to the b
 ### 1. Validate Response
 
 ```javascript
-import { validateMLServerResponse } from './schemas/mlServerResponse.schema.js';
+import { validateMLServerResponse } from "./schemas/mlServerResponse.schema.js";
 
 // In callback handler
 const result = validateMLServerResponse(mlServerData);
 if (!result.success) {
-  console.error('Invalid ML response:', result.error);
-  throw new Error('Invalid ML Server response');
+  console.error("Invalid ML response:", result.error);
+  throw new Error("Invalid ML Server response");
 }
 ```
 
@@ -283,24 +287,24 @@ if (!result.success) {
 
 ```javascript
 // Store scoring metrics
-await supabase.from('player_metrics').insert({
+await supabase.from("player_metrics").insert({
   player_id: data.player_id,
   data_id: data.player_data_id,
-  metric_type: 'overall',
-  metric_name: 'gr4de_score',
+  metric_type: "overall",
+  metric_name: "gr4de_score",
   metric_value: data.scoring_metrics.gr4de_score,
-  percentile: data.benchmark_comparison.percentiles.overall_score
+  percentile: data.benchmark_comparison.percentiles.overall_score,
 });
 
 // Store position-specific metrics
 const posMetrics = data.position_specific_metrics;
-if (posMetrics.position === 'striker') {
+if (posMetrics.position === "striker") {
   // Store finishing metrics
-  await supabase.from('player_metrics').insert({
+  await supabase.from("player_metrics").insert({
     player_id: data.player_id,
-    metric_type: 'position_specific',
-    metric_name: 'goals_inside_box',
-    metric_value: posMetrics.striker_metrics.finishing.goals_inside_box
+    metric_type: "position_specific",
+    metric_name: "goals_inside_box",
+    metric_value: posMetrics.striker_metrics.finishing.goals_inside_box,
   });
 }
 ```
@@ -308,7 +312,7 @@ if (posMetrics.position === 'striker') {
 ### 3. Generate Player Report
 
 ```javascript
-await supabase.from('player_reports').insert({
+await supabase.from("player_reports").insert({
   player_id: data.player_id,
   data_id: data.player_data_id,
   gr4de_score: data.scoring_metrics.gr4de_score,
@@ -317,9 +321,9 @@ await supabase.from('player_reports').insert({
     scoring_metrics: data.scoring_metrics,
     position_specific: data.position_specific_metrics,
     benchmarks: data.benchmark_comparison,
-    insights: data.insights
+    insights: data.insights,
   },
-  match_date: data.match_metadata.match_date
+  match_date: data.match_metadata.match_date,
 });
 ```
 

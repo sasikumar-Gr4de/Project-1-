@@ -1,50 +1,197 @@
 import React, { useState, useEffect } from "react";
 import { useUserStore } from "@/store/userStore";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+
+import IdentityCard from "@/components/passport/IdentityCard";
+import PerformanceMetrics from "@/components/passport/PerformanceMetrics";
+import ReportsSection from "@/components/passport/ReportsSection";
+import MediaGallery from "@/components/passport/MediaGallery";
+import FilterSidebar from "@/components/passport/FilterSidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  User,
-  Shield,
-  Award,
-  Calendar,
-  MapPin,
-  TrendingUp,
-  Download,
-  Share2,
-  Eye,
-  CheckCircle,
-  XCircle,
-  Clock,
-  Star,
-  Zap,
-  Target,
-  Activity,
-} from "lucide-react";
-import api from "@/services/base.api";
+import { Copy, Eye, X, Share2, Badge } from "lucide-react";
+
+const mockPassportData = {
+  player: {
+    player_id: "770e8400-e29b-41d4-a716-446655440002",
+    tier: "pro",
+    passport_status: "verified",
+    created_at: "2024-01-15T00:00:00Z",
+    updated_at: "2025-11-24T15:30:00Z",
+  },
+
+  identity: {
+    first_name: "Alex",
+    last_name: "Thompson",
+    dob: "2005-08-15",
+    nationality: "English",
+    height_cm: 178,
+    weight_kg: 72,
+    preferred_foot: "right",
+    positions: ["CM", "CAM", "CDM"],
+    headshot_url:
+      "https://amzn-gr4de-bucket.s3.eu-north-1.amazonaws.com/avatars3402718.jpg-1762354884724-aim9o7oqqgb",
+    guardian_name: "Sarah Thompson",
+    guardian_email: "sarah.thompson@email.com",
+    guardian_phone: "+44 7911 123456",
+  },
+
+  passport: {
+    passport_id: "880e8400-e29b-41d4-a716-446655440000",
+    current_club: "London FC Academy",
+    season: "2025-26",
+    squad_level: "U18",
+    shirt_number: "8",
+    notes: "Team captain, excellent leadership qualities",
+  },
+
+  verifications: [
+    {
+      verification_id: "990e8400-e29b-41d4-a716-446655440001",
+      document_type: "passport",
+      status: "approved",
+      verification_badge: "identity_verified",
+      created_at: "2024-01-20T00:00:00Z",
+    },
+    {
+      verification_id: "990e8400-e29b-41d4-a716-446655440002",
+      document_type: "club_letter",
+      status: "approved",
+      verification_badge: "club_verified",
+      created_at: "2024-01-22T00:00:00Z",
+    },
+  ],
+
+  metrics: [
+    {
+      metric_id: "aa0e8400-e29b-41d4-a716-446655440001",
+      match_id: "880e8400-e29b-41d4-a716-446655440003",
+      date: "2025-11-23",
+      competition: "Premier League Academy",
+      minutes: 90,
+      gr4de_score: 87.5,
+      benchmarks: {
+        percentile_rank: 94,
+        position: "central_midfielder",
+        age_group: "u18",
+        level: "academy",
+      },
+      gps_summary: {
+        distance_m: 11240,
+        hsr_m: 940,
+        sprints: 15,
+        top_speed_ms: 8.1,
+      },
+      event_summary: {
+        passes_completed: 62,
+        passes_attempted: 71,
+        shots: 2,
+        tackles: 5,
+      },
+      source: "stepout",
+    },
+    {
+      metric_id: "aa0e8400-e29b-41d4-a716-446655440002",
+      match_id: "880e8400-e29b-41d4-a716-446655440004",
+      date: "2025-11-16",
+      competition: "Youth Cup",
+      minutes: 85,
+      gr4de_score: 82.3,
+      benchmarks: {
+        percentile_rank: 88,
+        position: "central_midfielder",
+        age_group: "u18",
+        level: "academy",
+      },
+      gps_summary: {
+        distance_m: 10850,
+        hsr_m: 820,
+        sprints: 12,
+        top_speed_ms: 7.9,
+      },
+      event_summary: {
+        passes_completed: 58,
+        passes_attempted: 65,
+        shots: 1,
+        tackles: 7,
+      },
+      source: "catapult",
+    },
+  ],
+
+  tempo_data: [
+    {
+      tempo_id: "bb0e8400-e29b-41d4-a716-446655440001",
+      match_id: "880e8400-e29b-41d4-a716-446655440003",
+      date: "2025-11-23",
+      tempo_index: 82.0,
+      consistency: 88.5,
+      avg_action_tempo: 18.5,
+      peak_tempo_periods: [
+        { start_minute: 12, end_minute: 18, tempo_index: 92 },
+        { start_minute: 68, end_minute: 75, tempo_index: 88 },
+      ],
+    },
+  ],
+
+  reports: [
+    {
+      report_id: "cc0e8400-e29b-41d4-a716-446655440001",
+      report_type: "match",
+      period_start: "2025-11-23",
+      period_end: "2025-11-23",
+      pdf_url: "/api/reports/match-2025-11-23.pdf",
+      created_at: "2025-11-24T10:00:00Z",
+    },
+    {
+      report_id: "cc0e8400-e29b-41d4-a716-446655440002",
+      report_type: "weekly",
+      period_start: "2025-11-16",
+      period_end: "2025-11-22",
+      pdf_url: "/api/reports/weekly-2025-11-22.pdf",
+      created_at: "2025-11-22T09:00:00Z",
+    },
+  ],
+
+  media: [
+    {
+      media_id: "dd0e8400-e29b-41d4-a716-446655440001",
+      media_type: "video",
+      title: "Match Highlights vs Manchester United",
+      description: "Best moments from the academy match",
+      url: "/api/videos/highlights-2025-11-23.mp4",
+      created_at: "2025-11-24T14:00:00Z",
+    },
+    {
+      media_id: "dd0e8400-e29b-41d4-a716-446655440002",
+      media_type: "image",
+      title: "Training Session",
+      description: "Technical drills and exercises",
+      url: "/api/images/training-2025-11-20.jpg",
+      created_at: "2025-11-20T11:00:00Z",
+    },
+  ],
+};
+
+export const seasons = [
+  { value: "2025-26", label: "2025-26" },
+  { value: "2024-25", label: "2024-25" },
+  { value: "2023-24", label: "2023-24" },
+];
+
+export const dateRanges = [
+  { value: "last-7-days", label: "Last 7 Days" },
+  { value: "last-30-days", label: "Last 30 Days" },
+  { value: "last-90-days", label: "Last 90 Days" },
+  { value: "season", label: "Current Season" },
+  { value: "custom", label: "Custom Range" },
+];
 
 const Passport = () => {
   const { user } = useUserStore();
   const [passportData, setPassportData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState(false);
-  const [formData, setFormData] = useState({});
+  const [selectedSeason, setSelectedSeason] = useState("2025-26");
+  const [selectedDateRange, setSelectedDateRange] = useState("season");
   const [shareLink, setShareLink] = useState(null);
 
   useEffect(() => {
@@ -53,58 +200,77 @@ const Passport = () => {
 
   const loadPassportData = async () => {
     try {
-      const response = await api.get("/passport/v1/player/passport");
-      if (response.data.success) {
-        setPassportData(response.data.data);
-      }
+      // Simulate API call with mock data
+      setTimeout(() => {
+        setPassportData(mockPassportData);
+        setLoading(false);
+      }, 1000);
     } catch (error) {
       console.error("Failed to load passport data:", error);
-    } finally {
       setLoading(false);
     }
   };
 
-  const handleSave = async () => {
-    try {
-      const response = await api.put("/passport/v1/player/passport", formData);
-      if (response.data.success) {
-        await loadPassportData();
-        setEditing(false);
-      }
-    } catch (error) {
-      console.error("Failed to save passport:", error);
-    }
-  };
-
   const createShareLink = async () => {
-    try {
-      const response = await api.post(
-        "/passport/v1/player/passport/share/create"
-      );
-      if (response.data.success) {
-        setShareLink(response.data.data);
-      }
-    } catch (error) {
-      console.error("Failed to create share link:", error);
-    }
+    // Simulate share link creation
+    setShareLink({
+      share_token: "share_123456789",
+      share_url: `${window.location.origin}/public/passport/share_123456789`,
+      expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+    });
   };
 
   const revokeShareLink = async () => {
-    if (!shareLink) return;
-    try {
-      await api.post("/passport/v1/player/passport/share/revoke", {
-        share_token: shareLink.share_token,
-      });
-      setShareLink(null);
-    } catch (error) {
-      console.error("Failed to revoke share link:", error);
-    }
+    setShareLink(null);
   };
+
+  const handleResetFilters = () => {
+    setSelectedSeason("2025-26");
+    setSelectedDateRange("season");
+  };
+
+  const filteredMetrics = React.useMemo(() => {
+    if (!passportData?.metrics) return [];
+
+    return passportData.metrics.filter((metric) => {
+      // Simple filter logic - in real app, this would be more sophisticated
+      const metricDate = new Date(metric.date);
+      const now = new Date();
+
+      switch (selectedDateRange) {
+        case "last-7-days":
+          const sevenDaysAgo = new Date(now.setDate(now.getDate() - 7));
+          return metricDate >= sevenDaysAgo;
+        case "last-30-days":
+          const thirtyDaysAgo = new Date(now.setDate(now.getDate() - 30));
+          return metricDate >= thirtyDaysAgo;
+        case "last-90-days":
+          const ninetyDaysAgo = new Date(now.setDate(now.getDate() - 90));
+          return metricDate >= ninetyDaysAgo;
+        default:
+          return true;
+      }
+    });
+  }, [passportData?.metrics, selectedDateRange]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-96">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <span className="ml-3 text-placeholder">Loading passport data...</span>
+      </div>
+    );
+  }
+
+  if (!passportData) {
+    return (
+      <div className="text-center py-12">
+        <h2 className="text-2xl font-bold text-white mb-4">
+          Passport Not Found
+        </h2>
+        <p className="text-placeholder">
+          Unable to load passport data. Please try again later.
+        </p>
       </div>
     );
   }
@@ -112,353 +278,153 @@ const Passport = () => {
   const {
     player,
     identity,
-    passport: passportInfo,
+    passport,
     verifications,
-    reports,
     metrics,
     tempo_data,
-  } = passportData || {};
-  const tier = player?.tier || "free";
+    reports,
+    media,
+  } = passportData;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-4xl font-bold font-['Orbitron'] bg-linear-to-r from-white to-primary bg-clip-text text-transparent">
             Player Passport
           </h1>
-          <p className="text-[#B0AFAF] text-lg mt-2 font-['Orbitron']">
+          <p className="text-(--muted-text) text-lg mt-2 font-['Orbitron']">
             Your comprehensive football profile and performance analytics
           </p>
         </div>
-        <div className="flex items-center space-x-3">
-          <Badge variant="outline" className="text-primary border-primary">
-            {tier.toUpperCase()} Plan
-          </Badge>
-          {editing ? (
-            <div className="flex space-x-2">
-              <Button onClick={handleSave} size="sm">
-                Save Changes
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setEditing(false)}
-                size="sm"
-              >
-                Cancel
-              </Button>
-            </div>
-          ) : (
-            <Button onClick={() => setEditing(true)} size="sm">
-              Edit Profile
-            </Button>
-          )}
+      </div>
+
+      <div className="grid gap-8 lg:grid-cols-4">
+        {/* Main Content - 3/4 width */}
+        <div className="lg:col-span-3 space-y-6">
+          {/* Identity Information */}
+          <IdentityCard
+            identity={identity}
+            passport={passport}
+            verifications={verifications}
+            player={player}
+          />
+
+          {/* Performance Metrics */}
+          <PerformanceMetrics
+            metrics={filteredMetrics}
+            tempoData={tempo_data}
+            tier={player?.tier}
+          />
+
+          {/* Reports Section */}
+          <ReportsSection reports={reports} />
+
+          {/* Media Gallery */}
+          <MediaGallery media={media} />
         </div>
-      </div>
 
-      {/* Verification Status */}
-      <Card className="bg-[#262626] border-[#343434]">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2 text-white">
-            <Shield className="w-5 h-5 text-primary" />
-            <span>Verification Status</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              {verifications?.some(
-                (v) => v.verification_badge === "identity_verified"
-              ) ? (
-                <CheckCircle className="w-5 h-5 text-green-500" />
-              ) : (
-                <Clock className="w-5 h-5 text-yellow-500" />
-              )}
-              <span className="text-white">Identity Verified</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              {verifications?.some(
-                (v) => v.verification_badge === "club_verified"
-              ) ? (
-                <CheckCircle className="w-5 h-5 text-green-500" />
-              ) : (
-                <Clock className="w-5 h-5 text-yellow-500" />
-              )}
-              <span className="text-white">Club Verified</span>
-            </div>
-            <Badge
-              variant={
-                player?.passport_status === "verified" ? "default" : "secondary"
-              }
-              className={
-                player?.passport_status === "verified" ? "bg-green-500" : ""
-              }
-            >
-              {player?.passport_status || "Draft"}
-            </Badge>
-          </div>
-        </CardContent>
-      </Card>
+        {/* Sidebar - 1/4 width */}
+        <div className="lg:col-span-1">
+          <FilterSidebar
+            selectedSeason={selectedSeason}
+            onSeasonChange={setSelectedSeason}
+            selectedDateRange={selectedDateRange}
+            onDateRangeChange={setSelectedDateRange}
+            onResetFilters={handleResetFilters}
+            metrics={filteredMetrics}
+          />
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Identity Information */}
-        <Card className="bg-[#262626] border-[#343434]">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-white">
-              <User className="w-5 h-5 text-primary" />
-              <span>Identity Information</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {identity ? (
-              <div className="space-y-3">
-                <div className="flex items-center space-x-3">
-                  {identity.headshot_url && (
-                    <img
-                      src={identity.headshot_url}
-                      alt="Profile"
-                      className="w-16 h-16 rounded-full object-cover"
-                    />
-                  )}
-                  <div>
-                    <h3 className="text-lg font-semibold text-white">
-                      {identity.first_name} {identity.last_name}
-                    </h3>
-                    <p className="text-[#B0AFAF]">
-                      {identity.nationality} • {identity.height_cm}cm •{" "}
-                      {identity.weight_kg}kg
-                    </p>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-[#B0AFAF]">Preferred Foot:</span>
-                    <p className="text-white">{identity.preferred_foot}</p>
-                  </div>
-                  <div>
-                    <span className="text-[#B0AFAF]">Positions:</span>
-                    <p className="text-white">
-                      {identity.positions?.join(", ") || "N/A"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <p className="text-[#B0AFAF]">
-                Identity information not provided
-              </p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Club Information */}
-        <Card className="bg-[#262626] border-[#343434]">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-white">
-              <MapPin className="w-5 h-5 text-primary" />
-              <span>Club Information</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {passportInfo ? (
-              <div className="space-y-3">
-                <div>
-                  <h3 className="text-lg font-semibold text-white">
-                    {passportInfo.current_club}
-                  </h3>
-                  <p className="text-[#B0AFAF]">
-                    {passportInfo.squad_level} • Season {passportInfo.season}
-                  </p>
-                </div>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-[#B0AFAF]">Shirt Number:</span>
-                    <p className="text-white">#{passportInfo.shirt_number}</p>
-                  </div>
-                  <div>
-                    <span className="text-[#B0AFAF]">Status:</span>
-                    <p className="text-white">Active</p>
-                  </div>
-                </div>
-                {passportInfo.notes && (
-                  <div>
-                    <span className="text-[#B0AFAF]">Notes:</span>
-                    <p className="text-white">{passportInfo.notes}</p>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <p className="text-[#B0AFAF]">Club information not provided</p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Performance Metrics */}
-      {(tier === "basic" || tier === "pro") && (
-        <Card className="bg-[#262626] border-[#343434]">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-white">
-              <TrendingUp className="w-5 h-5 text-primary" />
-              <span>Performance Metrics</span>
-            </CardTitle>
-            <CardDescription className="text-[#B0AFAF]">
-              Your latest GR4DE scores and performance data
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {metrics && metrics.length > 0 ? (
-              <div className="space-y-4">
-                {metrics
-                  .slice(0, tier === "basic" ? 3 : 10)
-                  .map((metric, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-4 bg-[#1A1A1A] rounded-lg"
-                    >
-                      <div>
-                        <div className="flex items-center space-x-2">
-                          <Award className="w-5 h-5 text-primary" />
-                          <span className="text-white font-semibold">
-                            GR4DE Score: {metric.gr4de_score}
-                          </span>
-                        </div>
-                        <p className="text-[#B0AFAF] text-sm">
-                          {metric.competition} •{" "}
-                          {new Date(metric.date).toLocaleDateString()}
-                        </p>
-                      </div>
-                      {tier === "pro" && metric.benchmarks && (
-                        <Badge variant="outline">
-                          {Math.round(metric.benchmarks.percentile_rank || 0)}th
-                          Percentile
-                        </Badge>
-                      )}
-                    </div>
-                  ))}
-              </div>
-            ) : (
-              <p className="text-[#B0AFAF]">No performance data available</p>
-            )}
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Tempo Analysis */}
-      {tier === "pro" && tempo_data && tempo_data.length > 0 && (
-        <Card className="bg-[#262626] border-[#343434]">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-white">
-              <Zap className="w-5 h-5 text-primary" />
-              <span>Tempo Analysis</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 md:grid-cols-3">
-              {tempo_data.slice(0, 3).map((tempo, index) => (
-                <div
-                  key={index}
-                  className="text-center p-4 bg-[#1A1A1A] rounded-lg"
-                >
-                  <div className="text-2xl font-bold text-primary mb-2">
-                    {tempo.tempo_index}
-                  </div>
-                  <p className="text-[#B0AFAF] text-sm">Tempo Index</p>
-                  <p className="text-[#B0AFAF] text-xs">
-                    {new Date(tempo.created_at).toLocaleDateString()}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Reports */}
-      {reports && reports.length > 0 && (
-        <Card className="bg-[#262626] border-[#343434]">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-white">
-              <Download className="w-5 h-5 text-primary" />
-              <span>Analysis Reports</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {reports.slice(0, 5).map((report) => (
-                <div
-                  key={report.report_id}
-                  className="flex items-center justify-between p-3 bg-[#1A1A1A] rounded-lg"
-                >
-                  <div>
-                    <p className="text-white font-medium">
-                      {report.report_type}
-                    </p>
-                    <p className="text-[#B0AFAF] text-sm">
-                      {new Date(report.created_at).toLocaleDateString()}
-                    </p>
-                  </div>
-                  {report.pdf_url && (
-                    <Button size="sm" variant="outline">
-                      <Download className="w-4 h-4 mr-2" />
-                      Download
-                    </Button>
-                  )}
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Share Profile */}
-      <Card className="bg-[#262626] border-[#343434]">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2 text-white">
-            <Share2 className="w-5 h-5 text-primary" />
-            <span>Share Profile</span>
-          </CardTitle>
-          <CardDescription className="text-[#B0AFAF]">
-            Create a public link to share your profile with coaches and clubs
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {shareLink ? (
+          {/* Share Profile Section */}
+          <div className="bg-(--surface-1) border border-(--surface-2) hover:border-primary/30 transition-all duration-300 rounded-xl p-6 mt-5">
             <div className="space-y-4">
-              <div className="p-4 bg-[#1A1A1A] rounded-lg">
-                <p className="text-white mb-2">Public Profile Link:</p>
-                <div className="flex items-center space-x-2">
-                  <Input
-                    value={shareLink.share_url}
-                    readOnly
-                    className="bg-[#343434] border-[#343434] text-white"
-                  />
-                  <Button
-                    size="sm"
-                    onClick={() =>
-                      navigator.clipboard.writeText(shareLink.share_url)
-                    }
-                  >
-                    Copy
-                  </Button>
-                </div>
-                <p className="text-[#B0AFAF] text-sm mt-2">
-                  Expires: {new Date(shareLink.expires_at).toLocaleDateString()}
+              {/* Header */}
+              <div className="text-center">
+                <Share2 className="w-8 h-8 text-primary mx-auto mb-3" />
+                <h3 className="text-xl font-bold text-white mb-2">
+                  Share Your Passport
+                </h3>
+                <p className="text-placeholder max-w-md mx-auto">
+                  Create a public link to share your profile with coaches and
+                  clubs
                 </p>
               </div>
-              <Button variant="destructive" size="sm" onClick={revokeShareLink}>
-                Revoke Link
-              </Button>
+
+              {/* Share Link Display */}
+              {shareLink && (
+                <div className="space-y-3">
+                  <div className="  border border-(--surface-2) rounded-lg p-4">
+                    <p className="text-xs text-placeholder mb-2 font-medium">
+                      Expires:{" "}
+                      {new Date(shareLink.expires_at).toLocaleDateString()}
+                    </p>
+                    <p className="text-sm text-placeholder"></p>
+                    <div className="flex items-center space-x-2">
+                      <Input
+                        value={shareLink.share_url}
+                        readOnly
+                        className="bg-[#343434] border-(--surface-2) text-white text-sm font-mono flex-1"
+                      />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          navigator.clipboard.writeText(shareLink.share_url)
+                        }
+                        className="bg-[#404040] border-(--surface-2) text-white hover:bg-[#505050] shrink-0"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+                {shareLink ? (
+                  <>
+                    <Button
+                      onClick={() => window.open(shareLink.share_url, "_blank")}
+                      className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold flex-1"
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      View Public Profile
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={revokeShareLink}
+                      className="flex-1"
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Revoke Link
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    onClick={() => {
+                      createShareLink();
+                    }}
+                    className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold w-full max-w-xs mx-auto"
+                  >
+                    <Share2 className="w-4 h-4 mr-2" />
+                    Create Share Link
+                  </Button>
+                )}
+              </div>
+
+              {/* Additional Info */}
+              <div className="text-center pt-4 border-t border-[#343434]">
+                <p className="text-xs text-placeholder">
+                  Share links are valid for 7 days and can be revoked at any
+                  time
+                </p>
+              </div>
             </div>
-          ) : (
-            <Button onClick={createShareLink}>
-              <Share2 className="w-4 h-4 mr-2" />
-              Create Share Link
-            </Button>
-          )}
-        </CardContent>
-      </Card>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
