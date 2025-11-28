@@ -163,7 +163,7 @@ const PerformanceMetrics = ({ metrics, tempoData, tier }) => {
                   <div className={`w-full h-3 rounded-lg relative flex`}>
                     {/* Rest of the chart (unfilled portion) */}
                     <div
-                      className={`w-full h-full bg-placeholder rounded-lg absolute top-0 left-0`}
+                      className={`w-full h-full bg-white rounded-lg absolute top-0 left-0`}
                     />
                     <div
                       className={`h-full bg-primary rounded-lg transition-all duration-1000 ease-out relative z-10`}

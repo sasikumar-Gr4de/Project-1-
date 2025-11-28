@@ -105,7 +105,7 @@ const IdentityCard = ({ identity, passport, verifications, player }) => {
                 <div className="flex items-center space-x-2 bg-(--surface-0) rounded-2xl p-3">
                   <Ruler className="w-6 h-6 text-black bg-primary rounded p-1" />
                   <div className="flex-2">
-                    <p className="text-sm text-placeholder">Height</p>
+                    <p className="text-sm text-placeholder font-bold">Height</p>
 
                     <p className="text-primary font-medium font-['Orbitron'] text-right">
                       {identity.height_cm}cm
@@ -116,7 +116,7 @@ const IdentityCard = ({ identity, passport, verifications, player }) => {
                 <div className="flex items-center space-x-2 bg-(--surface-0) rounded-2xl p-3">
                   <Scale className="w-6 h-6 text-black bg-primary rounded p-1" />
                   <div className="flex-2">
-                    <p className="text-sm text-placeholder">Weight</p>
+                    <p className="text-sm text-placeholder font-bold">Weight</p>
                     <p className="text-primary font-medium font-['Orbitron'] text-right">
                       {identity.weight_kg}kg
                     </p>
@@ -126,7 +126,9 @@ const IdentityCard = ({ identity, passport, verifications, player }) => {
                 <div className="flex items-center space-x-2 bg-(--surface-0) rounded-2xl p-3">
                   <Footprints className="w-6 h-6 text-black bg-primary rounded p-1 " />
                   <div className="flex-2">
-                    <p className="text-sm text-placeholder">Preferred Foot</p>
+                    <p className="text-sm text-placeholder font-bold">
+                      Preferred Foot
+                    </p>
                     <p className="text-primary  font-medium capitalize font-['Orbitron'] text-right">
                       {identity.preferred_foot}
                     </p>
@@ -136,7 +138,9 @@ const IdentityCard = ({ identity, passport, verifications, player }) => {
                 <div className="flex items-center space-x-2 bg-(--surface-0) rounded-2xl p-3">
                   <Target className="w-6 h-6 text-black bg-primary rounded p-1" />
                   <div>
-                    <p className="text-sm text-placeholder">Positions</p>
+                    <p className="text-sm text-placeholder font-bold">
+                      Positions
+                    </p>
                     <p className="text-primary font-medium">
                       {identity.positions?.join(", ")}
                     </p>
