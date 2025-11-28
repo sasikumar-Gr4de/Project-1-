@@ -37,7 +37,7 @@ const Verification = () => {
     isLoading,
   } = usePassportStore();
   const { toast } = useToast();
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(4);
   const [loadingStatus, setLoadingStatus] = useState(true);
 
   useEffect(() => {

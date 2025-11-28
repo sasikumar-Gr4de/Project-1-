@@ -95,7 +95,7 @@ const Benchmarks = () => {
       label: "Your Score",
       value: performanceData.overall.yourScore,
       color:
-        "bg-gradient-to-t from-[var(--color-surface-4)] from-[var(--color-surface-3)]",
+        "bg-gradient-to-t from-[var(--surface-3)] from-[var(--muted-foreground)]",
       textColor: "text-primary",
     },
     {

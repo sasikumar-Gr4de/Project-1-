@@ -15,22 +15,11 @@ import {
   Clock,
   Shield,
 } from "lucide-react";
+import { calculateAge } from "@/utils/helper.utils";
+import VerificationBadge from "@/components/passport/VerificationBadge";
+import Verification from "@/pages/Player/Verification";
 
 const IdentityCard = ({ identity, passport, verifications, player }) => {
-  const calculateAge = (dob) => {
-    const birthDate = new Date(dob);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (
-      monthDiff < 0 ||
-      (monthDiff === 0 && today.getDate() < birthDate.getDate())
-    ) {
-      age--;
-    }
-    return age;
-  };
-
   const isVerified = verifications?.some((v) => v.status === "approved");
   const identityVerified = verifications?.some(
     (v) => v.verification_badge === "identity_verified"
@@ -49,37 +38,11 @@ const IdentityCard = ({ identity, passport, verifications, player }) => {
           </CardTitle>
 
           {/* Verification Status Badge */}
-          <div className="flex items-center space-x-2">
-            {isVerified ? (
-              <CheckCircle className="w-5 h-5 text-green-400" />
-            ) : (
-              <Clock className="w-5 h-5 text-yellow-400" />
-            )}
-            <Badge
-              className={
-                isVerified
-                  ? "bg-green-500/20 text-green-400 border-green-500/30"
-                  : "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
-              }
-            >
-              {isVerified ? "Verified" : "Pending"}
-            </Badge>
-            {!isVerified && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => (window.location.href = "/verification")}
-                className="bg-primary/20 text-primary border-primary/30 hover:bg-primary/30"
-              >
-                <Shield className="w-4 h-4 mr-2" />
-                Verify
-              </Button>
-            )}
-          </div>
+          {/* <VerificationBadge isVerified={isVerified} /> */}
         </div>
 
         {/* Detailed Verification Status */}
-        <div className="flex items-center space-x-4 mt-2">
+        {/* <div className="flex items-center space-x-4 mt-2">
           <div className="flex items-center space-x-2">
             {identityVerified ? (
               <CheckCircle className="w-4 h-4 text-green-400" />
@@ -96,7 +59,7 @@ const IdentityCard = ({ identity, passport, verifications, player }) => {
             )}
             <span className="text-sm text-placeholder">Club</span>
           </div>
-        </div>
+        </div> */}
       </CardHeader>
 
       <CardContent className="space-y-4">
@@ -111,9 +74,12 @@ const IdentityCard = ({ identity, passport, verifications, player }) => {
                 />
               )}
               <div className="flex-1">
-                <h3 className="text-xl font-bold text-white">
-                  {identity.first_name} {identity.last_name}
-                </h3>
+                <div className="flex items-center space-x-4">
+                  <h3 className="text-xl font-bold text-white ">
+                    {identity.first_name} {identity.last_name}{" "}
+                  </h3>
+                  <VerificationBadge isVerified={isVerified} />
+                </div>
                 <div className="flex items-center space-x-3 mt-1">
                   <Badge
                     variant="outline"
@@ -134,69 +100,80 @@ const IdentityCard = ({ identity, passport, verifications, player }) => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-border">
-              <div className="flex items-center space-x-2">
-                <Ruler className="w-4 h-4 text-primary" />
-                <div>
-                  <p className="text-sm text-placeholder">Height</p>
-                  <p className="text-white font-medium">
-                    {identity.height_cm}cm
-                  </p>
+            <div className="grid grid-cols-2 gap-4  ">
+              <div className="grid grid-cols-2 border-border gap-4 ">
+                <div className="flex items-center space-x-2 bg-(--surface-0) rounded-2xl p-3">
+                  <Ruler className="w-6 h-6 text-black bg-primary rounded p-1" />
+                  <div className="flex-2">
+                    <p className="text-sm text-placeholder">Height</p>
+
+                    <p className="text-primary font-medium font-['Orbitron'] text-right">
+                      {identity.height_cm}cm
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-2 bg-(--surface-0) rounded-2xl p-3">
+                  <Scale className="w-6 h-6 text-black bg-primary rounded p-1" />
+                  <div className="flex-2">
+                    <p className="text-sm text-placeholder">Weight</p>
+                    <p className="text-primary font-medium font-['Orbitron'] text-right">
+                      {identity.weight_kg}kg
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-2 bg-(--surface-0) rounded-2xl p-3">
+                  <Footprints className="w-6 h-6 text-black bg-primary rounded p-1 " />
+                  <div className="flex-2">
+                    <p className="text-sm text-placeholder">Preferred Foot</p>
+                    <p className="text-primary  font-medium capitalize font-['Orbitron'] text-right">
+                      {identity.preferred_foot}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-2 bg-(--surface-0) rounded-2xl p-3">
+                  <Target className="w-6 h-6 text-black bg-primary rounded p-1" />
+                  <div>
+                    <p className="text-sm text-placeholder">Positions</p>
+                    <p className="text-primary font-medium">
+                      {identity.positions?.join(", ")}
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              <div className="flex items-center space-x-2">
-                <Scale className="w-4 h-4 text-primary" />
-                <div>
-                  <p className="text-sm text-placeholder">Weight</p>
-                  <p className="text-white font-medium">
-                    {identity.weight_kg}kg
-                  </p>
+              {identity.guardian_name && (
+                <div className="border-l border-placeholder p-4">
+                  <div className="bg-(--surface-0) rounded-2xl p-4">
+                    <h4 className="text-sm font-medium text-placeholder mb-2">
+                      Guardian Information
+                    </h4>
+                    <div className="grid grid-cols-1 gap-2">
+                      <div>
+                        <p className="text-placeholder text-sm">Name</p>
+                        <p className="text-white">{identity.guardian_name}</p>
+                      </div>
+                      <div className="grid grid-cols-2">
+                        <div>
+                          <p className="text-placeholder text-sm">Email</p>
+                          <p className="text-white">
+                            {identity.guardian_email}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-placeholder text-sm">Phone</p>
+                          <p className="text-white">
+                            {identity.guardian_phone}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Footprints className="w-4 h-4 text-primary" />
-                <div>
-                  <p className="text-sm text-placeholder">Preferred Foot</p>
-                  <p className="text-white font-medium capitalize">
-                    {identity.preferred_foot}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Target className="w-4 h-4 text-primary" />
-                <div>
-                  <p className="text-sm text-placeholder">Positions</p>
-                  <p className="text-white font-medium">
-                    {identity.positions?.join(", ")}
-                  </p>
-                </div>
-              </div>
+              )}
             </div>
-
-            {identity.guardian_name && (
-              <div className="pt-4 border-t border-border">
-                <h4 className="text-sm font-medium text-placeholder mb-2">
-                  Guardian Information
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
-                  <div>
-                    <p className="text-placeholder">Name</p>
-                    <p className="text-white">{identity.guardian_name}</p>
-                  </div>
-                  <div>
-                    <p className="text-placeholder">Email</p>
-                    <p className="text-white">{identity.guardian_email}</p>
-                  </div>
-                  <div>
-                    <p className="text-placeholder">Phone</p>
-                    <p className="text-white">{identity.guardian_phone}</p>
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* Quick Actions */}
             {/* <div className="pt-4 border-t border-border">

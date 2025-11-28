@@ -20,7 +20,7 @@ router.put("/:player_id/passport", updatePlayerPassport);
 /**
  * Get player's passport data
  */
-router.get("/v1/player/passport", async (req, res) => {
+router.get("/player/passport", async (req, res) => {
   try {
     const { id: userId } = req.user;
 
@@ -129,7 +129,7 @@ router.get("/v1/player/passport", async (req, res) => {
 /**
  * Update passport data
  */
-router.put("/v1/player/passport", async (req, res) => {
+router.put("/player/passport", async (req, res) => {
   try {
     const { id: userId } = req.user;
     const { passport: passportData, identity: identityData } = req.body;
@@ -224,7 +224,7 @@ router.put("/v1/player/passport", async (req, res) => {
 /**
  * Upload passport files (headshot, documents)
  */
-router.post("/v1/player/passport/files", async (req, res) => {
+router.post("/player/passport/files", async (req, res) => {
   try {
     const { id: userId } = req.user;
     const { file_url, file_type, document_type } = req.body;
@@ -257,7 +257,7 @@ router.post("/v1/player/passport/files", async (req, res) => {
 /**
  * Get passport status and verification info
  */
-router.get("/v1/player/passport/status", async (req, res) => {
+router.get("/player/passport/status", async (req, res) => {
   try {
     const { id: userId } = req.user;
 
@@ -308,7 +308,7 @@ router.get("/v1/player/passport/status", async (req, res) => {
 /**
  * Create shareable passport link
  */
-router.post("/v1/player/passport/share/create", async (req, res) => {
+router.post("/player/passport/share/create", async (req, res) => {
   try {
     const { id: userId } = req.user;
     const { expires_in_days = 30 } = req.body;
@@ -349,7 +349,7 @@ router.post("/v1/player/passport/share/create", async (req, res) => {
 /**
  * Revoke passport share link
  */
-router.post("/v1/player/passport/share/revoke", async (req, res) => {
+router.post("/player/passport/share/revoke", async (req, res) => {
   try {
     const { id: userId } = req.user;
     const { share_token } = req.body;
@@ -384,7 +384,7 @@ router.post("/v1/player/passport/share/revoke", async (req, res) => {
 /**
  * Get public passport view (no authentication required)
  */
-router.get("/v1/player/passport/public/:token", async (req, res) => {
+router.get("/player/passport/public/:token", async (req, res) => {
   try {
     const { token } = req.params;
 
@@ -521,7 +521,7 @@ router.get("/v1/player/passport/public/:token", async (req, res) => {
  * Admin: Review passport verification (admin only)
  */
 router.post(
-  "/v1/player/passport/review/:playerId",
+  "/player/passport/review/:playerId",
   requireRole(["admin"]),
   async (req, res) => {
     try {

@@ -158,7 +158,7 @@ const mockPassportData = {
       media_type: "video",
       title: "Match Highlights vs Manchester United",
       description: "Best moments from the academy match",
-      url: "/api/videos/highlights-2025-11-23.mp4",
+      url: "https://www.youtube.com/watch?v=OIAwlZSJQ-o",
       created_at: "2025-11-24T14:00:00Z",
     },
     {
@@ -166,7 +166,7 @@ const mockPassportData = {
       media_type: "image",
       title: "Training Session",
       description: "Technical drills and exercises",
-      url: "/api/images/training-2025-11-20.jpg",
+      url: "https://media.gettyimages.com/id/2247567358/ja/%E3%82%B9%E3%83%88%E3%83%83%E3%82%AF%E3%83%95%E3%82%A9%E3%83%88/riyadh-saudi-arabia-cristiano-ronaldo-of-team-al-nassr-fc-scores-their-fourth-goal-during.jpg?s=612x612&w=0&k=20&c=_WEU4D-4NUmVkZtnQ5Fji_-YFq7Is-QTiBT9n16lEWo=",
       created_at: "2025-11-20T11:00:00Z",
     },
   ],

@@ -14,9 +14,9 @@ const PillarCard = ({ name, yourScore, average, top10, color }) => {
       </CardHeader>
       <CardContent className="space-y-2">
         <div className="flex justify-center items-center">
-          <div className="text-center w-32 h-32 rounded-full p-0.5 bg-linear-to-b from-primary to-primary-600">
+          <div className="text-center w-36 h-36 rounded-full p-0.5 bg-linear-to-b from-primary bg-green-700">
             <div className="w-full h-full rounded-full bg-black flex flex-col items-center justify-center">
-              <div className="text-3xl font-bold bg-linear-to-r from-primary to-primary-300 text-transparent bg-clip-text font-['Orbitron']">
+              <div className="text-4xl font-bold bg-linear-to-r from-primary to-primary-300 text-transparent bg-clip-text font-['Orbitron']">
                 {yourScore}
               </div>
               <div className="text-xs text-placeholder mt-1">Your Score</div>

@@ -74,7 +74,7 @@ const Dashboard = () => {
             </p>
             <Button
               asChild
-              className="bg-linear-to-r from-primary to-[#94D44A] text-black hover:from-[#94D44A] hover:to-primary font-semibold rounded-xl px-8 py-3"
+              className="bg-linear-to-r from-primary to-secondary text-black hover:from-secondary hover:to-primary font-semibold rounded-xl px-8 py-3"
             >
               <a href="/passport">Complete Player Profile</a>
             </Button>
@@ -201,7 +201,7 @@ const Dashboard = () => {
 
         {/* Benchmark Rank */}
         <StatsCard
-          title="Progress Trend"
+          title="Benchmark Rank"
           value={benchmarks ? "Top 25%" : "--"}
           description={`Since ${user?.position || "--"} • ${
             user?.date_of_birth
@@ -209,8 +209,8 @@ const Dashboard = () => {
               : "--"
           }`}
           icon={Target}
-          gradient="from-[var(--color-orange-light)] to-[var(--color-orange)]"
-          valueColor="text-[var(--color-orange-light)]"
+          gradient="from-[var(--color-purple-light)] to-[var(--color-purple)]"
+          valueColor="text-[var(--color-purple-light)]"
           className="text-sm"
         />
       </div>
@@ -409,7 +409,7 @@ const Dashboard = () => {
                     All Reports
                   </h3>
                   <p className="text-sm text-placeholder mt-1">
-                    Access your complete report history
+                    Access your complete reports history
                   </p>
                 </div>
               </div>

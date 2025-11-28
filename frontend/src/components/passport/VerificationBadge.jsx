@@ -2,54 +2,35 @@ import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Clock, XCircle, AlertCircle } from "lucide-react";
 
-const VerificationBadge = ({ status, label, size = "default" }) => {
-  const getStatusConfig = () => {
-    switch (status) {
-      case "verified":
-        return {
-          icon: CheckCircle,
-          color: "bg-linear-to-r from-green-500 to-emerald-600 text-white",
-          iconColor: "text-white",
-        };
-      case "pending":
-        return {
-          icon: Clock,
-          color: "bg-linear-to-r from-yellow-500 to-amber-600 text-white",
-          iconColor: "text-white",
-        };
-      case "rejected":
-        return {
-          icon: XCircle,
-          color: "bg-linear-to-r from-red-500 to-rose-600 text-white",
-          iconColor: "text-white",
-        };
-      default:
-        return {
-          icon: AlertCircle,
-          color: "bg-[var(--surface-2)] text-[var(--muted-text)]",
-          iconColor: "text-[var(--muted-text)]",
-        };
-    }
-  };
-
-  const config = getStatusConfig();
-  const IconComponent = config.icon;
-
-  const sizeClasses = {
-    small: "px-2 py-1 text-xs",
-    default: "px-3 py-1.5 text-sm",
-    large: "px-4 py-2 text-base",
-  };
-
+const VerificationBadge = ({ isVerified = false }) => {
   return (
-    <Badge
-      className={`${config.color} ${sizeClasses[size]} font-semibold border-0`}
-    >
-      <div className="flex items-center space-x-1">
-        <IconComponent className={`w-3 h-3 ${config.iconColor}`} />
-        <span>{label}</span>
-      </div>
-    </Badge>
+    <div className="flex items-center space-x-2">
+      {isVerified ? (
+        <CheckCircle className="w-5 h-5 text-green-400" />
+      ) : (
+        <Clock className="w-5 h-5 text-yellow-400" />
+      )}
+      <Badge
+        className={
+          isVerified
+            ? "bg-green-500/20 text-green-400 border-green-500/30"
+            : "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+        }
+      >
+        {isVerified ? "Verified" : "Pending"}
+      </Badge>
+      {!isVerified && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => (window.location.href = "/verification")}
+          className="bg-primary/20 text-primary border-primary/30 hover:bg-primary/30"
+        >
+          <Shield className="w-4 h-4 mr-2" />
+          Verify
+        </Button>
+      )}
+    </div>
   );
 };
 
