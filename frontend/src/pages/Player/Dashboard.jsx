@@ -74,7 +74,7 @@ const Dashboard = () => {
             </p>
             <Button
               asChild
-              className="bg-linear-to-r from-primary to-secondary text-black hover:from-secondary hover:to-primary font-semibold rounded-xl px-8 py-3"
+              className="bg-linear-to-r from-primary to-secondary text-(--surface-0) hover:from-secondary hover:to-primary font-semibold rounded-xl px-8 py-3"
             >
               <a href="/passport">Complete Player Profile</a>
             </Button>
@@ -295,7 +295,7 @@ const Dashboard = () => {
                 </p>
                 <Button
                   asChild
-                  className="mt-6 bg-linear-to-r from-primary to-[#94D44A] text-black hover:from-secondary hover:to-primary font-semibold rounded-xl"
+                  className="mt-6 bg-linear-to-r from-primary to-[#94D44A] text-(--surface-0) hover:from-secondary hover:to-primary font-semibold rounded-xl"
                 >
                   <Link to="/upload">Upload Your First Data</Link>
                 </Button>
@@ -362,7 +362,7 @@ const Dashboard = () => {
             <CardContent className="p-6">
               <div className="flex items-center space-x-4">
                 <div className="w-12 h-12 bg-linear-to-br from-primary to-primary rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <Upload className="w-6 h-6 text-black" />
+                  <Upload className="w-6 h-6 text-(--surface-0)" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-white group-hover:text-primary transition-colors">

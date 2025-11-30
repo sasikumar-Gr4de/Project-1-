@@ -11,10 +11,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Tabs from "@/components/common/Tabs";
-import { Mail, Phone, ArrowRight } from "lucide-react";
 import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
+import { Mail, Phone, ArrowRight } from "lucide-react";
 import { useToast } from "@/contexts/ToastContext";
+import "react-phone-input-2/lib/style.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");

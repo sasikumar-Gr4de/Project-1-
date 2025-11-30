@@ -202,7 +202,7 @@ const Benchmarks = () => {
         </div>
         <Button
           asChild
-          className="bg-linear-to-r from-primary to-secondary text-[#0F0F0E] hover:from-primary-300 hover:to-primary font-semibold rounded-lg px-4 py-2 h-10 text-sm shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto"
+          className="bg-linear-to-r from-primary to-secondary text-(--surfce-0) hover:from-primary-300 hover:to-primary font-semibold rounded-lg px-4 py-2 h-10 text-sm shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto"
         >
           <Link to="/reports">
             <BarChart3 className="w-4 h-4 mr-2" />

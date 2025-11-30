@@ -8,7 +8,7 @@ import MediaGallery from "@/components/passport/MediaGallery";
 import FilterSidebar from "@/components/passport/FilterSidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Copy, Eye, X, Share2, Badge } from "lucide-react";
+import { Copy, Eye, X, Share2 } from "lucide-react";
 
 const mockPassportData = {
   player: {
@@ -388,7 +388,7 @@ const Passport = () => {
                         onClick={() =>
                           navigator.clipboard.writeText(shareLink.share_url)
                         }
-                        className="bg-[#404040] border-(--surface-2) text-white hover:bg-[#505050] shrink-0"
+                        className="bg-(--surface-3) border-(--surface-2) text-white hover:bg-[#505050] shrink-0"
                       >
                         <Copy className="w-4 h-4" />
                       </Button>
@@ -403,7 +403,7 @@ const Passport = () => {
                   <>
                     <Button
                       onClick={() => window.open(shareLink.share_url, "_blank")}
-                      className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold flex-1"
+                      className="bg-linear-to-r from-primary to-secondary text-[#0F0F0E] hover:from-secondary hover:to-primary font-semibold flex-1"
                     >
                       <Eye className="w-4 h-4 mr-2" />
                       View Public Profile
@@ -422,7 +422,7 @@ const Passport = () => {
                     onClick={() => {
                       createShareLink();
                     }}
-                    className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold w-full max-w-xs mx-auto"
+                    className="bg-linear-to-r from-primary to-[#94D44A] text-(--ink) hover:from-[#94D44A] hover:to-primary font-semibold w-full max-w-xs mx-auto"
                   >
                     <Share2 className="w-4 h-4 mr-2" />
                     Create Share Link
@@ -431,7 +431,7 @@ const Passport = () => {
               </div>
 
               {/* Additional Info */}
-              <div className="text-center pt-4 border-t border-[#343434]">
+              <div className="text-center pt-4 border-t border-(--surface-2)">
                 <p className="text-xs text-placeholder">
                   Share links are valid for 7 days and can be revoked at any
                   time
