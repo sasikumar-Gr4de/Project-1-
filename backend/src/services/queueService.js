@@ -22,7 +22,7 @@ export const getQueueById = async (queueId) => {
   return data;
 };
 
-export const updateQueue = async (queueId, data) => {
+export const updateQueueData = async (queueId, data) => {
   const { data, error } = await supabase
     .from("processing_queue")
     .update(data)

@@ -1,6 +1,6 @@
 import { supabase } from "../config/supabase.config.js";
-import { generateUUID } from "./tokenService.js";
 
+// login or signup service
 export const getOrCreateUser = async (email, phone, userData = {}) => {
   try {
     // Check if user already exists by querying the users table
@@ -39,6 +39,7 @@ export const getOrCreateUser = async (email, phone, userData = {}) => {
   }
 };
 
+// get user profile service
 export const getUserProfile = async (userId) => {
   const { data, error } = await supabase
     .from("users")
@@ -57,6 +58,7 @@ export const getUserProfile = async (userId) => {
   return data;
 };
 
+// update user profile service
 export const updateUserProfile = async (userId, updates) => {
   // Validate updates
   const allowedFields = [
@@ -97,6 +99,7 @@ export const updateUserProfile = async (userId, updates) => {
   return data;
 };
 
+// complete onboarding service
 export const completeOnboarding = async (userId, onboardingData) => {
   const requiredFields = ["player_name", "date_of_birth", "position"];
   const missingFields = requiredFields.filter(
@@ -110,6 +113,7 @@ export const completeOnboarding = async (userId, onboardingData) => {
   return await updateUserProfile(userId, onboardingData);
 };
 
+// get user by email or phone service
 const getUserByEmailOrPhone = async (email, phone) => {
   let query = supabase.from("users").select("*");
 

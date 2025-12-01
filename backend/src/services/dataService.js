@@ -1,4 +1,5 @@
 import { supabase } from "../config/supabase.config.js";
+import { createQueue } from "../services/queueService.js";
 import { PLAYER_DATA_STATUS, QUEUE_STATUS } from "../utils/constants.js";
 
 export const createPlayerData = async (userId, playerData) => {
@@ -19,18 +20,14 @@ export const createPlayerData = async (userId, playerData) => {
     .select()
     .single();
 
-  const { id } = data;
-  const { data: queueData, error: queueError } = await supabase
-    .from("processing_queue")
-    .insert({
-      player_data_id: id,
-      status: QUEUE_STATUS.PENDING,
-      logs: "Queue created for player data",
-      created_at: new Date().toISOString(),
-    })
-    .select()
-    .single();
-  const { id: queueId } = queueData;
+  // Create queue
+  const { data: queueData, error: queueError } = await createQueue({
+    player_data_id: data.id,
+    status: QUEUE_STATUS.PENDING,
+    logs: "Queue created for player data",
+    created_at: new Date().toISOString(),
+  });
+  const { id: jobId } = queueData;
 
   if (error || queueError) {
     console.log(error);
@@ -39,7 +36,7 @@ export const createPlayerData = async (userId, playerData) => {
 
   return {
     ...data,
-    queue_id: queueId,
+    job_id: jobId,
   };
 };
 
@@ -98,14 +95,20 @@ export const getAllPlayerDataByPlayerId = async (
   };
 };
 
-export const updateQueueData = async (queueId, data) => {
-  const { data, error } = await supabase
-    .from("processing_queue")
-    .update(data)
-    .eq("id", queueId)
-    .select()
-    .single();
+// Trigger analysis model service
+export const triggerAnalaysisModel = async (data) => {
+  const { player_data_id, video_url, gps_url, metadata } = data;
 
-  if (error) throw new Error("Failed to update queue data");
+  // send request to model server
+  const response = await axios.post(
+    `${process.env.MODEL_SERVER_URL}/analyze`,
+    data
+  );
+  if (response.status !== 200) {
+    throw new Error("Failed to trigger analysis model");
+  }
+  return response.data;
+
+  if (error) throw new Error("Failed to trigger analysis model");
   return data;
 };

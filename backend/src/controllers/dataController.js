@@ -3,8 +3,10 @@ import {
   changePlayerDataStatus,
   getAllPlayerDataByPlayerId,
   triggerAnalaysisModel,
-  updateQueueData,
 } from "../services/dataService.js";
+import { createPlayerMetrics } from "../services/metricsService.js";
+import { createPlayerReport } from "../services/reportService.js";
+import { updateQueueData } from "../services/queueService.js";
 import { RESPONSES } from "../utils/messages.js";
 
 // Create new player data => trigger analysis workflow
@@ -90,28 +92,28 @@ export const getAnalysisCallback = async (req, res) => {
         processing_time_ms: processing_time_ms,
         logs: `Analysis completed successfully at ${new Date().toISOString()}`, // Option for more detailed logs (ML Server)
       });
+
+      // Prepare data for player metrics and report
+      data["metadata"] = metadata;
+      // Create player metrics
+      await createPlayerMetrics(data);
+
+      // Create player report
+      await createPlayerReport(data);
     } else if (status === "failed") {
       await changePlayerDataStatus(player_data_id, "failed");
+      await updateQueueData(player_data_id, {
+        status: "failed",
+        completed_at: new Date().toISOString(),
+        processing_time_ms: processing_time_ms,
+        logs: `Analysis failed at ${new Date().toISOString()}`, // Option for more detailed logs (ML Server)
+      });
     }
-
     res.json(RESPONSES.SUCCESS("Analysis callback received"));
   } catch (error) {
     console.log("Analysis callback error:", error);
     res
       .status(500)
       .json(RESPONSES.SERVER_ERROR("Failed to process analysis callback"));
-  }
-};
-
-// Update queue data
-export const updateQueueData = async (req, res) => {
-  try {
-    const { queueId } = req.body;
-    const { data } = req.body;
-    const result = await updateQueueData(queueId, data);
-    res.json(RESPONSES.SUCCESS("Queue data updated successfully", result));
-  } catch (error) {
-    console.log("Update queue data error:", error);
-    res.status(500).json(RESPONSES.SERVER_ERROR("Failed to update queue data"));
   }
 };

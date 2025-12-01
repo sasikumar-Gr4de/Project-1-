@@ -1,4 +1,5 @@
 import { supabase } from "../config/supabase.config.js";
+import { createAuditLog } from "./logService.js";
 
 // Add missing service functions
 export const createPlayerPassport = async (playerId, passportData) => {
@@ -17,6 +18,7 @@ export const createPlayerPassport = async (playerId, passportData) => {
   return data;
 };
 
+// Update player passport service
 export const updatePlayerPassport = async (playerId, passportData) => {
   const { data, error } = await supabase
     .from("player_passport")
@@ -32,6 +34,7 @@ export const updatePlayerPassport = async (playerId, passportData) => {
   return data;
 };
 
+// Get player passport service
 export const getPlayerPassport = async (playerId) => {
   try {
     const [identity, passport, metrics, reports, media, verifications] =
@@ -104,6 +107,7 @@ export const getPlayerPassport = async (playerId) => {
   }
 };
 
+// Create player identity service
 export const createPlayerIdentity = async (playerId, identityData) => {
   try {
     const { data, error } = await supabase
@@ -137,6 +141,7 @@ export const createPlayerIdentity = async (playerId, identityData) => {
   }
 };
 
+// Get verification status service
 export const getVerificationStatus = async (playerId) => {
   try {
     const [identity, verifications] = await Promise.all([
@@ -181,6 +186,7 @@ export const getVerificationStatus = async (playerId) => {
   }
 };
 
+// Upload verification document service
 export const uploadVerificationDocument = async (playerId, documentData) => {
   try {
     // Validate document type
@@ -221,6 +227,7 @@ export const uploadVerificationDocument = async (playerId, documentData) => {
   }
 };
 
+// Update headshot service
 export const updateHeadshot = async (playerId, headshotUrl) => {
   try {
     const { data, error } = await supabase
@@ -370,23 +377,6 @@ const buildTimeline = (metrics, reports) => {
   });
 
   return timeline.sort((a, b) => new Date(b.date) - new Date(a.date));
-};
-
-const createAuditLog = async (actorId, entity, entityId, action, diff) => {
-  try {
-    await supabase.from("audit_logs").insert([
-      {
-        actor_id: actorId,
-        entity,
-        entity_id: entityId,
-        action,
-        diff_json: diff,
-        created_at: new Date().toISOString(),
-      },
-    ]);
-  } catch (error) {
-    console.error("Create audit log error:", error);
-  }
 };
 
 export const restartVerificationProcess = async (playerId) => {
