@@ -76,8 +76,8 @@ export const calculateAge = (dateOfBirth) => {
 export const getScoreColor = (score) => {
   if (score >= 90) return "text-green-500";
   if (score >= 80) return "text-green-400";
-  if (score >= 70) return "text-yellow-500";
-  if (score >= 60) return "text-orange-500";
+  if (score >= 70) return "text-yellow-400";
+  if (score >= 60) return "text-yellow-500";
   return "text-red-500";
 };
 

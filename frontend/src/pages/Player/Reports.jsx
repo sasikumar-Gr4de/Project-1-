@@ -105,7 +105,7 @@ const Reports = () => {
   const getScoreBadgeVariant = (score) => {
     if (score >= 90) return "default";
     if (score >= 80) return "secondary";
-    if (score >= 70) return "outline";
+    if (score >= 70) return "secondary";
     return "destructive";
   };
 
