@@ -2,9 +2,14 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 
+// Completed Routes
+
+// Pending Routes
+import userRoutes from "./routes/userRoutes.js";
+
+// UnCompleted Routes
 import authRoutes from "./routes/authRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
-import userRoutes from "./routes/userRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
 import subscriptionRoutes from "./routes/subscriptionRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
@@ -46,13 +51,13 @@ app.use(
 );
 
 // Routes
+app.use("/api/users", userRoutes);
+
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/data", dataRoutes);
-app.use("/api/users", userRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
-
 app.use("/api/upload", uploadRoutes);
 app.use("/api/passport", passportRoutes);
 app.use("/api/verifications", verficationRoutes);

@@ -7,32 +7,11 @@ import {
 import { RESPONSES, USER_MESSAGES } from "../utils/messages.js";
 
 /**
- * Update user profile
- */
-export const updateProfile = async (req, res) => {
-  try {
-    const updates = req.body;
-    const updatedProfile = await updateUserProfile(req.user.id, updates);
-
-    res.json(RESPONSES.SUCCESS(USER_MESSAGES.PROFILE_UPDATED, updatedProfile));
-  } catch (error) {
-    console.error("Update profile error:", error);
-
-    if (error.message?.includes("Player profile not found")) {
-      return res.status(404).json(RESPONSES.ERROR("Player profile not found"));
-    }
-
-    res.status(500).json(RESPONSES.SERVER_ERROR(USER_MESSAGES.INTERNAL_ERROR));
-  }
-};
-
-/**
  * Get user dashboard data
  */
 export const getDashboard = async (req, res) => {
   try {
     const dashboardData = await getUserDashboard(req.user.id);
-
     res.json(
       RESPONSES.SUCCESS("Dashboard data fetched successfully", dashboardData)
     );
@@ -52,6 +31,26 @@ export const getDashboard = async (req, res) => {
     res
       .status(500)
       .json(RESPONSES.SERVER_ERROR("Failed to fetch dashboard data"));
+  }
+};
+
+/**
+ * Update user profile
+ */
+export const updateProfile = async (req, res) => {
+  try {
+    const updates = req.body;
+    const updatedProfile = await updateUserProfile(req.user.id, updates);
+
+    res.json(RESPONSES.SUCCESS(USER_MESSAGES.PROFILE_UPDATED, updatedProfile));
+  } catch (error) {
+    console.error("Update profile error:", error);
+
+    if (error.message?.includes("Player profile not found")) {
+      return res.status(404).json(RESPONSES.ERROR("Player profile not found"));
+    }
+
+    res.status(500).json(RESPONSES.SERVER_ERROR(USER_MESSAGES.INTERNAL_ERROR));
   }
 };
 

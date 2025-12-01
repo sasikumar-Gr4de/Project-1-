@@ -33,6 +33,16 @@ export const useUserStore = create((set, get) => ({
   setError: (error) => set({ error }),
   clearError: () => set({ error: null }),
 
+  // Set Subscription
+  setSubscription: (subscription) => set({ subscription }),
+  // Clear current report
+  clearCurrentReport: () => set({ currentReport: null }),
+  // Update pagination
+  setPagination: (pagination) =>
+    set({
+      pagination: { ...get().pagination, ...pagination },
+    }),
+
   // Subscription Actions
   fetchSubscription: async () => {
     set({ isLoading: true, error: null });
@@ -54,6 +64,7 @@ export const useUserStore = create((set, get) => ({
     }
   },
 
+  // Sync Subscription
   syncSubscription: async () => {
     try {
       const response = await subscriptionService.syncSubscription();
@@ -68,8 +79,6 @@ export const useUserStore = create((set, get) => ({
       throw error;
     }
   },
-
-  setSubscription: (subscription) => set({ subscription }),
 
   // Check feature access
   checkFeatureAccess: async (feature) => {
@@ -178,15 +187,6 @@ export const useUserStore = create((set, get) => ({
       throw error;
     }
   },
-
-  // Clear current report
-  clearCurrentReport: () => set({ currentReport: null }),
-
-  // Update pagination
-  setPagination: (pagination) =>
-    set({
-      pagination: { ...get().pagination, ...pagination },
-    }),
 
   // Reset store
   reset: () =>

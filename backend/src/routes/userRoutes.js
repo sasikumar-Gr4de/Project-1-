@@ -18,6 +18,7 @@ router.get("/dashboard", getDashboard);
 router.get("/reports", getReports);
 router.get("/reports/:reportId", getReport);
 
+// Update Profile
 router.patch("/profile", validate(updateProfileSchema), updateProfile);
 
 export default router;
