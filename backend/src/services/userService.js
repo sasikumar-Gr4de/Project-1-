@@ -1,5 +1,6 @@
 import { supabase } from "../config/supabase.config.js";
 
+// Get user dashboard service
 export const getUserDashboard = async (userId) => {
   try {
     // Get user profile directly from users table
@@ -38,8 +39,8 @@ export const getUserDashboard = async (userId) => {
       .from("player_metrics")
       .select("date, gr4de_score")
       .eq("player_id", userId)
-      .gte("date", sixMonthsAgo.toISOString())
-      .order("date", { ascending: true });
+      .gte("match_date", sixMonthsAgo.toISOString())
+      .order("match_date", { ascending: true });
 
     if (progressError) throw progressError;
 
@@ -226,4 +227,16 @@ export const updateUserProfile = async (userId, updates) => {
     console.error("Update user profile error:", error);
     throw error;
   }
+};
+
+// Get user by id service
+export const getUserById = async (userId) => {
+  const { data, error } = await supabase
+    .from("users")
+    .select("*")
+    .eq("id", userId)
+    .single();
+
+  if (error) throw error;
+  return data;
 };
