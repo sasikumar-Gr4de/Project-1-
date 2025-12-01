@@ -16,7 +16,7 @@ export const getQueueById = async (queueId) => {
     .from("processing_queue")
     .select("*")
     .eq("id", queueId)
-    .single();
+    .maybeSingle();
 
   if (error) throw error;
   return data;

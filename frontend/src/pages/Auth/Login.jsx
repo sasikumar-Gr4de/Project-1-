@@ -536,7 +536,7 @@ const Login = () => {
           <div className="flex justify-center mb-4">
             <img
               src="https://amzn-gr4de-bucket.s3.eu-north-1.amazonaws.com/serverfavicon.png-1761828500393-y4b46hwju9k"
-              alt="GR4DE Logo"
+              alt=" "
               className="w-20 h-20"
             />
           </div>

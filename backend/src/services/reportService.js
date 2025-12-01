@@ -1,4 +1,6 @@
 import { supabase } from "../config/supabase.config.js";
+import { getUserById } from "../services/userService.js";
+import { getPlayerDataById } from "../services/dataService.js";
 
 // Create player report service
 export const createPlayerReport = async (data) => {
@@ -22,13 +24,13 @@ export const createPlayerReport = async (data) => {
       {
         player_id: player_id,
         player_data_id: player_data_id,
-        job_id: job_id,
         match_date: match_date,
         gr4de_score: gr4de_score,
         tempo_index: tempo_index,
+        report_data: data,
       },
     ]);
-  if (reportError) throw error;
+  if (reportError) throw reportError;
   return reportData;
 };
 

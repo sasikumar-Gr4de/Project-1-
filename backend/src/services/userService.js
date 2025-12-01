@@ -35,14 +35,14 @@ export const getUserDashboard = async (userId) => {
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
-    const { data: progressData, error: progressError } = await supabase
+    const { data: metricsData, error: metricsError } = await supabase
       .from("player_metrics")
-      .select("date, gr4de_score")
+      .select("match_date, gr4de_score")
       .eq("player_id", userId)
       .gte("match_date", sixMonthsAgo.toISOString())
       .order("match_date", { ascending: true });
 
-    if (progressError) throw progressError;
+    if (metricsError) throw metricsError;
 
     let benchmarkData = null;
 
@@ -53,19 +53,18 @@ export const getUserDashboard = async (userId) => {
       playerIdentity.positions.length > 0
     ) {
       const primaryPosition = playerIdentity.positions[0];
-
-      user.position = playerIdentity.positions[0];
+      user.position = primaryPosition;
       user.date_of_birth = playerIdentity.date_of_birth;
 
-      const { data: benchmarks, error: benchmarkError } = await supabase
-        .from("tempo_benchmarks")
-        .select("*")
-        .eq("position", primaryPosition)
-        .maybeSingle();
+      // const { data: benchmarks, error: benchmarkError } = await supabase
+      //   .from("tempo_benchmarks")
+      //   .select("*")
+      //   .eq("position", primaryPosition)
+      //   .maybeSingle();
 
-      if (!benchmarkError) {
-        benchmarkData = benchmarks;
-      }
+      // if (!benchmarkError) {
+      //   benchmarkData = benchmarks;
+      // }
     }
 
     return {
@@ -75,7 +74,7 @@ export const getUserDashboard = async (userId) => {
         identity: playerIdentity, // player identity data with verfication status
       },
       recentReports: recentReports || [],
-      progressData: progressData || [],
+      progressData: metricsData || [],
       benchmarkData,
     };
   } catch (error) {
@@ -235,7 +234,7 @@ export const getUserById = async (userId) => {
     .from("users")
     .select("*")
     .eq("id", userId)
-    .single();
+    .maybeSingle();
 
   if (error) throw error;
   return data;

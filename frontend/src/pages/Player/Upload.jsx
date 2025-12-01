@@ -32,7 +32,6 @@ import {
 import { useToast } from "@/contexts/ToastContext";
 import { useDataStore } from "@/store/dataStore";
 import { FOOTBALL_POSITIONS, JERSEY_COLORS } from "@/utils/constants";
-import api from "@/services/base.api";
 
 const Upload = () => {
   // const { fetchDashboard } = useUserStore();
@@ -56,8 +55,8 @@ const Upload = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [queueId, setQueueId] = useState(null);
-  const [queueStatus, setQueueStatus] = useState(null);
-  const [pollingInterval, setPollingInterval] = useState(null);
+  // const [queueStatus, setQueueStatus] = useState(null);
+  // const [pollingInterval, setPollingInterval] = useState(null);
 
   const { uploadPlayerData } = useDataStore();
 
@@ -275,7 +274,7 @@ const Upload = () => {
       </div>
 
       {/* Queue Status */}
-      {queueId && queueStatus && (
+      {/* {queueId && queueStatus && (
         <Card className="border-blue-500/20 bg-blue-500/10">
           <CardContent className="p-4">
             <div className="flex items-center space-x-3">
@@ -298,7 +297,7 @@ const Upload = () => {
             </div>
           </CardContent>
         </Card>
-      )}
+      )} */}
 
       {/* Upload Progress */}
       {isUploading && (

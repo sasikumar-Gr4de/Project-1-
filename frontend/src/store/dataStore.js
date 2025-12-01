@@ -6,7 +6,6 @@ const playerDataAPI = {
 };
 
 export const useDataStore = create((set, get) => ({
-  // Actions
   uploadPlayerData: async (data) => {
     try {
       const response = await playerDataAPI.uploadPlayerData(data);

@@ -19,13 +19,13 @@ export const createData = async (req, res) => {
 
     // Trigger analysis model after data creation
     try {
-      await triggerAnalaysisModel({
-        player_data_id: data.id,
-        video_url: data.video_file,
-        gps_url: data.gps_file,
-        metadata: data.metadata,
-        callback_url: `${process.env.SERVER_URL}/api/data/ml/callbacks`,
-      });
+      // await triggerAnalaysisModel({
+      //   player_data_id: data.id,
+      //   video_url: data.video_file,
+      //   gps_url: data.gps_file,
+      //   metadata: data.metadata,
+      //   callback_url: `${process.env.SERVER_URL}/api/data/ml/callbacks`,
+      // });
       console.log("Analysis model triggered successfully");
       console.log("Triggered analysis for player data ID:", data.id);
     } catch (analysisError) {
@@ -82,8 +82,8 @@ export const changeDataStatus = async (req, res) => {
 // Get analysis callback from ML Server
 export const getAnalysisCallback = async (req, res) => {
   try {
-    const { player_data_id, status, processing_time_ms, data, metadata } =
-      req.body;
+    const { status, processing_time_ms, data, metadata } = req.body;
+    const { player_data_id } = data;
 
     if (status === "success") {
       await updateQueueDataService(player_data_id, {
@@ -100,6 +100,7 @@ export const getAnalysisCallback = async (req, res) => {
 
       // Create player report
       await createPlayerReport(data);
+      res.json(RESPONSES.SUCCESS("Analysis callback received", data));
     } else if (status === "failed") {
       await changePlayerDataStatus(player_data_id, "failed");
       await updateQueueDataService(player_data_id, {
@@ -109,7 +110,7 @@ export const getAnalysisCallback = async (req, res) => {
         logs: `Analysis failed at ${new Date().toISOString()}`, // Option for more detailed logs (ML Server)
       });
     }
-    res.json(RESPONSES.SUCCESS("Analysis callback received"));
+    res.json(RESPONSES.BAD_REQUEST("Analysis callback failed"));
   } catch (error) {
     console.log("Analysis callback error:", error);
     res
