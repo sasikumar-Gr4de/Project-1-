@@ -12,7 +12,7 @@ router.use(authenticateToken);
 /**
  * Get queue status by ID
  */
-router.get("/v1/queue/:id/status", async (req, res) => {
+router.get("/queue/:id/status", async (req, res) => {
   try {
     const { id } = req.params;
     const { id: userId, role } = req.user;
@@ -75,7 +75,7 @@ router.get("/v1/queue/:id/status", async (req, res) => {
  * Retry failed queue item (admin only)
  */
 router.post(
-  "/v1/queue/:id/retry",
+  "/queue/:id/retry",
   requireRole([USER_ROLES.ADMIN]),
   async (req, res) => {
     try {

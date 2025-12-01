@@ -6,9 +6,6 @@ import {
   s3Config,
 } from "../config/aws.config.js";
 import { authenticateToken } from "../middleware/auth.js";
-import { validate } from "../middleware/validation.js";
-import { uploadSchema } from "../middleware/validation.js";
-import { createUpload } from "../controllers/uploadController.js";
 
 const router = express.Router();
 
@@ -55,9 +52,6 @@ router.post("/generate-presigned-url", async (req, res) => {
     });
   }
 });
-
-// Main upload endpoint for video + data processing
-router.post("/v1/uploads", validate(uploadSchema), createUpload);
 
 // Delete file from S3
 router.delete("/file/:key", async (req, res) => {

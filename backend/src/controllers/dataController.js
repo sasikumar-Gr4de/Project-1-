@@ -6,7 +6,7 @@ import {
 } from "../services/dataService.js";
 import { createPlayerMetrics } from "../services/metricsService.js";
 import { createPlayerReport } from "../services/reportService.js";
-import { updateQueueData } from "../services/queueService.js";
+import { updateQueueData as updateQueueDataService } from "../services/queueService.js";
 import { RESPONSES } from "../utils/messages.js";
 
 // Create new player data => trigger analysis workflow
@@ -86,7 +86,7 @@ export const getAnalysisCallback = async (req, res) => {
       req.body;
 
     if (status === "success") {
-      await updateQueueData(player_data_id, {
+      await updateQueueDataService(player_data_id, {
         status: "completed",
         completed_at: new Date().toISOString(),
         processing_time_ms: processing_time_ms,
@@ -102,7 +102,7 @@ export const getAnalysisCallback = async (req, res) => {
       await createPlayerReport(data);
     } else if (status === "failed") {
       await changePlayerDataStatus(player_data_id, "failed");
-      await updateQueueData(player_data_id, {
+      await updateQueueDataService(player_data_id, {
         status: "failed",
         completed_at: new Date().toISOString(),
         processing_time_ms: processing_time_ms,
@@ -115,5 +115,17 @@ export const getAnalysisCallback = async (req, res) => {
     res
       .status(500)
       .json(RESPONSES.SERVER_ERROR("Failed to process analysis callback"));
+  }
+};
+
+export const updateQueueData = async (req, res) => {
+  try {
+    const { player_data_id } = req.params;
+    const { data } = req.body;
+    const queue = await updateQueueDataService(player_data_id, data);
+    res.json(RESPONSES.SUCCESS("Queue data updated successfully", queue));
+  } catch (error) {
+    console.log("Update queue data error:", error);
+    res.status(500).json(RESPONSES.SERVER_ERROR("Failed to update queue data"));
   }
 };

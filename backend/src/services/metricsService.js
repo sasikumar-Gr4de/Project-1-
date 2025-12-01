@@ -35,36 +35,38 @@ export const createPlayerMetrics = async (data) => {
   const { raw_file_urls } = data;
   const { metadata } = data; // importend from parent
 
-  const { data, error } = await supabase.from("player_metrics").insert([
-    {
-      player_id: player_id,
-      player_data_id: player_data_id,
-      job_id: job_id,
-      match_date: match_date,
-      metric_type: "overall",
-      metric_name: "gr4de-score",
-      overall_score: overall_score,
-      gr4de_score: gr4de_score,
-      match_metadata: match_metadata,
-      scoring_metrics: scoring_metrics,
-      technical_metrics: technical_metrics,
-      tactical_metrics: tactical_metrics,
-      physical_metrics: physical_metrics,
-      mental_metrics: mental_metrics,
-      tempo_results: tempo_results,
-      position_specific_metrics: position_specific_metrics,
-      benchmark_comparison: benchmark_comparison,
-      insights: insights,
+  const { data: metricsData, error: metricsError } = await supabase
+    .from("player_metrics")
+    .insert([
+      {
+        player_id: player_id,
+        player_data_id: player_data_id,
+        job_id: job_id,
+        match_date: match_date,
+        metric_type: "overall",
+        metric_name: "gr4de-score",
+        overall_score: overall_score,
+        gr4de_score: gr4de_score,
+        match_metadata: match_metadata,
+        scoring_metrics: scoring_metrics,
+        technical_metrics: technical_metrics,
+        tactical_metrics: tactical_metrics,
+        physical_metrics: physical_metrics,
+        mental_metrics: mental_metrics,
+        tempo_results: tempo_results,
+        position_specific_metrics: position_specific_metrics,
+        benchmark_comparison: benchmark_comparison,
+        insights: insights,
 
-      // uploaded files
-      raw_file_urls: raw_file_urls,
-      metadata: metadata,
-      created_at: new Date().toISOString(),
-    },
-  ]);
+        // uploaded files
+        raw_file_urls: raw_file_urls,
+        metadata: metadata,
+        created_at: new Date().toISOString(),
+      },
+    ]);
 
-  if (error) throw error;
-  return data;
+  if (metricsError) throw error;
+  return metricsData;
 };
 
 // Get metrics by id service
@@ -101,8 +103,6 @@ export const getMetricsByPlayerId = async (
   const { start_date, end_date } = filters;
 
   // pagination parameters
-  const page = parseInt(page);
-  const limit = parseInt(limit);
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 

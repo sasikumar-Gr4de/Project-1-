@@ -16,18 +16,20 @@ export const createPlayerReport = async (data) => {
   const { tempo_index } = data.tempo_results;
   const { match_date } = data.match_metadata;
 
-  const { data, error } = await supabase.from("player_reports").insert([
-    {
-      player_id: player_id,
-      player_data_id: player_data_id,
-      job_id: job_id,
-      match_date: match_date,
-      gr4de_score: gr4de_score,
-      tempo_index: tempo_index,
-    },
-  ]);
-  if (error) throw error;
-  return data;
+  const { data: reportData, error: reportError } = await supabase
+    .from("player_reports")
+    .insert([
+      {
+        player_id: player_id,
+        player_data_id: player_data_id,
+        job_id: job_id,
+        match_date: match_date,
+        gr4de_score: gr4de_score,
+        tempo_index: tempo_index,
+      },
+    ]);
+  if (reportError) throw error;
+  return reportData;
 };
 
 // Get report by id service
@@ -43,26 +45,26 @@ export const getReportById = async (reportId) => {
 
 // Update report service
 export const updateReport = async (reportId, data) => {
-  const { data, error } = await supabase
+  const { data: reportData, error: reportError } = await supabase
     .from("player_reports")
     .update(data)
     .eq("id", reportId)
     .select()
     .single();
-  if (error) throw error;
-  return data;
+  if (reportError) throw reportError;
+  return reportData;
 };
 
 // Delete report service
 export const deleteReport = async (reportId) => {
-  const { data, error } = await supabase
+  const { data: reportData, error: reportError } = await supabase
     .from("player_reports")
     .delete()
     .eq("id", reportId)
     .select()
     .single();
-  if (error) throw error;
-  return data;
+  if (reportError) throw reportError;
+  return reportData;
 };
 
 // Get all reports service with pagination and filters
@@ -70,8 +72,8 @@ export const getAllReports = async (page = 1, limit = 10, filters = {}) => {
   // start_date, end_date filter
   const { start_date, end_date } = filters;
   // pagination parameters
-  const page = parseInt(page);
-  const limit = parseInt(limit);
+  // const page = parseInt(page);
+  // const limit = parseInt(limit);
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
@@ -102,8 +104,8 @@ export const getReportsByPlayerId = async (
   const { start_date, end_date } = filters;
 
   // pagination parameters
-  const page = parseInt(page);
-  const limit = parseInt(limit);
+  // const page = parseInt(page);
+  // const limit = parseInt(limit);
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
