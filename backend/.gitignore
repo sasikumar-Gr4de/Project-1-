@@ -1,4 +1,5 @@
 /node_modules
+/mock_references
 /.env
 /.env.local
 /.env.*.local

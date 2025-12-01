@@ -88,7 +88,7 @@ export const getAnalysisCallback = async (req, res) => {
         status: "completed",
         completed_at: new Date().toISOString(),
         processing_time_ms: processing_time_ms,
-        logs: `Analysis completed successfully at ${new Date().toISOString()}`,
+        logs: `Analysis completed successfully at ${new Date().toISOString()}`, // Option for more detailed logs (ML Server)
       });
     } else if (status === "failed") {
       await changePlayerDataStatus(player_data_id, "failed");
