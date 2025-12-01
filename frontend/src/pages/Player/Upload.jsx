@@ -35,7 +35,7 @@ import { FOOTBALL_POSITIONS, JERSEY_COLORS } from "@/utils/constants";
 import api from "@/services/base.api";
 
 const Upload = () => {
-  const { fetchDashboard } = useUserStore();
+  // const { fetchDashboard } = useUserStore();
   const { toast } = useToast();
   const [uploadData, setUploadData] = useState({
     match_date: "",
@@ -72,80 +72,80 @@ const Upload = () => {
   };
 
   // Poll queue status
-  const pollQueueStatus = async (id) => {
-    try {
-      const response = await api.get(`/queue/v1/queue/${id}/status`);
-      const status = response.data.data;
+  // const pollQueueStatus = async (id) => {
+  //   try {
+  //     const response = await api.get(`/queue/v1/queue/${id}/status`);
+  //     const status = response.data.data;
 
-      setQueueStatus(status);
+  //     setQueueStatus(status);
 
-      if (status.status === "completed") {
-        // Stop polling and show success
-        if (pollingInterval) {
-          clearInterval(pollingInterval);
-          setPollingInterval(null);
-        }
+  //     if (status.status === "completed") {
+  //       // Stop polling and show success
+  //       if (pollingInterval) {
+  //         clearInterval(pollingInterval);
+  //         setPollingInterval(null);
+  //       }
 
-        toast({
-          title: "Success",
-          description: "Your report is ready!",
-          variant: "success",
-        });
-        fetchDashboard(); // Refresh dashboard
+  //       toast({
+  //         title: "Success",
+  //         description: "Your report is ready!",
+  //         variant: "success",
+  //       });
+  //       fetchDashboard(); // Refresh dashboard
 
-        // Reset form after success
-        setUploadData({
-          match_date: "",
-          jersey_number: "",
-          position: "",
-          jersey_color: "",
-          opponent_jersey_color: "",
-          notes: "",
-          competition: "",
-          opponent: "",
-          location: "",
-          minutes: "",
-        });
-        setFiles({ video: null, gps: null });
-        setQueueId(null);
-        setQueueStatus(null);
-      } else if (status.status === "failed") {
-        // Stop polling and show error
-        if (pollingInterval) {
-          clearInterval(pollingInterval);
-          setPollingInterval(null);
-        }
+  //       // Reset form after success
+  //       setUploadData({
+  //         match_date: "",
+  //         jersey_number: "",
+  //         position: "",
+  //         jersey_color: "",
+  //         opponent_jersey_color: "",
+  //         notes: "",
+  //         competition: "",
+  //         opponent: "",
+  //         location: "",
+  //         minutes: "",
+  //       });
+  //       setFiles({ video: null, gps: null });
+  //       setQueueId(null);
+  //       setQueueStatus(null);
+  //     } else if (status.status === "failed") {
+  //       // Stop polling and show error
+  //       if (pollingInterval) {
+  //         clearInterval(pollingInterval);
+  //         setPollingInterval(null);
+  //       }
 
-        toast({
-          title: "Error",
-          description: "Analysis failed. Please try again.",
-          variant: "error",
-        });
+  //       toast({
+  //         title: "Error",
+  //         description: "Analysis failed. Please try again.",
+  //         variant: "error",
+  //       });
 
-        setQueueId(null);
-        setQueueStatus(null);
-      }
-    } catch (error) {
-      console.error("Error polling queue status:", error);
-    }
-  };
+  //       setQueueId(null);
+  //       setQueueStatus(null);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error polling queue status:", error);
+  //   }
+  // };
 
   // Start polling when queueId is set
-  useEffect(() => {
-    if (queueId && !pollingInterval) {
-      // Poll immediately, then every 10 seconds
-      pollQueueStatus(queueId);
-      const interval = setInterval(() => pollQueueStatus(queueId), 10000);
-      setPollingInterval(interval);
-    }
+  // useEffect(() => {
+  //   if (queueId && !pollingInterval) {
+  //     // Poll immediately, then every 10 seconds
+  //     pollQueueStatus(queueId);
+  //     const interval = setInterval(() => pollQueueStatus(queueId), 10000);
+  //     setPollingInterval(interval);
+  //   }
 
-    return () => {
-      if (pollingInterval) {
-        clearInterval(pollingInterval);
-        setPollingInterval(null);
-      }
-    };
-  }, [queueId]);
+  //   return () => {
+  //     if (pollingInterval) {
+  //       clearInterval(pollingInterval);
+  //       setPollingInterval(null);
+  //     }
+  //   };
+  // }, [queueId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -343,7 +343,7 @@ const Upload = () => {
             <CardContent>
               <VideoUpload
                 onUpload={(result) => handleFileUpload("video", result)}
-                maxSize={10 * 1024 * 1024 * 1024}
+                maxSize={100 * 1024 * 1024}
                 folder="match-videos"
                 label="Select video file"
                 uploadText="Upload video"

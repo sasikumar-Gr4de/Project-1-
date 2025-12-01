@@ -1,5 +1,5 @@
 import { supabase } from "../config/supabase.config.js";
-import { PLAYER_DATA_STATUS } from "../utils/constants.js";
+import { PLAYER_DATA_STATUS, QUEUE_STATUS } from "../utils/constants.js";
 
 export const createPlayerData = async (userId, playerData) => {
   const { match_date, video_url, gps_url, metadata } = playerData;
@@ -19,13 +19,27 @@ export const createPlayerData = async (userId, playerData) => {
     .select()
     .single();
 
-  if (error) {
+  const { id } = data;
+  const { data: queueData, error: queueError } = await supabase
+    .from("processing_queue")
+    .insert({
+      player_data_id: id,
+      status: QUEUE_STATUS.PENDING,
+      logs: "Queue created for player data",
+      created_at: new Date().toISOString(),
+    })
+    .select()
+    .single();
+  const { id: queueId } = queueData;
+
+  if (error || queueError) {
     console.log(error);
     throw new Error("Failed save player data");
   }
 
   return {
     ...data,
+    queue_id: queueId,
   };
 };
 
@@ -84,25 +98,14 @@ export const getAllPlayerDataByPlayerId = async (
   };
 };
 
-export const triggerAnalaysisModel = async (data) => {
-  // const result = await fetch(process.env.ANALYSIS_MODEL_URL + "/analyze", {
-  //   method: "POST",
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //   },
-  //   body: JSON.stringify({
-  //     ...data,
-  //   }),
-  // });
-  const result = { success: true }; // Mocked result for demonstration
+export const updateQueueData = async (queueId, data) => {
+  const { data, error } = await supabase
+    .from("processing_queue")
+    .update(data)
+    .eq("id", queueId)
+    .select()
+    .single();
 
-  if (!result.success) {
-    throw new Error("Failed to start analysis workflow");
-  }
-
-  // Change status to 'processing'
-  await changePlayerDataStatus(
-    data.player_data_id,
-    PLAYER_DATA_STATUS.PROCESSING
-  );
+  if (error) throw new Error("Failed to update queue data");
+  return data;
 };

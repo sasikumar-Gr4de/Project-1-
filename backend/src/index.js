@@ -6,6 +6,7 @@ import cors from "cors";
 
 // Pending Routes
 import userRoutes from "./routes/userRoutes.js";
+import dataRoutes from "./routes/dataRoutes.js";
 
 // UnCompleted Routes
 import authRoutes from "./routes/authRoutes.js";
@@ -13,7 +14,6 @@ import adminRoutes from "./routes/adminRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
 import subscriptionRoutes from "./routes/subscriptionRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
-import dataRoutes from "./routes/dataRoutes.js";
 import passportRoutes from "./routes/passportRoutes.js";
 import verficationRoutes from "./routes/verificationRoutes.js";
 import passportRoutesV1 from "./routes/passportRoutes.js";
@@ -52,10 +52,10 @@ app.use(
 
 // Routes
 app.use("/api/users", userRoutes);
+app.use("/api/data", dataRoutes);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
-app.use("/api/data", dataRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/upload", uploadRoutes);
