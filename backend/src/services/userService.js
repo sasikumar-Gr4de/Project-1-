@@ -46,8 +46,16 @@ export const getUserDashboard = async (userId) => {
     let benchmarkData = null;
 
     // Get benchmark data if player has positions
-    if (playerIdentity?.positions && playerIdentity.positions.length > 0) {
+    if (
+      playerIdentity &&
+      playerIdentity?.positions &&
+      playerIdentity.positions.length > 0
+    ) {
       const primaryPosition = playerIdentity.positions[0];
+
+      user.position = playerIdentity.positions[0];
+      user.date_of_birth = playerIdentity.date_of_birth;
+
       const { data: benchmarks, error: benchmarkError } = await supabase
         .from("tempo_benchmarks")
         .select("*")
@@ -63,9 +71,7 @@ export const getUserDashboard = async (userId) => {
       user: {
         ...user,
         player_id: userId, // player_id is now the user id
-        position: playerIdentity?.positions?.[0] || null,
-        date_of_birth: playerIdentity?.dob || null,
-        identity: playerIdentity,
+        identity: playerIdentity, // player identity data with verfication status
       },
       recentReports: recentReports || [],
       progressData: progressData || [],
