@@ -77,6 +77,7 @@ export const getUserDashboard = async (userId) => {
   }
 };
 
+// Get user reports with pagination
 export const getUserReports = async (userId, page = 1, limit = 10) => {
   try {
     const start = (page - 1) * limit;
@@ -110,6 +111,7 @@ export const getUserReports = async (userId, page = 1, limit = 10) => {
   }
 };
 
+// Get report details service
 export const getReportDetails = async (reportId, userId) => {
   try {
     const { data, error } = await supabase
@@ -140,6 +142,7 @@ export const getReportDetails = async (reportId, userId) => {
   }
 };
 
+// Upadte user profile service
 export const updateUserProfile = async (userId, updates) => {
   try {
     // Update basic user info

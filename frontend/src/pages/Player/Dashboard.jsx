@@ -76,7 +76,7 @@ const Dashboard = () => {
               asChild
               className="bg-linear-to-r from-primary to-secondary text-(--surface-0) hover:from-secondary hover:to-primary font-semibold rounded-xl px-8 py-3"
             >
-              <a href="/passport">Complete Player Profile</a>
+              <Link to="/passport">Complete Player Profile</Link>
             </Button>
           </CardContent>
         </Card>
@@ -84,6 +84,7 @@ const Dashboard = () => {
     );
   }
 
+  // Loading state
   if (isLoading) {
     return (
       <div className="space-y-8">
@@ -117,7 +118,7 @@ const Dashboard = () => {
   const playerName =
     user?.first_name && user?.last_name
       ? `${user.first_name} ${user.last_name}`
-      : user?.player_name || "Player";
+      : user?.player_name || "Default Player";
 
   return (
     <div className="space-y-8">
@@ -133,12 +134,12 @@ const Dashboard = () => {
         </div>
         <Button
           asChild
-          className="bg-linear-to-r from-primary to-[#94D44A] text-black hover:from-[#94D44A] hover:to-primary font-semibold rounded-xl px-6 py-3 h-12 shadow-lg hover:shadow-xl transition-all duration-300"
+          className="bg-linear-to-r from-primary to-secondary text-black hover:from-secondary hover:to-primary font-semibold rounded-xl px-6 py-3 h-12 shadow-lg hover:shadow-xl transition-all duration-300"
         >
-          <a href="/upload">
+          <Link to="/upload">
             <Upload className="w-5 h-5 mr-2" />
             Upload New Data
-          </a>
+          </Link>
         </Button>
       </div>
 
@@ -295,7 +296,7 @@ const Dashboard = () => {
                 </p>
                 <Button
                   asChild
-                  className="mt-6 bg-linear-to-r from-primary to-[#94D44A] text-(--surface-0) hover:from-secondary hover:to-primary font-semibold rounded-xl"
+                  className="mt-6 bg-linear-to-r from-primary to-secondary text-(--surface-0) hover:from-secondary hover:to-primary font-semibold rounded-xl"
                 >
                   <Link to="/upload">Upload Your First Data</Link>
                 </Button>
