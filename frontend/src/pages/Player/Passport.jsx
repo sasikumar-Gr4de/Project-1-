@@ -422,7 +422,7 @@ const Passport = () => {
                     onClick={() => {
                       createShareLink();
                     }}
-                    className="bg-linear-to-r from-primary to-[#94D44A] text-(--ink) hover:from-[#94D44A] hover:to-primary font-semibold w-full max-w-xs mx-auto"
+                    className="bg-linear-to-r from-primary to-secondary text-(--ink) hover:from-secondary hover:to-primary font-semibold w-full max-w-xs mx-auto"
                   >
                     <Share2 className="w-4 h-4 mr-2" />
                     Create Share Link

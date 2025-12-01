@@ -134,7 +134,7 @@ const Dashboard = () => {
         </div>
         <Button
           asChild
-          className="bg-linear-to-r from-primary to-secondary text-black hover:from-secondary hover:to-primary font-semibold rounded-xl px-6 py-3 h-12 shadow-lg hover:shadow-xl transition-all duration-300"
+          className="bg-linear-to-r from-primary to-se text-black from-primary to-secondary text-(--ink) hover:from-secondary hover:to-primary font-semibold  rounded-xl px-6 py-3 h-12 shadow-lg hover:shadow-xl transition-all duration-300"
         >
           <Link to="/upload">
             <Upload className="w-5 h-5 mr-2" />
@@ -149,13 +149,13 @@ const Dashboard = () => {
         <StatsCard
           title="GR4DE Score"
           value={
-            latestReport?.summary_json?.overall_score ? (
+            latestReport?.report_data?.scoring_metrics?.overall_score ? (
               <span
                 className={getScoreColor(
-                  latestReport.summary_json.overall_score
+                  latestReport.report_data.scoring_metrics.overall_score
                 )}
               >
-                {latestReport.summary_json.overall_score}
+                {latestReport.report_data.scoring_metrics.overall_score}
               </span>
             ) : null
           }
@@ -240,23 +240,21 @@ const Dashboard = () => {
                     <div className="flex items-center space-x-4">
                       <div
                         className={`w-12 h-12 rounded-xl flex items-center justify-center ${getScoreColor(
-                          report.summary_json?.overall_score || 0
+                          report.report_data?.scoring_metrics?.overall_score ||
+                            0
                         ).replace(
                           "text-",
                           "bg-"
                         )} bg-opacity-20 border-2 ${getScoreColor(
-                          report.summary_json?.overall_score || 0
+                          report.report_data?.scoring_metrics?.overall_score ||
+                            0
                         ).replace("text-", "border-")} border-opacity-30`}
                       >
-                        <Award
-                          className={`w-6 h-6 ${getScoreColor(
-                            report.summary_json?.overall_score || 0
-                          )}`}
-                        />
+                        <Award className={`w-6 h-6 text-black`} />
                       </div>
                       <div>
                         <p className="font-semibold text-white group-hover:text-primary transition-colors">
-                          {report.report_type || "GR4DE Report"}
+                          GR4DE Report
                         </p>
                         <div className="flex items-center space-x-2 text-sm text-placeholder mt-1">
                           <Calendar className="w-3 h-3" />
@@ -272,10 +270,12 @@ const Dashboard = () => {
                     <div className="text-right">
                       <p
                         className={`text-2xl font-bold ${getScoreColor(
-                          report.summary_json?.overall_score || 0
+                          report.report_data?.scoring_metrics?.overall_score ||
+                            0
                         )}`}
                       >
-                        {report.summary_json?.overall_score || "--"}
+                        {report.report_data?.scoring_metrics?.overall_score ||
+                          "--"}
                       </p>
                       <Badge
                         variant="outline"
@@ -296,7 +296,7 @@ const Dashboard = () => {
                 </p>
                 <Button
                   asChild
-                  className="mt-6 bg-linear-to-r from-primary to-secondary text-(--surface-0) hover:from-secondary hover:to-primary font-semibold rounded-xl"
+                  className="mt-6 bg-linear-to-r from-primary to-se text-(--surface-0) hover:from-secondary hover:to-primary font-semibold rounded-xl"
                 >
                   <Link to="/upload">Upload Your First Data</Link>
                 </Button>
@@ -323,7 +323,7 @@ const Dashboard = () => {
                   <div key={index} className="space-y-3">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-white">
-                        {formatDate(data.date)}
+                        {formatDate(data.match_date)}
                       </span>
                       <span
                         className={`font-bold ${getScoreColor(

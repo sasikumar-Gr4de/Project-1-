@@ -1,4 +1,4 @@
-// DataTable.jsx - Updated with platform color palette
+// DataTable.jsx - Improved for pixel-perfect responsiveness
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +20,7 @@ import {
   ChevronsRight,
 } from "lucide-react";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
+import { Input } from "@/components/ui/input";
 
 const DataTable = ({
   data = [],
@@ -164,30 +165,44 @@ const DataTable = ({
     return (
       <div className="relative min-h-[400px]">
         {/* Desktop Skeleton */}
-        <div className="hidden md:block overflow-x-auto w-full">
+        <div className="hidden lg:block overflow-x-auto w-full">
           <table className="w-full text-sm border-separate border-spacing-y-2">
-            <thead className="bg-[#262626] border-b border-[#343434]">
+            <thead
+              style={{
+                backgroundColor: "var(--surface-1)",
+                borderBottomColor: "var(--surface-2)",
+              }}
+            >
               <tr>
                 {columns.map((column, index) => (
                   <th
                     key={index}
-                    className={
-                      index === 0
-                        ? "h-15 pl-3 text-left align-middle font-semibold text-white whitespace-nowrap text-sm uppercase tracking-wide rounded-tl-xl"
-                        : "h-15 px-6 text-left align-middle font-semibold text-white whitespace-nowrap text-sm uppercase tracking-wide"
-                    }
+                    className={`
+                      h-12 px-4 text-left align-middle font-semibold text-white 
+                      whitespace-nowrap text-xs md:text-sm uppercase tracking-wide
+                      ${index === 0 ? "rounded-tl-xl pl-6" : ""}
+                      ${
+                        index === columns.length - 1 && !actions
+                          ? "rounded-tr-xl pr-6"
+                          : ""
+                      }
+                    `}
                   >
-                    {column.header}
+                    <div className="truncate">{column.header}</div>
                   </th>
                 ))}
                 {actions && (
-                  <th className="h-15 px-3 text-left align-middle font-semibold text-white whitespace-nowrap text-sm uppercase tracking-wide w-20 rounded-tr-xl">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm whitespace-nowrap text-placeholder">
-                        Items per page
-                      </span>
+                  <th className="h-12 px-4 text-left align-middle font-semibold text-white whitespace-nowrap text-xs md:text-sm uppercase tracking-wide rounded-tr-xl">
+                    <div className="flex items-center justify-end space-x-2">
                       <Select disabled value={itemsPerPage.toString()}>
-                        <SelectTrigger className="w-20 h-9 border-[#343434] bg-[#1A1A1A] text-white text-sm">
+                        <SelectTrigger
+                          className="w-20 h-8 text-xs"
+                          style={{
+                            borderColor: "var(--surface-2)",
+                            backgroundColor: "var(--surface-0)",
+                            color: "white",
+                          }}
+                        >
                           <SelectValue />
                         </SelectTrigger>
                       </Select>
@@ -196,35 +211,45 @@ const DataTable = ({
                 )}
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#343434] bg-[#1A1A1A] border-b border-[#343434]">
+            <tbody style={{ borderBottomColor: "var(--surface-2)" }}>
               {skeletonRows.map((rowIndex) => (
                 <tr
                   key={rowIndex}
-                  className="group transition-all duration-200 even:bg-[#262626] text-sm"
+                  className="group transition-all duration-200 even:bg-[var(--surface-1)] text-sm"
+                  style={{ backgroundColor: "var(--surface-0)" }}
                 >
                   {columns.map((column, colIndex) => (
                     <td
                       key={colIndex}
-                      className={
-                        colIndex === 0
-                          ? "p-6 align-middle text-sm rounded-tl-xl whitespace-nowrap rounded-bl-xl"
-                          : "p-6 align-middle whitespace-nowrap text-sm"
-                      }
+                      className={`
+                        px-4 py-3 align-middle text-xs md:text-sm
+                        ${colIndex === 0 ? "rounded-tl-xl pl-6" : ""}
+                        ${
+                          colIndex === columns.length - 1 && !actions
+                            ? "rounded-tr-xl pr-6"
+                            : ""
+                        }
+                      `}
                     >
                       <div className="flex items-center space-x-2">
-                        <div className="h-4 bg-[#343434] rounded animate-pulse flex-1 max-w-[120px]"></div>
-                        {colIndex === 0 && (
-                          <div className="w-6 h-6 bg-[#343434] rounded-full animate-pulse"></div>
-                        )}
+                        <div
+                          className="h-3 rounded animate-pulse flex-1 max-w-[120px]"
+                          style={{ backgroundColor: "var(--surface-2)" }}
+                        ></div>
                       </div>
                     </td>
                   ))}
                   {actions && (
-                    <td className="p-6 align-middle rounded-tr-xl whitespace-nowrap rounded-br-xl">
-                      <div className="flex items-center space-x-2 opacity-50">
-                        <div className="w-8 h-8 bg-[#343434] rounded-md animate-pulse"></div>
-                        <div className="w-8 h-8 bg-[#343434] rounded-md animate-pulse"></div>
-                        <div className="w-8 h-8 bg-[#343434] rounded-md animate-pulse"></div>
+                    <td className="px-4 py-3 align-middle rounded-tr-xl whitespace-nowrap">
+                      <div className="flex items-center justify-end space-x-2 opacity-50">
+                        <div
+                          className="w-6 h-6 rounded-md animate-pulse"
+                          style={{ backgroundColor: "var(--surface-2)" }}
+                        ></div>
+                        <div
+                          className="w-6 h-6 rounded-md animate-pulse"
+                          style={{ backgroundColor: "var(--surface-2)" }}
+                        ></div>
                       </div>
                     </td>
                   )}
@@ -234,9 +259,74 @@ const DataTable = ({
           </table>
         </div>
 
+        {/* Tablet Skeleton */}
+        <div className="hidden md:block lg:hidden">
+          <div className="space-y-3 p-4">
+            {skeletonRows.map((rowIndex) => (
+              <div
+                key={rowIndex}
+                className="rounded-xl p-4 animate-pulse"
+                style={{
+                  backgroundColor: "var(--surface-1)",
+                  borderColor: "var(--surface-2)",
+                }}
+              >
+                <div className="space-y-3">
+                  {columns.slice(0, 2).map((_, colIndex) => (
+                    <div key={colIndex} className="space-y-2">
+                      <div
+                        className="h-3 rounded w-1/4"
+                        style={{ backgroundColor: "var(--surface-2)" }}
+                      ></div>
+                      <div
+                        className="h-4 rounded w-3/4"
+                        style={{ backgroundColor: "var(--surface-2)" }}
+                      ></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Mobile Skeleton */}
+        <div className="block md:hidden">
+          <div className="space-y-3 p-3">
+            {skeletonRows.map((rowIndex) => (
+              <div
+                key={rowIndex}
+                className="rounded-lg p-3 animate-pulse"
+                style={{
+                  backgroundColor: "var(--surface-1)",
+                  borderColor: "var(--surface-2)",
+                }}
+              >
+                <div className="space-y-2">
+                  <div
+                    className="h-3 rounded w-1/3"
+                    style={{ backgroundColor: "var(--surface-2)" }}
+                  ></div>
+                  <div
+                    className="h-4 rounded w-2/3"
+                    style={{ backgroundColor: "var(--surface-2)" }}
+                  ></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Loading Overlay */}
-        <div className="absolute inset-0 bg-[#0F0F0E]/50 backdrop-blur-sm flex items-center justify-center rounded-xl border border-[#343434]">
-          <div className="text-center">
+        <div
+          className="absolute inset-0 flex items-center justify-center rounded-xl"
+          style={{
+            backgroundColor: "rgba(15, 15, 14, 0.5)",
+            backdropFilter: "blur(4px)",
+            borderColor: "var(--surface-2)",
+          }}
+        >
+          <div className="text-center px-4">
             <LoadingSpinner
               type="pulse"
               size="lg"
@@ -252,21 +342,46 @@ const DataTable = ({
 
   // No Data State
   const NoDataState = () => (
-    <div className="flex flex-col items-center justify-center py-16 px-4 text-center bg-[#262626] rounded-xl border border-[#343434] min-h-[200px]">
-      <div className="relative mb-6">
-        <div className="w-20 h-20 bg-linear-to-br from-primary/10 to-[#94D44A]/5 rounded-full flex items-center justify-center mb-2 border border-primary/20">
-          <Inbox className="w-8 h-8 text-primary/60" />
+    <div
+      className="flex flex-col items-center justify-center py-12 px-6 text-center rounded-xl min-h-[200px]"
+      style={{
+        backgroundColor: "var(--surface-1)",
+        borderColor: "var(--surface-2)",
+      }}
+    >
+      <div className="relative mb-4">
+        <div
+          className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mb-2 border"
+          style={{
+            background:
+              "linear-gradient(to bottom right, var(--primary)/10, var(--accent-2)/5)",
+            borderColor: "var(--primary)/20",
+          }}
+        >
+          <Inbox
+            className="w-6 h-6 md:w-8 md:h-8"
+            style={{ color: "var(--primary)/60" }}
+          />
         </div>
-        <div className="absolute -top-1 -right-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center shadow-sm">
-          <Database className="w-3 h-3 text-[#0F0F0E]" />
+        <div
+          className="absolute -top-1 -right-1 w-5 h-5 md:w-6 md:h-6 rounded-full flex items-center justify-center shadow-sm"
+          style={{ backgroundColor: "var(--primary)" }}
+        >
+          <Database
+            className="w-2.5 h-2.5 md:w-3 md:h-3"
+            style={{ color: "var(--ink)" }}
+          />
         </div>
       </div>
 
-      <h4 className="text-xl font-semibold text-white mb-3 ">
+      <h4 className="text-lg md:text-xl font-semibold text-white mb-2">
         {emptyStateTitle}
       </h4>
 
-      <p className="text-placeholder max-w-md mb-6 text-sm ">
+      <p
+        className="max-w-sm md:max-w-md mb-6 text-xs md:text-sm"
+        style={{ color: "var(--muted-text)" }}
+      >
         {searchTerm
           ? "No records match your search criteria. Try adjusting your search terms."
           : emptyStateDescription}
@@ -275,9 +390,14 @@ const DataTable = ({
       {onAdd && !searchTerm && (
         <Button
           onClick={onAdd}
-          className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold "
+          className="font-semibold text-sm px-4 py-2 h-9"
+          style={{
+            background:
+              "linear-gradient(to right, var(--primary), var(--accent-2))",
+            color: "var(--ink)",
+          }}
         >
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-3.5 h-3.5 md:w-4 md:h-4 mr-2" />
           {addButtonText}
         </Button>
       )}
@@ -286,21 +406,41 @@ const DataTable = ({
 
   // Empty search results state
   const EmptySearchState = () => (
-    <div className="flex flex-col items-center justify-center py-12 px-4 text-center bg-[#262626] rounded-xl border border-[#343434] min-h-[200px]">
-      <div className="w-14 h-14 bg-[#343434] rounded-full flex items-center justify-center mb-4">
-        <Search className="w-6 h-6 text-placeholder" />
+    <div
+      className="flex flex-col items-center justify-center py-8 px-6 text-center rounded-xl min-h-[200px]"
+      style={{
+        backgroundColor: "var(--surface-1)",
+        borderColor: "var(--surface-2)",
+      }}
+    >
+      <div
+        className="w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center mb-3"
+        style={{ backgroundColor: "var(--surface-2)" }}
+      >
+        <Search
+          className="w-5 h-5 md:w-6 md:h-6"
+          style={{ color: "var(--muted-text)" }}
+        />
       </div>
-      <h4 className="text-md font-semibold text-white mb-2 ">
+      <h4 className="text-base md:text-lg font-semibold text-white mb-1">
         No results found
       </h4>
-      <p className="text-placeholder mb-4 text-sm ">
+      <p
+        className="mb-4 text-xs md:text-sm"
+        style={{ color: "var(--muted-text)" }}
+      >
         No records match "
         <span className="font-medium text-white">"{searchTerm}"</span>
       </p>
       <Button
         variant="outline"
         onClick={() => setSearchTerm("")}
-        className="px-4 py-2 bg-[#262626] border-[#343434] text-white hover:bg-[#343434] "
+        className="px-3 py-1.5 h-8 text-xs"
+        style={{
+          backgroundColor: "var(--surface-1)",
+          borderColor: "var(--surface-2)",
+          color: "white",
+        }}
       >
         Clear search
       </Button>
@@ -311,27 +451,61 @@ const DataTable = ({
   const displayTotal = isExternalPagination ? totalItems : filteredData.length;
 
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full space-y-4 md:space-y-6">
       {/* Header Section */}
-      <div className="flex flex-col w-full sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="space-y-1">{/* Optional title */}</div>
+      <div className="flex flex-col w-full lg:flex-row items-start lg:items-center justify-between gap-4">
+        {title && (
+          <div className="space-y-1">
+            <h2 className="text-xl md:text-2xl font-bold text-white">
+              {title}
+            </h2>
+          </div>
+        )}
 
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
+          {/* Search Input */}
+          {searchable && (
+            <div className="relative flex-1 sm:flex-none sm:w-64">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-(--muted-text)" />
+              <Input
+                type="text"
+                placeholder={searchPlaceholder}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 h-9 text-sm rounded-lg"
+                style={{
+                  backgroundColor: "var(--surface-1)",
+                  borderColor: "var(--surface-2)",
+                  color: "white",
+                  borderWidth: "1px",
+                }}
+              />
+            </div>
+          )}
+
           {/* Add Button */}
           {onAdd && (
             <Button
               onClick={onAdd}
-              className="bg-linear-to-r from-primary to-[#94D44A] text-[#0F0F0E] hover:from-[#94D44A] hover:to-primary font-semibold order-1 sm:order-2 w-full sm:w-auto h-9 "
+              className="font-semibold text-sm px-3 py-2 h-9 min-w-[120px]"
+              style={{
+                background:
+                  "linear-gradient(to right, var(--primary), var(--accent-2))",
+                color: "var(--ink)",
+              }}
               disabled={isLoading}
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="w-3.5 h-3.5 md:w-4 md:h-4 mr-1.5" />
               {addButtonText}
             </Button>
           )}
         </div>
       </div>
 
-      <div className="relative w-full rounded-xl bg-[#0F0F0E]">
+      <div
+        className="relative w-full rounded-xl overflow-hidden"
+        style={{ backgroundColor: "var(--surface-0)" }}
+      >
         {isLoading ? (
           <TableSkeleton />
         ) : displayTotal === 0 ? (
@@ -342,49 +516,67 @@ const DataTable = ({
           )
         ) : (
           <>
-            {/* Desktop Table */}
-            <div className="hidden md:block overflow-x-auto w-full">
-              <table className="w-full text-sm border-separate border-spacing-y-2">
-                <thead className="bg-[#262626] border-b border-[#343434]">
+            {/* Desktop Table (Large Screens) */}
+            <div className="hidden lg:block overflow-x-auto w-full">
+              <table className="w-full text-sm border-separate border-spacing-y-2 min-w-[800px]">
+                <thead
+                  style={{
+                    backgroundColor: "var(--surface-1)",
+                    borderBottomColor: "var(--surface-2)",
+                  }}
+                >
                   <tr>
                     {columns.map((column, index) => (
                       <th
                         key={index}
-                        className={
-                          index === 0
-                            ? "h-15 pl-3 text-left align-middle font-semibold text-white whitespace-nowrap text-sm uppercase tracking-wide rounded-tl-xl "
-                            : "h-15 px-6 text-left align-middle font-semibold text-white whitespace-nowrap text-sm uppercase tracking-wide "
-                        }
+                        className={`
+                          h-12 px-4 text-left align-middle font-semibold text-white 
+                          whitespace-nowrap text-xs md:text-sm uppercase tracking-wide
+                          ${index === 0 ? "rounded-tl-xl pl-6" : ""}
+                          ${
+                            index === columns.length - 1 && !actions
+                              ? "rounded-tr-xl pr-6"
+                              : ""
+                          }
+                        `}
                       >
-                        {column.header}
+                        <div className="truncate">{column.header}</div>
                       </th>
                     ))}
                     {actions && (
-                      <th className="h-15 px-3 text-left align-middle font-semibold text-white whitespace-nowrap text-sm uppercase tracking-wide w-20 rounded-tr-xl ">
-                        <div className="flex items-center space-x-2 order-2 sm:order-1">
-                          <span className="text-sm whitespace-nowrap text-placeholder ">
-                            Items per page
+                      <th className="h-12 px-4 text-left align-middle font-semibold text-white whitespace-nowrap text-xs md:text-sm uppercase tracking-wide rounded-tr-xl">
+                        <div className="flex items-center justify-end space-x-2">
+                          <span
+                            className="text-xs whitespace-nowrap hidden md:inline"
+                            style={{ color: "var(--muted-text)" }}
+                          >
+                            Items
                           </span>
                           <Select
                             value={itemsPerPage.toString()}
                             onValueChange={handleItemsPerPageChange}
                           >
-                            <SelectTrigger className="w-20 h-9 border-[#343434] bg-[#1A1A1A] text-white text-sm focus:border-primary ">
+                            <SelectTrigger
+                              className="w-16 md:w-20 h-8 text-xs"
+                              style={{
+                                borderColor: "var(--surface-2)",
+                                backgroundColor: "var(--surface-0)",
+                                color: "white",
+                              }}
+                            >
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className="bg-[#262626] border-[#343434] text-white ">
-                              <SelectItem value="5" className="">
-                                5
-                              </SelectItem>
-                              <SelectItem value="10" className="">
-                                10
-                              </SelectItem>
-                              <SelectItem value="20" className="">
-                                20
-                              </SelectItem>
-                              <SelectItem value="50" className="">
-                                50
-                              </SelectItem>
+                            <SelectContent
+                              style={{
+                                backgroundColor: "var(--surface-1)",
+                                borderColor: "var(--surface-2)",
+                                color: "white",
+                              }}
+                            >
+                              <SelectItem value="5">5</SelectItem>
+                              <SelectItem value="10">10</SelectItem>
+                              <SelectItem value="20">20</SelectItem>
+                              <SelectItem value="50">50</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -392,20 +584,24 @@ const DataTable = ({
                     )}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#343434] bg-[#1A1A1A] border-b border-[#343434]">
+                <tbody style={{ borderBottomColor: "var(--surface-2)" }}>
                   {displayData.map((row, rowIndex) => (
                     <tr
                       key={rowIndex}
-                      className="group transition-all duration-200 hover:bg-[#262626] even:bg-[#1A1A1A] text-sm "
+                      className="group transition-all duration-200 hover:bg-[var(--surface-1)] even:bg-[var(--surface-0)] text-sm"
                     >
                       {columns.map((column, colIndex) => (
                         <td
                           key={colIndex}
-                          className={
-                            colIndex === 0
-                              ? "p-6 align-middle text-sm rounded-tl-xl whitespace-nowrap rounded-bl-xl"
-                              : "p-6 align-middle whitespace-nowrap text-sm"
-                          }
+                          className={`
+                            px-4 py-3 align-middle text-xs md:text-sm
+                            ${colIndex === 0 ? "rounded-tl-xl pl-6" : ""}
+                            ${
+                              colIndex === columns.length - 1 && !actions
+                                ? "rounded-tr-xl pr-6"
+                                : ""
+                            }
+                          `}
                         >
                           {column.cell ? (
                             column.cell({ row })
@@ -413,12 +609,12 @@ const DataTable = ({
                             column.badge ? (
                               <Badge
                                 variant={getBadgeVariant(row[column.accessor])}
-                                className="whitespace-nowrap text-sm font-medium "
+                                className="whitespace-nowrap text-xs font-medium"
                               >
                                 {row[column.accessor]}
                               </Badge>
                             ) : (
-                              <span className="text-white whitespace-nowrap ">
+                              <span className="text-white whitespace-nowrap truncate block max-w-[200px]">
                                 {row[column.accessor]}
                               </span>
                             )
@@ -426,8 +622,8 @@ const DataTable = ({
                         </td>
                       ))}
                       {actions && (
-                        <td className="p-6 align-middle rounded-tr-xl whitespace-nowrap rounded-br-xl">
-                          <div className="flex items-center whitespace-nowrap gap-1 opacity-80 group-hover:opacity-100 transition-opacity duration-200">
+                        <td className="px-4 py-3 align-middle rounded-tr-xl whitespace-nowrap">
+                          <div className="flex items-center justify-end gap-2 opacity-80 group-hover:opacity-100 transition-opacity duration-200">
                             {actions({ row })}
                           </div>
                         </td>
@@ -438,95 +634,224 @@ const DataTable = ({
               </table>
             </div>
 
-            {/* Mobile Cards */}
-            <div className="block md:hidden space-y-3 p-4">
-              {displayData.map((row, rowIndex) => (
-                <div
-                  key={rowIndex}
-                  className="bg-[#262626] border border-[#343434] rounded-xl p-4 space-y-3 shadow-sm hover:shadow-md transition-shadow duration-200"
-                >
-                  {/* Main content */}
-                  <div className="space-y-2">
-                    {columns.slice(0, 2).map((column, colIndex) => (
-                      <div
-                        key={colIndex}
-                        className="flex justify-between items-start"
-                      >
-                        <span className="text-xs font-medium text-placeholder uppercase tracking-wide ">
-                          {column.header}:
-                        </span>
-                        <div className="text-right max-w-[60%]">
-                          {column.cell ? (
-                            column.cell({ row })
-                          ) : column.accessor ? (
-                            column.badge ? (
-                              <Badge
-                                variant={getBadgeVariant(row[column.accessor])}
-                                className="text-xs font-medium "
-                              >
-                                {row[column.accessor]}
-                              </Badge>
-                            ) : (
-                              <span className="text-white text-sm font-medium truncate block ">
-                                {row[column.accessor]}
-                              </span>
-                            )
-                          ) : null}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Additional fields */}
-                  {columns.length > 2 && (
-                    <div className="pt-2 border-t border-[#343434]">
-                      <div className="space-y-2">
-                        {columns.slice(2).map((column, colIndex) => (
-                          <div
-                            key={colIndex}
-                            className="flex justify-between items-start"
+            {/* Tablet View (Medium Screens) */}
+            <div className="hidden md:block lg:hidden">
+              <div className="space-y-3 p-4">
+                {displayData.map((row, rowIndex) => (
+                  <div
+                    key={rowIndex}
+                    className="rounded-xl p-4 space-y-4 shadow-sm hover:shadow-md transition-shadow duration-200"
+                    style={{
+                      backgroundColor: "var(--surface-1)",
+                      borderColor: "var(--surface-2)",
+                    }}
+                  >
+                    {/* Main content */}
+                    <div className="space-y-3">
+                      {columns.slice(0, 2).map((column, colIndex) => (
+                        <div
+                          key={colIndex}
+                          className="flex justify-between items-start"
+                        >
+                          <span
+                            className="text-xs font-medium uppercase tracking-wide min-w-[100px]"
+                            style={{ color: "var(--muted-text)" }}
                           >
-                            <span className="text-xs font-medium text-placeholder uppercase tracking-wide ">
-                              {column.header}:
-                            </span>
-                            <div className="text-right max-w-[60%]">
-                              {column.cell ? (
-                                column.cell({ row })
-                              ) : column.accessor ? (
-                                column.badge ? (
-                                  <Badge
-                                    variant={getBadgeVariant(
-                                      row[column.accessor]
-                                    )}
-                                    className="text-xs font-medium "
-                                  >
-                                    {row[column.accessor]}
-                                  </Badge>
-                                ) : (
-                                  <span className="text-white text-sm truncate block ">
-                                    {row[column.accessor]}
-                                  </span>
-                                )
-                              ) : null}
-                            </div>
+                            {column.header}:
+                          </span>
+                          <div className="text-right flex-1 pl-4">
+                            {column.cell ? (
+                              column.cell({ row })
+                            ) : column.accessor ? (
+                              column.badge ? (
+                                <Badge
+                                  variant={getBadgeVariant(
+                                    row[column.accessor]
+                                  )}
+                                  className="text-xs font-medium"
+                                >
+                                  {row[column.accessor]}
+                                </Badge>
+                              ) : (
+                                <span className="text-white text-sm font-medium truncate block">
+                                  {row[column.accessor]}
+                                </span>
+                              )
+                            ) : null}
                           </div>
-                        ))}
-                      </div>
+                        </div>
+                      ))}
                     </div>
-                  )}
 
-                  {/* Actions for mobile */}
-                  {actions && (
-                    <div className="pt-3 border-t border-[#343434]">
-                      <div className="flex justify-end">
-                        <div className="flex items-center gap-2">
-                          {actions({ row })}
+                    {/* Additional fields */}
+                    {columns.length > 2 && (
+                      <div
+                        className="pt-3"
+                        style={{ borderTopColor: "var(--surface-2)" }}
+                      >
+                        <div className="space-y-2">
+                          {columns.slice(2).map((column, colIndex) => (
+                            <div
+                              key={colIndex}
+                              className="flex justify-between items-start"
+                            >
+                              <span
+                                className="text-xs font-medium uppercase tracking-wide min-w-[100px]"
+                                style={{ color: "var(--muted-text)" }}
+                              >
+                                {column.header}:
+                              </span>
+                              <div className="text-right flex-1 pl-4">
+                                {column.cell ? (
+                                  column.cell({ row })
+                                ) : column.accessor ? (
+                                  column.badge ? (
+                                    <Badge
+                                      variant={getBadgeVariant(
+                                        row[column.accessor]
+                                      )}
+                                      className="text-xs font-medium"
+                                    >
+                                      {row[column.accessor]}
+                                    </Badge>
+                                  ) : (
+                                    <span className="text-white text-sm truncate block">
+                                      {row[column.accessor]}
+                                    </span>
+                                  )
+                                ) : null}
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
+                    )}
+
+                    {/* Actions for tablet */}
+                    {actions && (
+                      <div
+                        className="pt-3"
+                        style={{ borderTopColor: "var(--surface-2)" }}
+                      >
+                        <div className="flex justify-end">
+                          <div className="flex items-center gap-2">
+                            {actions({ row })}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Mobile View (Small Screens) */}
+            <div className="block md:hidden">
+              <div className="space-y-3 p-3">
+                {displayData.map((row, rowIndex) => (
+                  <div
+                    key={rowIndex}
+                    className="rounded-lg p-3 space-y-3 shadow-sm hover:shadow-md transition-shadow duration-200"
+                    style={{
+                      backgroundColor: "var(--surface-1)",
+                      borderColor: "var(--surface-2)",
+                    }}
+                  >
+                    {/* Main content - stacked vertically */}
+                    <div className="space-y-2">
+                      {columns.slice(0, 2).map((column, colIndex) => (
+                        <div key={colIndex} className="space-y-1">
+                          <span
+                            className="text-[10px] font-medium uppercase tracking-wide"
+                            style={{ color: "var(--muted-text)" }}
+                          >
+                            {column.header}
+                          </span>
+                          <div className="text-sm">
+                            {column.cell ? (
+                              <div className="scale-75 origin-left">
+                                {column.cell({ row })}
+                              </div>
+                            ) : column.accessor ? (
+                              column.badge ? (
+                                <Badge
+                                  variant={getBadgeVariant(
+                                    row[column.accessor]
+                                  )}
+                                  className="text-[10px] font-medium py-0 h-5"
+                                >
+                                  {row[column.accessor]}
+                                </Badge>
+                              ) : (
+                                <span className="text-white text-sm font-medium truncate block">
+                                  {row[column.accessor]}
+                                </span>
+                              )
+                            ) : null}
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  )}
-                </div>
-              ))}
+
+                    {/* Additional fields */}
+                    {columns.length > 2 && (
+                      <div
+                        className="pt-2"
+                        style={{ borderTopColor: "var(--surface-2)" }}
+                      >
+                        <div className="space-y-2">
+                          {columns.slice(2).map((column, colIndex) => (
+                            <div key={colIndex} className="space-y-1">
+                              <span
+                                className="text-[10px] font-medium uppercase tracking-wide"
+                                style={{ color: "var(--muted-text)" }}
+                              >
+                                {column.header}
+                              </span>
+                              <div className="text-sm">
+                                {column.cell ? (
+                                  <div className="scale-75 origin-left">
+                                    {column.cell({ row })}
+                                  </div>
+                                ) : column.accessor ? (
+                                  column.badge ? (
+                                    <Badge
+                                      variant={getBadgeVariant(
+                                        row[column.accessor]
+                                      )}
+                                      className="text-[10px] font-medium py-0 h-5"
+                                    >
+                                      {row[column.accessor]}
+                                    </Badge>
+                                  ) : (
+                                    <span className="text-white text-sm truncate block">
+                                      {row[column.accessor]}
+                                    </span>
+                                  )
+                                ) : null}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Actions for mobile */}
+                    {actions && (
+                      <div
+                        className="pt-2"
+                        style={{ borderTopColor: "var(--surface-2)" }}
+                      >
+                        <div className="flex justify-end">
+                          <div className="flex items-center gap-1 flex-wrap justify-end">
+                            {actions({ row })}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           </>
         )}
@@ -534,9 +859,18 @@ const DataTable = ({
 
       {/* Pagination */}
       {!isLoading && displayTotal > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-end gap-4 p-4 border-[#343434] bg-[#262626] rounded-xl">
+        <div
+          className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-xl"
+          style={{
+            borderColor: "var(--surface-2)",
+            backgroundColor: "var(--surface-1)",
+          }}
+        >
           {/* Results info */}
-          <div className="text-sm text-placeholder ">
+          <div
+            className="text-xs md:text-sm"
+            style={{ color: "var(--muted-text)" }}
+          >
             <span className="font-medium text-white">
               {(currentPage - 1) * itemsPerPage + 1}
             </span>{" "}
@@ -545,7 +879,7 @@ const DataTable = ({
               {Math.min(currentPage * itemsPerPage, displayTotal)}
             </span>{" "}
             of <span className="font-medium text-white">{displayTotal}</span>{" "}
-            results
+            {displayTotal === 1 ? "result" : "results"}
           </div>
 
           {/* Pagination controls */}
@@ -556,9 +890,14 @@ const DataTable = ({
               size="sm"
               onClick={goToFirstPage}
               disabled={currentPage === 1}
-              className="h-8 w-8 p-0 border-[#343434] bg-[#1A1A1A] text-white hover:bg-[#343434]"
+              className="h-7 w-7 md:h-8 md:w-8 p-0"
+              style={{
+                borderColor: "var(--surface-2)",
+                backgroundColor: "var(--surface-0)",
+                color: "white",
+              }}
             >
-              <ChevronsLeft className="w-3.5 h-3.5" />
+              <ChevronsLeft className="w-3 h-3 md:w-3.5 md:h-3.5" />
               <span className="sr-only">First page</span>
             </Button>
 
@@ -568,9 +907,14 @@ const DataTable = ({
               size="sm"
               onClick={() => goToPage(currentPage - 1)}
               disabled={currentPage === 1}
-              className="h-8 w-8 p-0 border-[#343434] bg-[#1A1A1A] text-white hover:bg-[#343434]"
+              className="h-7 w-7 md:h-8 md:w-8 p-0"
+              style={{
+                borderColor: "var(--surface-2)",
+                backgroundColor: "var(--surface-0)",
+                color: "white",
+              }}
             >
-              <ChevronLeft className="w-3.5 h-3.5" />
+              <ChevronLeft className="w-3 h-3 md:w-3.5 md:h-3.5" />
               <span className="sr-only">Previous page</span>
             </Button>
 
@@ -582,17 +926,31 @@ const DataTable = ({
                 size="sm"
                 onClick={() => goToPage(page)}
                 disabled={page === "..."}
-                className={
+                className={`
+                  h-7 w-7 md:h-8 md:w-8 p-0 min-w-7 md:min-w-8
+                  ${page === "..." ? "border-0 cursor-default" : ""}
+                  ${
+                    currentPage === page
+                      ? "border-primary"
+                      : "border-[var(--surface-2)]"
+                  }
+                `}
+                style={
                   page === "..."
-                    ? "h-8 w-8 p-0 border-0 cursor-default text-placeholder bg-transparent "
-                    : `h-8 w-8 p-0 min-w-8  ${
-                        currentPage === page
-                          ? "bg-primary text-[#0F0F0E] border-primary"
-                          : "border-[#343434] bg-[#1A1A1A] text-white hover:bg-[#343434]"
-                      }`
+                    ? {
+                        color: "var(--muted-text)",
+                        backgroundColor: "transparent",
+                      }
+                    : currentPage === page
+                    ? {
+                        backgroundColor: "var(--primary)",
+                        color: "var(--ink)",
+                        borderColor: "var(--primary)",
+                      }
+                    : { backgroundColor: "var(--surface-0)", color: "white" }
                 }
               >
-                {page}
+                <span className="text-xs md:text-sm">{page}</span>
               </Button>
             ))}
 
@@ -602,9 +960,14 @@ const DataTable = ({
               size="sm"
               onClick={() => goToPage(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="h-8 w-8 p-0 border-[#343434] bg-[#1A1A1A] text-white hover:bg-[#343434]"
+              className="h-7 w-7 md:h-8 md:w-8 p-0"
+              style={{
+                borderColor: "var(--surface-2)",
+                backgroundColor: "var(--surface-0)",
+                color: "white",
+              }}
             >
-              <ChevronRight className="w-3.5 h-3.5" />
+              <ChevronRight className="w-3 h-3 md:w-3.5 md:h-3.5" />
               <span className="sr-only">Next page</span>
             </Button>
 
@@ -614,9 +977,14 @@ const DataTable = ({
               size="sm"
               onClick={goToLastPage}
               disabled={currentPage === totalPages}
-              className="h-8 w-8 p-0 border-[#343434] bg-[#1A1A1A] text-white hover:bg-[#343434]"
+              className="h-7 w-7 md:h-8 md:w-8 p-0"
+              style={{
+                borderColor: "var(--surface-2)",
+                backgroundColor: "var(--surface-0)",
+                color: "white",
+              }}
             >
-              <ChevronsRight className="w-3.5 h-3.5" />
+              <ChevronsRight className="w-3 h-3 md:w-3.5 md:h-3.5" />
               <span className="sr-only">Last page</span>
             </Button>
           </div>
