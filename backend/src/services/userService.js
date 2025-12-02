@@ -26,8 +26,9 @@ export const getUserDashboard = async (userId) => {
       .from("player_reports")
       .select("*")
       .eq("player_id", userId)
-      .order("created_at", { ascending: false })
-      .limit(3);
+      .order("created_at", { ascending: false });
+
+    let totalReports = recentReports.length;
 
     if (reportsError) throw reportsError;
 
@@ -73,7 +74,8 @@ export const getUserDashboard = async (userId) => {
         player_id: userId, // player_id is now the user id
         identity: playerIdentity, // player identity data with verfication status
       },
-      recentReports: recentReports || [],
+      totalReports: totalReports || 0,
+      recentReports: recentReports.slice(0, 3) || [],
       progressData: metricsData || [],
       benchmarkData,
     };

@@ -1,4 +1,3 @@
-// Reports.jsx - Updated to display more fields from server response
 import React, { useState, useEffect } from "react";
 import { useUserStore } from "@/store/userStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,7 +15,6 @@ import {
   Trophy,
   Zap,
   BarChart3,
-  DownloadIcon,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import DataTable from "@/components/common/DataTable";

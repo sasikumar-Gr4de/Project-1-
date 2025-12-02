@@ -111,7 +111,8 @@ const Dashboard = () => {
     );
   }
 
-  const { user, recentReports, progressData, benchmarks } = localData || {};
+  const { user, totalReports, recentReports, progressData, benchmarks } =
+    localData || {};
   const latestReport = recentReports?.[0];
 
   // Calculate player name from identity data
@@ -169,11 +170,11 @@ const Dashboard = () => {
         {/* Total Reports */}
         <StatsCard
           title="Total Reports"
-          value={recentReports?.length || 0}
+          value={totalReports || 0}
           description={
-            recentReports?.length ? "All time reports" : "No reports generated"
+            totalReports ? "All time reports" : "No reports generated"
           }
-          icon={Award}
+          icon={FileText}
           gradient="from-[var(--color-blue-light)] to-[var(--color-blue)]"
           valueColor="text-[var(--color-blue-light)]"
           className="text-sm"
@@ -234,7 +235,7 @@ const Dashboard = () => {
               <div className="space-y-4">
                 {recentReports.map((report, index) => (
                   <div
-                    key={report.report_id}
+                    key={report.id}
                     className="flex items-center justify-between p-4 border rounded-xl bg-(--surface-0) border-(--surface-2) hover:border-primary/30 transition-all duration-300 group"
                   >
                     <div className="flex items-center space-x-4">
